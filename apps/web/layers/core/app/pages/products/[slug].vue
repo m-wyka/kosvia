@@ -52,7 +52,7 @@ watchEffect(() => {
 });
 
 async function createAlert() {
-  if (!product.value || !alertPrice.value) return;
+  if (!product.value || !alertPrice.value) {return;}
   alertSaving.value = true;
   try {
     await api('/price-alerts', {
@@ -73,7 +73,7 @@ async function createAlert() {
 
 const facts = computed(() => {
   const value = product.value;
-  if (!value) return [];
+  if (!value) {return [];}
   return [
     { label: t('PRODUCT.SIZE'), value: formatVolume(value.volume, value.volumeUnit) },
     {
@@ -90,11 +90,11 @@ const facts = computed(() => {
 
 const badges = computed(() => {
   const value = product.value;
-  if (!value) return [];
+  if (!value) {return [];}
   const list: Array<{ label: string; tone: 'sage' | 'lavender' | 'peach' }> = [];
-  if (value.isFragranceFree) list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });
-  if (value.isVegan) list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });
-  if (value.isCrueltyFree) list.push({ label: t('SEARCH.FILTER.CRUELTY_FREE'), tone: 'peach' });
+  if (value.isFragranceFree) {list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });}
+  if (value.isVegan) {list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });}
+  if (value.isCrueltyFree) {list.push({ label: t('SEARCH.FILTER.CRUELTY_FREE'), tone: 'peach' });}
   return list;
 });
 

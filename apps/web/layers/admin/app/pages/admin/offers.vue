@@ -117,7 +117,7 @@ async function save() {
     },
     t('ADMIN.OFFERS.SAVED'),
   );
-  if (result) modalOpen.value = false;
+  if (result) {modalOpen.value = false;}
 }
 
 const AVAILABILITY = ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'UNKNOWN'] as const;

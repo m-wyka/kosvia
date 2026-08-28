@@ -1,6 +1,10 @@
-/** Keeps signed-in users off the login and register pages. */
 export default defineNuxtRouteMiddleware(async () => {
-  const auth = useAuthStore();
-  await auth.init();
-  if (auth.isAuthenticated) return navigateTo(useLocalePath()('/dashboard'));
+  const { isAuthenticated } = storeToRefs(useAuthStore());
+  const { init } = useAuthStore();
+  await init();
+
+  if (isAuthenticated.value) {
+    const localePath = useLocalePath();
+    return navigateTo(localePath('/dashboard'));
+  }
 });

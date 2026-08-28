@@ -120,7 +120,7 @@ async function save() {
   const result = editing.value
     ? await resource.update(editing.value.id, body, t('ADMIN.INGREDIENTS.SAVED'))
     : await resource.create(body, t('ADMIN.INGREDIENTS.CREATED'));
-  if (result) modalOpen.value = false;
+  if (result) {modalOpen.value = false;}
 }
 
 function toggle(list: string[], value: string): string[] {

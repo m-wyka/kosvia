@@ -16,10 +16,10 @@ const vocab = useVocabulary();
 const queryString = computed(() => {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(route.query)) {
-    if (value === undefined || value === null || value === '') continue;
+    if (value === undefined || value === null || value === '') {continue;}
     params.set(key, String(value));
   }
-  if (!params.has('pageSize')) params.set('pageSize', '24');
+  if (!params.has('pageSize')) {params.set('pageSize', '24');}
   return params.toString();
 });
 
@@ -54,7 +54,7 @@ const sort = computed({
 const page = computed(() => Number(route.query.page ?? 1));
 function goToPage(next: number) {
   router.push({ query: { ...route.query, page: next === 1 ? undefined : next } });
-  if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (import.meta.client) {window.scrollTo({ top: 0, behavior: 'smooth' });}
 }
 
 const filtersOpen = ref(false);
@@ -62,12 +62,12 @@ const searchTerm = computed(() => (route.query.q as string) ?? '');
 
 const activeCategory = computed(() => {
   const slug = route.query.category as string | undefined;
-  if (!slug) return null;
+  if (!slug) {return null;}
   const find = (nodes: CategoryDto[]): CategoryDto | null => {
     for (const node of nodes) {
-      if (node.slug === slug) return node;
+      if (node.slug === slug) {return node;}
       const found = node.children?.length ? find(node.children) : null;
-      if (found) return found;
+      if (found) {return found;}
     }
     return null;
   };
@@ -75,7 +75,7 @@ const activeCategory = computed(() => {
 });
 
 const heading = computed(() => {
-  if (searchTerm.value) return t('SEARCH.RESULTS_FOR', { query: searchTerm.value });
+  if (searchTerm.value) {return t('SEARCH.RESULTS_FOR', { query: searchTerm.value });}
   if (activeCategory.value) {
     return vocab.category(activeCategory.value.slug, activeCategory.value.name);
   }

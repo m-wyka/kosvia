@@ -9,7 +9,7 @@ const titleId = useId();
 
 // Escape to close, and the page behind must not scroll while the modal is up.
 onKeyStroke('Escape', () => {
-  if (open.value) open.value = false;
+  if (open.value) {open.value = false;}
 });
 
 watchEffect(() => {
@@ -18,7 +18,7 @@ watchEffect(() => {
   }
 });
 onUnmounted(() => {
-  if (import.meta.client) document.documentElement.style.overflow = '';
+  if (import.meta.client) {document.documentElement.style.overflow = '';}
 });
 
 const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };

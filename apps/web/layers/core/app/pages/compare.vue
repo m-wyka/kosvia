@@ -30,7 +30,7 @@ const { data, pending, error, refresh } = await useApiFetch<ComparisonResultDto>
 function removeProduct(slug: string) {
   const next = slugs.value.filter((entry) => entry !== slug);
   const removed = compare.items.find((item) => item.slug === slug);
-  if (removed) compare.remove(removed.id);
+  if (removed) {compare.remove(removed.id);}
   router.replace({ query: next.length ? { products: next.join(',') } : {} });
 }
 
@@ -41,10 +41,10 @@ const winnerIndex = computed(() =>
 );
 
 function formatCell(key: string, value: string | number | null): string {
-  if (value === null) return t('COMMON.NOT_AVAILABLE');
-  if (typeof value !== 'number') return value;
-  if (key === 'price' || key === 'price-per-100') return format.price(value);
-  if (key === 'match') return `${value}%`;
+  if (value === null) {return t('COMMON.NOT_AVAILABLE');}
+  if (typeof value !== 'number') {return value;}
+  if (key === 'price' || key === 'price-per-100') {return format.price(value);}
+  if (key === 'match') {return `${value}%`;}
   return String(value);
 }
 

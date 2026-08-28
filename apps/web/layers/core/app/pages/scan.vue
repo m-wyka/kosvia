@@ -17,7 +17,7 @@ const notFound = ref(false);
 
 async function lookup() {
   const code = ean.value.trim();
-  if (!code) return;
+  if (!code) {return;}
   looking.value = true;
   notFound.value = false;
   try {

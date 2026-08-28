@@ -49,7 +49,6 @@ describe('ProductCard', () => {
     const component = mount(ProductCard, { props: { product: product() } });
     const text = component.text();
 
-    // Prices follow Polish conventions, and the tags come from the locale file.
     expect(text).toContain('59,99 zł');
     expect(text).toContain('92% dopasowania');
     expect(text).toContain('Bezzapachowe');

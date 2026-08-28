@@ -37,7 +37,7 @@ const locales = Object.fromEntries(
 function walk(dir) {
   return readdirSync(dir).flatMap((entry) => {
     const full = join(dir, entry);
-    if (entry === 'node_modules' || entry.startsWith('.')) return [];
+    if (entry === 'node_modules' || entry.startsWith('.')) {return [];}
     return statSync(full).isDirectory() ? walk(full) : [full];
   });
 }
@@ -71,10 +71,10 @@ const problems = [];
 for (const other of others) {
   const otherKeys = new Set(flatten(locales[other]));
   for (const key of referenceKeys) {
-    if (!otherKeys.has(key)) problems.push(`missing in ${other}.json: ${key}`);
+    if (!otherKeys.has(key)) {problems.push(`missing in ${other}.json: ${key}`);}
   }
   for (const key of otherKeys) {
-    if (!referenceKeys.has(key)) problems.push(`missing in ${reference}.json: ${key}`);
+    if (!referenceKeys.has(key)) {problems.push(`missing in ${reference}.json: ${key}`);}
   }
 }
 
@@ -94,13 +94,13 @@ console.log(`keys: ${referenceKeys.size} · used statically: ${staticKeys.size} 
 
 if (unused.length) {
   console.log(`\nunused keys (${unused.length}):`);
-  for (const key of unused.slice(0, 40)) console.log(`  ${key}`);
-  if (unused.length > 40) console.log(`  … and ${unused.length - 40} more`);
+  for (const key of unused.slice(0, 40)) {console.log(`  ${key}`);}
+  if (unused.length > 40) {console.log(`  … and ${unused.length - 40} more`);}
 }
 
 if (problems.length) {
   console.error(`\n✖ ${problems.length} problem(s):`);
-  for (const problem of problems) console.error(`  ${problem}`);
+  for (const problem of problems) {console.error(`  ${problem}`);}
   process.exit(1);
 }
 

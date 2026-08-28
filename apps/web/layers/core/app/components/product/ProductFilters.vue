@@ -23,7 +23,7 @@ const query = computed(() => route.query);
 function update(patch: Record<string, string | number | boolean | undefined>) {
   const next: Record<string, string> = {};
   for (const [key, value] of Object.entries({ ...route.query, ...patch })) {
-    if (value === undefined || value === '' || value === false || value === null) continue;
+    if (value === undefined || value === '' || value === false || value === null) {continue;}
     next[key] = String(value);
   }
   delete next.page;
@@ -46,7 +46,7 @@ const flatCategories = computed(() => {
   const walk = (nodes: CategoryDto[], depth: number) => {
     for (const node of nodes) {
       output.push({ slug: node.slug, name: vocab.category(node.slug, node.name), depth });
-      if (node.children?.length) walk(node.children, depth + 1);
+      if (node.children?.length) {walk(node.children, depth + 1);}
     }
   };
   walk(props.categories, 0);
@@ -67,8 +67,8 @@ const activeCount = computed(
 
 function clearAll() {
   const preserved: Record<string, string> = {};
-  if (route.query.q) preserved.q = String(route.query.q);
-  if (route.query.sort) preserved.sort = String(route.query.sort);
+  if (route.query.q) {preserved.q = String(route.query.q);}
+  if (route.query.sort) {preserved.sort = String(route.query.sort);}
   router.push({ path: route.path, query: preserved });
 }
 </script>

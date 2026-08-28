@@ -12,10 +12,6 @@ const match = (overrides: Partial<PersonalMatchDto> = {}): PersonalMatchDto => (
   ...overrides,
 });
 
-/**
- * The match score is the most load-bearing number in the product, so its
- * accessible labelling and its non-personalised fallback are worth asserting.
- */
 describe('MatchScore', () => {
   it('renders the score and its tier', () => {
     const component = mount(MatchScore, { props: { match: match() } });

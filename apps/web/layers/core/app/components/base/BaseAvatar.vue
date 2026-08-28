@@ -3,7 +3,7 @@ const props = withDefaults(defineProps<{ name?: string | null; size?: number }>(
 
 const initials = computed(() => {
   const source = props.name?.trim();
-  if (!source) return '?';
+  if (!source) {return '?';}
   const parts = source.split(/\s+/).filter(Boolean);
   const initialsFromWords = parts.length > 1 ? `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}` : '';
   return (initialsFromWords || source.slice(0, 2)).toUpperCase();

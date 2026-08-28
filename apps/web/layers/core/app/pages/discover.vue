@@ -44,8 +44,8 @@ function sectionTitle(section: { key: string; title: string }): string {
     const ceiling = /(\d+)/.exec(section.title)?.[1] ?? '50';
     return t('DISCOVER.SECTION.BEST_VALUE', { price: ceiling });
   }
-  if (section.key === 'fragrance-free') return t('DISCOVER.SECTION.FRAGRANCE_FREE');
-  if (section.key === 'daily-spf') return t('DISCOVER.SECTION.DAILY_SPF');
+  if (section.key === 'fragrance-free') {return t('DISCOVER.SECTION.FRAGRANCE_FREE');}
+  if (section.key === 'daily-spf') {return t('DISCOVER.SECTION.DAILY_SPF');}
   return section.title;
 }
 
@@ -55,10 +55,10 @@ function sectionSubtitle(section: { key: string; subtitle: string | null }): str
       ? t('DISCOVER.SECTION.RECOMMENDED_SUBTITLE_PERSONAL')
       : t('DISCOVER.SECTION.RECOMMENDED_SUBTITLE_GENERIC');
   }
-  if (section.key.startsWith('concern-')) return t('DISCOVER.SECTION.CONCERN_SUBTITLE');
-  if (section.key === 'best-value') return t('DISCOVER.SECTION.BEST_VALUE_SUBTITLE');
-  if (section.key === 'fragrance-free') return t('DISCOVER.SECTION.FRAGRANCE_FREE_SUBTITLE');
-  if (section.key === 'daily-spf') return t('DISCOVER.SECTION.DAILY_SPF_SUBTITLE');
+  if (section.key.startsWith('concern-')) {return t('DISCOVER.SECTION.CONCERN_SUBTITLE');}
+  if (section.key === 'best-value') {return t('DISCOVER.SECTION.BEST_VALUE_SUBTITLE');}
+  if (section.key === 'fragrance-free') {return t('DISCOVER.SECTION.FRAGRANCE_FREE_SUBTITLE');}
+  if (section.key === 'daily-spf') {return t('DISCOVER.SECTION.DAILY_SPF_SUBTITLE');}
   return section.subtitle;
 }
 </script>

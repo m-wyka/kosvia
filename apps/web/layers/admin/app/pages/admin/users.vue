@@ -39,7 +39,7 @@ async function setRole(user: UserRow, role: 'USER' | 'ADMIN') {
 }
 
 async function confirmDelete(user: UserRow) {
-  if (!confirm(t('ADMIN.USERS.CONFIRM_DELETE', { email: user.email }))) return;
+  if (!confirm(t('ADMIN.USERS.CONFIRM_DELETE', { email: user.email }))) {return;}
   await resource.remove(user.id, t('ADMIN.USERS.DELETED'));
 }
 

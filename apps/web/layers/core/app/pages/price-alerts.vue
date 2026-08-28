@@ -37,7 +37,7 @@ async function remove(alert: PriceAlertDto) {
 }
 
 function distance(alert: PriceAlertDto): string {
-  if (alert.product.lowestPrice === null) return t('ALERTS.NO_PRICE');
+  if (alert.product.lowestPrice === null) {return t('ALERTS.NO_PRICE');}
   const gap = alert.product.lowestPrice - alert.targetPrice;
   return gap <= 0
     ? t('ALERTS.BELOW', { amount: format.price(Math.abs(gap)) })

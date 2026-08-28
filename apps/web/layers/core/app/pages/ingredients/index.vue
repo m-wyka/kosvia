@@ -18,8 +18,8 @@ watchDebounced(
 const { data, pending, error, refresh } = await useApiFetch<IngredientDto[]>(
   () => {
     const params = new URLSearchParams();
-    if (route.query.q) params.set('q', String(route.query.q));
-    if (route.query.tag) params.set('tag', String(route.query.tag));
+    if (route.query.q) {params.set('q', String(route.query.q));}
+    if (route.query.tag) {params.set('tag', String(route.query.tag));}
     params.set('take', '120');
     return `/ingredients?${params.toString()}`;
   },

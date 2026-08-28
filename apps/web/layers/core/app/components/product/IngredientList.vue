@@ -25,11 +25,11 @@ const grouped = computed(() => {
   const used = new Set<string>();
   const result = GROUPS.map((group) => {
     const members = props.ingredients.filter((entry) => {
-      if (used.has(entry.ingredient.id)) return false;
+      if (used.has(entry.ingredient.id)) {return false;}
       const match =
         (group.key === 'ACTIVES' && entry.ingredient.isActiveIngredient) ||
         entry.ingredient.tags.some((tag) => group.tags.includes(tag));
-      if (match) used.add(entry.ingredient.id);
+      if (match) {used.add(entry.ingredient.id);}
       return match;
     });
     return { ...group, members };

@@ -26,7 +26,7 @@ definePageMeta({
       // second request — and awaiting inside route middleware would lose the
       // Nuxt instance before `navigateTo` runs (NUXT_E1001).
       const auth = useAuthStore();
-      if (!auth.needsOnboarding) return navigateTo(useLocalePath()('/profile'));
+      if (!auth.needsOnboarding) {return navigateTo(useLocalePath()('/profile'));}
     },
   ],
 });
@@ -72,7 +72,7 @@ const progress = computed(() => ((step.value + 1) / steps.length) * 100);
 const isLast = computed(() => step.value === steps.length - 1);
 
 function next() {
-  if (isLast.value) return save();
+  if (isLast.value) {return save();}
   step.value += 1;
 }
 

@@ -5,26 +5,40 @@ export interface Toast {
   action?: { label: string; to: string };
 }
 
+interface PushOptions {
+  tone?: Toast['tone'];
+  action?: Toast['action'];
+  duration?: number;
+}
+
+const DEFAULT_DURATION_MS = 4200;
+const ERROR_DURATION_MS = 6000;
+
 const toasts = ref<Toast[]>([]);
 let nextId = 0;
 
-/** Lightweight confirmations for actions that would otherwise happen silently. */
-export function useToast() {
-  function push(message: string, options: { tone?: Toast['tone']; action?: Toast['action']; duration?: number } = {}) {
-    const toast: Toast = { id: nextId++, message, tone: options.tone ?? 'neutral', action: options.action };
-    toasts.value = [...toasts.value, toast];
-    setTimeout(() => dismiss(toast.id), options.duration ?? 4200);
-  }
-
-  function dismiss(id: number) {
+export const useToast = () => {
+  const dismiss = (id: number) => {
     toasts.value = toasts.value.filter((toast) => toast.id !== id);
-  }
+  };
+
+  const push = (message: string, options: PushOptions = {}) => {
+    const toast: Toast = {
+      id: nextId++,
+      message,
+      tone: options.tone ?? 'neutral',
+      action: options.action,
+    };
+    toasts.value = [...toasts.value, toast];
+    setTimeout(() => dismiss(toast.id), options.duration ?? DEFAULT_DURATION_MS);
+  };
 
   return {
     toasts: readonly(toasts),
     dismiss,
     notify: (message: string, action?: Toast['action']) => push(message, { action }),
-    success: (message: string, action?: Toast['action']) => push(message, { tone: 'positive', action }),
-    error: (message: string) => push(message, { tone: 'critical', duration: 6000 }),
+    success: (message: string, action?: Toast['action']) =>
+      push(message, { tone: 'positive', action }),
+    error: (message: string) => push(message, { tone: 'critical', duration: ERROR_DURATION_MS }),
   };
-}
+};

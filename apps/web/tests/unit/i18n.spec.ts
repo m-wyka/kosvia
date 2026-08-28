@@ -32,8 +32,6 @@ describe('locale files', () => {
   });
 
   it('only leaves a value untranslated where Polish genuinely uses the same word', () => {
-    // Loanwords, technical terms, brand names and pure format templates. Any
-    // key that drifts onto this list is a translation someone forgot to write.
     const SAME_IN_BOTH = new Set([
       'COMMON.NOT_AVAILABLE',
       'LOCALE.EN',
@@ -65,8 +63,6 @@ describe('locale files', () => {
       'ADMIN.USERS.COL_PLAN',
       'ADMIN.USERS.PLAN.PREMIUM',
       'SEO.ADMIN.TITLE',
-      // Nothing but the interpolated routine step, which the vocabulary
-      // translates on its own.
       'GENERATED.ROUTINE_STEP_NAME',
     ]);
 

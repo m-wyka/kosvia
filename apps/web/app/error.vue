@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app';
 
-/**
- * The error page. Never shows a status code as the headline — people do not
- * read HTTP, and "404" is not an explanation.
- */
 const props = defineProps<{ error: NuxtError }>();
 
 const { t } = useI18n();

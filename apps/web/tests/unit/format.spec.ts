@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatPrice, matchTier, pricePerHundred, slugify } from '@kosvia/shared';
 
-/**
- * The shared formatters decide how money and match tiers read across the whole
- * product, so they are worth pinning down.
- */
 describe('formatPrice', () => {
   it('uses the comma decimal separator Polish prices are written with', () => {
     expect(formatPrice(59.99)).toBe('59,99 PLN');

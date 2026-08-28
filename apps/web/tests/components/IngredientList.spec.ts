@@ -4,11 +4,11 @@ import type { IngredientDto, ProductIngredientDto } from '@kosvia/shared';
 import IngredientBadge from '../../layers/core/app/components/product/IngredientBadge.vue';
 import IngredientList from '../../layers/core/app/components/product/IngredientList.vue';
 
-function entry(
+const entry = (
   position: number,
   inciName: string,
   overrides: Partial<IngredientDto> = {},
-): ProductIngredientDto {
+): ProductIngredientDto => {
   return {
     position,
     concentrationRange: null,
@@ -30,7 +30,7 @@ function entry(
       ...overrides,
     } as IngredientDto,
   };
-}
+};
 
 const INGREDIENTS: ProductIngredientDto[] = [
   entry(1, 'Aqua', { tags: ['solvent'] }),
@@ -40,11 +40,6 @@ const INGREDIENTS: ProductIngredientDto[] = [
   entry(5, 'Parfum', { tags: ['fragrance'], concerns: 'A common source of reactions.' }),
 ];
 
-/**
- * Grouping the INCI list by function is the heart of the ingredient UI, so the
- * grouping rules — and the fact that nothing is labelled "bad" — are asserted
- * rather than eyeballed.
- */
 describe('IngredientList', () => {
   const mountList = () => mount(IngredientList, { props: { ingredients: INGREDIENTS } });
 
@@ -61,15 +56,12 @@ describe('IngredientList', () => {
     const text = mountList().text();
     for (const name of ['Aqua', 'Glycerin', 'Niacinamide', 'Parfum']) {
       const occurrences = text.split(name).length - 1;
-      // Once in its group, and once more inside the full INCI list is not
-      // rendered until expanded — so exactly one occurrence.
       expect(occurrences, `${name} appeared ${occurrences} times`).toBe(1);
     }
   });
 
   it('shows the label position, because position implies concentration', () => {
     const list = mountList();
-    // One expandable row per ingredient (the full-list disclosure is separate).
     expect(list.findAll('li button[aria-expanded]').length).toBe(INGREDIENTS.length);
     const positions = list.findAll('li button[aria-expanded] > span:first-child');
     expect(positions.map((node) => node.text())).toEqual(['3', '2', '4', '5', '1']);

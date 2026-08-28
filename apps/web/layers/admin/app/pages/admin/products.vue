@@ -32,8 +32,8 @@ const categoryOptions = computed(() => {
   const walk = (nodes: CategoryDto[], trail: string[]) => {
     for (const node of nodes) {
       const label = vocab.category(node.slug, node.name);
-      if (!node.children?.length) output.push({ value: node.id, label: [...trail, label].join(' › ') });
-      else walk(node.children, [...trail, label]);
+      if (!node.children?.length) {output.push({ value: node.id, label: [...trail, label].join(' › ') });}
+      else {walk(node.children, [...trail, label]);}
     }
   };
   walk(categories.value ?? [], []);
@@ -142,7 +142,7 @@ async function save() {
   const result = editing.value
     ? await resource.update(editing.value.id, body, t('ADMIN.PRODUCTS.SAVED'))
     : await resource.create(body, t('ADMIN.PRODUCTS.CREATED'));
-  if (result) modalOpen.value = false;
+  if (result) {modalOpen.value = false;}
 }
 
 function toggleSkinType(type: SkinType) {

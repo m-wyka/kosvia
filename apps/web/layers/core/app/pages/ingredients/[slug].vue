@@ -23,11 +23,11 @@ const vocab = useVocabulary();
 
 const tolerance = computed(() => {
   const value = ingredient.value?.sensitivityImpact ?? 0;
-  if (value >= 2) return { label: t('INGREDIENTS.TOLERANCE_LEVEL.CALMING'), tone: 'sage' as const };
+  if (value >= 2) {return { label: t('INGREDIENTS.TOLERANCE_LEVEL.CALMING'), tone: 'sage' as const };}
   if (value === 1) {
     return { label: t('INGREDIENTS.TOLERANCE_LEVEL.WELL_TOLERATED'), tone: 'sage' as const };
   }
-  if (value === 0) return { label: t('INGREDIENTS.TOLERANCE_LEVEL.NEUTRAL'), tone: 'neutral' as const };
+  if (value === 0) {return { label: t('INGREDIENTS.TOLERANCE_LEVEL.NEUTRAL'), tone: 'neutral' as const };}
   if (value === -1) {
     return { label: t('INGREDIENTS.TOLERANCE_LEVEL.OCCASIONAL'), tone: 'peach' as const };
   }

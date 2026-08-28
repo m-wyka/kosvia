@@ -11,7 +11,7 @@ const { data, pending, error, refresh } = await useApiFetch<AlternativeGroupDto[
 const localise = useLocalisedText();
 const active = ref<string | null>(null);
 watchEffect(() => {
-  if (!active.value && data.value?.length) active.value = data.value[0]!.kind;
+  if (!active.value && data.value?.length) {active.value = data.value[0]!.kind;}
 });
 
 const groups = computed(() => data.value ?? []);

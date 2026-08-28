@@ -48,7 +48,7 @@ watchEffect(() => {
   const value = profile.value;
   // `""` for "no profile yet" would pass a plain truthiness check on some
   // transports; require the shape we actually read from.
-  if (!value || typeof value !== 'object') return;
+  if (!value || typeof value !== 'object') {return;}
   form.skinType = value.skinType;
   form.sensitivity = value.sensitivity;
   form.budget = value.budget;

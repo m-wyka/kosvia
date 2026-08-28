@@ -39,7 +39,7 @@ function startNew() {
 
 async function send(text?: string) {
   const content = (text ?? draft.value).trim();
-  if (!content || thinking.value) return;
+  if (!content || thinking.value) {return;}
 
   error.value = '';
   draft.value = '';

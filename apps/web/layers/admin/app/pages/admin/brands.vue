@@ -50,11 +50,11 @@ async function save() {
   const result = editing.value
     ? await resource.update(editing.value.id, body, t('ADMIN.BRANDS.SAVED'))
     : await resource.create(body, t('ADMIN.BRANDS.CREATED'));
-  if (result) modalOpen.value = false;
+  if (result) {modalOpen.value = false;}
 }
 
 async function confirmDelete(brand: BrandRow) {
-  if (!confirm(t('ADMIN.CONFIRM_DELETE', { name: brand.name }))) return;
+  if (!confirm(t('ADMIN.CONFIRM_DELETE', { name: brand.name }))) {return;}
   await resource.remove(brand.id, t('ADMIN.BRANDS.DELETED'));
 }
 

@@ -21,7 +21,7 @@ const explaining = ref(false);
 
 async function explain() {
   open.value = !open.value;
-  if (!open.value || explanation.value || explaining.value) return;
+  if (!open.value || explanation.value || explaining.value) {return;}
   explaining.value = true;
   try {
     // The paragraph is composed server-side, so the server needs to know which

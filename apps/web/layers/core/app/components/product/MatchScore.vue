@@ -33,7 +33,7 @@ const score = computed(() => props.match?.score ?? 0);
 const displayed = ref(props.animate ? 0 : score.value);
 
 onMounted(() => {
-  if (!props.animate) return;
+  if (!props.animate) {return;}
   // Respect the user's motion preference — no count-up if they asked for less.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     displayed.value = score.value;
@@ -44,11 +44,11 @@ onMounted(() => {
   const tick = (now: number) => {
     const t = Math.min(1, (now - start) / duration);
     displayed.value = Math.round(score.value * (1 - Math.pow(1 - t, 3)));
-    if (t < 1) requestAnimationFrame(tick);
+    if (t < 1) {requestAnimationFrame(tick);}
   };
   requestAnimationFrame(tick);
 });
-watch(score, (next) => { if (!props.animate) displayed.value = next; });
+watch(score, (next) => { if (!props.animate) {displayed.value = next;} });
 
 const tone = computed(() => {
   const tier = props.match?.tier ?? 'poor';

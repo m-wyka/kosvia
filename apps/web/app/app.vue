@@ -1,15 +1,15 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
 
-// Pages set a plain title; the site name is appended here, once, and skipped
-// when the page has already named the brand itself.
-useHead({
-  titleTemplate: (chunk) => {
-    const site = config.public.siteName;
-    if (!chunk) return site;
-    return chunk.includes(site) ? chunk : `${chunk} · ${site}`;
-  },
-});
+const withSiteName = (pageTitle?: string | null): string => {
+  const siteName = config.public.siteName;
+  if (!pageTitle) {
+    return siteName;
+  }
+  return pageTitle.includes(siteName) ? pageTitle : `${pageTitle} · ${siteName}`;
+};
+
+useHead({ titleTemplate: withSiteName });
 </script>
 
 <template>

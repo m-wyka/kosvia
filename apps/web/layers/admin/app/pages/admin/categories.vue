@@ -88,7 +88,7 @@ async function save() {
   const result = editing.value
     ? await resource.update(editing.value.id, body, t('ADMIN.CATEGORIES.SAVED'))
     : await resource.create(body, t('ADMIN.CATEGORIES.CREATED'));
-  if (result) modalOpen.value = false;
+  if (result) {modalOpen.value = false;}
 }
 
 useSeo(() => ({
