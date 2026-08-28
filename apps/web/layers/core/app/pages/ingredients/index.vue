@@ -3,6 +3,8 @@ import { INGREDIENT_TAGS, type IngredientDto } from '@kosvia/shared';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
+const vocab = useVocabulary();
 
 const search = ref(String(route.query.q ?? ''));
 const tag = computed(() => (route.query.tag as string) ?? '');
@@ -28,26 +30,26 @@ function setTag(next: string) {
   router.replace({ query: { ...route.query, tag: tag.value === next ? undefined : next } });
 }
 
-useSeo({
-  title: 'Cosmetic ingredient library',
-  description:
-    'Look up any INCI ingredient: what it does, which skin types it suits, and what is worth knowing before you use it.',
+useSeo(() => ({
+  title: t('SEO.INGREDIENTS.TITLE'),
+  description: t('SEO.INGREDIENTS.DESCRIPTION'),
   path: '/ingredients',
-});
+}));
 </script>
 
 <template>
   <div class="container-page py-8 sm:py-12">
     <header class="mb-8 max-w-2xl">
-      <h1 class="font-display text-3xl text-ink sm:text-4xl">Ingredient library</h1>
-      <p class="mt-2 text-base text-ink-muted">
-        What each INCI name actually does. We describe function and tolerance —
-        we never label an ingredient good or bad.
-      </p>
+      <h1 class="font-display text-3xl text-ink sm:text-4xl">{{ $t('INGREDIENTS.TITLE') }}</h1>
+      <p class="mt-2 text-base text-ink-muted">{{ $t('INGREDIENTS.SUBTITLE') }}</p>
     </header>
 
     <div class="mb-6 space-y-4">
-      <BaseInput v-model="search" placeholder="Search by INCI or common name" class="max-w-md">
+      <BaseInput
+        v-model="search"
+        :placeholder="$t('INGREDIENTS.SEARCH_PLACEHOLDER')"
+        class="max-w-md"
+      >
         <template #prefix><BaseIcon name="search" :size="16" /></template>
       </BaseInput>
 
@@ -63,7 +65,7 @@ useSeo({
               : 'border-line text-ink-muted hover:border-line-strong hover:text-ink'
           "
           @click="setTag(option)"
-        >{{ option.replace('-', ' ') }}</button>
+        >{{ vocab.tag(option) }}</button>
       </div>
     </div>
 
@@ -76,13 +78,13 @@ useSeo({
     <BaseEmptyState
       v-else-if="!data?.length"
       icon="search"
-      title="No ingredients matched"
-      description="Try a different spelling, or clear the filter."
+      :title="$t('INGREDIENTS.EMPTY_TITLE')"
+      :description="$t('INGREDIENTS.EMPTY_BODY')"
     />
 
     <ul v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       <li v-for="ingredient in data" :key="ingredient.id">
-        <NuxtLink
+        <NuxtLinkLocale
           :to="`/ingredients/${ingredient.slug}`"
           class="flex h-full flex-col rounded-xl border border-line bg-surface p-4
                  transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
@@ -97,7 +99,7 @@ useSeo({
           <span class="mt-3 flex flex-wrap gap-1">
             <IngredientBadge v-for="entry in ingredient.tags.slice(0, 3)" :key="entry" :tag="entry" />
           </span>
-        </NuxtLink>
+        </NuxtLinkLocale>
       </li>
     </ul>
   </div>

@@ -1,10 +1,29 @@
 <script setup lang="ts">
 import type { TaxonomyItemDto } from '@kosvia/shared';
 
+/** `kind` selects the vocabulary the item slugs are translated against. */
+
 /** Multi-select chips for concerns and goals. Big, tappable, keyboard-friendly. */
 const model = defineModel<string[]>({ required: true });
 
-defineProps<{ items: TaxonomyItemDto[]; columns?: 2 | 3 }>();
+const props = defineProps<{
+  items: TaxonomyItemDto[];
+  columns?: 2 | 3;
+  kind: 'concern' | 'goal';
+}>();
+
+const vocab = useVocabulary();
+
+const entries = computed(() =>
+  props.items.map((item) => ({
+    slug: item.slug,
+    name: props.kind === 'concern' ? vocab.concern(item.slug, item.name) : vocab.goal(item.slug, item.name),
+    hint:
+      props.kind === 'concern'
+        ? vocab.concernHint(item.slug, item.description)
+        : vocab.goalHint(item.slug, item.description),
+  })),
+);
 
 function toggle(slug: string) {
   model.value = model.value.includes(slug)
@@ -16,7 +35,7 @@ function toggle(slug: string) {
 <template>
   <div class="grid gap-2.5 sm:grid-cols-2" :class="columns === 3 && 'lg:grid-cols-3'">
     <button
-      v-for="item in items"
+      v-for="item in entries"
       :key="item.slug"
       type="button"
       class="flex items-start gap-3 rounded-lg border bg-surface p-3.5 text-left
@@ -34,8 +53,8 @@ function toggle(slug: string) {
       </span>
       <span class="min-w-0">
         <span class="block text-sm font-medium text-ink">{{ item.name }}</span>
-        <span v-if="item.description" class="mt-0.5 block text-xs leading-snug text-ink-muted">
-          {{ item.description }}
+        <span v-if="item.hint" class="mt-0.5 block text-xs leading-snug text-ink-muted">
+          {{ item.hint }}
         </span>
       </span>
     </button>

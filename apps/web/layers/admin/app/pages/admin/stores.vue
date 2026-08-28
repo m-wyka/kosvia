@@ -7,14 +7,15 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 type StoreRow = StoreDto & { affiliateUrlTemplate: string | null; _count: { offers: number } };
 
 const resource = useAdminResource<StoreRow>('/admin/stores', { paginated: false });
+const { t } = useI18n();
 
-const columns: TableColumn[] = [
-  { key: 'name', label: 'Store' },
-  { key: 'websiteUrl', label: 'Website', secondary: true },
-  { key: 'affiliate', label: 'Affiliate template', secondary: true },
-  { key: 'offers', label: 'Offers', align: 'right', width: 'w-24' },
+const columns = computed<TableColumn[]>(() => [
+  { key: 'name', label: t('ADMIN.STORES.COL_STORE') },
+  { key: 'websiteUrl', label: t('ADMIN.STORES.COL_WEBSITE'), secondary: true },
+  { key: 'affiliate', label: t('ADMIN.STORES.COL_AFFILIATE'), secondary: true },
+  { key: 'offers', label: t('ADMIN.STORES.COL_OFFERS'), align: 'right', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
-];
+]);
 
 const modalOpen = ref(false);
 const editing = ref<StoreRow | null>(null);
@@ -45,25 +46,29 @@ async function save() {
     affiliateUrlTemplate: form.affiliateUrlTemplate || undefined,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, 'Store saved')
-    : await resource.create(body, 'Store created');
+    ? await resource.update(editing.value.id, body, t('ADMIN.STORES.SAVED'))
+    : await resource.create(body, t('ADMIN.STORES.CREATED'));
   if (result) modalOpen.value = false;
 }
 
-useSeo({ title: 'Stores · Admin', description: 'Manage demo retailers.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.ADMIN.STORES'),
+  description: t('SEO.ADMIN.STORES_DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div>
     <AdminPageHeader
-      title="Stores"
+      :title="$t('ADMIN.STORES.TITLE')"
       :count="resource.total.value"
-      description="Demo retailers. Real integrations are deliberately out of scope for now."
+      :description="$t('ADMIN.STORES.SUBTITLE')"
     >
       <template #actions>
         <BaseButton size="sm" @click="openCreate">
           <template #icon><BaseIcon name="plus" :size="15" /></template>
-          New store
+          {{ $t('ADMIN.STORES.NEW') }}
         </BaseButton>
       </template>
     </AdminPageHeader>
@@ -75,7 +80,7 @@ useSeo({ title: 'Stores · Admin', description: 'Manage demo retailers.', noinde
       :columns="columns"
       :rows="resource.rows.value"
       :loading="resource.pending.value"
-      empty-title="No stores yet"
+      :empty-title="$t('ADMIN.STORES.EMPTY')"
     >
       <template #cell-name="{ row }">
         <span class="font-medium text-ink">{{ row.name }}</span>
@@ -87,7 +92,7 @@ useSeo({ title: 'Stores · Admin', description: 'Manage demo retailers.', noinde
         <code v-if="row.affiliateUrlTemplate" class="text-2xs text-ink-muted">
           {{ row.affiliateUrlTemplate }}
         </code>
-        <span v-else class="text-xs text-ink-faint">Not set</span>
+        <span v-else class="text-xs text-ink-faint">{{ $t('ADMIN.STORES.NOT_SET') }}</span>
       </template>
       <template #cell-offers="{ row }">
         <span class="tabular-nums text-ink-soft">{{ row._count?.offers ?? 0 }}</span>
@@ -97,7 +102,7 @@ useSeo({ title: 'Stores · Admin', description: 'Manage demo retailers.', noinde
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="`Edit ${row.name}`"
+            :aria-label="$t('ADMIN.STORES.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -105,8 +110,8 @@ useSeo({ title: 'Stores · Admin', description: 'Manage demo retailers.', noinde
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
-            :aria-label="`Delete ${row.name}`"
-            @click="resource.remove(row.id, 'Store deleted')"
+            :aria-label="$t('COMMON.DELETE')"
+            @click="resource.remove(row.id, t('ADMIN.STORES.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -114,22 +119,34 @@ useSeo({ title: 'Stores · Admin', description: 'Manage demo retailers.', noinde
       </template>
     </AdminTable>
 
-    <BaseModal v-model:open="modalOpen" :title="editing ? `Edit ${editing.name}` : 'New store'" size="sm">
+    <BaseModal
+      v-model:open="modalOpen"
+      :title="editing ? $t('ADMIN.STORES.EDIT', { name: editing.name }) : $t('ADMIN.STORES.NEW')"
+      size="sm"
+    >
       <div class="space-y-4">
-        <BaseInput v-model="form.name" label="Name" required />
-        <BaseInput v-model="form.slug" label="Slug" hint="Leave empty to generate from the name." />
-        <BaseInput v-model="form.websiteUrl" label="Website URL" placeholder="https://…" />
+        <BaseInput v-model="form.name" :label="$t('ADMIN.STORES.FIELD_NAME')" required />
+        <BaseInput
+          v-model="form.slug"
+          :label="$t('ADMIN.STORES.FIELD_SLUG')"
+          :hint="$t('ADMIN.STORES.SLUG_HINT')"
+        />
+        <BaseInput
+          v-model="form.websiteUrl"
+          :label="$t('ADMIN.STORES.FIELD_WEBSITE')"
+          placeholder="https://…"
+        />
         <BaseInput
           v-model="form.affiliateUrlTemplate"
-          label="Affiliate URL template"
+          :label="$t('ADMIN.STORES.FIELD_AFFILIATE')"
           placeholder="https://store.example/p/{sku}?ref=kosvia"
-          hint="Used once affiliate programmes are connected. Unused today."
+          :hint="$t('ADMIN.STORES.AFFILIATE_HINT')"
         />
       </div>
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">Cancel</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
         <BaseButton :loading="resource.saving.value" :disabled="!form.name" @click="save">
-          {{ editing ? 'Save changes' : 'Create store' }}
+          {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.STORES.CREATE') }}
         </BaseButton>
       </template>
     </BaseModal>

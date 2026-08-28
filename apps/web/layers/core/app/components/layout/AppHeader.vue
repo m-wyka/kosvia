@@ -3,17 +3,18 @@ const auth = useAuthStore();
 const compare = useCompareStore();
 const route = useRoute();
 const router = useRouter();
+const localePath = useLocalePath();
 
 const search = ref('');
 const menuOpen = ref(false);
 
 const links = [
-  { to: '/discover', label: 'Discover' },
-  { to: '/products', label: 'Products' },
-  { to: '/compare', label: 'Compare' },
-  { to: '/shelf', label: 'My Shelf', auth: true },
-  { to: '/ai', label: 'AI Shopper', auth: true },
-  { to: '/price-alerts', label: 'Price alerts', auth: true },
+  { to: '/discover', label: 'NAV.DISCOVER' },
+  { to: '/products', label: 'NAV.PRODUCTS' },
+  { to: '/compare', label: 'NAV.COMPARE' },
+  { to: '/shelf', label: 'NAV.SHELF', auth: true },
+  { to: '/ai', label: 'NAV.AI', auth: true },
+  { to: '/price-alerts', label: 'NAV.ALERTS', auth: true },
 ];
 
 const visibleLinks = computed(() => links.filter((link) => !link.auth || auth.isAuthenticated));
@@ -23,7 +24,7 @@ function submitSearch() {
   const q = search.value.trim();
   if (!q) return;
   menuOpen.value = false;
-  router.push({ path: '/products', query: { q } });
+  router.push({ path: localePath('/products'), query: { q } });
 }
 
 watch(() => route.fullPath, () => { menuOpen.value = false; });
@@ -31,29 +32,29 @@ watch(() => route.fullPath, () => { menuOpen.value = false; });
 async function signOut() {
   await auth.logout();
   menuOpen.value = false;
-  await router.push('/');
+  await router.push(localePath('/'));
 }
 </script>
 
 <template>
   <header class="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-md">
     <div class="container-page flex h-16 items-center gap-4">
-      <NuxtLink to="/" class="shrink-0" aria-label="Kosvia home">
+      <NuxtLinkLocale to="/" class="shrink-0" :aria-label="$t('NAV.HOME')">
         <AppLogo />
-      </NuxtLink>
+      </NuxtLinkLocale>
 
-      <nav class="hidden items-center gap-0.5 lg:flex" aria-label="Main">
-        <NuxtLink
+      <nav class="hidden items-center gap-0.5 lg:flex" :aria-label="$t('NAV.MAIN')">
+        <NuxtLinkLocale
           v-for="link in visibleLinks"
           :key="link.to"
           :to="link.to"
           class="rounded-md px-3 py-2 text-sm font-medium transition-colors"
           :class="isActive(link.to) ? 'bg-surface-muted text-ink' : 'text-ink-muted hover:text-ink'"
-        >{{ link.label }}</NuxtLink>
+        >{{ $t(link.label) }}</NuxtLinkLocale>
       </nav>
 
       <form class="ml-auto hidden min-w-0 flex-1 justify-end md:flex" role="search" @submit.prevent="submitSearch">
-        <label for="header-search" class="sr-only">Search products</label>
+        <label for="header-search" class="sr-only">{{ $t('NAV.SEARCH_LABEL') }}</label>
         <div class="relative w-full max-w-xs">
           <BaseIcon
             name="search"
@@ -64,7 +65,7 @@ async function signOut() {
             id="header-search"
             v-model="search"
             type="search"
-            placeholder="Search products or ingredients"
+            :placeholder="$t('NAV.SEARCH_PLACEHOLDER')"
             class="h-10 w-full rounded-pill border border-line bg-surface pr-3.5 pl-9 text-sm
                    placeholder:text-ink-faint transition-colors hover:border-line-strong"
           >
@@ -72,7 +73,9 @@ async function signOut() {
       </form>
 
       <div class="ml-auto flex shrink-0 items-center gap-1.5 md:ml-0">
-        <NuxtLink
+        <LocaleSwitcher class="hidden sm:flex" />
+
+        <NuxtLinkLocale
           v-if="compare.count > 0"
           to="/compare"
           class="relative hidden items-center gap-1.5 rounded-pill border border-line px-3 py-2
@@ -80,30 +83,34 @@ async function signOut() {
         >
           <BaseIcon name="compare" :size="16" />
           <span class="tabular-nums">{{ compare.count }}</span>
-        </NuxtLink>
+        </NuxtLinkLocale>
 
         <template v-if="auth.isAuthenticated">
-          <NuxtLink
+          <NuxtLinkLocale
             to="/profile"
             class="hidden items-center gap-2 rounded-pill py-1 pr-3 pl-1 transition-colors hover:bg-surface-muted sm:flex"
           >
             <BaseAvatar :name="auth.user?.name ?? auth.user?.email" :size="30" />
             <span class="max-w-24 truncate text-sm font-medium text-ink">{{ auth.displayName }}</span>
-          </NuxtLink>
+          </NuxtLinkLocale>
           <BaseButton
             v-if="auth.isAdmin"
             to="/admin"
             variant="ghost"
             size="sm"
             class="hidden lg:inline-flex"
-          >Admin</BaseButton>
+          >{{ $t('NAV.ADMIN') }}</BaseButton>
           <BaseButton variant="ghost" size="sm" class="hidden lg:inline-flex" @click="signOut">
-            Sign out
+            {{ $t('COMMON.SIGN_OUT') }}
           </BaseButton>
         </template>
         <template v-else>
-          <BaseButton to="/login" variant="ghost" size="sm" class="hidden sm:inline-flex">Sign in</BaseButton>
-          <BaseButton to="/register" size="sm" class="hidden sm:inline-flex">Get started</BaseButton>
+          <BaseButton to="/login" variant="ghost" size="sm" class="hidden sm:inline-flex">
+            {{ $t('COMMON.SIGN_IN') }}
+          </BaseButton>
+          <BaseButton to="/register" size="sm" class="hidden sm:inline-flex">
+            {{ $t('COMMON.GET_STARTED') }}
+          </BaseButton>
         </template>
 
         <button
@@ -111,7 +118,7 @@ async function signOut() {
           class="rounded-md p-2 text-ink-soft transition-colors hover:bg-surface-muted lg:hidden"
           :aria-expanded="menuOpen"
           aria-controls="mobile-menu"
-          aria-label="Menu"
+          :aria-label="$t('NAV.MENU')"
           @click="menuOpen = !menuOpen"
         >
           <BaseIcon :name="menuOpen ? 'close' : 'menu'" :size="20" />
@@ -128,7 +135,7 @@ async function signOut() {
       <div v-if="menuOpen" id="mobile-menu" class="border-t border-line bg-canvas lg:hidden">
         <div class="container-page space-y-1 py-4">
           <form class="mb-3 md:hidden" role="search" @submit.prevent="submitSearch">
-            <label for="mobile-search" class="sr-only">Search products</label>
+            <label for="mobile-search" class="sr-only">{{ $t('NAV.SEARCH_LABEL') }}</label>
             <div class="relative">
               <BaseIcon
                 name="search"
@@ -139,29 +146,33 @@ async function signOut() {
                 id="mobile-search"
                 v-model="search"
                 type="search"
-                placeholder="Search products or ingredients"
+                :placeholder="$t('NAV.SEARCH_PLACEHOLDER')"
                 class="h-11 w-full rounded-pill border border-line bg-surface pr-3.5 pl-9 text-sm"
               >
             </div>
           </form>
 
-          <NuxtLink
+          <NuxtLinkLocale
             v-for="link in visibleLinks"
             :key="link.to"
             :to="link.to"
             class="block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
             :class="isActive(link.to) ? 'bg-surface-muted text-ink' : 'text-ink-soft hover:bg-surface-muted'"
-          >{{ link.label }}</NuxtLink>
+          >{{ $t(link.label) }}</NuxtLinkLocale>
 
           <div class="!mt-4 flex flex-col gap-2 border-t border-line pt-4">
+            <LocaleSwitcher variant="stacked" class="mb-2 sm:hidden" />
+
             <template v-if="auth.isAuthenticated">
-              <BaseButton to="/profile" variant="secondary" block>Profile</BaseButton>
-              <BaseButton v-if="auth.isAdmin" to="/admin" variant="secondary" block>Admin panel</BaseButton>
-              <BaseButton variant="ghost" block @click="signOut">Sign out</BaseButton>
+              <BaseButton to="/profile" variant="secondary" block>{{ $t('NAV.PROFILE') }}</BaseButton>
+              <BaseButton v-if="auth.isAdmin" to="/admin" variant="secondary" block>
+                {{ $t('NAV.ADMIN') }}
+              </BaseButton>
+              <BaseButton variant="ghost" block @click="signOut">{{ $t('COMMON.SIGN_OUT') }}</BaseButton>
             </template>
             <template v-else>
-              <BaseButton to="/register" block>Get started</BaseButton>
-              <BaseButton to="/login" variant="secondary" block>Sign in</BaseButton>
+              <BaseButton to="/register" block>{{ $t('COMMON.GET_STARTED') }}</BaseButton>
+              <BaseButton to="/login" variant="secondary" block>{{ $t('COMMON.SIGN_IN') }}</BaseButton>
             </template>
           </div>
         </div>

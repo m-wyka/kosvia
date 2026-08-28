@@ -29,16 +29,16 @@ const tones = {
             :class="tones[toast.tone]"
           >
             <span class="min-w-0 flex-1">{{ toast.message }}</span>
-            <NuxtLink
+            <NuxtLinkLocale
               v-if="toast.action"
               :to="toast.action.to"
               class="shrink-0 font-medium underline underline-offset-2"
               @click="dismiss(toast.id)"
-            >{{ toast.action.label }}</NuxtLink>
+            >{{ toast.action.label }}</NuxtLinkLocale>
             <button
               type="button"
               class="-mr-1 shrink-0 rounded p-1 opacity-70 transition-opacity hover:opacity-100"
-              aria-label="Dismiss"
+              :aria-label="$t('COMMON.CLOSE')"
               @click="dismiss(toast.id)"
             >
               <BaseIcon name="close" :size="14" />

@@ -41,7 +41,7 @@ defineEmits<{ retry: [] }>();
       v-else-if="!rows.length"
       compact
       class="rounded-none border-0 bg-transparent"
-      :title="emptyTitle ?? 'Nothing here yet'"
+      :title="emptyTitle ?? $t('ADMIN.EMPTY_TITLE')"
       :description="emptyDescription"
     >
       <slot name="empty-action" />

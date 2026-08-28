@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const route = useRoute();
 const router = useRouter();
+const vocab = useVocabulary();
 
 const query = computed(() => route.query);
 
@@ -44,7 +45,7 @@ const flatCategories = computed(() => {
   const output: Array<{ slug: string; name: string; depth: number }> = [];
   const walk = (nodes: CategoryDto[], depth: number) => {
     for (const node of nodes) {
-      output.push({ slug: node.slug, name: node.name, depth });
+      output.push({ slug: node.slug, name: vocab.category(node.slug, node.name), depth });
       if (node.children?.length) walk(node.children, depth + 1);
     }
   };
@@ -75,16 +76,16 @@ function clearAll() {
 <template>
   <div class="space-y-7">
     <div v-if="activeCount" class="flex items-center justify-between gap-2">
-      <p class="text-sm text-ink-muted">{{ activeCount }} filter{{ activeCount > 1 ? 's' : '' }} applied</p>
+      <p class="text-sm text-ink-muted">{{ $t('SEARCH.FILTER.APPLIED', activeCount) }}</p>
       <button
         type="button"
         class="text-sm font-medium text-ink underline-offset-4 hover:underline"
         @click="clearAll"
-      >Clear all</button>
+      >{{ $t('COMMON.CLEAR_ALL') }}</button>
     </div>
 
     <section>
-      <h3 class="mb-2.5 text-sm font-semibold text-ink">Category</h3>
+      <h3 class="mb-2.5 text-sm font-semibold text-ink">{{ $t('SEARCH.FILTER.CATEGORY') }}</h3>
       <ul class="space-y-0.5">
         <li>
           <button
@@ -92,7 +93,7 @@ function clearAll() {
             class="w-full rounded-md px-2 py-1.5 text-left text-sm transition-colors"
             :class="!query.category ? 'bg-surface-muted font-medium text-ink' : 'text-ink-muted hover:text-ink'"
             @click="update({ category: undefined })"
-          >All products</button>
+          >{{ $t('SEARCH.FILTER.ALL_PRODUCTS') }}</button>
         </li>
         <li v-for="category in flatCategories" :key="category.slug">
           <button
@@ -114,56 +115,59 @@ function clearAll() {
     <section>
       <BaseSlider
         v-model="maxPrice"
-        label="Maximum price"
+        :label="$t('SEARCH.FILTER.MAX_PRICE')"
         :min="0"
         :max="priceCeiling"
         :step="5"
-        :format="(value) => (value === 0 ? 'Any price' : `up to ${value} PLN`)"
+        :format="
+          (value) =>
+            value === 0 ? $t('SEARCH.FILTER.ANY_PRICE') : $t('SEARCH.FILTER.UP_TO', { price: value })
+        "
         @change="update({ maxPrice: maxPrice || undefined })"
       />
     </section>
 
     <section>
-      <h3 class="mb-2.5 text-sm font-semibold text-ink">Formula</h3>
+      <h3 class="mb-2.5 text-sm font-semibold text-ink">{{ $t('SEARCH.FILTER.FORMULA') }}</h3>
       <div class="space-y-2.5">
         <BaseCheckbox
           :model-value="query.fragranceFree === 'true'"
-          label="Fragrance-free"
+          :label="$t('SEARCH.FILTER.FRAGRANCE_FREE')"
           @update:model-value="update({ fragranceFree: $event || undefined })"
         />
         <BaseCheckbox
           :model-value="query.vegan === 'true'"
-          label="Vegan"
+          :label="$t('SEARCH.FILTER.VEGAN')"
           @update:model-value="update({ vegan: $event || undefined })"
         />
         <BaseCheckbox
           :model-value="query.crueltyFree === 'true'"
-          label="Cruelty-free"
+          :label="$t('SEARCH.FILTER.CRUELTY_FREE')"
           @update:model-value="update({ crueltyFree: $event || undefined })"
         />
       </div>
     </section>
 
     <section>
-      <h3 class="mb-2.5 text-sm font-semibold text-ink">Suits my skin type</h3>
+      <h3 class="mb-2.5 text-sm font-semibold text-ink">{{ $t('SEARCH.FILTER.SKIN_TYPE') }}</h3>
       <div class="flex flex-wrap gap-1.5">
         <button
-          v-for="type in ['DRY', 'OILY', 'COMBINATION', 'NORMAL', 'SENSITIVE']"
+          v-for="type in vocab.concreteSkinTypes.value"
           :key="type"
           type="button"
-          class="rounded-pill border px-3 py-1.5 text-xs font-medium capitalize transition-colors"
+          class="rounded-pill border px-3 py-1.5 text-xs font-medium transition-colors"
           :class="
             query.skinType === type
               ? 'border-ink bg-ink text-ink-inverse'
               : 'border-line text-ink-muted hover:border-line-strong hover:text-ink'
           "
           @click="update({ skinType: query.skinType === type ? undefined : type })"
-        >{{ type.toLowerCase() }}</button>
+        >{{ vocab.skinType(type) }}</button>
       </div>
     </section>
 
     <section v-if="facets?.brands.length">
-      <h3 class="mb-2.5 text-sm font-semibold text-ink">Brand</h3>
+      <h3 class="mb-2.5 text-sm font-semibold text-ink">{{ $t('SEARCH.FILTER.BRAND') }}</h3>
       <ul class="hide-scrollbar max-h-64 space-y-1.5 overflow-y-auto pr-1">
         <li v-for="brand in facets.brands" :key="brand.id">
           <BaseCheckbox

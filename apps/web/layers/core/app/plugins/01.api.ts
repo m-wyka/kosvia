@@ -21,8 +21,10 @@ type FetchOptions = Parameters<typeof $fetch>[1];
  * hook: that hook cannot turn a failed response into a successful one, because
  * ofetch throws on `response.ok` regardless of what the hook does to it.
  */
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig();
+  // Error copy is user-facing, so it goes through the same translations.
+  const t = (key: string) => String(nuxtApp.$i18n.t(key));
   const baseURL = import.meta.server ? config.apiInternalUrl : config.public.apiBase;
 
   /** Cookie header used for SSR requests; updated in place after a refresh. */
@@ -115,10 +117,10 @@ export default defineNuxtPlugin(() => {
           return Array.isArray(data.message) ? data.message.join(' ') : data.message;
         }
         const status = statusOf(error);
-        if (status === 404) return 'We could not find what you were looking for.';
-        if (status === 401) return 'Please sign in to continue.';
-        if (status === 403) return 'You do not have access to this.';
-        return 'Something went wrong. Please try again.';
+        if (status === 404) return t('ERRORS.API.NOT_FOUND');
+        if (status === 401) return t('ERRORS.API.UNAUTHORIZED');
+        if (status === 403) return t('ERRORS.API.FORBIDDEN');
+        return t('ERRORS.API.GENERIC');
       },
     },
   };

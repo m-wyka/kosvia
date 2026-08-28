@@ -2,6 +2,8 @@
 import type { ProductSummaryDto } from '@kosvia/shared';
 
 defineProps<{ featured?: ProductSummaryDto | null }>();
+
+const format = useFormat();
 </script>
 
 <template>
@@ -17,37 +19,36 @@ defineProps<{ featured?: ProductSummaryDto | null }>();
       <div class="animate-fade-up max-w-xl">
         <BaseBadge tone="blush">
           <template #icon><BaseIcon name="sparkles" :size="12" /></template>
-          Your personal AI beauty shopper
+          {{ $t('LANDING.BADGE') }}
         </BaseBadge>
 
         <h1 class="mt-5 font-display text-4xl leading-[1.08] text-ink sm:text-5xl lg:text-[3.4rem]">
-          Find cosmetics that actually fit you.
+          {{ $t('LANDING.HERO_TITLE') }}
         </h1>
 
-        <p class="mt-5 text-lg leading-relaxed text-ink-soft">
-          Kosvia analyses products, ingredients, prices and your personal preferences
-          to help you choose better.
-        </p>
+        <p class="mt-5 text-lg leading-relaxed text-ink-soft">{{ $t('LANDING.HERO_BODY') }}</p>
 
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
           <BaseButton to="/onboarding" size="lg">
-            Find my cosmetics
+            {{ $t('LANDING.CTA_PRIMARY') }}
             <template #icon><BaseIcon name="arrow-right" :size="18" /></template>
           </BaseButton>
-          <BaseButton to="/products" size="lg" variant="secondary">Explore products</BaseButton>
+          <BaseButton to="/products" size="lg" variant="secondary">
+            {{ $t('LANDING.CTA_SECONDARY') }}
+          </BaseButton>
         </div>
 
         <dl class="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-7">
           <div>
-            <dt class="text-xs text-ink-muted">Products analysed</dt>
+            <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_PRODUCTS') }}</dt>
             <dd class="font-display text-2xl text-ink">130+</dd>
           </div>
           <div>
-            <dt class="text-xs text-ink-muted">Ingredients decoded</dt>
+            <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_INGREDIENTS') }}</dt>
             <dd class="font-display text-2xl text-ink">139</dd>
           </div>
           <div>
-            <dt class="text-xs text-ink-muted">Stores compared</dt>
+            <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_STORES') }}</dt>
             <dd class="font-display text-2xl text-ink">5</dd>
           </div>
         </dl>
@@ -75,7 +76,7 @@ defineProps<{ featured?: ProductSummaryDto | null }>();
 
           <ProductImage
             :src="featured?.imageUrl ?? '/img/product/kalme-ceramide-barrier-cream.svg'"
-            :alt="featured ? `${featured.brand.name} ${featured.name}` : 'Illustrated moisturiser'"
+            :alt="featured ? `${featured.brand.name} ${featured.name}` : $t('LANDING.HERO_CARD_ALT')"
             ratio="square"
             eager
             class="mt-4"
@@ -84,15 +85,15 @@ defineProps<{ featured?: ProductSummaryDto | null }>();
           <ul class="mt-4 space-y-2 text-sm">
             <li class="flex items-start gap-2 text-ink-soft">
               <BaseIcon name="check" :size="15" class="mt-0.5 shrink-0 text-sage" />
-              Matches your combination skin
+              {{ $t('LANDING.HERO_CARD_REASON_1') }}
             </li>
             <li class="flex items-start gap-2 text-ink-soft">
               <BaseIcon name="check" :size="15" class="mt-0.5 shrink-0 text-sage" />
-              Ceramides and panthenol for your barrier goal
+              {{ $t('LANDING.HERO_CARD_REASON_2') }}
             </li>
             <li class="flex items-start gap-2 text-ink-soft">
               <BaseIcon name="check" :size="15" class="mt-0.5 shrink-0 text-sage" />
-              Fragrance-free, within your budget
+              {{ $t('LANDING.HERO_CARD_REASON_3') }}
             </li>
           </ul>
 
@@ -102,7 +103,7 @@ defineProps<{ featured?: ProductSummaryDto | null }>();
               :store="featured?.lowestPriceStore ?? null"
             />
             <BaseButton size="sm" :to="featured ? `/products/${featured.slug}` : '/products'">
-              See why
+              {{ $t('LANDING.HERO_CARD_CTA') }}
             </BaseButton>
           </div>
         </div>
@@ -112,8 +113,8 @@ defineProps<{ featured?: ProductSummaryDto | null }>();
         <div
           class="absolute top-[38%] -left-6 hidden rounded-xl border border-line bg-surface px-4 py-3 shadow-lg sm:block"
         >
-          <p class="text-xs text-ink-muted">Cheaper alternative</p>
-          <p class="font-display text-lg text-ink">41,99 PLN</p>
+          <p class="text-xs text-ink-muted">{{ $t('LANDING.CHEAPER_ALTERNATIVE') }}</p>
+          <p class="font-display text-lg text-ink">{{ format.price(41.99) }}</p>
         </div>
       </div>
     </div>

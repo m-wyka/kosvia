@@ -9,18 +9,27 @@ export default defineEventHandler((event) => {
   const { public: config } = useRuntimeConfig(event);
   setHeader(event, 'content-type', 'text/plain; charset=utf-8');
 
+  // Private areas exist under every locale prefix, so each rule is emitted once
+  // per locale — /shelf and /pl/shelf are different URLs to a crawler.
+  const localePrefixes = ['', '/pl'];
+  const privatePaths = [
+    '/admin',
+    '/dashboard',
+    '/shelf',
+    '/profile',
+    '/onboarding',
+    '/ai',
+    '/price-alerts',
+    '/login',
+    '/register',
+  ];
+
   return [
     'User-agent: *',
     'Allow: /',
-    'Disallow: /admin',
-    'Disallow: /dashboard',
-    'Disallow: /shelf',
-    'Disallow: /profile',
-    'Disallow: /onboarding',
-    'Disallow: /ai',
-    'Disallow: /price-alerts',
-    'Disallow: /login',
-    'Disallow: /register',
+    ...localePrefixes.flatMap((prefix) =>
+      privatePaths.map((path) => `Disallow: ${prefix}${path}`),
+    ),
     '',
     `Sitemap: ${config.siteUrl}/sitemap.xml`,
     '',

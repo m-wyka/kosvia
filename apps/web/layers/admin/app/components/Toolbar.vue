@@ -17,7 +17,7 @@ defineEmits<{ 'update:page': [value: number] }>();
       <input
         v-model="search"
         type="search"
-        :placeholder="placeholder ?? 'Search…'"
+        :placeholder="placeholder ?? $t('ADMIN.SEARCH_PLACEHOLDER')"
         class="h-10 w-full rounded-lg border border-line bg-surface pr-3 pl-9 text-sm
                placeholder:text-ink-faint transition-colors hover:border-line-strong"
       >
@@ -25,7 +25,8 @@ defineEmits<{ 'update:page': [value: number] }>();
 
     <div v-if="pageCount > 1" class="flex items-center gap-2">
       <span class="text-xs tabular-nums text-ink-muted">
-        Page {{ page }} of {{ pageCount }}<template v-if="total"> · {{ total }} total</template>
+        {{ $t('ADMIN.PAGE_OF', { page, total: pageCount }) }}
+        <template v-if="total">{{ $t('ADMIN.TOTAL_SUFFIX', { total }) }}</template>
       </span>
       <BaseButton variant="secondary" size="sm" :disabled="page <= 1" @click="$emit('update:page', page - 1)">
         <BaseIcon name="chevron-left" :size="15" />

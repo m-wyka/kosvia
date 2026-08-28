@@ -4,6 +4,7 @@ definePageMeta({ layout: 'focused', middleware: 'guest' });
 const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
+const localePath = useLocalePath();
 const message = useApiMessage();
 
 const email = ref('');
@@ -17,7 +18,7 @@ async function submit() {
   try {
     await auth.login(email.value, password.value);
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : null;
-    await router.push(redirect ?? (auth.needsOnboarding ? '/onboarding' : '/dashboard'));
+    await router.push(redirect ?? localePath(auth.needsOnboarding ? '/onboarding' : '/dashboard'));
   } catch (caught) {
     error.value = message(caught);
   } finally {
@@ -31,32 +32,32 @@ function useDemoAccount() {
   password.value = 'Password123!';
 }
 
-useSeo({
-  title: 'Sign in',
-  description: 'Sign in to Kosvia to see your personal match scores, shelf and price alerts.',
+const { t } = useI18n();
+
+useSeo(() => ({
+  title: t('SEO.LOGIN.TITLE'),
+  description: t('SEO.LOGIN.DESCRIPTION'),
   noindex: true,
-});
+}));
 </script>
 
 <template>
   <div class="w-full max-w-sm">
-    <h1 class="font-display text-3xl text-ink">Welcome back</h1>
-    <p class="mt-2 text-sm text-ink-muted">
-      Sign in to pick up your shelf, your matches and your alerts.
-    </p>
+    <h1 class="font-display text-3xl text-ink">{{ $t('AUTH.LOGIN_TITLE') }}</h1>
+    <p class="mt-2 text-sm text-ink-muted">{{ $t('AUTH.LOGIN_BODY') }}</p>
 
     <form class="mt-8 space-y-4" novalidate @submit.prevent="submit">
       <BaseInput
         v-model="email"
-        label="Email"
+        :label="$t('AUTH.EMAIL')"
         type="email"
         autocomplete="email"
-        placeholder="you@example.com"
+        :placeholder="$t('AUTH.EMAIL_PLACEHOLDER')"
         required
       />
       <BaseInput
         v-model="password"
-        label="Password"
+        :label="$t('AUTH.PASSWORD')"
         type="password"
         autocomplete="current-password"
         required
@@ -71,7 +72,9 @@ useSeo({
         {{ error }}
       </p>
 
-      <BaseButton type="submit" block size="lg" :loading="pending">Sign in</BaseButton>
+      <BaseButton type="submit" block size="lg" :loading="pending">
+        {{ $t('AUTH.SIGN_IN') }}
+      </BaseButton>
     </form>
 
     <button
@@ -79,17 +82,15 @@ useSeo({
       class="mt-4 w-full rounded-lg border border-dashed border-line-strong px-4 py-3 text-left transition-colors hover:bg-surface-muted"
       @click="useDemoAccount"
     >
-      <span class="block text-sm font-medium text-ink">Use the demo account</span>
-      <span class="block text-xs text-ink-muted">
-        demo@kosvia.app — a filled-in profile, shelf and price alerts
-      </span>
+      <span class="block text-sm font-medium text-ink">{{ $t('AUTH.DEMO_TITLE') }}</span>
+      <span class="block text-xs text-ink-muted">{{ $t('AUTH.DEMO_BODY') }}</span>
     </button>
 
     <p class="mt-8 text-center text-sm text-ink-muted">
-      New here?
-      <NuxtLink to="/register" class="font-medium text-ink underline-offset-4 hover:underline">
-        Create an account
-      </NuxtLink>
+      {{ $t('AUTH.NO_ACCOUNT') }}
+      <NuxtLinkLocale to="/register" class="font-medium text-ink underline-offset-4 hover:underline">
+        {{ $t('AUTH.CREATE_ACCOUNT') }}
+      </NuxtLinkLocale>
     </p>
   </div>
 </template>

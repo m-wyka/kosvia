@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatPrice, type ProductSummaryDto, type StoreDto } from '@kosvia/shared';
+import type { ProductSummaryDto, StoreDto } from '@kosvia/shared';
 import type { TableColumn } from '../../components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -18,15 +18,33 @@ interface OfferRow {
 const api = useApi();
 const resource = useAdminResource<OfferRow>('/admin/offers');
 const { data: stores } = await useApiFetch<StoreDto[]>('/stores', { key: 'stores' });
+const { t } = useI18n();
+const vocab = useVocabulary();
+const format = useFormat();
 
-const columns: TableColumn[] = [
-  { key: 'product', label: 'Product' },
-  { key: 'store', label: 'Store', secondary: true },
-  { key: 'price', label: 'Price', align: 'right', width: 'w-32' },
-  { key: 'availability', label: 'Availability', align: 'center', secondary: true, width: 'w-32' },
-  { key: 'lastCheckedAt', label: 'Checked', align: 'right', secondary: true },
+const columns = computed<TableColumn[]>(() => [
+  { key: 'product', label: t('ADMIN.OFFERS.COL_PRODUCT') },
+  { key: 'store', label: t('ADMIN.OFFERS.COL_STORE'), secondary: true },
+  { key: 'price', label: t('ADMIN.OFFERS.COL_PRICE'), align: 'right', width: 'w-32' },
+  {
+    key: 'availability',
+    label: t('ADMIN.OFFERS.COL_AVAILABILITY'),
+    align: 'center',
+    secondary: true,
+    width: 'w-32',
+  },
+  { key: 'lastCheckedAt', label: t('ADMIN.OFFERS.COL_CHECKED'), align: 'right', secondary: true },
   { key: 'actions', label: '', align: 'right', width: 'w-16' },
-];
+]);
+
+const storeOptions = computed(() => [
+  { value: '', label: t('ADMIN.OFFERS.STORE_PLACEHOLDER') },
+  ...(stores.value ?? []).map((store) => ({ value: store.id, label: store.name })),
+]);
+
+const availabilityOptions = computed(() =>
+  AVAILABILITY.map((value) => ({ value, label: vocab.availability(value) })),
+);
 
 const modalOpen = ref(false);
 const productSearch = ref('');
@@ -97,30 +115,31 @@ async function save() {
       url: form.url || undefined,
       availability: form.availability,
     },
-    'Offer saved — lowest price recomputed',
+    t('ADMIN.OFFERS.SAVED'),
   );
   if (result) modalOpen.value = false;
 }
 
 const AVAILABILITY = ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'UNKNOWN'] as const;
 
-const formatDate = (value: string) =>
-  new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-
-useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.ADMIN.OFFERS'),
+  description: t('SEO.ADMIN.OFFERS_DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div>
     <AdminPageHeader
-      title="Offers"
+      :title="$t('ADMIN.OFFERS.TITLE')"
       :count="resource.total.value"
-      description="Saving an offer writes a price-history entry and recomputes the product's lowest price."
+      :description="$t('ADMIN.OFFERS.SUBTITLE')"
     >
       <template #actions>
         <BaseButton size="sm" @click="openCreate">
           <template #icon><BaseIcon name="plus" :size="15" /></template>
-          New offer
+          {{ $t('ADMIN.OFFERS.NEW') }}
         </BaseButton>
       </template>
     </AdminPageHeader>
@@ -130,7 +149,7 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
       :page="resource.page.value"
       :page-count="resource.pageCount.value"
       :total="resource.total.value"
-      placeholder="Search by product name…"
+      :placeholder="$t('ADMIN.OFFERS.SEARCH_PLACEHOLDER')"
       @update:page="resource.page.value = $event"
     />
 
@@ -141,13 +160,13 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
       :columns="columns"
       :rows="resource.rows.value"
       :loading="resource.pending.value"
-      empty-title="No offers found"
+      :empty-title="$t('ADMIN.OFFERS.EMPTY')"
     >
       <template #cell-product="{ row }">
         <span class="min-w-0">
-          <NuxtLink :to="`/products/${row.product.slug}`" class="text-sm font-medium text-ink hover:underline">
+          <NuxtLinkLocale :to="`/products/${row.product.slug}`" class="text-sm font-medium text-ink hover:underline">
             {{ row.product.name }}
-          </NuxtLink>
+          </NuxtLinkLocale>
           <span class="block text-xs text-ink-muted">{{ row.product.brand.name }}</span>
         </span>
       </template>
@@ -156,24 +175,24 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
       </template>
       <template #cell-price="{ row }">
         <span class="text-sm font-medium whitespace-nowrap tabular-nums text-ink">
-          {{ formatPrice(Number(row.price), row.currency) }}
+          {{ format.price(Number(row.price), row.currency) }}
         </span>
       </template>
       <template #cell-availability="{ row }">
         <BaseBadge
           :tone="row.availability === 'IN_STOCK' ? 'sage' : row.availability === 'LOW_STOCK' ? 'caution' : 'neutral'"
           size="xs"
-        >{{ row.availability.replace('_', ' ').toLowerCase() }}</BaseBadge>
+        >{{ vocab.availability(row.availability) }}</BaseBadge>
       </template>
       <template #cell-lastCheckedAt="{ row }">
-        <span class="text-xs text-ink-muted">{{ formatDate(row.lastCheckedAt) }}</span>
+        <span class="text-xs text-ink-muted">{{ format.dateShort(row.lastCheckedAt) }}</span>
       </template>
       <template #cell-actions="{ row }">
         <span class="flex justify-end gap-0.5">
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            aria-label="Edit offer"
+            :aria-label="$t('ADMIN.OFFERS.EDIT_ARIA')"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -181,8 +200,8 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
-            aria-label="Delete offer"
-            @click="resource.remove(row.id, 'Offer deleted')"
+            :aria-label="$t('ADMIN.OFFERS.DELETE_ARIA')"
+            @click="resource.remove(row.id, t('ADMIN.OFFERS.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -190,10 +209,10 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
       </template>
     </AdminTable>
 
-    <BaseModal v-model:open="modalOpen" title="Store offer" size="sm">
+    <BaseModal v-model:open="modalOpen" :title="$t('ADMIN.OFFERS.MODAL_TITLE')" size="sm">
       <div class="space-y-4">
         <div>
-          <p class="mb-1.5 text-sm font-medium text-ink-soft">Product</p>
+          <p class="mb-1.5 text-sm font-medium text-ink-soft">{{ $t('ADMIN.OFFERS.PRODUCT_LABEL') }}</p>
           <div
             v-if="form.productId"
             class="flex items-center justify-between gap-2 rounded-lg border border-line bg-surface-muted px-3.5 py-2.5"
@@ -203,10 +222,10 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
               type="button"
               class="shrink-0 text-xs text-ink-muted hover:text-ink"
               @click="form.productId = ''"
-            >Change</button>
+            >{{ $t('ADMIN.OFFERS.CHANGE') }}</button>
           </div>
           <template v-else>
-            <BaseInput v-model="productSearch" placeholder="Search products…">
+            <BaseInput v-model="productSearch" :placeholder="$t('ADMIN.OFFERS.PRODUCT_PLACEHOLDER')">
               <template #prefix><BaseIcon name="search" :size="16" /></template>
             </BaseInput>
             <ul v-if="productResults.length" class="mt-2 space-y-1">
@@ -221,48 +240,35 @@ useSeo({ title: 'Offers · Admin', description: 'Manage store offers.', noindex:
                 </button>
               </li>
             </ul>
-            <p v-else-if="searching" class="mt-2 text-xs text-ink-muted">Searching…</p>
+            <p v-else-if="searching" class="mt-2 text-xs text-ink-muted">
+              {{ $t('ADMIN.OFFERS.SEARCHING') }}
+            </p>
           </template>
         </div>
 
-        <div>
-          <label for="offer-store" class="mb-1.5 block text-sm font-medium text-ink-soft">Store</label>
-          <select
-            id="offer-store"
-            v-model="form.storeId"
-            class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-          >
-            <option value="" disabled>Choose a store</option>
-            <option v-for="store in stores" :key="store.id" :value="store.id">{{ store.name }}</option>
-          </select>
-        </div>
+        <BaseNativeSelect
+          v-model="form.storeId"
+          :options="storeOptions"
+          :label="$t('ADMIN.OFFERS.STORE_LABEL')"
+        />
 
-        <BaseInput v-model="form.price" label="Price (PLN)" type="number" required />
-        <BaseInput v-model="form.url" label="Product URL" placeholder="https://…" />
+        <BaseInput v-model="form.price" :label="$t('ADMIN.OFFERS.PRICE_LABEL')" type="number" required />
+        <BaseInput v-model="form.url" :label="$t('ADMIN.OFFERS.URL_LABEL')" placeholder="https://…" />
 
-        <div>
-          <label for="offer-availability" class="mb-1.5 block text-sm font-medium text-ink-soft">
-            Availability
-          </label>
-          <select
-            id="offer-availability"
-            v-model="form.availability"
-            class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-          >
-            <option v-for="value in AVAILABILITY" :key="value" :value="value">
-              {{ value.replace('_', ' ').toLowerCase() }}
-            </option>
-          </select>
-        </div>
+        <BaseNativeSelect
+          v-model="form.availability"
+          :options="availabilityOptions"
+          :label="$t('ADMIN.OFFERS.AVAILABILITY_LABEL')"
+        />
       </div>
 
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">Cancel</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
         <BaseButton
           :loading="resource.saving.value"
           :disabled="!form.productId || !form.storeId || !form.price"
           @click="save"
-        >Save offer</BaseButton>
+        >{{ $t('ADMIN.OFFERS.SAVE') }}</BaseButton>
       </template>
     </BaseModal>
   </div>

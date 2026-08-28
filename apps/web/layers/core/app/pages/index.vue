@@ -20,14 +20,16 @@ const affordable = computed(
   () => feed.value?.sections.find((section) => section.key === 'best-value')?.products ?? [],
 );
 
-useSeo({
-  title: 'Kosvia — your personal AI for choosing cosmetics',
-  description:
-    'Kosvia analyses cosmetics, their INCI ingredients, prices and your personal preferences, then tells you which product actually fits you — and where it is cheapest.',
+const { t } = useI18n();
+
+useSeo(() => ({
+  title: t('SEO.HOME.TITLE'),
+  description: t('SEO.HOME.DESCRIPTION'),
   path: '/',
-});
+}));
 
 const config = useRuntimeConfig();
+const format = useFormat();
 useHead({
   script: [
     {
@@ -37,7 +39,7 @@ useHead({
         '@type': 'WebSite',
         name: 'Kosvia',
         url: config.public.siteUrl,
-        description: 'AI Beauty Shopper — find cosmetics that fit you.',
+        description: t('SEO.HOME.DESCRIPTION'),
         potentialAction: {
           '@type': 'SearchAction',
           target: `${config.public.siteUrl}/products?q={search_term_string}`,
@@ -56,15 +58,15 @@ useHead({
     <LandingSteps />
 
     <LandingFeature
-      eyebrow="Personalised recommendations"
-      title="One number that means something"
-      description="Every product carries a Personal Match: how well this specific formula fits your skin, your concerns, your budget and what is already on your shelf."
+      :eyebrow="$t('LANDING.MATCH.EYEBROW')"
+      :title="$t('LANDING.MATCH.TITLE')"
+      :description="$t('LANDING.MATCH.BODY')"
       :points="[
-        'Computed on the backend, the same way every time',
-        'Every point is attributed to a named reason',
-        'Ask “Why?” and get the breakdown, not a black box',
+        $t('LANDING.MATCH.POINT_1'),
+        $t('LANDING.MATCH.POINT_2'),
+        $t('LANDING.MATCH.POINT_3'),
       ]"
-      cta-label="See it on a product"
+      :cta-label="$t('LANDING.MATCH.CTA')"
       cta-to="/products"
       tone="surface"
     >
@@ -72,15 +74,15 @@ useHead({
     </LandingFeature>
 
     <LandingFeature
-      eyebrow="Ingredient analysis"
-      title="The label, translated"
-      description="INCI lists are ordered by how much of each ingredient is in the bottle. We read them that way — grouped by what each ingredient is actually doing, with position taken seriously."
+      :eyebrow="$t('LANDING.INGREDIENTS.EYEBROW')"
+      :title="$t('LANDING.INGREDIENTS.TITLE')"
+      :description="$t('LANDING.INGREDIENTS.BODY')"
       :points="[
-        '139 ingredients with plain-language descriptions',
-        'Grouped into actives, hydration, soothing, base',
-        'Nothing is labelled “toxic” — we describe, you decide',
+        $t('LANDING.INGREDIENTS.POINT_1'),
+        $t('LANDING.INGREDIENTS.POINT_2'),
+        $t('LANDING.INGREDIENTS.POINT_3'),
       ]"
-      cta-label="Browse the ingredient library"
+      :cta-label="$t('LANDING.INGREDIENTS.CTA')"
       cta-to="/ingredients"
       reverse
     >
@@ -88,14 +90,14 @@ useHead({
     </LandingFeature>
 
     <LandingFeature
-      eyebrow="Alternatives"
-      title="There is almost always something better"
-      description="Cheaper, better matched, better value, or built from nearly the same ingredients. Alternatives come from measured overlap and real prices, never from similar-sounding names."
+      :eyebrow="$t('LANDING.ALTERNATIVES.EYEBROW')"
+      :title="$t('LANDING.ALTERNATIVES.TITLE')"
+      :description="$t('LANDING.ALTERNATIVES.BODY')"
       :points="[
-        'Cheaper — the same job for less',
-        'Better match — closer to your profile',
-        'Better value — the strongest match per złoty',
-        'Similar ingredients — measured, not guessed',
+        $t('LANDING.ALTERNATIVES.POINT_1'),
+        $t('LANDING.ALTERNATIVES.POINT_2'),
+        $t('LANDING.ALTERNATIVES.POINT_3'),
+        $t('LANDING.ALTERNATIVES.POINT_4'),
       ]"
       tone="surface"
     >
@@ -103,33 +105,33 @@ useHead({
     </LandingFeature>
 
     <LandingFeature
-      eyebrow="My Shelf"
-      title="Kosvia remembers what you already own"
-      description="Add what is on your bathroom shelf and recommendations change: no more suggesting a fourth cleanser, and gaps in your routine become obvious."
+      :eyebrow="$t('LANDING.SHELF.EYEBROW')"
+      :title="$t('LANDING.SHELF.TITLE')"
+      :description="$t('LANDING.SHELF.BODY')"
       :points="[
-        'Spot products doing the same job',
-        'See which formulas nearly duplicate each other',
-        'Find the step your routine is missing',
+        $t('LANDING.SHELF.POINT_1'),
+        $t('LANDING.SHELF.POINT_2'),
+        $t('LANDING.SHELF.POINT_3'),
       ]"
-      cta-label="Start your shelf"
+      :cta-label="$t('LANDING.SHELF.CTA')"
       cta-to="/shelf"
       reverse
     >
       <BaseCard class="shadow-md">
-        <p class="text-sm font-semibold text-ink">Routine analysis</p>
+        <p class="text-sm font-semibold text-ink">{{ $t('LANDING.SHELF.DEMO_TITLE') }}</p>
         <div class="mt-4 space-y-3">
           <div class="flex items-start gap-3 rounded-lg bg-surface-muted p-3.5">
             <BaseIcon name="info" :size="16" class="mt-0.5 shrink-0 text-ink-faint" />
             <p class="text-sm text-ink-soft">
-              <span class="font-medium text-ink">Two products doing the same job.</span>
-              Both of your serums sit at the same step. Fine if you rotate them.
+              <span class="font-medium text-ink">{{ $t('LANDING.SHELF.DEMO_OVERLAP_TITLE') }}</span>
+              {{ $t('LANDING.SHELF.DEMO_OVERLAP_BODY') }}
             </p>
           </div>
           <div class="flex items-start gap-3 rounded-lg bg-caution-soft p-3.5">
             <BaseIcon name="alert" :size="16" class="mt-0.5 shrink-0 text-caution" />
             <p class="text-sm text-ink-soft">
-              <span class="font-medium text-ink">No sun protection on your shelf.</span>
-              The step with the clearest long-term effect on skin.
+              <span class="font-medium text-ink">{{ $t('LANDING.SHELF.DEMO_GAP_TITLE') }}</span>
+              {{ $t('LANDING.SHELF.DEMO_GAP_BODY') }}
             </p>
           </div>
         </div>
@@ -137,15 +139,15 @@ useHead({
     </LandingFeature>
 
     <LandingFeature
-      eyebrow="AI Beauty Shopper"
-      title="Ask the way you would ask a friend"
-      description="“I need a moisturiser under 70 PLN for combination sensitive skin.” Kosvia searches its own catalogue first, then writes the answer around real products."
+      :eyebrow="$t('LANDING.AI.EYEBROW')"
+      :title="$t('LANDING.AI.TITLE')"
+      :description="$t('LANDING.AI.BODY')"
       :points="[
-        'Grounded in your profile and your shelf',
-        'Real products, real prices, every time',
-        'Structured cards, not a wall of text',
+        $t('LANDING.AI.POINT_1'),
+        $t('LANDING.AI.POINT_2'),
+        $t('LANDING.AI.POINT_3'),
       ]"
-      cta-label="Try the AI shopper"
+      :cta-label="$t('LANDING.AI.CTA')"
       cta-to="/ai"
       tone="surface"
     >
@@ -154,38 +156,38 @@ useHead({
 
     <section v-if="affordable.length" class="container-page py-16 sm:py-20">
       <ProductRail
-        title="Strong formulas under 50 PLN"
-        subtitle="Live from the catalogue — every card scored the same way yours will be."
+        :title="$t('LANDING.RAIL.TITLE')"
+        :subtitle="$t('LANDING.RAIL.SUBTITLE')"
         :products="affordable.slice(0, 8)"
         see-all-to="/products?maxPrice=50&sort=ingredient-score"
       />
     </section>
 
     <LandingFeature
-      eyebrow="Price comparison"
-      title="Then we find where it is cheapest"
-      description="The same product sits at different prices in different stores. Kosvia tracks every offer it knows about and lets you set an alert for the price you would actually pay."
+      :eyebrow="$t('LANDING.PRICE.EYEBROW')"
+      :title="$t('LANDING.PRICE.TITLE')"
+      :description="$t('LANDING.PRICE.BODY')"
       :points="[
-        'Every store offer on one page',
-        'Price per 100 ml, so sizes compare fairly',
-        'Alerts when a product reaches your number',
+        $t('LANDING.PRICE.POINT_1'),
+        $t('LANDING.PRICE.POINT_2'),
+        $t('LANDING.PRICE.POINT_3'),
       ]"
-      cta-label="See price alerts"
+      :cta-label="$t('LANDING.PRICE.CTA')"
       cta-to="/price-alerts"
       reverse
     >
       <BaseCard :padded="false" class="overflow-hidden shadow-md">
         <div class="border-b border-line px-5 py-4">
-          <p class="text-sm font-semibold text-ink">Ceramide Barrier Cream · 50 ml</p>
-          <p class="text-xs text-ink-muted">Across 4 stores</p>
+          <p class="text-sm font-semibold text-ink">{{ $t('LANDING.PRICE.DEMO_TITLE') }}</p>
+          <p class="text-xs text-ink-muted">{{ $t('LANDING.PRICE.DEMO_SUBTITLE') }}</p>
         </div>
         <ul class="divide-y divide-line">
           <li
             v-for="(offer, index) in [
-              { store: 'Demo Drogeria', price: '40,99 PLN', best: true },
-              { store: 'Demo Apteka', price: '44,49 PLN', best: false },
-              { store: 'Demo Market', price: '47,99 PLN', best: false },
-              { store: 'Demo Beauty Club', price: '52,00 PLN', best: false },
+              { store: 'Demo Drogeria', price: 40.99, best: true },
+              { store: 'Demo Apteka', price: 44.49, best: false },
+              { store: 'Demo Market', price: 47.99, best: false },
+              { store: 'Demo Beauty Club', price: 52.0, best: false },
             ]"
             :key="index"
             class="flex items-center justify-between gap-3 px-5 py-3"
@@ -195,8 +197,12 @@ useHead({
               {{ offer.store }}
             </span>
             <span class="flex items-center gap-2">
-              <BaseBadge v-if="offer.best" tone="sage" size="xs">Best price</BaseBadge>
-              <span class="text-sm font-semibold tabular-nums text-ink">{{ offer.price }}</span>
+              <BaseBadge v-if="offer.best" tone="sage" size="xs">
+                {{ $t('LANDING.PRICE.BEST_PRICE') }}
+              </BaseBadge>
+              <span class="text-sm font-semibold tabular-nums text-ink">
+                {{ format.price(offer.price) }}
+              </span>
             </span>
           </li>
         </ul>

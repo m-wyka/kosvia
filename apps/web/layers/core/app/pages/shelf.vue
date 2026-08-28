@@ -7,6 +7,8 @@ const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
 const route = useRoute();
+const { t } = useI18n();
+const vocab = useVocabulary();
 
 const { data: items, pending, error, refresh } = await useApiFetch<ShelfItemDto[]>('/shelf', {
   key: 'shelf',
@@ -19,9 +21,13 @@ const { data: analysis, refresh: refreshAnalysis } = await useApiFetch<RoutineAn
 
 const tab = ref(String(route.query.tab ?? 'all'));
 const tabs = computed(() => [
-  { value: 'all', label: 'Everything', count: items.value?.length ?? 0 },
-  { value: 'favorites', label: 'Favourites', count: items.value?.filter((i) => i.isFavorite).length ?? 0 },
-  { value: 'routine', label: 'Routine analysis' },
+  { value: 'all', label: t('SHELF.TAB_ALL'), count: items.value?.length ?? 0 },
+  {
+    value: 'favorites',
+    label: t('SHELF.TAB_FAVORITES'),
+    count: items.value?.filter((i) => i.isFavorite).length ?? 0,
+  },
+  { value: 'routine', label: t('SHELF.TAB_ROUTINE') },
 ]);
 
 const visible = computed(() =>
@@ -30,10 +36,16 @@ const visible = computed(() =>
 
 /** Grouped by category so the shelf reads like a routine, not a list. */
 const grouped = computed(() => {
-  const map = new Map<string, { name: string; items: ShelfItemDto[] }>();
+  const map = new Map<string, { name: string; slug: string; items: ShelfItemDto[] }>();
   for (const item of visible.value) {
     const key = item.product.category.id;
-    if (!map.has(key)) map.set(key, { name: item.product.category.name, items: [] });
+    if (!map.has(key)) {
+      map.set(key, {
+        name: item.product.category.name,
+        slug: item.product.category.slug,
+        items: [],
+      });
+    }
     map.get(key)!.items.push(item);
   }
   return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
@@ -56,7 +68,7 @@ async function removeItem(item: ShelfItemDto) {
   try {
     await api(`/shelf/${item.id}`, { method: 'DELETE' });
     await reloadAll();
-    toast.notify(`${item.product.name} removed from your shelf`);
+    toast.notify(t('SHELF.REMOVED', { name: item.product.name }));
   } catch (caught) {
     toast.error(message(caught));
   }
@@ -95,27 +107,29 @@ async function addProduct(product: ProductSummaryDto) {
     await reloadAll();
     addOpen.value = false;
     search.value = '';
-    toast.success(`${product.name} added to your shelf`);
+    toast.success(t('SHELF.ADDED', { name: product.name }));
   } catch (caught) {
     toast.error(message(caught));
   }
 }
 
-useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a routine.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.SHELF.TITLE'),
+  description: t('SEO.SHELF.DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div class="container-page py-8 sm:py-12">
     <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="font-display text-3xl text-ink sm:text-4xl">My Shelf</h1>
-        <p class="mt-2 text-sm text-ink-muted">
-          What you already own changes what we recommend.
-        </p>
+        <h1 class="font-display text-3xl text-ink sm:text-4xl">{{ $t('SHELF.TITLE') }}</h1>
+        <p class="mt-2 text-sm text-ink-muted">{{ $t('SHELF.SUBTITLE') }}</p>
       </div>
       <BaseButton @click="addOpen = true">
         <template #icon><BaseIcon name="plus" :size="17" /></template>
-        Add a product
+        {{ $t('SHELF.ADD_PRODUCT') }}
       </BaseButton>
     </header>
 
@@ -132,10 +146,10 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
       <BaseEmptyState
         v-if="!analysis || analysis.itemCount === 0"
         icon="shelf"
-        title="Nothing to analyse yet"
-        description="Add a few products and we will tell you what your routine covers and what it is missing."
+        :title="$t('SHELF.ROUTINE.EMPTY_TITLE')"
+        :description="$t('SHELF.ROUTINE.EMPTY_BODY')"
       >
-        <BaseButton @click="addOpen = true">Add a product</BaseButton>
+        <BaseButton @click="addOpen = true">{{ $t('SHELF.ADD_PRODUCT') }}</BaseButton>
       </BaseEmptyState>
 
       <div v-else class="grid gap-6 lg:grid-cols-[1fr_20rem]">
@@ -161,7 +175,7 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
 
         <aside class="space-y-4">
           <BaseCard>
-            <h2 class="text-sm font-semibold text-ink">What your routine covers</h2>
+            <h2 class="text-sm font-semibold text-ink">{{ $t('SHELF.ROUTINE.COVERS') }}</h2>
             <ul class="mt-3 flex flex-wrap gap-1.5">
               <li v-for="category in analysis.coveredCategories" :key="category">
                 <BaseBadge tone="sage" size="xs">{{ category }}</BaseBadge>
@@ -170,26 +184,27 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
           </BaseCard>
 
           <BaseCard v-if="analysis.missingCategories.length">
-            <h2 class="text-sm font-semibold text-ink">Gaps</h2>
+            <h2 class="text-sm font-semibold text-ink">{{ $t('SHELF.ROUTINE.GAPS') }}</h2>
             <ul class="mt-3 space-y-3">
               <li v-for="gap in analysis.missingCategories" :key="gap.slug">
-                <NuxtLink
+                <NuxtLinkLocale
                   :to="`/products?category=${gap.slug}`"
                   class="group flex items-start justify-between gap-2"
                 >
                   <span class="min-w-0">
-                    <span class="block text-sm font-medium text-ink group-hover:underline">{{ gap.name }}</span>
+                    <span class="block text-sm font-medium text-ink group-hover:underline">
+                      {{ vocab.category(gap.slug, gap.name) }}
+                    </span>
                     <span class="block text-xs text-ink-muted">{{ gap.why }}</span>
                   </span>
                   <BaseIcon name="chevron-right" :size="15" class="mt-0.5 shrink-0 text-ink-faint" />
-                </NuxtLink>
+                </NuxtLinkLocale>
               </li>
             </ul>
           </BaseCard>
 
           <p class="px-1 text-xs leading-relaxed text-ink-muted">
-            These are observations about what your products do, not advice about your skin.
-            Kosvia is not a medical service.
+            {{ $t('SHELF.ROUTINE.NOTE') }}
           </p>
         </aside>
       </div>
@@ -199,21 +214,19 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
     <BaseEmptyState
       v-else-if="!visible.length"
       icon="shelf"
-      :title="tab === 'favorites' ? 'No favourites yet' : 'Your shelf is empty'"
+      :title="tab === 'favorites' ? $t('SHELF.EMPTY_FAVORITES_TITLE') : $t('SHELF.EMPTY_TITLE')"
       :description="
-        tab === 'favorites'
-          ? 'Tap the heart on any product to keep it here.'
-          : 'Search for your first cosmetic and start building your personal beauty collection.'
+        tab === 'favorites' ? $t('SHELF.EMPTY_FAVORITES_BODY') : $t('SHELF.EMPTY_BODY')
       "
     >
-      <BaseButton @click="addOpen = true">Add product</BaseButton>
-      <BaseButton variant="secondary" to="/discover">Browse recommendations</BaseButton>
+      <BaseButton @click="addOpen = true">{{ $t('SHELF.EMPTY_CTA') }}</BaseButton>
+      <BaseButton variant="secondary" to="/discover">{{ $t('SHELF.BROWSE_CTA') }}</BaseButton>
     </BaseEmptyState>
 
     <div v-else class="space-y-10">
       <section v-for="group in grouped" :key="group.name">
         <h2 class="mb-3 text-sm font-semibold tracking-wide text-ink-muted uppercase">
-          {{ group.name }}
+          {{ vocab.category(group.slug, group.name) }}
         </h2>
         <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <li
@@ -221,23 +234,23 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
             :key="item.id"
             class="flex gap-3.5 rounded-xl border border-line bg-surface p-3.5"
           >
-            <NuxtLink :to="`/products/${item.product.slug}`" class="w-20 shrink-0">
+            <NuxtLinkLocale :to="`/products/${item.product.slug}`" class="w-20 shrink-0">
               <ProductImage
                 :src="item.product.imageUrl"
                 :alt="item.product.name"
                 ratio="square"
                 class="rounded-md"
               />
-            </NuxtLink>
+            </NuxtLinkLocale>
 
             <div class="flex min-w-0 flex-1 flex-col">
               <p class="truncate text-2xs tracking-wide text-ink-muted uppercase">
                 {{ item.product.brand.name }}
               </p>
-              <NuxtLink
+              <NuxtLinkLocale
                 :to="`/products/${item.product.slug}`"
                 class="text-sm leading-snug font-medium text-ink hover:underline"
-              >{{ item.product.name }}</NuxtLink>
+              >{{ item.product.name }}</NuxtLinkLocale>
 
               <p v-if="item.notes" class="mt-1 line-clamp-2 text-xs text-ink-muted">{{ item.notes }}</p>
 
@@ -245,13 +258,13 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
                 <span
                   v-if="item.product.personalMatch"
                   class="text-xs font-medium tabular-nums text-ink-muted"
-                >{{ item.product.personalMatch.score }}% match</span>
+                >{{ $t('PRODUCT.MATCH', { score: item.product.personalMatch.score }) }}</span>
                 <span class="flex items-center gap-0.5">
                   <button
                     type="button"
                     class="rounded-md p-1.5 transition-colors"
                     :class="item.isFavorite ? 'text-blush-deep' : 'text-ink-faint hover:text-ink'"
-                    :aria-label="item.isFavorite ? 'Remove from favourites' : 'Add to favourites'"
+                    :aria-label="item.isFavorite ? $t('SHELF.REMOVE_FAVORITE') : $t('SHELF.ADD_FAVORITE')"
                     :aria-pressed="item.isFavorite"
                     @click="toggleFavorite(item)"
                   >
@@ -260,7 +273,7 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
                   <button
                     type="button"
                     class="rounded-md p-1.5 text-ink-faint transition-colors hover:text-critical"
-                    :aria-label="`Remove ${item.product.name} from shelf`"
+                    :aria-label="$t('SHELF.REMOVE_ITEM', { name: item.product.name })"
                     @click="removeItem(item)"
                   >
                     <BaseIcon name="trash" :size="16" />
@@ -275,11 +288,15 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
 
     <BaseModal
       v-model:open="addOpen"
-      title="Add a product"
-      description="Search the catalogue. Barcode scanning is coming later."
+      :title="$t('SHELF.ADD_MODAL.TITLE')"
+      :description="$t('SHELF.ADD_MODAL.BODY')"
       size="md"
     >
-      <BaseInput v-model="search" placeholder="Search by product, brand or EAN" autocomplete="off">
+      <BaseInput
+        v-model="search"
+        :placeholder="$t('SHELF.ADD_MODAL.PLACEHOLDER')"
+        autocomplete="off"
+      >
         <template #prefix><BaseIcon name="search" :size="16" /></template>
       </BaseInput>
 
@@ -289,7 +306,7 @@ useSeo({ title: 'My Shelf', description: 'The cosmetics you own, analysed as a r
         </div>
 
         <p v-else-if="search.trim().length >= 2 && !results.length" class="py-6 text-center text-sm text-ink-muted">
-          Nothing matched “{{ search }}”.
+          {{ $t('SHELF.ADD_MODAL.NO_RESULTS', { query: search }) }}
         </p>
 
         <button

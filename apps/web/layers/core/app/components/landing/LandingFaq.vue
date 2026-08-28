@@ -1,37 +1,24 @@
 <script setup lang="ts">
-const faqs = [
-  {
-    q: 'Is Kosvia just another ingredient scanner?',
-    a: 'No. Scanners tell you what is in a product. Kosvia answers a harder question — whether that product suits you specifically, given your skin, your goals, your budget and what you already own.',
-  },
-  {
-    q: 'Where does the Personal Match number come from?',
-    a: 'A deterministic scoring service on our backend. It weighs your skin type, concerns, goals, preferences, budget and shelf against the product’s ingredient list. The AI can explain the score in plain language, but it never produces it.',
-  },
-  {
-    q: 'Can the AI invent a product or a price?',
-    a: 'It cannot. The backend retrieves real rows from the database first and the model is only allowed to talk about those. Prices, ingredients and availability are passed to it as facts, never asked of it.',
-  },
-  {
-    q: 'Do you label ingredients as toxic?',
-    a: 'Never. We describe what an ingredient does and note where something is worth knowing — fragrance being a common trigger for reactive skin, for example. That is information, not a verdict.',
-  },
-  {
-    q: 'Is this medical advice?',
-    a: 'No. Kosvia is a shopping assistant. It does not diagnose skin conditions and does not claim any product will treat one. For a persistent skin concern, see a dermatologist.',
-  },
-  {
-    q: 'Are the products and prices real?',
-    a: 'Not in this build. The catalogue is demo data — invented brands, generated prices and illustrated packaging — so the product can be evaluated before any retailer integration exists.',
-  },
-];
+const { t } = useI18n();
+
+/** Six entries, each a Q/A pair under LANDING.FAQ. */
+const faqs = computed(() =>
+  [1, 2, 3, 4, 5, 6].map((n) => ({
+    q: t(`LANDING.FAQ.Q_${n}`),
+    a: t(`LANDING.FAQ.A_${n}`),
+  })),
+);
 
 const open = ref<number | null>(0);
 </script>
 
 <template>
   <section class="container-page py-16 sm:py-20">
-    <SectionHeading eyebrow="FAQ" title="Questions worth asking" align="center" />
+    <SectionHeading
+      :eyebrow="$t('LANDING.FAQ.EYEBROW')"
+      :title="$t('LANDING.FAQ.TITLE')"
+      align="center"
+    />
 
     <dl class="mx-auto mt-10 max-w-2xl divide-y divide-line rounded-xl border border-line bg-surface">
       <div v-for="(faq, index) in faqs" :key="faq.q">

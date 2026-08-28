@@ -131,6 +131,8 @@ describe('PersonalMatchService', () => {
       });
       const warning = result.warnings.find((w) => w.code === 'ingredient-excluded');
       expect(warning?.label).toContain('Niacinamide');
+      // Clients translate on the code, so the raw values have to come with it.
+      expect(warning?.params?.ingredients).toEqual(['Niacinamide']);
     });
   });
 
@@ -208,6 +210,49 @@ describe('PersonalMatchService', () => {
     });
     expect(perfect.score).toBeGreaterThan(80);
     expect(perfect.score).toBeLessThanOrEqual(99);
+  });
+
+  describe('translatable reasons', () => {
+    it('carries the data behind each sentence, not just the sentence', () => {
+      const result = service.score({
+        product: product({
+          ...hydratingCream,
+          targetSkinTypes: ['COMBINATION'],
+          lowestPrice: 300,
+        }),
+        profile: profile({
+          skinType: 'COMBINATION',
+          budget: 'UNDER_50',
+          concernSlugs: ['dehydration'],
+          goalSlugs: ['hydration'],
+        }),
+      });
+
+      const byCode = new Map(
+        [...result.reasons, ...result.warnings].map((entry) => [entry.code, entry]),
+      );
+
+      expect(byCode.get('skin-type')?.params).toEqual({ skinType: 'COMBINATION' });
+      expect(byCode.get('concerns')?.params?.concerns).toEqual(['dehydration']);
+      expect(byCode.get('goals')?.params?.goals).toEqual(['hydration']);
+      expect(byCode.get('budget-over')?.params).toEqual({ budget: 50 });
+    });
+
+    it('gives each distinct message its own code', () => {
+      const good = service.score({
+        product: product({ ...hydratingCream, ingredientScore: 90 }),
+        profile: profile(),
+      });
+      const poor = service.score({
+        product: product({ ...hydratingCream, ingredientScore: 20 }),
+        profile: profile(),
+      });
+
+      // One code cannot mean both "well built" and "light on actives" — the UI
+      // would have nothing else to translate on.
+      expect(good.reasons.some((r) => r.code === 'ingredient-quality-good')).toBe(true);
+      expect(poor.warnings.some((w) => w.code === 'ingredient-quality-poor')).toBe(true);
+    });
   });
 
   it('scoreMany returns one entry per product', () => {

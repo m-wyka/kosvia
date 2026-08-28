@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { formatPrice, type ComparisonResultDto } from '@kosvia/shared';
+import type { ComparisonResultDto } from '@kosvia/shared';
 
 const route = useRoute();
 const router = useRouter();
 const compare = useCompareStore();
+const { t } = useI18n();
+const format = useFormat();
 
 onMounted(() => {
   compare.hydrate();
@@ -38,39 +40,41 @@ const winnerIndex = computed(() =>
 );
 
 function formatCell(key: string, value: string | number | null): string {
-  if (value === null) return '—';
+  if (value === null) return t('COMMON.NOT_AVAILABLE');
   if (typeof value !== 'number') return value;
-  if (key === 'price' || key === 'price-per-100') return formatPrice(value);
+  if (key === 'price' || key === 'price-per-100') return format.price(value);
   if (key === 'match') return `${value}%`;
   return String(value);
 }
 
-useSeo({
-  title: 'Compare cosmetics side by side',
-  description:
-    'Compare up to four cosmetics on price per 100 ml, personal match, ingredient score and key actives — with a clear recommendation at the end.',
+/** Row labels come from the locale file, keyed on the API's row key. */
+function rowLabel(key: string): string {
+  return t(`COMPARE.ROW.${key.replace(/-/g, '_').toUpperCase()}`);
+}
+
+useSeo(() => ({
+  title: t('SEO.COMPARE.TITLE'),
+  description: t('SEO.COMPARE.DESCRIPTION'),
   path: '/compare',
-});
+}));
 </script>
 
 <template>
   <div class="container-page py-8 sm:py-12">
     <header class="mb-8 max-w-2xl">
-      <h1 class="font-display text-3xl text-ink sm:text-4xl">Compare</h1>
-      <p class="mt-2 text-base text-ink-muted">
-        Two to four products, measured on the things that actually decide it.
-      </p>
+      <h1 class="font-display text-3xl text-ink sm:text-4xl">{{ $t('COMPARE.TITLE') }}</h1>
+      <p class="mt-2 text-base text-ink-muted">{{ $t('COMPARE.SUBTITLE') }}</p>
     </header>
 
     <BaseEmptyState
       v-if="slugs.length < 2"
       icon="compare"
-      title="Pick at least two products"
-      description="Add products from anywhere in the catalogue using the compare button on a product card."
+      :title="$t('COMPARE.EMPTY_TITLE')"
+      :description="$t('COMPARE.EMPTY_BODY')"
     >
-      <BaseButton to="/products">Browse products</BaseButton>
+      <BaseButton to="/products">{{ $t('COMPARE.BROWSE') }}</BaseButton>
       <BaseButton v-if="compare.count === 1" variant="secondary" to="/discover">
-        Find one more
+        {{ $t('COMPARE.FIND_ONE_MORE') }}
       </BaseButton>
     </BaseEmptyState>
 
@@ -105,18 +109,18 @@ useSeo({
             v-if="winnerIndex >= 0"
             :to="`/products/${data.products[winnerIndex]!.slug}`"
             class="shrink-0"
-          >View product</BaseButton>
+          >{{ $t('COMPARE.VIEW_PRODUCT') }}</BaseButton>
         </div>
       </BaseCard>
 
       <!-- Table on desktop; stacked cards on mobile, where a table cannot work. -->
       <div class="hide-scrollbar -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
         <table class="w-full min-w-[42rem] border-separate border-spacing-0">
-          <caption class="sr-only">Product comparison</caption>
+          <caption class="sr-only">{{ $t('COMPARE.CAPTION') }}</caption>
           <thead>
             <tr>
               <th scope="col" class="w-40 border-b border-line px-3 pb-4 text-left align-bottom">
-                <span class="sr-only">Attribute</span>
+                <span class="sr-only">{{ $t('COMPARE.ATTRIBUTE') }}</span>
               </th>
               <th
                 v-for="(product, index) in data.products"
@@ -129,7 +133,7 @@ useSeo({
                   <button
                     type="button"
                     class="absolute -top-1 -right-1 rounded-md p-1 text-ink-faint transition-colors hover:text-critical"
-                    :aria-label="`Remove ${product.name}`"
+                    :aria-label="$t('COMPARE.REMOVE', { name: product.name })"
                     @click="removeProduct(product.slug)"
                   >
                     <BaseIcon name="close" :size="14" />
@@ -140,16 +144,16 @@ useSeo({
                     ratio="square"
                     class="w-20"
                   />
-                  <NuxtLink :to="`/products/${product.slug}`" class="min-w-0">
+                  <NuxtLinkLocale :to="`/products/${product.slug}`" class="min-w-0">
                     <span class="block text-2xs tracking-wide text-ink-muted uppercase">
                       {{ product.brand.name }}
                     </span>
                     <span class="mt-0.5 block text-sm font-medium text-ink hover:underline">
                       {{ product.name }}
                     </span>
-                  </NuxtLink>
+                  </NuxtLinkLocale>
                   <BaseBadge v-if="index === winnerIndex" tone="sage" size="xs">
-                    Kosvia's pick
+                    {{ $t('COMPARE.OUR_PICK') }}
                   </BaseBadge>
                 </div>
               </th>
@@ -158,7 +162,7 @@ useSeo({
           <tbody>
             <tr v-for="row in data.rows" :key="row.key" class="even:bg-surface-muted/60">
               <th scope="row" class="px-3 py-3 text-left text-sm font-medium text-ink-soft">
-                {{ row.label }}
+                {{ rowLabel(row.key) }}
               </th>
               <td
                 v-for="(value, index) in row.values"
@@ -186,8 +190,7 @@ useSeo({
       </div>
 
       <p class="mt-6 text-xs text-ink-muted">
-        Price per 100 ml is the fairest way to compare products of different sizes.
-        Personal Match is computed from your profile, not from reviews.
+        {{ $t('COMPARE.NOTE') }}
       </p>
     </template>
   </div>

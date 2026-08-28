@@ -16,6 +16,16 @@ const ROLE_TONE = {
   alternative: 'neutral',
   'already-owned': 'peach',
 } as const;
+
+const { t } = useI18n();
+const format = useFormat();
+
+/**
+ * The API sends an English `label` alongside the machine-readable `role`; we
+ * translate the role and ignore the label, exactly as with match reasons.
+ */
+const roleLabel = (role: keyof typeof ROLE_TONE) =>
+  t(`AI.ROLE.${role.replace(/-/g, '_').toUpperCase()}`);
 </script>
 
 <template>
@@ -40,7 +50,7 @@ const ROLE_TONE = {
 
       <ul v-if="message.suggestions.length" class="space-y-2.5">
         <li v-for="suggestion in message.suggestions" :key="suggestion.product.id">
-          <NuxtLink
+          <NuxtLinkLocale
             :to="`/products/${suggestion.product.slug}`"
             class="group flex items-center gap-3 rounded-xl border border-line bg-surface p-3
                    transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
@@ -53,7 +63,7 @@ const ROLE_TONE = {
             />
             <span class="min-w-0 flex-1">
               <BaseBadge :tone="ROLE_TONE[suggestion.role]" size="xs">
-                {{ suggestion.label }}
+                {{ roleLabel(suggestion.role) }}
               </BaseBadge>
               <span class="mt-1.5 block truncate text-2xs tracking-wide text-ink-muted uppercase">
                 {{ suggestion.product.brand.name }}
@@ -71,10 +81,10 @@ const ROLE_TONE = {
                 class="block text-sm font-semibold tabular-nums text-sage"
               >{{ suggestion.product.personalMatch.score }}%</span>
               <span class="block text-sm font-semibold tabular-nums text-ink">
-                {{ suggestion.product.lowestPrice?.toFixed(2).replace('.', ',') }} PLN
+                {{ format.price(suggestion.product.lowestPrice) }}
               </span>
             </span>
-          </NuxtLink>
+          </NuxtLinkLocale>
         </li>
       </ul>
     </div>

@@ -43,18 +43,18 @@ watch(() => props.products, () => nextTick(updateEdges));
         <p v-if="subtitle" class="mt-1 text-sm text-ink-muted">{{ subtitle }}</p>
       </div>
       <div class="flex shrink-0 items-center gap-2">
-        <NuxtLink
+        <NuxtLinkLocale
           v-if="seeAllTo"
           :to="seeAllTo"
           class="text-sm font-medium text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline"
-        >See all</NuxtLink>
+        >{{ $t('COMMON.SEE_ALL') }}</NuxtLinkLocale>
         <div class="hidden gap-1 sm:flex">
           <button
             type="button"
             class="flex size-8 items-center justify-center rounded-full border border-line text-ink-soft
                    transition-colors hover:border-line-strong hover:bg-surface disabled:opacity-35"
             :disabled="atStart"
-            aria-label="Scroll left"
+            :aria-label="$t('PRODUCT.SCROLL_LEFT')"
             @click="scrollBy(-1)"
           >
             <BaseIcon name="chevron-left" :size="16" />
@@ -64,7 +64,7 @@ watch(() => props.products, () => nextTick(updateEdges));
             class="flex size-8 items-center justify-center rounded-full border border-line text-ink-soft
                    transition-colors hover:border-line-strong hover:bg-surface disabled:opacity-35"
             :disabled="atEnd"
-            aria-label="Scroll right"
+            :aria-label="$t('PRODUCT.SCROLL_RIGHT')"
             @click="scrollBy(1)"
           >
             <BaseIcon name="chevron-right" :size="16" />

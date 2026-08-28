@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MATCH_TIER_LABEL, type PersonalMatchDto } from '@kosvia/shared';
+import type { PersonalMatchDto } from '@kosvia/shared';
 
 /**
  * The Personal Match number — the single most important figure in the product,
@@ -15,6 +15,9 @@ const props = withDefaults(
   }>(),
   { size: 'md', showLabel: true },
 );
+
+const { t } = useI18n();
+const vocab = useVocabulary();
 
 const dimensions = {
   sm: { box: 40, stroke: 3.5, text: 'text-xs' },
@@ -59,7 +62,9 @@ const tone = computed(() => {
 });
 
 const label = computed(() =>
-  props.match?.personalised === false ? 'Formula score' : MATCH_TIER_LABEL[props.match?.tier ?? 'poor'],
+  props.match?.personalised === false
+    ? t('PRODUCT.FORMULA_SCORE')
+    : vocab.matchTier(props.match?.tier ?? 'poor'),
 );
 </script>
 
@@ -72,7 +77,7 @@ const label = computed(() =>
         :viewBox="`0 0 ${d.box} ${d.box}`"
         class="-rotate-90"
         role="img"
-        :aria-label="`Personal match ${score} percent — ${label}`"
+        :aria-label="$t('PRODUCT.MATCH_ARIA', { score, tier: label })"
       >
         <circle
           :cx="d.box / 2" :cy="d.box / 2" :r="radius"
@@ -95,7 +100,7 @@ const label = computed(() =>
     <div v-if="showLabel" class="min-w-0">
       <p class="text-sm font-medium text-ink">{{ label }}</p>
       <p v-if="match.personalised === false" class="text-xs text-ink-muted">
-        Complete your profile for a personal score
+        {{ $t('PRODUCT.COMPLETE_PROFILE') }}
       </p>
       <p v-else-if="match.reasons.length" class="truncate text-xs text-ink-muted">
         {{ match.reasons[0]!.label }}

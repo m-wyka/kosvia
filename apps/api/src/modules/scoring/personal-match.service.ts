@@ -3,6 +3,7 @@ import {
   BUDGET_CEILING,
   matchTier,
   type MatchReason,
+  type MatchReasonParams,
   type PersonalMatchDto,
 } from '@kosvia/shared';
 import {
@@ -75,9 +76,11 @@ export class PersonalMatchService {
     // reported breakdown always adds up to the score the user sees.
     const raw: MatchReason[] = [];
 
-    const add = (code: string, label: string, impact: number) => {
+    // `label` stays the canonical English sentence; `params` carries the raw
+    // values so a client can render the same reason in its own language.
+    const add = (code: string, label: string, impact: number, params?: MatchReasonParams) => {
       if (Math.abs(impact) < 0.5) return;
-      raw.push({ code, label, impact });
+      raw.push({ code, label, impact, ...(params ? { params } : {}) });
     };
 
     /* --------------------------------------------------------- hard blocks -- */
@@ -95,6 +98,7 @@ export class PersonalMatchService {
         'ingredient-excluded',
         `Contains ${names.join(', ')}, which you avoid`,
         -clamp(20 + excludedHits.length * 8, 20, 40),
+        { ingredients: names },
       );
     }
 
@@ -108,12 +112,18 @@ export class PersonalMatchService {
       );
 
       if (positioned) {
-        add('skin-type', `Formulated for ${this.readable(profile.skinType)} skin`, WEIGHTS.skinType * 0.6);
+        add(
+          'skin-type',
+          `Formulated for ${this.readable(profile.skinType)} skin`,
+          WEIGHTS.skinType * 0.6,
+          { skinType: profile.skinType },
+        );
       } else if (product.targetSkinTypes.length) {
         add(
           'skin-type-mismatch',
           `Positioned for ${product.targetSkinTypes.map((t) => this.readable(t)).join(', ')} skin`,
           -WEIGHTS.skinType * 0.45,
+          { skinTypes: product.targetSkinTypes },
         );
       }
       add('skin-type-ingredients', 'Ingredients suit your skin type', WEIGHTS.skinType * 0.4 * ingredientFit);
@@ -136,11 +146,9 @@ export class PersonalMatchService {
       const depth = clamp(weightedHits / 2, 0, 1);
       const impact = WEIGHTS.concerns * (coverage * 0.7 + depth * 0.3);
       if (matched.size) {
-        add(
-          'concerns',
-          `Targets ${[...matched].map((s) => this.readableSlug(s)).join(', ')}`,
-          impact,
-        );
+        add('concerns', `Targets ${[...matched].map((s) => this.readableSlug(s)).join(', ')}`, impact, {
+          concerns: [...matched],
+        });
       } else {
         add('concerns-none', 'Nothing here specifically addresses your concerns', -WEIGHTS.concerns * 0.3);
       }
@@ -166,6 +174,7 @@ export class PersonalMatchService {
           'goals',
           `Works towards ${[...matched].map((s) => this.readableSlug(s)).join(', ')}`,
           WEIGHTS.goals * (coverage * 0.65 + depth * 0.35),
+          { goals: [...matched] },
         );
       }
     }
@@ -227,9 +236,13 @@ export class PersonalMatchService {
       if (product.lowestPrice <= ceiling) {
         add('budget-fit', 'Fits your budget', WEIGHTS.budget * 0.7);
       } else if (product.lowestPrice <= ceiling * 1.25) {
-        add('budget-stretch', `Slightly above your ${ceiling} PLN budget`, -WEIGHTS.budget * 0.4);
+        add('budget-stretch', `Slightly above your ${ceiling} PLN budget`, -WEIGHTS.budget * 0.4, {
+          budget: ceiling,
+        });
       } else {
-        add('budget-over', `Well above your ${ceiling} PLN budget`, -WEIGHTS.budget);
+        add('budget-over', `Well above your ${ceiling} PLN budget`, -WEIGHTS.budget, {
+          budget: ceiling,
+        });
       }
     }
 
@@ -259,7 +272,7 @@ export class PersonalMatchService {
     /* -------------------------------------------- formula quality & shelf -- */
 
     add(
-      'ingredient-quality',
+      product.ingredientScore >= 50 ? 'ingredient-quality-good' : 'ingredient-quality-poor',
       product.ingredientScore >= 50 ? 'Well-built formula' : 'Formula is light on active ingredients',
       ((product.ingredientScore - 50) / 50) * WEIGHTS.ingredientQuality,
     );

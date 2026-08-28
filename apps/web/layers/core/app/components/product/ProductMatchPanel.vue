@@ -12,6 +12,7 @@ const props = defineProps<{ match: PersonalMatchDto; slug: string }>();
 
 const auth = useAuthStore();
 const api = useApi();
+const reasonLabel = useMatchReason();
 
 const open = ref(false);
 const explanation = ref<string | null>(null);
@@ -42,17 +43,17 @@ const maxImpact = computed(() =>
       <MatchScore :match="match" size="lg" :show-label="false" animate />
       <div class="min-w-0 flex-1">
         <h2 class="font-display text-xl text-ink">
-          {{ match.personalised ? 'Your Personal Match' : 'Formula score' }}
+          {{ match.personalised ? $t('PRODUCT.MATCH_PANEL.PERSONAL_TITLE') : $t('PRODUCT.MATCH_PANEL.GENERIC_TITLE') }}
         </h2>
         <p class="mt-1 text-sm text-ink-muted">
           <template v-if="match.personalised">
-            Computed from your profile, your shelf and this ingredient list.
+            {{ $t('PRODUCT.MATCH_PANEL.PERSONAL_BODY') }}
           </template>
           <template v-else-if="auth.isAuthenticated">
-            Based on formula quality alone — complete your profile to make it personal.
+            {{ $t('PRODUCT.MATCH_PANEL.GENERIC_BODY_AUTHED') }}
           </template>
           <template v-else>
-            Based on formula quality alone. Sign in to score it against your skin.
+            {{ $t('PRODUCT.MATCH_PANEL.GENERIC_BODY_ANON') }}
           </template>
         </p>
 
@@ -61,7 +62,7 @@ const maxImpact = computed(() =>
           :to="auth.isAuthenticated ? '/onboarding' : '/register'"
           size="sm"
           class="mt-3"
-        >{{ auth.isAuthenticated ? 'Complete my profile' : 'Get my personal score' }}</BaseButton>
+        >{{ auth.isAuthenticated ? $t('PRODUCT.MATCH_PANEL.COMPLETE_PROFILE') : $t('PRODUCT.MATCH_PANEL.GET_PERSONAL_SCORE') }}</BaseButton>
       </div>
     </div>
 
@@ -73,7 +74,7 @@ const maxImpact = computed(() =>
       :aria-expanded="open"
       @click="explain"
     >
-      Why this score?
+      {{ $t('PRODUCT.MATCH_PANEL.WHY') }}
       <BaseIcon
         name="chevron-down"
         :size="16"
@@ -85,7 +86,7 @@ const maxImpact = computed(() =>
     <div v-if="open" class="animate-fade-up mt-4 space-y-4">
       <div v-if="match.reasons.length">
         <p class="mb-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-          Working in its favour
+          {{ $t('PRODUCT.MATCH_PANEL.IN_FAVOUR') }}
         </p>
         <ul class="space-y-2">
           <li
@@ -93,7 +94,7 @@ const maxImpact = computed(() =>
             :key="reason.code"
             class="flex items-center gap-3"
           >
-            <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ reason.label }}</span>
+            <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ reasonLabel(reason) }}</span>
             <span class="h-1.5 w-16 shrink-0 overflow-hidden rounded-pill bg-line">
               <span
                 class="block h-full rounded-pill bg-sage"
@@ -107,7 +108,7 @@ const maxImpact = computed(() =>
 
       <div v-if="match.warnings.length">
         <p class="mb-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-          Worth weighing up
+          {{ $t('PRODUCT.MATCH_PANEL.AGAINST') }}
         </p>
         <ul class="space-y-2">
           <li
@@ -115,7 +116,7 @@ const maxImpact = computed(() =>
             :key="warning.code"
             class="flex items-center gap-3"
           >
-            <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ warning.label }}</span>
+            <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ reasonLabel(warning) }}</span>
             <span class="h-1.5 w-16 shrink-0 overflow-hidden rounded-pill bg-line">
               <span
                 class="block h-full rounded-pill bg-caution"
@@ -130,12 +131,12 @@ const maxImpact = computed(() =>
       <div class="rounded-lg bg-surface-muted p-4">
         <p class="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
           <BaseIcon name="sparkles" :size="12" />
-          In plain language
+          {{ $t('PRODUCT.MATCH_PANEL.PLAIN_LANGUAGE') }}
         </p>
         <BaseSkeleton v-if="explaining" :lines="2" height="0.875rem" />
         <p v-else-if="explanation" class="text-sm leading-relaxed text-ink-soft">{{ explanation }}</p>
         <p v-else class="text-sm text-ink-muted">
-          The breakdown above is the whole story for this one.
+          {{ $t('PRODUCT.MATCH_PANEL.NO_EXPLANATION') }}
         </p>
       </div>
     </div>

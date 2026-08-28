@@ -55,7 +55,7 @@ const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };
               <button
                 type="button"
                 class="-m-1.5 rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink"
-                aria-label="Close"
+                :aria-label="$t('COMMON.CLOSE')"
                 @click="open = false"
               >
                 <BaseIcon name="close" :size="18" />

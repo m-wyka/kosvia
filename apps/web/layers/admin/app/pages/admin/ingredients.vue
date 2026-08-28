@@ -23,14 +23,38 @@ interface IngredientRow {
 
 const resource = useAdminResource<IngredientRow>('/admin/ingredients');
 const { concerns, goals } = useProfileOptions();
+const { t } = useI18n();
+const vocab = useVocabulary();
 
-const columns: TableColumn[] = [
-  { key: 'inciName', label: 'INCI' },
-  { key: 'tags', label: 'Tags', secondary: true },
-  { key: 'sensitivityImpact', label: 'Tolerance', align: 'center', secondary: true, width: 'w-28' },
-  { key: 'products', label: 'Used in', align: 'right', width: 'w-24' },
+const columns = computed<TableColumn[]>(() => [
+  { key: 'inciName', label: t('ADMIN.INGREDIENTS.COL_INCI') },
+  { key: 'tags', label: t('ADMIN.INGREDIENTS.COL_TAGS'), secondary: true },
+  {
+    key: 'sensitivityImpact',
+    label: t('ADMIN.INGREDIENTS.COL_TOLERANCE'),
+    align: 'center',
+    secondary: true,
+    width: 'w-28',
+  },
+  { key: 'products', label: t('ADMIN.INGREDIENTS.COL_USED_IN'), align: 'right', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
-];
+]);
+
+/** -2…2 maps onto MINUS_2 … PLUS_2, since a key cannot start with a digit. */
+const TOLERANCE_KEYS: Record<number, string> = {
+  '-2': 'MINUS_2',
+  '-1': 'MINUS_1',
+  0: 'ZERO',
+  1: 'PLUS_1',
+  2: 'PLUS_2',
+};
+
+const toleranceLabel = (value: number) =>
+  t(`ADMIN.INGREDIENTS.TOLERANCE.${TOLERANCE_KEYS[value] ?? 'ZERO'}`);
+
+const toleranceOptions = computed(() =>
+  [-2, -1, 0, 1, 2].map((value) => ({ value, label: `${value} — ${toleranceLabel(value)}` })),
+);
 
 const modalOpen = ref(false);
 const editing = ref<IngredientRow | null>(null);
@@ -94,37 +118,33 @@ async function save() {
     supportsGoalSlugs: form.supportsGoalSlugs,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, 'Ingredient saved — affected product scores recomputed')
-    : await resource.create(body, 'Ingredient created');
+    ? await resource.update(editing.value.id, body, t('ADMIN.INGREDIENTS.SAVED'))
+    : await resource.create(body, t('ADMIN.INGREDIENTS.CREATED'));
   if (result) modalOpen.value = false;
 }
-
-const TOLERANCE_LABEL: Record<number, string> = {
-  [-2]: 'Often reactive',
-  [-1]: 'Sometimes reactive',
-  0: 'Neutral',
-  1: 'Well tolerated',
-  2: 'Calming',
-};
 
 function toggle(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((entry) => entry !== value) : [...list, value];
 }
 
-useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.ADMIN.INGREDIENTS'),
+  description: t('SEO.ADMIN.INGREDIENTS_DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div>
     <AdminPageHeader
-      title="Ingredients"
+      :title="$t('ADMIN.INGREDIENTS.TITLE')"
       :count="resource.total.value"
-      description="The reference the whole analysis engine reads from. Editing one recomputes every affected product score."
+      :description="$t('ADMIN.INGREDIENTS.SUBTITLE')"
     >
       <template #actions>
         <BaseButton size="sm" @click="openCreate">
           <template #icon><BaseIcon name="plus" :size="15" /></template>
-          New ingredient
+          {{ $t('ADMIN.INGREDIENTS.NEW') }}
         </BaseButton>
       </template>
     </AdminPageHeader>
@@ -134,7 +154,7 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
       :page="resource.page.value"
       :page-count="resource.pageCount.value"
       :total="resource.total.value"
-      placeholder="Search by INCI or common name…"
+      :placeholder="$t('ADMIN.INGREDIENTS.SEARCH_PLACEHOLDER')"
       @update:page="resource.page.value = $event"
     />
 
@@ -145,13 +165,15 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
       :columns="columns"
       :rows="resource.rows.value"
       :loading="resource.pending.value"
-      empty-title="No ingredients found"
+      :empty-title="$t('ADMIN.INGREDIENTS.EMPTY')"
     >
       <template #cell-inciName="{ row }">
         <span class="min-w-0">
           <span class="flex items-center gap-2">
             <span class="font-medium text-ink">{{ row.inciName }}</span>
-            <BaseBadge v-if="row.isActiveIngredient" tone="peach" size="xs">Active</BaseBadge>
+            <BaseBadge v-if="row.isActiveIngredient" tone="peach" size="xs">
+              {{ $t('ADMIN.INGREDIENTS.ACTIVE') }}
+            </BaseBadge>
           </span>
           <span v-if="row.commonName" class="block text-xs text-ink-muted">{{ row.commonName }}</span>
         </span>
@@ -163,7 +185,7 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
         </span>
       </template>
       <template #cell-sensitivityImpact="{ row }">
-        <span class="text-xs text-ink-muted">{{ TOLERANCE_LABEL[row.sensitivityImpact] ?? '—' }}</span>
+        <span class="text-xs text-ink-muted">{{ toleranceLabel(row.sensitivityImpact) }}</span>
       </template>
       <template #cell-products="{ row }">
         <span class="tabular-nums text-ink-soft">{{ row._count?.products ?? 0 }}</span>
@@ -173,7 +195,7 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="`Edit ${row.inciName}`"
+            :aria-label="$t('ADMIN.INGREDIENTS.EDIT', { name: row.inciName })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -181,8 +203,8 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
-            :aria-label="`Delete ${row.inciName}`"
-            @click="resource.remove(row.id, 'Ingredient deleted')"
+            :aria-label="$t('COMMON.DELETE')"
+            @click="resource.remove(row.id, t('ADMIN.INGREDIENTS.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -192,35 +214,43 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="editing ? `Edit ${editing.inciName}` : 'New ingredient'"
+      :title="
+        editing
+          ? $t('ADMIN.INGREDIENTS.EDIT', { name: editing.inciName })
+          : $t('ADMIN.INGREDIENTS.NEW')
+      "
       size="lg"
     >
       <div class="space-y-5">
         <div class="grid gap-4 sm:grid-cols-2">
-          <BaseInput v-model="form.inciName" label="INCI name" required />
-          <BaseInput v-model="form.commonName" label="Common name" placeholder="Vitamin B3" />
+          <BaseInput v-model="form.inciName" :label="$t('ADMIN.INGREDIENTS.FIELD_INCI')" required />
+          <BaseInput
+            v-model="form.commonName"
+            :label="$t('ADMIN.INGREDIENTS.FIELD_COMMON')"
+            placeholder="Vitamin B3"
+          />
         </div>
 
         <BaseTextarea
           v-model="form.description"
-          label="Description"
+          :label="$t('ADMIN.INGREDIENTS.FIELD_DESCRIPTION')"
           :rows="3"
-          hint="Describe what it does. Never label an ingredient toxic or bad."
+          :hint="$t('ADMIN.INGREDIENTS.DESCRIPTION_HINT')"
         />
         <BaseTextarea
           v-model="form.concerns"
-          label="Worth knowing"
+          :label="$t('ADMIN.INGREDIENTS.FIELD_CONCERNS')"
           :rows="2"
-          hint="Neutral note shown in a caution box — e.g. increases sun sensitivity."
+          :hint="$t('ADMIN.INGREDIENTS.CONCERNS_HINT')"
         />
         <BaseInput
           v-model="form.functions"
-          label="Functions"
-          hint="Comma separated, e.g. Binds water in the skin, Improves texture"
+          :label="$t('ADMIN.INGREDIENTS.FIELD_FUNCTIONS')"
+          :hint="$t('ADMIN.INGREDIENTS.FUNCTIONS_HINT')"
         />
 
         <div>
-          <p class="mb-2 text-sm font-medium text-ink-soft">Tags</p>
+          <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('ADMIN.INGREDIENTS.TAGS_LABEL') }}</p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="tag in INGREDIENT_TAGS"
@@ -229,50 +259,43 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
               class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
               :class="form.tags.includes(tag) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted hover:border-line-strong'"
               @click="form.tags = toggle(form.tags, tag)"
-            >{{ tag.replace('-', ' ') }}</button>
+            >{{ vocab.tag(tag) }}</button>
           </div>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <BaseInput
             v-model="form.comedogenicRating"
-            label="Comedogenic rating"
+            :label="$t('ADMIN.INGREDIENTS.COMEDOGENIC')"
             type="number"
-            hint="0-5, or leave empty."
+            :hint="$t('ADMIN.INGREDIENTS.COMEDOGENIC_HINT')"
           />
-          <div>
-            <label for="tolerance" class="mb-1.5 block text-sm font-medium text-ink-soft">
-              Tolerance impact
-            </label>
-            <select
-              id="tolerance"
-              v-model.number="form.sensitivityImpact"
-              class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-            >
-              <option v-for="value in [-2, -1, 0, 1, 2]" :key="value" :value="value">
-                {{ value }} — {{ TOLERANCE_LABEL[value] }}
-              </option>
-            </select>
-          </div>
+          <BaseNativeSelect
+            v-model.number="form.sensitivityImpact"
+            :options="toleranceOptions"
+            :label="$t('ADMIN.INGREDIENTS.TOLERANCE_LABEL')"
+          />
         </div>
 
         <div>
-          <p class="mb-2 text-sm font-medium text-ink-soft">Commonly suits</p>
+          <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('ADMIN.INGREDIENTS.SUITS_LABEL') }}</p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="type in SKIN_TYPES.filter((entry) => entry !== 'UNKNOWN')"
               :key="type"
               type="button"
-              class="rounded-pill border px-2.5 py-1 text-xs capitalize transition-colors"
+              class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
               :class="form.goodForSkinTypes.includes(type) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
               @click="form.goodForSkinTypes = toggle(form.goodForSkinTypes, type) as SkinType[]"
-            >{{ type.toLowerCase() }}</button>
+            >{{ vocab.skinType(type) }}</button>
           </div>
         </div>
 
         <div class="grid gap-5 sm:grid-cols-2">
           <div>
-            <p class="mb-2 text-sm font-medium text-ink-soft">Targets concerns</p>
+            <p class="mb-2 text-sm font-medium text-ink-soft">
+              {{ $t('ADMIN.INGREDIENTS.TARGETS_LABEL') }}
+            </p>
             <div class="flex flex-wrap gap-1.5">
               <button
                 v-for="concern in concerns"
@@ -281,11 +304,13 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
                 class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
                 :class="form.targetsConcernSlugs.includes(concern.slug) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
                 @click="form.targetsConcernSlugs = toggle(form.targetsConcernSlugs, concern.slug)"
-              >{{ concern.name }}</button>
+              >{{ vocab.concern(concern.slug, concern.name) }}</button>
             </div>
           </div>
           <div>
-            <p class="mb-2 text-sm font-medium text-ink-soft">Supports goals</p>
+            <p class="mb-2 text-sm font-medium text-ink-soft">
+              {{ $t('ADMIN.INGREDIENTS.SUPPORTS_LABEL') }}
+            </p>
             <div class="flex flex-wrap gap-1.5">
               <button
                 v-for="goal in goals"
@@ -294,7 +319,7 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
                 class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
                 :class="form.supportsGoalSlugs.includes(goal.slug) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
                 @click="form.supportsGoalSlugs = toggle(form.supportsGoalSlugs, goal.slug)"
-              >{{ goal.name }}</button>
+              >{{ vocab.goal(goal.slug, goal.name) }}</button>
             </div>
           </div>
         </div>
@@ -302,16 +327,16 @@ useSeo({ title: 'Ingredients · Admin', description: 'Manage the INCI reference.
         <div class="rounded-lg border border-line bg-surface-muted p-4">
           <BaseSwitch
             v-model="form.isActiveIngredient"
-            label="Headline active ingredient"
-            hint="Actives carry more weight in the formula score."
+            :label="$t('ADMIN.INGREDIENTS.ACTIVE_LABEL')"
+            :hint="$t('ADMIN.INGREDIENTS.ACTIVE_HINT')"
           />
         </div>
       </div>
 
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">Cancel</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
         <BaseButton :loading="resource.saving.value" :disabled="!form.inciName" @click="save">
-          {{ editing ? 'Save changes' : 'Create ingredient' }}
+          {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.INGREDIENTS.CREATE') }}
         </BaseButton>
       </template>
     </BaseModal>

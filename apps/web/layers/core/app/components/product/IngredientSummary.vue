@@ -18,10 +18,18 @@ const highlights = computed(() =>
     })),
 );
 
+const { t } = useI18n();
+
 const stats = computed(() => [
-  { label: 'Active ingredients', value: props.breakdown?.activeCount ?? highlights.value.length },
-  { label: 'Supporting ingredients', value: props.breakdown?.supportiveCount ?? '—' },
-  { label: 'Total on the label', value: props.ingredients.length },
+  {
+    label: t('PRODUCT.ANALYSIS.ACTIVE_COUNT'),
+    value: props.breakdown?.activeCount ?? highlights.value.length,
+  },
+  {
+    label: t('PRODUCT.ANALYSIS.SUPPORTIVE_COUNT'),
+    value: props.breakdown?.supportiveCount ?? t('COMMON.NOT_AVAILABLE'),
+  },
+  { label: t('PRODUCT.ANALYSIS.TOTAL_COUNT'), value: props.ingredients.length },
 ]);
 </script>
 
@@ -29,14 +37,12 @@ const stats = computed(() => [
   <BaseCard>
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h2 class="font-display text-xl text-ink">Ingredient analysis</h2>
-        <p class="mt-1 text-sm text-ink-muted">
-          Based on our own ingredient database, not on a language model.
-        </p>
+        <h2 class="font-display text-xl text-ink">{{ $t('PRODUCT.ANALYSIS.TITLE') }}</h2>
+        <p class="mt-1 text-sm text-ink-muted">{{ $t('PRODUCT.ANALYSIS.SUBTITLE') }}</p>
       </div>
       <div class="text-right">
         <p class="text-3xl font-semibold tabular-nums text-ink">{{ score }}<span class="text-lg text-ink-muted">/100</span></p>
-        <p class="text-xs text-ink-muted">Formula score</p>
+        <p class="text-xs text-ink-muted">{{ $t('PRODUCT.ANALYSIS.SCORE') }}</p>
       </div>
     </div>
 
@@ -48,7 +54,7 @@ const stats = computed(() => [
     </dl>
 
     <div v-if="highlights.length" class="mt-5">
-      <p class="mb-2 text-sm font-medium text-ink-soft">What is doing the work</p>
+      <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('PRODUCT.ANALYSIS.HIGHLIGHTS') }}</p>
       <ul class="space-y-2">
         <li
           v-for="item in highlights"

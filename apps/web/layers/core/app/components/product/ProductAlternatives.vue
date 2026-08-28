@@ -22,10 +22,8 @@ const current = computed(
 <template>
   <section>
     <div class="mb-4">
-      <h2 class="font-display text-2xl text-ink">Find alternatives</h2>
-      <p class="mt-1 text-sm text-ink-muted">
-        Other products doing the same job — ranked on price, match and measured ingredient overlap.
-      </p>
+      <h2 class="font-display text-2xl text-ink">{{ $t('PRODUCT.ALTERNATIVES.TITLE') }}</h2>
+      <p class="mt-1 text-sm text-ink-muted">{{ $t('PRODUCT.ALTERNATIVES.SUBTITLE') }}</p>
     </div>
 
     <BaseErrorState v-if="error" compact @retry="refresh()" />
@@ -40,8 +38,8 @@ const current = computed(
     <BaseEmptyState
       v-else-if="!groups.length"
       icon="compare"
-      title="No alternatives to show"
-      description="We do not have enough comparable products in this routine step yet."
+      :title="$t('PRODUCT.ALTERNATIVES.EMPTY_TITLE')"
+      :description="$t('PRODUCT.ALTERNATIVES.EMPTY_BODY')"
       compact
     />
 
@@ -49,7 +47,13 @@ const current = computed(
       <BaseTabs
         v-if="active"
         v-model="active"
-        :tabs="groups.map((group) => ({ value: group.kind, label: group.title, count: group.products.length }))"
+        :tabs="
+          groups.map((group) => ({
+            value: group.kind,
+            label: $t(`PRODUCT.ALTERNATIVES.KIND.${group.kind.replace(/-/g, '_').toUpperCase()}`),
+            count: group.products.length,
+          }))
+        "
       />
 
       <p v-if="current" class="mt-3 text-sm text-ink-muted">{{ current.description }}</p>

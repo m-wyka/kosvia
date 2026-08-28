@@ -12,10 +12,12 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "lint": "eslint . --max-warnings 0",
-    "test": "vitest run"
+    "test": "node scripts/check-i18n.mjs && vitest run",
+    "i18n:check": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@kosvia/shared": "*",
+    "@nuxtjs/i18n": "^10.6.0",
     "@pinia/nuxt": "^0.11.2",
     "@vueuse/core": "^13.9.0",
     "@vueuse/nuxt": "^13.9.0",

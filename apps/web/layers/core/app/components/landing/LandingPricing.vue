@@ -1,54 +1,38 @@
 <script setup lang="ts">
-const tiers = [
-  {
-    name: 'Free',
-    price: '0 PLN',
-    cadence: 'forever',
-    description: 'Everything you need to choose better.',
-    features: [
-      'Personal Match on every product',
-      'Full ingredient analysis',
-      'My Shelf and routine analysis',
-      'Cheaper and better alternatives',
-    ],
-    cta: { label: 'Create a free account', to: '/register' },
-    highlighted: false,
-  },
-  {
-    name: 'Premium',
-    price: '19 PLN',
-    cadence: 'per month',
-    description: 'For people building a routine deliberately.',
-    features: [
-      'Unlimited AI Beauty Shopper',
-      'Price alerts across every store',
-      'Smart Basket routine budgeting',
-      'Early access to new retailers',
-    ],
-    cta: { label: 'Coming soon', to: '/register' },
-    highlighted: true,
-  },
-];
+const { t } = useI18n();
+
+const tiers = computed(() =>
+  (['FREE', 'PREMIUM'] as const).map((key) => ({
+    key,
+    name: t(`LANDING.PRICING.${key}.NAME`),
+    price: t(`LANDING.PRICING.${key}.PRICE`),
+    cadence: key === 'FREE' ? t('LANDING.PRICING.FOREVER') : t('LANDING.PRICING.PER_MONTH'),
+    description: t(`LANDING.PRICING.${key}.DESCRIPTION`),
+    features: [1, 2, 3, 4].map((n) => t(`LANDING.PRICING.${key}.F_${n}`)),
+    cta: { label: t(`LANDING.PRICING.${key}.CTA`), to: '/register' },
+    highlighted: key === 'PREMIUM',
+  })),
+);
 </script>
 
 <template>
   <section class="container-page py-16 sm:py-20">
     <SectionHeading
-      eyebrow="Premium"
-      title="Free is genuinely useful. Premium is for the shortcut."
-      description="The analysis is free because it should be. Premium pays for the parts that keep working while you are not looking."
+      :eyebrow="$t('LANDING.PRICING.EYEBROW')"
+      :title="$t('LANDING.PRICING.TITLE')"
+      :description="$t('LANDING.PRICING.BODY')"
       align="center"
     />
 
     <div class="mx-auto mt-12 grid max-w-3xl gap-5 sm:grid-cols-2">
       <div
         v-for="tier in tiers"
-        :key="tier.name"
+        :key="tier.key"
         class="relative flex flex-col rounded-xl border bg-surface p-6"
         :class="tier.highlighted ? 'border-ink shadow-md' : 'border-line'"
       >
         <BaseBadge v-if="tier.highlighted" tone="blush" class="absolute -top-2.5 left-6">
-          Most complete
+          {{ $t('LANDING.PRICING.MOST_COMPLETE') }}
         </BaseBadge>
 
         <h3 class="font-display text-xl text-ink">{{ tier.name }}</h3>

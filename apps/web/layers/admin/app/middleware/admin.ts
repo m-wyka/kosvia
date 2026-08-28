@@ -8,10 +8,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthStore();
   await auth.init();
 
+  const localePath = useLocalePath();
+
   if (!auth.isAuthenticated) {
-    return navigateTo({ path: '/login', query: { redirect: to.fullPath } });
+    return navigateTo({ path: localePath('/login'), query: { redirect: to.fullPath } });
   }
   if (!auth.isAdmin) {
-    return navigateTo('/dashboard');
+    return navigateTo(localePath('/dashboard'));
   }
 });

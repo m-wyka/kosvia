@@ -14,10 +14,20 @@ import {
   watch,
   watchEffect,
 } from 'vue';
+import en from '../i18n/locales/en.json';
+import pl from '../i18n/locales/pl.json';
+
+/**
+ * The real vocabulary/format/reason composables, so tests exercise the same
+ * translation path the app does.
+ */
+import { useVocabulary } from '../layers/core/app/composables/useVocabulary';
+import { useFormat } from '../layers/core/app/composables/useFormat';
+import { useMatchReason } from '../layers/core/app/composables/useMatchReason';
 
 /**
  * The shared components are registered globally rather than stubbed, so a card
- * test actually asserts on the price the card renders — not on a placeholder.
+ * test asserts on the price the card renders — not on a placeholder.
  */
 import BaseBadge from '../layers/core/app/components/base/BaseBadge.vue';
 import BaseIcon from '../layers/core/app/components/base/BaseIcon.vue';
@@ -28,14 +38,68 @@ import PriceDisplay from '../layers/core/app/components/product/PriceDisplay.vue
 import ProductImage from '../layers/core/app/components/product/ProductImage.vue';
 
 /**
- * Nuxt auto-imports `ref`, `computed`, `useId` and the app's own composables,
+ * Nuxt auto-imports `ref`, `computed`, `useI18n` and the app's own composables,
  * so components reference them as bare identifiers. Outside a Nuxt runtime
- * those identifiers resolve to globals — which is exactly what we install here.
+ * those identifiers resolve to globals — which is what we install here.
  *
- * This keeps component tests fast and dependency-light while still exercising
- * the real `.vue` files rather than a re-implementation of them.
+ * Translations are the real locale files rather than stubs: a test asserting on
+ * "Fragrance-free" should fail if that key is deleted, and the Polish tests
+ * would be meaningless against a passthrough `t`.
  */
-const vueGlobals = {
+
+const MESSAGES: Record<string, Record<string, unknown>> = { en, pl };
+const activeLocale = ref<'en' | 'pl'>('en');
+
+/** Mirrors the Polish plural rule registered in i18n/i18n.config.ts. */
+function pluralIndex(locale: string, count: number, forms: number): number {
+  if (locale !== 'pl' || forms < 3) return count === 1 ? 0 : 1;
+  if (count === 1) return 0;
+  const last = count % 10;
+  const lastTwo = count % 100;
+  return last >= 2 && last <= 4 && !(lastTwo >= 12 && lastTwo <= 14) ? 1 : 2;
+}
+
+function lookup(locale: string, key: string): string | undefined {
+  const value = key
+    .split('.')
+    .reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], MESSAGES[locale]);
+  return typeof value === 'string' ? value : undefined;
+}
+
+function translate(key: string, params?: Record<string, unknown> | number): string {
+  const locale = activeLocale.value;
+  const template = lookup(locale, key) ?? lookup('en', key);
+  if (template === undefined) return key;
+
+  if (typeof params === 'number' && template.includes('|')) {
+    const forms = template.split('|').map((form) => form.trim());
+    const chosen = forms[pluralIndex(locale, params, forms.length)] ?? forms[0]!;
+    return chosen.replace(/\{count\}/g, String(params));
+  }
+
+  const values = (typeof params === 'object' && params !== null ? params : {}) as Record<
+    string,
+    unknown
+  >;
+  return template
+    // Literal interpolation, e.g. {'@'} — vue-i18n's escape for reserved characters.
+    .replace(/\{'([^']*)'\}/g, (_match, literal: string) => literal)
+    .replace(/\{(\w+)\}/g, (match, name) => (name in values ? String(values[name]) : match));
+}
+
+export function setTestLocale(locale: 'en' | 'pl'): void {
+  activeLocale.value = locale;
+}
+
+const useI18nStub = () => ({
+  t: translate,
+  te: (key: string) => lookup(activeLocale.value, key) !== undefined,
+  locale: activeLocale,
+  locales: computed(() => [{ code: 'en' }, { code: 'pl' }]),
+  defaultLocale: 'en',
+});
+
+Object.assign(globalThis, {
   ref,
   computed,
   reactive,
@@ -47,9 +111,8 @@ const vueGlobals = {
   onMounted,
   onUnmounted,
   nextTick,
-};
-
-Object.assign(globalThis, vueGlobals);
+  useI18n: useI18nStub,
+});
 
 let idCounter = 0;
 Object.assign(globalThis, {
@@ -57,8 +120,11 @@ Object.assign(globalThis, {
   useRoute: () => ({ path: '/', query: {}, params: {}, fullPath: '/' }),
   useRouter: () => ({ push: () => Promise.resolve(), replace: () => Promise.resolve() }),
   useRuntimeConfig: () => ({ public: { siteUrl: 'http://localhost:3000', siteName: 'Kosvia' } }),
+  useLocalePath: () => (path: string) => (activeLocale.value === 'en' ? path : `/pl${path}`),
   onKeyStroke: () => undefined,
 });
+
+Object.assign(globalThis, { useVocabulary, useFormat, useMatchReason });
 
 /** A minimal comparison tray, so cards can be mounted without Pinia. */
 const comparisonIds = ref<string[]>([]);
@@ -90,15 +156,16 @@ Object.assign(globalThis, {
   }),
 });
 
-/** `NuxtLink` renders as a plain anchor so href assertions stay meaningful. */
+/** `NuxtLinkLocale` renders as a plain anchor so href assertions stay meaningful. */
 const NuxtLinkStub = defineComponent({
-  name: 'NuxtLink',
+  name: 'NuxtLinkLocale',
   props: { to: { type: [String, Object], default: '' } },
   setup: (props, { slots }) => () => h('a', { href: String(props.to) }, slots.default?.()),
 });
 
 config.global.components = {
   NuxtLink: NuxtLinkStub,
+  NuxtLinkLocale: NuxtLinkStub,
   BaseBadge,
   BaseIcon,
   BaseSkeleton,
@@ -107,6 +174,7 @@ config.global.components = {
   PriceDisplay,
   ProductImage,
 };
+config.global.mocks = { $t: translate };
 config.global.stubs = {
   ClientOnly: { template: '<div><slot /></div>' },
   Teleport: true,
@@ -114,4 +182,5 @@ config.global.stubs = {
 
 export function resetTestGlobals(): void {
   comparisonIds.value = [];
+  activeLocale.value = 'en';
 }

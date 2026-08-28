@@ -10,6 +10,8 @@ import type { CategoryDto, ProductSearchResult, ProductSort } from '@kosvia/shar
 const route = useRoute();
 const router = useRouter();
 const shelf = useShelf();
+const { t } = useI18n();
+const vocab = useVocabulary();
 
 const queryString = computed(() => {
   const params = new URLSearchParams();
@@ -28,14 +30,21 @@ const { data, pending, error, refresh } = await useApiFetch<ProductSearchResult>
 
 const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', { key: 'categories' });
 
-const SORTS: Array<{ value: ProductSort; label: string }> = [
-  { value: 'recommended', label: 'Recommended' },
-  { value: 'best-match', label: 'Best match for me' },
-  { value: 'price-asc', label: 'Price: low to high' },
-  { value: 'price-desc', label: 'Price: high to low' },
-  { value: 'ingredient-score', label: 'Best ingredients' },
-  { value: 'newest', label: 'Newest' },
+const SORT_VALUES: ProductSort[] = [
+  'recommended',
+  'best-match',
+  'price-asc',
+  'price-desc',
+  'ingredient-score',
+  'newest',
 ];
+
+const sortOptions = computed(() =>
+  SORT_VALUES.map((value) => ({
+    value,
+    label: t(`SEARCH.SORT.${value.replace(/-/g, '_').toUpperCase()}`),
+  })),
+);
 
 const sort = computed({
   get: () => (route.query.sort as ProductSort) ?? 'recommended',
@@ -66,18 +75,26 @@ const activeCategory = computed(() => {
 });
 
 const heading = computed(() => {
-  if (searchTerm.value) return `Results for “${searchTerm.value}”`;
-  if (activeCategory.value) return activeCategory.value.name;
-  return 'All products';
+  if (searchTerm.value) return t('SEARCH.RESULTS_FOR', { query: searchTerm.value });
+  if (activeCategory.value) {
+    return vocab.category(activeCategory.value.slug, activeCategory.value.name);
+  }
+  return t('SEARCH.ALL_PRODUCTS');
 });
+
+const categoryDescription = computed(() =>
+  activeCategory.value
+    ? vocab.categoryDescription(activeCategory.value.slug, activeCategory.value.description)
+    : '',
+);
 
 onMounted(() => shelf.refresh());
 
 useSeo(() => ({
   title: heading.value,
-  description: activeCategory.value?.description
-    ? `${activeCategory.value.description} Compare ingredients, personal match and prices across stores on Kosvia.`
-    : 'Search cosmetics by ingredient, brand, price and skin type. Every product scored against your profile.',
+  description: categoryDescription.value
+    ? t('SEO.PRODUCTS.CATEGORY_DESCRIPTION', { description: categoryDescription.value })
+    : t('SEO.PRODUCTS.DESCRIPTION'),
   // Filtered permutations point their canonical at the clean category page, so
   // the index is not flooded with near-duplicates.
   path: activeCategory.value ? `/products?category=${activeCategory.value.slug}` : '/products',
@@ -86,10 +103,15 @@ useSeo(() => ({
 
 useBreadcrumbJsonLd(
   computed(() => [
-    { name: 'Home', path: '/' },
-    { name: 'Products', path: '/products' },
+    { name: t('NAV.HOME'), path: '/' },
+    { name: t('NAV.PRODUCTS'), path: '/products' },
     ...(activeCategory.value
-      ? [{ name: activeCategory.value.name, path: `/products?category=${activeCategory.value.slug}` }]
+      ? [
+          {
+            name: vocab.category(activeCategory.value.slug, activeCategory.value.name),
+            path: `/products?category=${activeCategory.value.slug}`,
+          },
+        ]
       : []),
   ]),
 );
@@ -99,18 +121,18 @@ useBreadcrumbJsonLd(
   <div class="container-page py-8 sm:py-10">
     <header class="mb-6">
       <nav aria-label="Breadcrumb" class="mb-2 flex items-center gap-1.5 text-xs text-ink-muted">
-        <NuxtLink to="/" class="hover:text-ink">Home</NuxtLink>
+        <NuxtLinkLocale to="/" class="hover:text-ink">{{ $t('NAV.HOME') }}</NuxtLinkLocale>
         <BaseIcon name="chevron-right" :size="12" />
-        <NuxtLink to="/products" class="hover:text-ink">Products</NuxtLink>
+        <NuxtLinkLocale to="/products" class="hover:text-ink">{{ $t('NAV.PRODUCTS') }}</NuxtLinkLocale>
         <template v-if="activeCategory">
           <BaseIcon name="chevron-right" :size="12" />
-          <span class="text-ink">{{ activeCategory.name }}</span>
+          <span class="text-ink">{{ vocab.category(activeCategory.slug, activeCategory.name) }}</span>
         </template>
       </nav>
 
       <h1 class="font-display text-3xl text-ink sm:text-4xl">{{ heading }}</h1>
-      <p v-if="activeCategory?.description" class="mt-2 max-w-2xl text-sm text-ink-muted">
-        {{ activeCategory.description }}
+      <p v-if="categoryDescription" class="mt-2 max-w-2xl text-sm text-ink-muted">
+        {{ categoryDescription }}
       </p>
     </header>
 
@@ -125,24 +147,22 @@ useBreadcrumbJsonLd(
       <div class="min-w-0">
         <div class="mb-5 flex items-center justify-between gap-3">
           <p class="shrink-0 text-sm whitespace-nowrap text-ink-muted">
-            <template v-if="pending">Searching…</template>
-            <template v-else-if="data">
-              {{ data.total }} product{{ data.total === 1 ? '' : 's' }}
-            </template>
+            <template v-if="pending">{{ $t('SEARCH.SEARCHING') }}</template>
+            <template v-else-if="data">{{ $t('SEARCH.COUNT', data.total) }}</template>
           </p>
 
           <div class="flex min-w-0 items-center gap-2">
             <BaseButton variant="secondary" size="sm" class="lg:hidden" @click="filtersOpen = true">
               <template #icon><BaseIcon name="filter" :size="15" /></template>
-              Filters
+              {{ $t('SEARCH.FILTERS') }}
             </BaseButton>
 
             <BaseNativeSelect
               v-model="sort"
-              :options="SORTS"
+              :options="sortOptions"
               size="sm"
               class="w-40 sm:w-48"
-              aria-label="Sort products"
+              :aria-label="$t('SEARCH.SORT_LABEL')"
             />
           </div>
         </div>
@@ -152,10 +172,10 @@ useBreadcrumbJsonLd(
         <BaseEmptyState
           v-else-if="!pending && data && data.items.length === 0"
           icon="search"
-          title="Nothing matched those filters"
-          description="Try widening the price range, or clearing a filter or two."
+          :title="$t('SEARCH.EMPTY_TITLE')"
+          :description="$t('SEARCH.EMPTY_BODY')"
         >
-          <BaseButton variant="secondary" to="/products">Clear all filters</BaseButton>
+          <BaseButton variant="secondary" to="/products">{{ $t('SEARCH.EMPTY_CTA') }}</BaseButton>
         </BaseEmptyState>
 
         <template v-else>
@@ -171,34 +191,34 @@ useBreadcrumbJsonLd(
           <nav
             v-if="data && data.pageCount > 1"
             class="mt-10 flex items-center justify-center gap-2"
-            aria-label="Pagination"
+            :aria-label="$t('SEARCH.PAGE', { page, total: data.pageCount })"
           >
             <BaseButton
               variant="secondary"
               size="sm"
               :disabled="page <= 1"
               @click="goToPage(page - 1)"
-            >Previous</BaseButton>
+            >{{ $t('COMMON.PREVIOUS') }}</BaseButton>
             <span class="px-3 text-sm tabular-nums text-ink-muted">
-              Page {{ page }} of {{ data.pageCount }}
+              {{ $t('SEARCH.PAGE', { page, total: data.pageCount }) }}
             </span>
             <BaseButton
               variant="secondary"
               size="sm"
               :disabled="page >= data.pageCount"
               @click="goToPage(page + 1)"
-            >Next</BaseButton>
+            >{{ $t('COMMON.NEXT') }}</BaseButton>
           </nav>
         </template>
       </div>
     </div>
 
     <!-- Mobile filter sheet -->
-    <BaseModal v-model:open="filtersOpen" title="Filters" size="sm">
+    <BaseModal v-model:open="filtersOpen" :title="$t('SEARCH.FILTERS')" size="sm">
       <ProductFilters :facets="data?.facets" :categories="categories ?? []" />
       <template #footer>
         <BaseButton block @click="filtersOpen = false">
-          Show {{ data?.total ?? 0 }} products
+          {{ $t('SEARCH.SHOW_COUNT', { count: data?.total ?? 0 }) }}
         </BaseButton>
       </template>
     </BaseModal>

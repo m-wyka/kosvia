@@ -3,14 +3,7 @@
  * Shown whenever a request fails. Never surfaces a status code — the user gets
  * plain language and a way to try again.
  */
-withDefaults(
-  defineProps<{ title?: string; message?: string; compact?: boolean }>(),
-  {
-    title: 'Something went wrong',
-    message: 'We could not load this right now. Please try again.',
-  },
-);
-
+defineProps<{ title?: string; message?: string; compact?: boolean }>();
 defineEmits<{ retry: [] }>();
 </script>
 
@@ -23,10 +16,10 @@ defineEmits<{ retry: [] }>();
     <span class="mb-4 flex size-11 items-center justify-center rounded-full bg-surface text-critical shadow-xs">
       <BaseIcon name="alert" :size="20" />
     </span>
-    <h3 class="font-display text-lg text-ink">{{ title }}</h3>
-    <p class="mt-1.5 max-w-sm text-sm text-ink-soft">{{ message }}</p>
+    <h3 class="font-display text-lg text-ink">{{ title ?? $t('ERRORS.GENERIC_TITLE') }}</h3>
+    <p class="mt-1.5 max-w-sm text-sm text-ink-soft">{{ message ?? $t('ERRORS.GENERIC_BODY') }}</p>
     <BaseButton variant="secondary" size="sm" class="mt-5" @click="$emit('retry')">
-      Try again
+      {{ $t('COMMON.RETRY') }}
     </BaseButton>
   </div>
 </template>

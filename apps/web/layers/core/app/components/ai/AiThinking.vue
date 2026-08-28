@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-2.5" role="status" aria-label="Kosvia is thinking">
+  <div class="flex gap-2.5" role="status" :aria-label="$t('AI.THINKING_ARIA')">
     <span
       class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-blush-soft text-blush-deep"
       aria-hidden="true"
@@ -16,7 +16,7 @@
       </div>
       <div class="flex items-center gap-2 px-1 text-xs text-ink-muted">
         <BaseSpinner :size="13" />
-        Searching the catalogue, then writing an answer…
+        {{ $t('AI.THINKING') }}
       </div>
     </div>
   </div>

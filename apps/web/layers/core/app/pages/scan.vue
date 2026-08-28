@@ -8,6 +8,8 @@ import type { ProductSummaryDto } from '@kosvia/shared';
 
 const api = useApi();
 const router = useRouter();
+const localePath = useLocalePath();
+const { t } = useI18n();
 
 const ean = ref('');
 const looking = ref(false);
@@ -24,7 +26,7 @@ async function lookup() {
     );
     const first = response.items[0];
     if (first) {
-      await router.push(`/products/${first.slug}`);
+      await router.push(localePath(`/products/${first.slug}`));
     } else {
       notFound.value = true;
     }
@@ -33,11 +35,11 @@ async function lookup() {
   }
 }
 
-useSeo({
-  title: 'Scan a product',
-  description: 'Look up a cosmetic by its barcode number.',
+useSeo(() => ({
+  title: t('SCAN.TITLE'),
+  description: t('SEO.SCAN.DESCRIPTION'),
   path: '/scan',
-});
+}));
 </script>
 
 <template>
@@ -46,34 +48,33 @@ useSeo({
       <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-ink text-ink-inverse">
         <BaseIcon name="scan" :size="26" />
       </span>
-      <h1 class="mt-5 font-display text-3xl text-ink">Scan a product</h1>
-      <p class="mt-2 text-sm text-ink-muted">
-        Camera scanning is not in this build yet. Type the barcode number and we will
-        look it up in the catalogue.
-      </p>
+      <h1 class="mt-5 font-display text-3xl text-ink">{{ $t('SCAN.TITLE') }}</h1>
+      <p class="mt-2 text-sm text-ink-muted">{{ $t('SCAN.SUBTITLE') }}</p>
     </div>
 
     <form class="mt-8 space-y-4" @submit.prevent="lookup">
       <BaseInput
         v-model="ean"
-        label="Barcode (EAN)"
+        :label="$t('SCAN.LABEL')"
         inputmode="numeric"
-        placeholder="5901234567890"
-        :error="notFound ? 'No product with that barcode in our catalogue yet.' : undefined"
+        :placeholder="$t('SCAN.PLACEHOLDER')"
+        :error="notFound ? $t('SCAN.NOT_FOUND') : undefined"
       >
         <template #prefix><BaseIcon name="tag" :size="16" /></template>
       </BaseInput>
-      <BaseButton type="submit" size="lg" block :loading="looking">Look it up</BaseButton>
+      <BaseButton type="submit" size="lg" block :loading="looking">
+        {{ $t('SCAN.LOOK_UP') }}
+      </BaseButton>
     </form>
 
     <div class="mt-10 rounded-xl border border-dashed border-line-strong bg-surface-muted p-5">
-      <p class="text-sm font-medium text-ink">In the meantime</p>
-      <p class="mt-1 text-sm text-ink-muted">
-        Search by name or brand — it is faster than typing thirteen digits.
-      </p>
+      <p class="text-sm font-medium text-ink">{{ $t('SCAN.MEANTIME_TITLE') }}</p>
+      <p class="mt-1 text-sm text-ink-muted">{{ $t('SCAN.MEANTIME_BODY') }}</p>
       <div class="mt-4 flex flex-wrap gap-2">
-        <BaseButton to="/products" variant="secondary" size="sm">Search the catalogue</BaseButton>
-        <BaseButton to="/ai" variant="ghost" size="sm">Ask the AI shopper</BaseButton>
+        <BaseButton to="/products" variant="secondary" size="sm">
+          {{ $t('SCAN.SEARCH_CTA') }}
+        </BaseButton>
+        <BaseButton to="/ai" variant="ghost" size="sm">{{ $t('SCAN.AI_CTA') }}</BaseButton>
       </div>
     </div>
   </div>

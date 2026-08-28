@@ -51,7 +51,7 @@ const ratios = { square: 'aspect-square', portrait: 'aspect-[4/5]', wide: 'aspec
       class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-canvas-deep text-ink-faint"
     >
       <BaseIcon name="droplet" :size="26" />
-      <span class="px-3 text-center text-2xs">Image unavailable</span>
+      <span class="px-3 text-center text-2xs">{{ $t('PRODUCT.IMAGE_UNAVAILABLE') }}</span>
     </div>
 
     <slot />

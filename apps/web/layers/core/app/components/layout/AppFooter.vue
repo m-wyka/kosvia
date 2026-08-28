@@ -3,21 +3,21 @@ const year = new Date().getFullYear();
 
 const groups = [
   {
-    title: 'Product',
+    title: 'FOOTER.PRODUCT',
     links: [
-      { to: '/discover', label: 'Discover' },
-      { to: '/products', label: 'All products' },
-      { to: '/ingredients', label: 'Ingredient library' },
-      { to: '/compare', label: 'Compare' },
+      { to: '/discover', label: 'NAV.DISCOVER' },
+      { to: '/products', label: 'FOOTER.ALL_PRODUCTS' },
+      { to: '/ingredients', label: 'FOOTER.INGREDIENT_LIBRARY' },
+      { to: '/compare', label: 'NAV.COMPARE' },
     ],
   },
   {
-    title: 'Your account',
+    title: 'FOOTER.ACCOUNT',
     links: [
-      { to: '/dashboard', label: 'Dashboard' },
-      { to: '/shelf', label: 'My Shelf' },
-      { to: '/ai', label: 'AI Beauty Shopper' },
-      { to: '/price-alerts', label: 'Price alerts' },
+      { to: '/dashboard', label: 'NAV.DASHBOARD' },
+      { to: '/shelf', label: 'NAV.SHELF' },
+      { to: '/ai', label: 'SEO.AI.TITLE' },
+      { to: '/price-alerts', label: 'NAV.ALERTS' },
     ],
   },
 ];
@@ -30,30 +30,27 @@ const groups = [
         <div class="lg:col-span-2">
           <AppLogo />
           <p class="mt-3 max-w-sm text-sm leading-relaxed text-ink-muted">
-            Kosvia is your personal AI for choosing cosmetics — it reads the ingredient list,
-            weighs it against your skin and your budget, and tells you what actually fits.
+            {{ $t('FOOTER.BLURB') }}
           </p>
+          <LocaleSwitcher class="mt-5 w-fit" />
         </div>
 
-        <nav v-for="group in groups" :key="group.title" :aria-label="group.title">
-          <h2 class="text-sm font-semibold text-ink">{{ group.title }}</h2>
+        <nav v-for="group in groups" :key="group.title" :aria-label="$t(group.title)">
+          <h2 class="text-sm font-semibold text-ink">{{ $t(group.title) }}</h2>
           <ul class="mt-3 space-y-2">
             <li v-for="link in group.links" :key="link.to">
-              <NuxtLink
+              <NuxtLinkLocale
                 :to="link.to"
                 class="text-sm text-ink-muted underline-offset-4 transition-colors hover:text-ink hover:underline"
-              >{{ link.label }}</NuxtLink>
+              >{{ $t(link.label) }}</NuxtLinkLocale>
             </li>
           </ul>
         </nav>
       </div>
 
       <div class="mt-10 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>© {{ year }} Kosvia. Demo build.</p>
-        <p class="max-w-xl">
-          Kosvia gives information about cosmetic products and their ingredients. It is not a
-          medical service and does not diagnose or treat skin conditions.
-        </p>
+        <p>{{ $t('FOOTER.RIGHTS', { year }) }}</p>
+        <p class="max-w-xl">{{ $t('COMMON.MEDICAL_NOTE') }}</p>
       </div>
     </div>
   </footer>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The one button in the product. Renders as <button>, <a> or <NuxtLink>
+ * The one button in the product. Renders as <button>, <a> or <NuxtLinkLocale>
  * depending on what it is given, so navigation stays semantic.
  */
 type Variant = 'primary' | 'secondary' | 'ghost' | 'accent' | 'danger';
@@ -22,7 +22,11 @@ const props = withDefaults(
   { variant: 'primary', size: 'md', type: 'button' },
 );
 
-const component = computed(() => (props.to ? resolveComponent('NuxtLink') : props.href ? 'a' : 'button'));
+// `NuxtLinkLocale`, not `NuxtLink`: with a prefixed strategy every internal
+// path needs the active locale applied, and callers pass unprefixed paths.
+const component = computed(() =>
+  props.to ? resolveComponent('NuxtLinkLocale') : props.href ? 'a' : 'button',
+);
 
 const variants: Record<Variant, string> = {
   primary:

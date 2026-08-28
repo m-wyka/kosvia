@@ -9,35 +9,14 @@ import type { ProductIngredientDto } from '@kosvia/shared';
  */
 const props = defineProps<{ ingredients: ProductIngredientDto[] }>();
 
-const GROUPS: Array<{ key: string; title: string; description: string; tags: string[] }> = [
+/** Group keys map onto PRODUCT.LIST.* translations. */
+const GROUPS: Array<{ key: string; tags: string[] }> = [
+  { key: 'ACTIVES', tags: ['retinoid', 'exfoliant', 'brightening', 'peptide', 'uv-filter'] },
+  { key: 'HYDRATION', tags: ['humectant', 'emollient', 'occlusive', 'barrier-support'] },
+  { key: 'SOOTHING', tags: ['soothing', 'antioxidant'] },
+  { key: 'FRAGRANCE', tags: ['fragrance'] },
   {
-    key: 'actives',
-    title: 'Active ingredients',
-    description: 'The ingredients this product is built around.',
-    tags: ['retinoid', 'exfoliant', 'brightening', 'peptide', 'uv-filter'],
-  },
-  {
-    key: 'hydration',
-    title: 'Hydration & barrier',
-    description: 'Holds water in the skin and supports its outer layer.',
-    tags: ['humectant', 'emollient', 'occlusive', 'barrier-support'],
-  },
-  {
-    key: 'soothing',
-    title: 'Soothing & antioxidant',
-    description: 'Comfort ingredients and antioxidants.',
-    tags: ['soothing', 'antioxidant'],
-  },
-  {
-    key: 'fragrance',
-    title: 'Fragrance',
-    description: 'Adds scent. Worth knowing about if your skin reacts easily.',
-    tags: ['fragrance'],
-  },
-  {
-    key: 'base',
-    title: 'Base & formulation',
-    description: 'Solvents, thickeners, emulsifiers and preservatives that hold the formula together.',
+    key: 'BASE',
     tags: ['solvent', 'thickener', 'emulsifier', 'preservative', 'ph-adjuster', 'surfactant', 'colorant'],
   },
 ];
@@ -48,7 +27,7 @@ const grouped = computed(() => {
     const members = props.ingredients.filter((entry) => {
       if (used.has(entry.ingredient.id)) return false;
       const match =
-        (group.key === 'actives' && entry.ingredient.isActiveIngredient) ||
+        (group.key === 'ACTIVES' && entry.ingredient.isActiveIngredient) ||
         entry.ingredient.tags.some((tag) => group.tags.includes(tag));
       if (match) used.add(entry.ingredient.id);
       return match;
@@ -58,13 +37,7 @@ const grouped = computed(() => {
 
   const rest = props.ingredients.filter((entry) => !used.has(entry.ingredient.id));
   if (rest.length) {
-    result.push({
-      key: 'other',
-      title: 'Other ingredients',
-      description: 'Everything else on the label.',
-      tags: [],
-      members: rest,
-    });
+    result.push({ key: 'OTHER', tags: [], members: rest });
   }
   return result;
 });
@@ -80,8 +53,8 @@ const fullList = computed(() =>
 <template>
   <div class="space-y-6">
     <section v-for="group in grouped" :key="group.key">
-      <h3 class="text-sm font-semibold text-ink">{{ group.title }}</h3>
-      <p class="mt-0.5 text-xs text-ink-muted">{{ group.description }}</p>
+      <h3 class="text-sm font-semibold text-ink">{{ $t(`PRODUCT.LIST.${group.key}`) }}</h3>
+      <p class="mt-0.5 text-xs text-ink-muted">{{ $t(`PRODUCT.LIST.${group.key}_BODY`) }}</p>
 
       <ul class="mt-3 divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
         <li v-for="entry in group.members" :key="entry.ingredient.id">
@@ -132,13 +105,13 @@ const fullList = computed(() =>
               <BaseIcon name="info" :size="14" class="mt-px shrink-0" />
               <span>{{ entry.ingredient.concerns }}</span>
             </p>
-            <NuxtLink
+            <NuxtLinkLocale
               :to="`/ingredients/${entry.ingredient.slug}`"
               class="mt-3 inline-flex items-center gap-1 text-xs font-medium text-ink-soft underline-offset-4 hover:underline"
             >
-              More about this ingredient
+              {{ $t('PRODUCT.LIST.MORE_ABOUT') }}
               <BaseIcon name="chevron-right" :size="12" />
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </li>
       </ul>
@@ -151,7 +124,7 @@ const fullList = computed(() =>
         :aria-expanded="showFullList"
         @click="showFullList = !showFullList"
       >
-        Full INCI list, in label order
+        {{ $t('PRODUCT.LIST.FULL_LIST') }}
         <BaseIcon
           name="chevron-down"
           :size="16"

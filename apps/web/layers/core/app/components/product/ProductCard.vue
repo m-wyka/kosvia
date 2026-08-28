@@ -24,6 +24,8 @@ const props = withDefaults(
 const emit = defineEmits<{ favorite: [ProductSummaryDto] }>();
 
 const compare = useCompareStore();
+const { t } = useI18n();
+const reasonLabel = useMatchReason();
 const inComparison = computed(() => compare.has(props.product.id));
 
 const popping = ref(false);
@@ -35,15 +37,17 @@ function onFavorite() {
 
 const tags = computed(() => {
   const list: Array<{ label: string; tone: 'sage' | 'lavender' | 'peach' | 'neutral' }> = [];
-  if (props.product.isFragranceFree) list.push({ label: 'Fragrance-free', tone: 'sage' });
-  if (props.product.isVegan) list.push({ label: 'Vegan', tone: 'lavender' });
+  if (props.product.isFragranceFree) {
+    list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });
+  }
+  if (props.product.isVegan) list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });
   // A match reason only earns a chip if it stays on one line — "Targets
   // dehydration, redness, pores, uneven tone" is a sentence, not a tag.
-  const top = props.product.personalMatch?.reasons.find(
-    (reason) =>
-      ['concerns', 'goals', 'skin-type'].includes(reason.code) && reason.label.length <= 26,
-  );
-  if (top && list.length < 3) list.push({ label: top.label, tone: 'peach' });
+  const top = props.product.personalMatch?.reasons
+    .filter((reason) => ['concerns', 'goals', 'skin-type'].includes(reason.code))
+    .map(reasonLabel)
+    .find((label) => label.length <= 26);
+  if (top && list.length < 3) list.push({ label: top, tone: 'peach' });
   return list.slice(0, 2);
 });
 </script>
@@ -74,7 +78,7 @@ const tags = computed(() => {
             'text-peach': product.personalMatch.tier === 'good',
             'text-ink-muted': ['fair', 'poor'].includes(product.personalMatch.tier),
           }"
-        >{{ product.personalMatch.score }}% match</span>
+        >{{ $t('PRODUCT.MATCH', { score: product.personalMatch.score }) }}</span>
       </div>
 
       <button
@@ -84,7 +88,11 @@ const tags = computed(() => {
                bg-surface/92 text-ink-muted shadow-xs backdrop-blur-sm transition-colors
                hover:text-blush-deep"
         :class="[isFavorite && 'text-blush-deep', popping && 'animate-pop']"
-        :aria-label="isFavorite ? `Remove ${product.name} from favourites` : `Add ${product.name} to favourites`"
+        :aria-label="
+          isFavorite
+            ? $t('PRODUCT.REMOVE_FAVORITE', { name: product.name })
+            : $t('PRODUCT.ADD_FAVORITE', { name: product.name })
+        "
         :aria-pressed="isFavorite"
         @click.stop.prevent="onFavorite"
       >
@@ -98,9 +106,9 @@ const tags = computed(() => {
           {{ product.brand.name }}
         </p>
         <h3 class="mt-0.5 text-sm leading-snug font-medium text-ink">
-          <NuxtLink :to="`/products/${product.slug}`" class="after:absolute after:inset-0">
+          <NuxtLinkLocale :to="`/products/${product.slug}`" class="after:absolute after:inset-0">
             <span class="line-clamp-2">{{ product.name }}</span>
-          </NuxtLink>
+          </NuxtLinkLocale>
         </h3>
       </div>
 
@@ -122,7 +130,11 @@ const tags = computed(() => {
           type="button"
           class="relative z-10 rounded-md p-1.5 transition-colors"
           :class="inComparison ? 'bg-ink text-ink-inverse' : 'text-ink-muted hover:bg-surface-muted hover:text-ink'"
-          :aria-label="inComparison ? `Remove ${product.name} from comparison` : `Add ${product.name} to comparison`"
+          :aria-label="
+            inComparison
+              ? $t('PRODUCT.REMOVE_COMPARE', { name: product.name })
+              : $t('PRODUCT.ADD_COMPARE', { name: product.name })
+          "
           :aria-pressed="inComparison"
           @click.stop.prevent="compare.toggle(product)"
         >

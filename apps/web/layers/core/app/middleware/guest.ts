@@ -2,5 +2,5 @@
 export default defineNuxtRouteMiddleware(async () => {
   const auth = useAuthStore();
   await auth.init();
-  if (auth.isAuthenticated) return navigateTo('/dashboard');
+  if (auth.isAuthenticated) return navigateTo(useLocalePath()('/dashboard'));
 });

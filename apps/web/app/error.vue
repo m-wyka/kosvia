@@ -7,27 +7,24 @@ import type { NuxtError } from '#app';
  */
 const props = defineProps<{ error: NuxtError }>();
 
+const { t } = useI18n();
+const localePath = useLocalePath();
+
 const isMissing = computed(() => props.error.statusCode === 404);
 
 const copy = computed(() =>
   isMissing.value
-    ? {
-        title: 'We could not find that page',
-        body: 'The link may be out of date, or the product may no longer be in our catalogue.',
-      }
-    : {
-        title: 'Something went wrong',
-        body: 'That is on us. Try again in a moment, or head back to the catalogue.',
-      },
+    ? { title: t('ERRORS.NOT_FOUND_TITLE'), body: t('ERRORS.NOT_FOUND_BODY') }
+    : { title: t('ERRORS.SERVER_TITLE'), body: t('ERRORS.SERVER_BODY') },
 );
 
-useHead({ title: copy.value.title });
+useHead(() => ({ title: copy.value.title }));
 </script>
 
 <template>
   <div class="flex min-h-dvh flex-col bg-canvas">
     <header class="container-page flex h-16 shrink-0 items-center">
-      <NuxtLink to="/" aria-label="Kosvia home"><AppLogo /></NuxtLink>
+      <NuxtLinkLocale to="/" :aria-label="$t('NAV.HOME')"><AppLogo /></NuxtLinkLocale>
     </header>
 
     <main class="container-page flex flex-1 items-center justify-center py-12">
@@ -43,16 +40,20 @@ useHead({ title: copy.value.title });
         <p class="mt-3 text-base text-ink-muted">{{ copy.body }}</p>
 
         <div class="mt-8 flex flex-col justify-center gap-2.5 sm:flex-row">
-          <BaseButton size="lg" @click="clearError({ redirect: '/products' })">
-            Browse products
+          <BaseButton size="lg" @click="clearError({ redirect: localePath('/products') })">
+            {{ $t('ERRORS.BROWSE_PRODUCTS') }}
           </BaseButton>
-          <BaseButton size="lg" variant="secondary" @click="clearError({ redirect: '/' })">
-            Go home
+          <BaseButton
+            size="lg"
+            variant="secondary"
+            @click="clearError({ redirect: localePath('/') })"
+          >
+            {{ $t('ERRORS.GO_HOME') }}
           </BaseButton>
         </div>
 
         <p v-if="error.statusCode" class="mt-8 text-xs text-ink-faint">
-          Error {{ error.statusCode }}
+          {{ $t('ERRORS.CODE', { code: error.statusCode }) }}
         </p>
       </div>
     </main>

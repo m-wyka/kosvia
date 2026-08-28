@@ -6,6 +6,7 @@ definePageMeta({ middleware: 'auth' });
 const api = useApi();
 const auth = useAuthStore();
 const message = useApiMessage();
+const { t } = useI18n();
 
 const { data: conversations, refresh: refreshConversations } = await useApiFetch<AiConversationDto[]>(
   '/ai/conversations',
@@ -19,13 +20,9 @@ const thinking = ref(false);
 const error = ref('');
 const thread = ref<HTMLElement | null>(null);
 
-const STARTERS = [
-  'Which moisturiser should I buy?',
-  'Find me a cheaper alternative to my serum',
-  'I have 150 PLN for a basic routine',
-  'Do I already have something similar?',
-  'Something for redness under 60 PLN',
-];
+const STARTERS = computed(() =>
+  [1, 2, 3, 4, 5].map((n) => t(`AI.STARTER.ITEM_${n}`)),
+);
 
 async function openConversation(id: string) {
   const conversation = await api<AiConversationDto>(`/ai/conversations/${id}`);
@@ -89,11 +86,11 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-useSeo({
-  title: 'AI Beauty Shopper',
-  description: 'Ask Kosvia for a product recommendation in your own words.',
+useSeo(() => ({
+  title: t('SEO.AI.TITLE'),
+  description: t('SEO.AI.DESCRIPTION'),
   noindex: true,
-});
+}));
 </script>
 
 <template>
@@ -102,13 +99,11 @@ useSeo({
       <div class="flex min-h-[70dvh] min-w-0 flex-col">
         <header class="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 class="font-display text-2xl text-ink sm:text-3xl">AI Beauty Shopper</h1>
-            <p class="mt-1 text-sm text-ink-muted">
-              Ask in your own words. Kosvia searches its own catalogue before it answers.
-            </p>
+            <h1 class="font-display text-2xl text-ink sm:text-3xl">{{ $t('AI.TITLE') }}</h1>
+            <p class="mt-1 text-sm text-ink-muted">{{ $t('AI.SUBTITLE') }}</p>
           </div>
           <BaseButton v-if="messages.length" variant="ghost" size="sm" @click="startNew">
-            New conversation
+            {{ $t('AI.NEW_CONVERSATION') }}
           </BaseButton>
         </header>
 
@@ -119,12 +114,9 @@ useSeo({
               <BaseIcon name="sparkles" :size="26" />
             </span>
             <h2 class="mt-5 font-display text-2xl text-ink">
-              What are you looking for, {{ auth.displayName }}?
+              {{ $t('AI.EMPTY_TITLE', { name: auth.displayName }) }}
             </h2>
-            <p class="mt-2 text-sm text-ink-muted">
-              Kosvia knows your profile and your shelf. It will only ever recommend products it
-              can actually find — never invented ones.
-            </p>
+            <p class="mt-2 text-sm text-ink-muted">{{ $t('AI.EMPTY_BODY') }}</p>
 
             <ul class="mt-7 flex flex-wrap justify-center gap-2">
               <li v-for="starter in STARTERS" :key="starter">
@@ -155,12 +147,12 @@ useSeo({
 
         <form class="sticky bottom-20 lg:bottom-0" @submit.prevent="send()">
           <div class="flex items-end gap-2 rounded-2xl border border-line bg-surface p-2 shadow-sm">
-            <label for="ai-input" class="sr-only">Your question</label>
+            <label for="ai-input" class="sr-only">{{ $t('AI.INPUT_LABEL') }}</label>
             <textarea
               id="ai-input"
               v-model="draft"
               rows="1"
-              placeholder="I need a moisturiser under 70 PLN…"
+              :placeholder="$t('AI.PLACEHOLDER')"
               class="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2.5 py-2.5 text-sm
                      text-ink placeholder:text-ink-faint focus:outline-none"
               @keydown="onKeydown"
@@ -170,13 +162,13 @@ useSeo({
               size="md"
               :disabled="!draft.trim()"
               :loading="thinking"
-              label="Send"
+              :label="$t('AI.SEND')"
             >
               <template #icon><BaseIcon name="send" :size="16" /></template>
             </BaseButton>
           </div>
           <p class="mt-2 px-1 text-2xs text-ink-muted">
-            Kosvia gives product information, not medical advice.
+            {{ $t('AI.DISCLAIMER') }}
           </p>
         </form>
       </div>
@@ -185,7 +177,7 @@ useSeo({
         <div class="sticky top-24 space-y-4">
           <BaseCard :padded="false" class="overflow-hidden">
             <p class="border-b border-line px-4 py-3 text-sm font-semibold text-ink">
-              Recent conversations
+              {{ $t('AI.RECENT_TITLE') }}
             </p>
             <ul v-if="conversations?.length" class="divide-y divide-line">
               <li v-for="conversation in conversations.slice(0, 8)" :key="conversation.id">
@@ -196,22 +188,22 @@ useSeo({
                   @click="openConversation(conversation.id)"
                 >
                   <span class="line-clamp-2 text-sm text-ink-soft">
-                    {{ conversation.title ?? 'Untitled' }}
+                    {{ conversation.title ?? $t('AI.UNTITLED') }}
                   </span>
                 </button>
               </li>
             </ul>
             <p v-else class="px-4 py-6 text-center text-sm text-ink-muted">
-              Nothing yet.
+              {{ $t('AI.RECENT_EMPTY') }}
             </p>
           </BaseCard>
 
           <div class="rounded-xl border border-dashed border-line-strong p-4">
-            <p class="text-sm font-medium text-ink">How this works</p>
+            <p class="text-sm font-medium text-ink">{{ $t('AI.HOW_TITLE') }}</p>
             <ol class="mt-2 space-y-1.5 text-xs leading-relaxed text-ink-muted">
-              <li>1. We read your question for a product type and a budget.</li>
-              <li>2. We search your profile, your shelf and the catalogue.</li>
-              <li>3. Only then does the AI write the answer — around real rows.</li>
+              <li>{{ $t('AI.HOW_1') }}</li>
+              <li>{{ $t('AI.HOW_2') }}</li>
+              <li>{{ $t('AI.HOW_3') }}</li>
             </ol>
           </div>
         </div>

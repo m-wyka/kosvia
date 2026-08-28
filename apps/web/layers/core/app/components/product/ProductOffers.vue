@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatPrice, pricePerHundred, type ProductDto } from '@kosvia/shared';
+import { pricePerHundred, type ProductDto } from '@kosvia/shared';
 
 const props = defineProps<{ product: ProductDto }>();
 
@@ -16,22 +16,20 @@ const bestPrice = computed(
   () => offers.value.find((offer) => offer.availability !== 'OUT_OF_STOCK')?.price ?? null,
 );
 
-const AVAILABILITY = {
-  IN_STOCK: { label: 'In stock', tone: 'positive' as const },
-  LOW_STOCK: { label: 'Low stock', tone: 'caution' as const },
-  OUT_OF_STOCK: { label: 'Out of stock', tone: 'neutral' as const },
-  UNKNOWN: { label: 'Availability unknown', tone: 'neutral' as const },
-};
+const vocab = useVocabulary();
+const format = useFormat();
 </script>
 
 <template>
   <BaseCard :padded="false" class="overflow-hidden">
     <header class="flex items-baseline justify-between gap-4 border-b border-line px-5 py-4">
       <div>
-        <h2 class="font-display text-xl text-ink">Where to buy</h2>
-        <p class="mt-0.5 text-xs text-ink-muted">Demo store data — no real retailer is connected yet.</p>
+        <h2 class="font-display text-xl text-ink">{{ $t('PRODUCT.OFFERS.TITLE') }}</h2>
+        <p class="mt-0.5 text-xs text-ink-muted">{{ $t('PRODUCT.OFFERS.SUBTITLE') }}</p>
       </div>
-      <span class="shrink-0 text-xs text-ink-muted">{{ offers.length }} offers</span>
+      <span class="shrink-0 text-xs text-ink-muted">
+        {{ $t('PRODUCT.OFFERS.COUNT', offers.length) }}
+      </span>
     </header>
 
     <ul v-if="offers.length" class="divide-y divide-line">
@@ -57,26 +55,30 @@ const AVAILABILITY = {
                   'text-caution': offer.availability === 'LOW_STOCK',
                   'text-ink-muted': ['OUT_OF_STOCK', 'UNKNOWN'].includes(offer.availability),
                 }"
-              >{{ AVAILABILITY[offer.availability].label }}</span>
+              >{{ vocab.availability(offer.availability) }}</span>
             </span>
           </span>
 
           <span class="shrink-0 text-right">
             <span class="block text-sm font-semibold tabular-nums text-ink">
-              {{ formatPrice(offer.price, offer.currency) }}
+              {{ format.price(offer.price, offer.currency) }}
             </span>
             <span
               v-if="pricePerHundred(offer.price, product.volume, product.volumeUnit)"
               class="block text-2xs tabular-nums text-ink-muted"
             >
-              {{ formatPrice(pricePerHundred(offer.price, product.volume, product.volumeUnit)) }}
-              / 100 {{ product.volumeUnit ?? 'ml' }}
+              {{
+                format.pricePer100(
+                  pricePerHundred(offer.price, product.volume, product.volumeUnit),
+                  product.volumeUnit,
+                )
+              }}
             </span>
           </span>
         </div>
 
         <div class="mt-2.5 flex items-center justify-between gap-3">
-          <BaseBadge v-if="offer.price === bestPrice" tone="sage" size="xs">Best price</BaseBadge>
+          <BaseBadge v-if="offer.price === bestPrice" tone="sage" size="xs">{{ $t('PRODUCT.OFFERS.BEST_PRICE') }}</BaseBadge>
           <span v-else aria-hidden="true" />
           <BaseButton
             v-if="offer.url && offer.availability !== 'OUT_OF_STOCK'"
@@ -85,13 +87,13 @@ const AVAILABILITY = {
             variant="secondary"
             target="_blank"
             rel="noopener nofollow"
-          >Visit store</BaseButton>
+          >{{ $t('PRODUCT.OFFERS.VISIT') }}</BaseButton>
         </div>
       </li>
     </ul>
 
     <p v-else class="px-5 py-8 text-center text-sm text-ink-muted">
-      We do not have a price for this product yet.
+      {{ $t('PRODUCT.OFFERS.NONE') }}
     </p>
   </BaseCard>
 </template>

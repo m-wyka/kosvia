@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatPrice, SKIN_TYPES, type BrandDto, type CategoryDto, type ProductDto, type SkinType } from '@kosvia/shared';
+import { SKIN_TYPES, type BrandDto, type CategoryDto, type ProductDto, type SkinType } from '@kosvia/shared';
 import type { TableColumn } from '../../components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -19,32 +19,41 @@ interface ProductRow {
 
 const api = useApi();
 const resource = useAdminResource<ProductRow>('/admin/products');
+const { t } = useI18n();
+const vocab = useVocabulary();
+const format = useFormat();
 
 const { data: brands } = await useApiFetch<BrandDto[]>('/brands', { key: 'brands' });
 const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', { key: 'categories' });
 
 /** Only leaf categories can hold products, so those are the only options offered. */
 const categoryOptions = computed(() => {
-  const output: Array<{ id: string; name: string }> = [];
+  const output: Array<{ value: string; label: string }> = [];
   const walk = (nodes: CategoryDto[], trail: string[]) => {
     for (const node of nodes) {
-      if (!node.children?.length) output.push({ id: node.id, name: [...trail, node.name].join(' › ') });
-      else walk(node.children, [...trail, node.name]);
+      const label = vocab.category(node.slug, node.name);
+      if (!node.children?.length) output.push({ value: node.id, label: [...trail, label].join(' › ') });
+      else walk(node.children, [...trail, label]);
     }
   };
   walk(categories.value ?? [], []);
-  return output;
+  return [{ value: '', label: t('ADMIN.PRODUCTS.CATEGORY_PLACEHOLDER') }, ...output];
 });
 
-const columns: TableColumn[] = [
-  { key: 'name', label: 'Product' },
-  { key: 'brand', label: 'Brand', secondary: true },
-  { key: 'category', label: 'Category', secondary: true },
-  { key: 'ingredientScore', label: 'Score', align: 'center', width: 'w-20' },
-  { key: 'lowestPrice', label: 'From', align: 'right', width: 'w-28' },
-  { key: 'status', label: 'Status', align: 'center', width: 'w-24' },
+const brandOptions = computed(() => [
+  { value: '', label: t('ADMIN.PRODUCTS.BRAND_PLACEHOLDER') },
+  ...(brands.value ?? []).map((brand) => ({ value: brand.id, label: brand.name })),
+]);
+
+const columns = computed<TableColumn[]>(() => [
+  { key: 'name', label: t('ADMIN.PRODUCTS.COL_PRODUCT') },
+  { key: 'brand', label: t('ADMIN.PRODUCTS.COL_BRAND'), secondary: true },
+  { key: 'category', label: t('ADMIN.PRODUCTS.COL_CATEGORY'), secondary: true },
+  { key: 'ingredientScore', label: t('ADMIN.PRODUCTS.COL_SCORE'), align: 'center', width: 'w-20' },
+  { key: 'lowestPrice', label: t('ADMIN.PRODUCTS.COL_FROM'), align: 'right', width: 'w-28' },
+  { key: 'status', label: t('ADMIN.PRODUCTS.COL_STATUS'), align: 'center', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
-];
+]);
 
 const modalOpen = ref(false);
 const editing = ref<ProductRow | null>(null);
@@ -131,8 +140,8 @@ async function save() {
     targetSkinTypes: form.targetSkinTypes,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, 'Product saved')
-    : await resource.create(body, 'Product created');
+    ? await resource.update(editing.value.id, body, t('ADMIN.PRODUCTS.SAVED'))
+    : await resource.create(body, t('ADMIN.PRODUCTS.CREATED'));
   if (result) modalOpen.value = false;
 }
 
@@ -142,20 +151,24 @@ function toggleSkinType(type: SkinType) {
     : [...form.targetSkinTypes, type];
 }
 
-useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.ADMIN.PRODUCTS'),
+  description: t('SEO.ADMIN.PRODUCTS_DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div>
     <AdminPageHeader
-      title="Products"
+      :title="$t('ADMIN.PRODUCTS.TITLE')"
       :count="resource.total.value"
-      description="Saving a product recomputes its ingredient score."
+      :description="$t('ADMIN.PRODUCTS.SUBTITLE')"
     >
       <template #actions>
         <BaseButton size="sm" @click="openCreate">
           <template #icon><BaseIcon name="plus" :size="15" /></template>
-          New product
+          {{ $t('ADMIN.PRODUCTS.NEW') }}
         </BaseButton>
       </template>
     </AdminPageHeader>
@@ -165,7 +178,7 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
       :page="resource.page.value"
       :page-count="resource.pageCount.value"
       :total="resource.total.value"
-      placeholder="Search by name, slug, EAN or brand…"
+      :placeholder="$t('ADMIN.PRODUCTS.SEARCH_PLACEHOLDER')"
       @update:page="resource.page.value = $event"
     />
 
@@ -176,15 +189,20 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
       :columns="columns"
       :rows="resource.rows.value"
       :loading="resource.pending.value"
-      empty-title="No products found"
+      :empty-title="$t('ADMIN.PRODUCTS.EMPTY')"
     >
       <template #cell-name="{ row }">
         <span class="min-w-0">
-          <NuxtLink :to="`/products/${row.slug}`" class="text-sm font-medium text-ink hover:underline">
+          <NuxtLinkLocale :to="`/products/${row.slug}`" class="text-sm font-medium text-ink hover:underline">
             {{ row.name }}
-          </NuxtLink>
+          </NuxtLinkLocale>
           <span class="block text-xs text-ink-muted">
-            {{ row._count?.ingredients ?? 0 }} ingredients · {{ row._count?.offers ?? 0 }} offers
+            {{
+              $t('ADMIN.PRODUCTS.META', {
+                ingredients: row._count?.ingredients ?? 0,
+                offers: row._count?.offers ?? 0,
+              })
+            }}
           </span>
         </span>
       </template>
@@ -199,12 +217,12 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
       </template>
       <template #cell-lowestPrice="{ row }">
         <span class="text-sm whitespace-nowrap tabular-nums text-ink-soft">
-          {{ row.lowestPrice ? formatPrice(Number(row.lowestPrice)) : '—' }}
+          {{ row.lowestPrice ? format.price(Number(row.lowestPrice)) : $t('COMMON.NOT_AVAILABLE') }}
         </span>
       </template>
       <template #cell-status="{ row }">
         <BaseBadge :tone="row.isActive ? 'sage' : 'neutral'" size="xs">
-          {{ row.isActive ? 'Live' : 'Hidden' }}
+          {{ row.isActive ? $t('ADMIN.PRODUCTS.LIVE') : $t('ADMIN.PRODUCTS.HIDDEN') }}
         </BaseBadge>
       </template>
       <template #cell-actions="{ row }">
@@ -212,7 +230,7 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="`Edit ${row.name}`"
+            :aria-label="$t('ADMIN.PRODUCTS.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -220,8 +238,8 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
-            :aria-label="`Delete ${row.name}`"
-            @click="resource.remove(row.id, 'Product deleted')"
+            :aria-label="$t('COMMON.DELETE')"
+            @click="resource.remove(row.id, t('ADMIN.PRODUCTS.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -231,7 +249,7 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="editing ? `Edit ${editing.name}` : 'New product'"
+      :title="editing ? $t('ADMIN.PRODUCTS.EDIT', { name: editing.name }) : $t('ADMIN.PRODUCTS.NEW')"
       size="lg"
     >
       <div v-if="loadingDetail" class="space-y-4">
@@ -242,87 +260,80 @@ useSeo({ title: 'Products · Admin', description: 'Manage the catalogue.', noind
 
       <div v-else class="space-y-5">
         <div class="grid gap-4 sm:grid-cols-2">
-          <BaseInput v-model="form.name" label="Name" required />
-          <BaseInput v-model="form.slug" label="Slug" hint="Leave empty to generate." />
+          <BaseInput v-model="form.name" :label="$t('ADMIN.PRODUCTS.FIELD_NAME')" required />
+          <BaseInput
+            v-model="form.slug"
+            :label="$t('ADMIN.PRODUCTS.FIELD_SLUG')"
+            :hint="$t('ADMIN.PRODUCTS.SLUG_HINT')"
+          />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label for="brand" class="mb-1.5 block text-sm font-medium text-ink-soft">Brand</label>
-            <select
-              id="brand"
-              v-model="form.brandId"
-              class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-            >
-              <option value="" disabled>Choose a brand</option>
-              <option v-for="brand in brands" :key="brand.id" :value="brand.id">{{ brand.name }}</option>
-            </select>
-          </div>
-          <div>
-            <label for="category" class="mb-1.5 block text-sm font-medium text-ink-soft">Category</label>
-            <select
-              id="category"
-              v-model="form.categoryId"
-              class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-            >
-              <option value="" disabled>Choose a category</option>
-              <option v-for="category in categoryOptions" :key="category.id" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
-          </div>
+          <BaseNativeSelect
+            v-model="form.brandId"
+            :options="brandOptions"
+            :label="$t('ADMIN.PRODUCTS.BRAND_LABEL')"
+          />
+          <BaseNativeSelect
+            v-model="form.categoryId"
+            :options="categoryOptions"
+            :label="$t('ADMIN.PRODUCTS.CATEGORY_LABEL')"
+          />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-3">
-          <BaseInput v-model="form.ean" label="EAN" placeholder="5901234567890" />
-          <BaseInput v-model="form.volume" label="Volume" type="number" />
-          <BaseInput v-model="form.volumeUnit" label="Unit" placeholder="ml" />
+          <BaseInput v-model="form.ean" :label="$t('ADMIN.PRODUCTS.FIELD_EAN')" placeholder="5901234567890" />
+          <BaseInput v-model="form.volume" :label="$t('ADMIN.PRODUCTS.FIELD_VOLUME')" type="number" />
+          <BaseInput v-model="form.volumeUnit" :label="$t('ADMIN.PRODUCTS.FIELD_UNIT')" placeholder="ml" />
         </div>
 
-        <BaseTextarea v-model="form.description" label="Description" :rows="4" />
-        <BaseTextarea v-model="form.usage" label="How to use it" :rows="2" />
+        <BaseTextarea v-model="form.description" :label="$t('ADMIN.PRODUCTS.FIELD_DESCRIPTION')" :rows="4" />
+        <BaseTextarea v-model="form.usage" :label="$t('ADMIN.PRODUCTS.FIELD_USAGE')" :rows="2" />
         <BaseTextarea
           v-model="form.highlights"
-          label="Highlights"
+          :label="$t('ADMIN.PRODUCTS.FIELD_HIGHLIGHTS')"
           :rows="3"
-          hint="One per line. Factual, not marketing copy."
+          :hint="$t('ADMIN.PRODUCTS.HIGHLIGHTS_HINT')"
         />
-        <BaseInput v-model="form.imageUrl" label="Image URL" placeholder="/img/product/slug.svg" />
+        <BaseInput
+          v-model="form.imageUrl"
+          :label="$t('ADMIN.PRODUCTS.FIELD_IMAGE')"
+          placeholder="/img/product/slug.svg"
+        />
 
         <div>
-          <p class="mb-2 text-sm font-medium text-ink-soft">Positioned for</p>
+          <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('ADMIN.PRODUCTS.POSITIONED_FOR') }}</p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="type in SKIN_TYPES.filter((entry) => entry !== 'UNKNOWN')"
               :key="type"
               type="button"
-              class="rounded-pill border px-2.5 py-1 text-xs capitalize transition-colors"
+              class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
               :class="form.targetSkinTypes.includes(type) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
               @click="toggleSkinType(type)"
-            >{{ type.toLowerCase() }}</button>
+            >{{ vocab.skinType(type) }}</button>
           </div>
         </div>
 
         <div class="grid gap-3 rounded-lg border border-line bg-surface-muted p-4 sm:grid-cols-2">
-          <BaseSwitch v-model="form.isFragranceFree" label="Fragrance-free" />
-          <BaseSwitch v-model="form.isVegan" label="Vegan" />
-          <BaseSwitch v-model="form.isCrueltyFree" label="Cruelty-free" />
-          <BaseSwitch v-model="form.isActive" label="Visible in the catalogue" />
+          <BaseSwitch v-model="form.isFragranceFree" :label="$t('SEARCH.FILTER.FRAGRANCE_FREE')" />
+          <BaseSwitch v-model="form.isVegan" :label="$t('SEARCH.FILTER.VEGAN')" />
+          <BaseSwitch v-model="form.isCrueltyFree" :label="$t('SEARCH.FILTER.CRUELTY_FREE')" />
+          <BaseSwitch v-model="form.isActive" :label="$t('ADMIN.PRODUCTS.VISIBLE')" />
         </div>
 
         <p class="rounded-lg bg-info-soft px-3.5 py-2.5 text-xs leading-relaxed text-info">
-          The ingredient list is not editable here yet — it is seeded and recomputed on save.
-          Editing formulas is the next step for this screen.
+          {{ $t('ADMIN.PRODUCTS.INGREDIENT_NOTE') }}
         </p>
       </div>
 
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">Cancel</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
         <BaseButton
           :loading="resource.saving.value"
           :disabled="!form.name || !form.brandId || !form.categoryId"
           @click="save"
-        >{{ editing ? 'Save changes' : 'Create product' }}</BaseButton>
+        >{{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.PRODUCTS.CREATE') }}</BaseButton>
       </template>
     </BaseModal>
   </div>

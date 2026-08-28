@@ -12,6 +12,7 @@ export function useShelf() {
   const auth = useAuthStore();
   const toast = useToast();
   const message = useApiMessage();
+  const { t } = useI18n();
 
   const items = useState<ShelfItemDto[]>('shelf-items', () => []);
   const loaded = useState('shelf-loaded', () => false);
@@ -42,7 +43,10 @@ export function useShelf() {
     try {
       await api('/shelf', { method: 'POST', body: { productId: product.id } });
       await refresh(true);
-      toast.success(`${product.name} added to your shelf`, { label: 'View shelf', to: '/shelf' });
+      toast.success(t('SHELF.ADDED', { name: product.name }), {
+        label: t('SHELF.VIEW_SHELF'),
+        to: '/shelf',
+      });
     } catch (error) {
       toast.error(message(error));
     } finally {
@@ -70,7 +74,10 @@ export function useShelf() {
     try {
       if (!existing) {
         await api('/shelf', { method: 'POST', body: { productId: product.id, isFavorite: true } });
-        toast.success(`${product.name} saved to your shelf`, { label: 'View shelf', to: '/shelf' });
+        toast.success(t('SHELF.SAVED', { name: product.name }), {
+          label: t('SHELF.VIEW_SHELF'),
+          to: '/shelf',
+        });
       } else {
         await api(`/shelf/${existing.id}`, { method: 'PATCH', body: { isFavorite: !existing.isFavorite } });
       }
@@ -84,7 +91,7 @@ export function useShelf() {
 
   function requireAuth(): boolean {
     if (auth.isAuthenticated) return true;
-    toast.notify('Sign in to build your shelf', { label: 'Sign in', to: '/login' });
+    toast.notify(t('SHELF.SIGN_IN_PROMPT'), { label: t('COMMON.SIGN_IN'), to: '/login' });
     return false;
   }
 

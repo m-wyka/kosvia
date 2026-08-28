@@ -1,5 +1,7 @@
 <script setup lang="ts">
 withDefaults(defineProps<{ size?: number; label?: string }>(), { size: 16 });
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -10,7 +12,7 @@ withDefaults(defineProps<{ size?: number; label?: string }>(), { size: 16 });
     fill="none"
     class="shrink-0 animate-spin"
     role="status"
-    :aria-label="label ?? 'Loading'"
+    :aria-label="label ?? t('COMMON.LOADING')"
   >
     <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.22" stroke-width="2.5" />
     <path

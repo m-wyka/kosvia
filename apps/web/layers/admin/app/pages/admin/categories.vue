@@ -20,14 +20,25 @@ const ROUTINE_STEPS = [
 ];
 
 const resource = useAdminResource<CategoryRow>('/admin/categories', { paginated: false });
+const { t } = useI18n();
+const vocab = useVocabulary();
 
-const columns: TableColumn[] = [
-  { key: 'name', label: 'Category' },
-  { key: 'parent', label: 'Parent', secondary: true },
-  { key: 'routineStep', label: 'Routine step', secondary: true },
-  { key: 'products', label: 'Products', align: 'right', width: 'w-24' },
+const columns = computed<TableColumn[]>(() => [
+  { key: 'name', label: t('ADMIN.CATEGORIES.COL_NAME') },
+  { key: 'parent', label: t('ADMIN.CATEGORIES.COL_PARENT'), secondary: true },
+  { key: 'routineStep', label: t('ADMIN.CATEGORIES.COL_STEP'), secondary: true },
+  { key: 'products', label: t('ADMIN.CATEGORIES.COL_PRODUCTS'), align: 'right', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
-];
+]);
+
+const routineStepOptions = computed(() =>
+  ROUTINE_STEPS.map((value) => ({ value, label: vocab.routineStep(value) })),
+);
+
+const parentSelectOptions = computed(() => [
+  { value: '', label: t('ADMIN.CATEGORIES.PARENT_NONE') },
+  ...parentOptions.value,
+]);
 
 const modalOpen = ref(false);
 const editing = ref<CategoryRow | null>(null);
@@ -75,25 +86,29 @@ async function save() {
     sortOrder: Number(form.sortOrder) || 0,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, 'Category saved')
-    : await resource.create(body, 'Category created');
+    ? await resource.update(editing.value.id, body, t('ADMIN.CATEGORIES.SAVED'))
+    : await resource.create(body, t('ADMIN.CATEGORIES.CREATED'));
   if (result) modalOpen.value = false;
 }
 
-useSeo({ title: 'Categories · Admin', description: 'Manage the category tree.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.ADMIN.CATEGORIES'),
+  description: t('SEO.ADMIN.CATEGORIES_DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div>
     <AdminPageHeader
-      title="Categories"
+      :title="$t('ADMIN.CATEGORIES.TITLE')"
       :count="resource.total.value"
-      description="The tree that drives navigation, filtering and routine analysis."
+      :description="$t('ADMIN.CATEGORIES.SUBTITLE')"
     >
       <template #actions>
         <BaseButton size="sm" @click="openCreate">
           <template #icon><BaseIcon name="plus" :size="15" /></template>
-          New category
+          {{ $t('ADMIN.CATEGORIES.NEW') }}
         </BaseButton>
       </template>
     </AdminPageHeader>
@@ -105,20 +120,22 @@ useSeo({ title: 'Categories · Admin', description: 'Manage the category tree.',
       :columns="columns"
       :rows="resource.rows.value"
       :loading="resource.pending.value"
-      empty-title="No categories yet"
+      :empty-title="$t('ADMIN.CATEGORIES.EMPTY')"
     >
       <template #cell-name="{ row }">
         <span class="flex items-center gap-2">
           <span v-if="row.parentId" class="text-ink-faint" aria-hidden="true">└</span>
-          <span class="font-medium text-ink">{{ row.name }}</span>
+          <span class="font-medium text-ink">{{ vocab.category(row.slug, row.name) }}</span>
           <code class="text-2xs text-ink-faint">{{ row.slug }}</code>
         </span>
       </template>
       <template #cell-parent="{ row }">
-        <span class="text-sm text-ink-muted">{{ row.parent?.name ?? '—' }}</span>
+        <span class="text-sm text-ink-muted">
+          {{ row.parent ? vocab.category(row.parent.id, row.parent.name) : $t('COMMON.NOT_AVAILABLE') }}
+        </span>
       </template>
       <template #cell-routineStep="{ row }">
-        <BaseBadge tone="neutral" size="xs">{{ row.routineStep.toLowerCase() }}</BaseBadge>
+        <BaseBadge tone="neutral" size="xs">{{ vocab.routineStep(row.routineStep) }}</BaseBadge>
       </template>
       <template #cell-products="{ row }">
         <span class="tabular-nums text-ink-soft">{{ row._count?.products ?? 0 }}</span>
@@ -128,7 +145,7 @@ useSeo({ title: 'Categories · Admin', description: 'Manage the category tree.',
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="`Edit ${row.name}`"
+            :aria-label="$t('ADMIN.CATEGORIES.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -136,8 +153,8 @@ useSeo({ title: 'Categories · Admin', description: 'Manage the category tree.',
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
-            :aria-label="`Delete ${row.name}`"
-            @click="resource.remove(row.id, 'Category deleted')"
+            :aria-label="$t('COMMON.DELETE')"
+            @click="resource.remove(row.id, t('ADMIN.CATEGORIES.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -145,45 +162,40 @@ useSeo({ title: 'Categories · Admin', description: 'Manage the category tree.',
       </template>
     </AdminTable>
 
-    <BaseModal v-model:open="modalOpen" :title="editing ? `Edit ${editing.name}` : 'New category'" size="sm">
+    <BaseModal
+      v-model:open="modalOpen"
+      :title="
+        editing ? $t('ADMIN.CATEGORIES.EDIT', { name: editing.name }) : $t('ADMIN.CATEGORIES.NEW')
+      "
+      size="sm"
+    >
       <div class="space-y-4">
-        <BaseInput v-model="form.name" label="Name" required />
-        <BaseInput v-model="form.slug" label="Slug" hint="Leave empty to generate from the name." />
+        <BaseInput v-model="form.name" :label="$t('ADMIN.BRANDS.FIELD_NAME')" required />
+        <BaseInput
+          v-model="form.slug"
+          :label="$t('ADMIN.BRANDS.FIELD_SLUG')"
+          :hint="$t('ADMIN.BRANDS.SLUG_HINT')"
+        />
 
-        <div>
-          <label for="parent" class="mb-1.5 block text-sm font-medium text-ink-soft">Parent category</label>
-          <select
-            id="parent"
-            v-model="form.parentId"
-            class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-          >
-            <option value="">None — top level</option>
-            <option v-for="option in parentOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
+        <BaseNativeSelect
+          v-model="form.parentId"
+          :options="parentSelectOptions"
+          :label="$t('ADMIN.CATEGORIES.PARENT_LABEL')"
+        />
 
-        <div>
-          <label for="step" class="mb-1.5 block text-sm font-medium text-ink-soft">Routine step</label>
-          <select
-            id="step"
-            v-model="form.routineStep"
-            class="h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm"
-          >
-            <option v-for="step in ROUTINE_STEPS" :key="step" :value="step">{{ step.toLowerCase() }}</option>
-          </select>
-          <p class="mt-1.5 text-xs text-ink-muted">
-            Drives alternatives, routine gap analysis and the routine builder.
-          </p>
-        </div>
+        <BaseNativeSelect
+          v-model="form.routineStep"
+          :options="routineStepOptions"
+          :label="$t('ADMIN.CATEGORIES.STEP_LABEL')"
+          :hint="$t('ADMIN.CATEGORIES.STEP_HINT')"
+        />
 
-        <BaseInput v-model="form.sortOrder" label="Sort order" type="number" />
+        <BaseInput v-model="form.sortOrder" :label="$t('ADMIN.CATEGORIES.SORT_ORDER')" type="number" />
       </div>
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">Cancel</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
         <BaseButton :loading="resource.saving.value" :disabled="!form.name" @click="save">
-          {{ editing ? 'Save changes' : 'Create category' }}
+          {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.CATEGORIES.CREATE') }}
         </BaseButton>
       </template>
     </BaseModal>

@@ -7,14 +7,15 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 type BrandRow = BrandDto & { _count: { products: number } };
 
 const resource = useAdminResource<BrandRow>('/admin/brands');
+const { t } = useI18n();
 
-const columns: TableColumn[] = [
-  { key: 'name', label: 'Brand' },
-  { key: 'slug', label: 'Slug', secondary: true },
-  { key: 'flags', label: 'Ethics', secondary: true },
-  { key: 'products', label: 'Products', align: 'right', width: 'w-24' },
+const columns = computed<TableColumn[]>(() => [
+  { key: 'name', label: t('ADMIN.BRANDS.COL_NAME') },
+  { key: 'slug', label: t('ADMIN.BRANDS.COL_SLUG'), secondary: true },
+  { key: 'flags', label: t('ADMIN.BRANDS.COL_ETHICS'), secondary: true },
+  { key: 'products', label: t('ADMIN.BRANDS.COL_PRODUCTS'), align: 'right', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
-];
+]);
 
 const editing = ref<BrandRow | null>(null);
 const modalOpen = ref(false);
@@ -47,26 +48,34 @@ async function save() {
     isCrueltyFree: form.isCrueltyFree,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, 'Brand saved')
-    : await resource.create(body, 'Brand created');
+    ? await resource.update(editing.value.id, body, t('ADMIN.BRANDS.SAVED'))
+    : await resource.create(body, t('ADMIN.BRANDS.CREATED'));
   if (result) modalOpen.value = false;
 }
 
 async function confirmDelete(brand: BrandRow) {
-  if (!confirm(`Delete ${brand.name}? This cannot be undone.`)) return;
-  await resource.remove(brand.id, 'Brand deleted');
+  if (!confirm(t('ADMIN.CONFIRM_DELETE', { name: brand.name }))) return;
+  await resource.remove(brand.id, t('ADMIN.BRANDS.DELETED'));
 }
 
-useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.ADMIN.BRANDS'),
+  description: t('SEO.ADMIN.BRANDS_DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
   <div>
-    <AdminPageHeader title="Brands" :count="resource.total.value" description="Who makes the products.">
+    <AdminPageHeader
+      :title="$t('ADMIN.BRANDS.TITLE')"
+      :count="resource.total.value"
+      :description="$t('ADMIN.BRANDS.SUBTITLE')"
+    >
       <template #actions>
         <BaseButton size="sm" @click="openCreate">
           <template #icon><BaseIcon name="plus" :size="15" /></template>
-          New brand
+          {{ $t('ADMIN.BRANDS.NEW') }}
         </BaseButton>
       </template>
     </AdminPageHeader>
@@ -76,7 +85,7 @@ useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true 
       :page="resource.page.value"
       :page-count="resource.pageCount.value"
       :total="resource.total.value"
-      placeholder="Search brands…"
+      :placeholder="$t('ADMIN.BRANDS.SEARCH_PLACEHOLDER')"
       @update:page="resource.page.value = $event"
     />
 
@@ -87,7 +96,7 @@ useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true 
       :columns="columns"
       :rows="resource.rows.value"
       :loading="resource.pending.value"
-      empty-title="No brands yet"
+      :empty-title="$t('ADMIN.BRANDS.EMPTY')"
     >
       <template #cell-name="{ row }">
         <span class="font-medium text-ink">{{ row.name }}</span>
@@ -97,9 +106,15 @@ useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true 
       </template>
       <template #cell-flags="{ row }">
         <span class="flex flex-wrap gap-1">
-          <BaseBadge v-if="row.isVegan" tone="lavender" size="xs">Vegan</BaseBadge>
-          <BaseBadge v-if="row.isCrueltyFree" tone="sage" size="xs">Cruelty-free</BaseBadge>
-          <span v-if="!row.isVegan && !row.isCrueltyFree" class="text-xs text-ink-faint">—</span>
+          <BaseBadge v-if="row.isVegan" tone="lavender" size="xs">
+            {{ $t('ADMIN.BRANDS.VEGAN') }}
+          </BaseBadge>
+          <BaseBadge v-if="row.isCrueltyFree" tone="sage" size="xs">
+            {{ $t('ADMIN.BRANDS.CRUELTY_FREE') }}
+          </BaseBadge>
+          <span v-if="!row.isVegan && !row.isCrueltyFree" class="text-xs text-ink-faint">
+            {{ $t('COMMON.NOT_AVAILABLE') }}
+          </span>
         </span>
       </template>
       <template #cell-products="{ row }">
@@ -110,7 +125,7 @@ useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true 
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint transition-colors hover:text-ink"
-            :aria-label="`Edit ${row.name}`"
+            :aria-label="$t('ADMIN.BRANDS.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -118,7 +133,7 @@ useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true 
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint transition-colors hover:text-critical"
-            :aria-label="`Delete ${row.name}`"
+            :aria-label="$t('COMMON.DELETE')"
             @click="confirmDelete(row)"
           >
             <BaseIcon name="trash" :size="15" />
@@ -129,22 +144,30 @@ useSeo({ title: 'Brands · Admin', description: 'Manage brands.', noindex: true 
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="editing ? `Edit ${editing.name}` : 'New brand'"
+      :title="editing ? $t('ADMIN.BRANDS.EDIT', { name: editing.name }) : $t('ADMIN.BRANDS.NEW')"
       size="sm"
     >
       <div class="space-y-4">
-        <BaseInput v-model="form.name" label="Name" required />
-        <BaseInput v-model="form.slug" label="Slug" hint="Leave empty to generate from the name." />
-        <BaseTextarea v-model="form.description" label="Description" :rows="3" />
+        <BaseInput v-model="form.name" :label="$t('ADMIN.BRANDS.FIELD_NAME')" required />
+        <BaseInput
+          v-model="form.slug"
+          :label="$t('ADMIN.BRANDS.FIELD_SLUG')"
+          :hint="$t('ADMIN.BRANDS.SLUG_HINT')"
+        />
+        <BaseTextarea
+          v-model="form.description"
+          :label="$t('ADMIN.BRANDS.FIELD_DESCRIPTION')"
+          :rows="3"
+        />
         <div class="space-y-3 rounded-lg border border-line bg-surface-muted p-4">
-          <BaseSwitch v-model="form.isVegan" label="Vegan" />
-          <BaseSwitch v-model="form.isCrueltyFree" label="Cruelty-free" />
+          <BaseSwitch v-model="form.isVegan" :label="$t('ADMIN.BRANDS.VEGAN')" />
+          <BaseSwitch v-model="form.isCrueltyFree" :label="$t('ADMIN.BRANDS.CRUELTY_FREE')" />
         </div>
       </div>
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">Cancel</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
         <BaseButton :loading="resource.saving.value" :disabled="!form.name" @click="save">
-          {{ editing ? 'Save changes' : 'Create brand' }}
+          {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.BRANDS.CREATE') }}
         </BaseButton>
       </template>
     </BaseModal>

@@ -16,7 +16,37 @@ export default defineNuxtConfig({
 
   extends: ['./layers/core', './layers/admin'],
 
-  modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxt/eslint'],
+  modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxt/eslint', '@nuxtjs/i18n'],
+
+  /**
+   * Two locales, each with its own URL space.
+   *
+   * `prefix_except_default` keeps English on the clean paths and puts Polish
+   * under /pl — so both languages are separately indexable, which matters for a
+   * catalogue this content-heavy. A single shared URL would mean Google only
+   * ever sees one of them.
+   *
+   * Browser detection redirects only from the site root: deep links must keep
+   * pointing at the language they were shared in, and redirecting everywhere
+   * makes locale switching fight the detector.
+   */
+  i18n: {
+    locales: [
+      { code: 'en', language: 'en-GB', name: 'English', file: 'en.json' },
+      { code: 'pl', language: 'pl-PL', name: 'Polski', file: 'pl.json' },
+    ],
+    defaultLocale: 'en',
+    vueI18n: './i18n.config.ts',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'kosvia_locale',
+      cookieCrossOrigin: false,
+      redirectOn: 'root',
+      alwaysRedirect: false,
+      fallbackLocale: 'en',
+    },
+  },
 
   ssr: true,
 

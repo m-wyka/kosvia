@@ -33,7 +33,6 @@ withDefaults(
     trackBy: 'value',
     searchable: true,
     clearable: true,
-    emptyText: 'No matches',
   },
 );
 
@@ -64,7 +63,7 @@ const id = useId();
       :allow-empty="clearable"
       :disabled="disabled"
       :loading="loading"
-      :placeholder="placeholder ?? 'Select…'"
+      :placeholder="placeholder ?? '—'"
       :close-on-select="!multiple"
       :clear-on-select="false"
       :preserve-search="multiple"
@@ -77,10 +76,10 @@ const id = useId();
       @close="emit('close')"
     >
       <template #noResult>
-        <span class="text-sm text-ink-muted">{{ emptyText }}</span>
+        <span class="text-sm text-ink-muted">{{ emptyText ?? $t('SEARCH.EMPTY_TITLE') }}</span>
       </template>
       <template #noOptions>
-        <span class="text-sm text-ink-muted">Nothing to choose from yet</span>
+        <span class="text-sm text-ink-muted">{{ $t('ERRORS.EMPTY_TITLE') }}</span>
       </template>
     </Multiselect>
 

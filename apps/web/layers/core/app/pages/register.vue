@@ -3,6 +3,7 @@ definePageMeta({ layout: 'focused', middleware: 'guest' });
 
 const auth = useAuthStore();
 const router = useRouter();
+const localePath = useLocalePath();
 const message = useApiMessage();
 
 const name = ref('');
@@ -11,12 +12,14 @@ const password = ref('');
 const error = ref('');
 const pending = ref(false);
 
+const { t } = useI18n();
+
 /** Mirrors the API's password policy so the rules are visible before submitting. */
 const rules = computed(() => [
-  { label: 'At least 10 characters', met: password.value.length >= 10 },
-  { label: 'One lowercase letter', met: /[a-z]/.test(password.value) },
-  { label: 'One uppercase letter', met: /[A-Z]/.test(password.value) },
-  { label: 'One number', met: /[0-9]/.test(password.value) },
+  { label: t('AUTH.RULE.LENGTH'), met: password.value.length >= 10 },
+  { label: t('AUTH.RULE.LOWER'), met: /[a-z]/.test(password.value) },
+  { label: t('AUTH.RULE.UPPER'), met: /[A-Z]/.test(password.value) },
+  { label: t('AUTH.RULE.DIGIT'), met: /[0-9]/.test(password.value) },
 ]);
 const passwordValid = computed(() => rules.value.every((rule) => rule.met));
 
@@ -25,7 +28,7 @@ async function submit() {
   pending.value = true;
   try {
     await auth.register(email.value, password.value, name.value);
-    await router.push('/onboarding');
+    await router.push(localePath('/onboarding'));
   } catch (caught) {
     error.value = message(caught);
   } finally {
@@ -33,33 +36,36 @@ async function submit() {
   }
 }
 
-useSeo({
-  title: 'Create your account',
-  description: 'Create a Kosvia account to get personal match scores on every cosmetic.',
+useSeo(() => ({
+  title: t('SEO.REGISTER.TITLE'),
+  description: t('SEO.REGISTER.DESCRIPTION'),
   noindex: true,
-});
+}));
 </script>
 
 <template>
   <div class="w-full max-w-sm">
-    <h1 class="font-display text-3xl text-ink">Create your account</h1>
-    <p class="mt-2 text-sm text-ink-muted">
-      Two minutes of questions, and every product gets a score that means something to you.
-    </p>
+    <h1 class="font-display text-3xl text-ink">{{ $t('AUTH.REGISTER_TITLE') }}</h1>
+    <p class="mt-2 text-sm text-ink-muted">{{ $t('AUTH.REGISTER_BODY') }}</p>
 
     <form class="mt-8 space-y-4" novalidate @submit.prevent="submit">
-      <BaseInput v-model="name" label="Name" autocomplete="name" placeholder="Optional" />
+      <BaseInput
+        v-model="name"
+        :label="$t('AUTH.NAME')"
+        autocomplete="name"
+        :placeholder="$t('AUTH.NAME_OPTIONAL')"
+      />
       <BaseInput
         v-model="email"
-        label="Email"
+        :label="$t('AUTH.EMAIL')"
         type="email"
         autocomplete="email"
-        placeholder="you@example.com"
+        :placeholder="$t('AUTH.EMAIL_PLACEHOLDER')"
         required
       />
       <BaseInput
         v-model="password"
-        label="Password"
+        :label="$t('AUTH.PASSWORD')"
         type="password"
         autocomplete="new-password"
         required
@@ -92,19 +98,18 @@ useSeo({
         size="lg"
         :loading="pending"
         :disabled="!passwordValid || !email"
-      >Create account</BaseButton>
+      >{{ $t('AUTH.REGISTER') }}</BaseButton>
     </form>
 
     <p class="mt-6 text-center text-xs leading-relaxed text-ink-muted">
-      Kosvia gives information about cosmetics and their ingredients. It is not a medical
-      service and does not diagnose or treat skin conditions.
+      {{ $t('COMMON.MEDICAL_NOTE') }}
     </p>
 
     <p class="mt-6 text-center text-sm text-ink-muted">
-      Already have an account?
-      <NuxtLink to="/login" class="font-medium text-ink underline-offset-4 hover:underline">
-        Sign in
-      </NuxtLink>
+      {{ $t('AUTH.HAVE_ACCOUNT') }}
+      <NuxtLinkLocale to="/login" class="font-medium text-ink underline-offset-4 hover:underline">
+        {{ $t('COMMON.SIGN_IN') }}
+      </NuxtLinkLocale>
     </p>
   </div>
 </template>

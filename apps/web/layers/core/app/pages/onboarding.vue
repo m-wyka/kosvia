@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import {
-  BUDGET_OPTIONS,
-  FRAGRANCE_OPTIONS,
-  SENSITIVITY_OPTIONS,
-  SKIN_TYPE_OPTIONS,
-  type BeautyProfileDto,
-  type BrandDto,
-  type BudgetTier,
-  type FragrancePreference,
-  type SensitivityLevel,
-  type SkinType,
-  type UpdateBeautyProfilePayload,
+import type {
+  BeautyProfileDto,
+  BrandDto,
+  BudgetTier,
+  FragrancePreference,
+  SensitivityLevel,
+  SkinType,
+  UpdateBeautyProfilePayload,
 } from '@kosvia/shared';
 
 definePageMeta({ layout: 'focused', middleware: 'auth' });
 
 const auth = useAuthStore();
 const router = useRouter();
+const localePath = useLocalePath();
 const api = useApi();
 const message = useApiMessage();
 const { concerns, goals, brands } = useProfileOptions();
+const { t } = useI18n();
+const vocab = useVocabulary();
 
 // Null before onboarding has ever run, which is the common case on this page.
 const existing = await auth.loadProfile();
@@ -37,11 +36,11 @@ const form = reactive({
 });
 
 const steps = [
-  { key: 'skin', title: 'Your skin', subtitle: 'The starting point for everything else.' },
-  { key: 'concerns', title: 'What bothers you', subtitle: 'Pick as many as apply — or none.' },
-  { key: 'goals', title: 'What you want', subtitle: 'What should a good routine be doing for you?' },
-  { key: 'preferences', title: 'Your preferences', subtitle: 'Rules we should never break.' },
-  { key: 'budget', title: 'Your budget', subtitle: 'What a single product is usually worth to you.' },
+  { key: 'skin', title: 'ONBOARDING.SKIN_TITLE', subtitle: 'ONBOARDING.SKIN_SUBTITLE' },
+  { key: 'concerns', title: 'ONBOARDING.CONCERNS_TITLE', subtitle: 'ONBOARDING.CONCERNS_SUBTITLE' },
+  { key: 'goals', title: 'ONBOARDING.GOALS_TITLE', subtitle: 'ONBOARDING.GOALS_SUBTITLE' },
+  { key: 'preferences', title: 'ONBOARDING.PREFERENCES_TITLE', subtitle: 'ONBOARDING.PREFERENCES_SUBTITLE' },
+  { key: 'budget', title: 'ONBOARDING.BUDGET_TITLE', subtitle: 'ONBOARDING.BUDGET_SUBTITLE' },
 ];
 
 const step = ref(0);
@@ -73,7 +72,7 @@ async function save() {
     };
     const profile = await api<BeautyProfileDto>('/profile', { method: 'PATCH', body: payload });
     auth.markProfileComplete(profile);
-    await router.push('/dashboard');
+    await router.push(localePath('/dashboard'));
   } catch (caught) {
     error.value = message(caught);
   } finally {
@@ -81,24 +80,24 @@ async function save() {
   }
 }
 
-useSeo({
-  title: 'Set up your beauty profile',
-  description: 'Tell Kosvia about your skin so every product gets a personal match score.',
+useSeo(() => ({
+  title: t('SEO.ONBOARDING.TITLE'),
+  description: t('SEO.ONBOARDING.DESCRIPTION'),
   noindex: true,
-});
+}));
 </script>
 
 <template>
   <div class="w-full max-w-2xl">
     <div class="mb-8">
       <div class="mb-2 flex items-center justify-between text-xs text-ink-muted">
-        <span>Step {{ step + 1 }} of {{ steps.length }}</span>
+        <span>{{ $t('ONBOARDING.STEP', { current: step + 1, total: steps.length }) }}</span>
         <button
           v-if="!isLast"
           type="button"
           class="underline-offset-4 hover:text-ink hover:underline"
           @click="save"
-        >Skip the rest</button>
+        >{{ $t('ONBOARDING.SKIP') }}</button>
       </div>
       <div class="h-1 overflow-hidden rounded-pill bg-line" role="progressbar" :aria-valuenow="step + 1" aria-valuemin="1" :aria-valuemax="steps.length">
         <div
@@ -108,16 +107,20 @@ useSeo({
       </div>
     </div>
 
-    <h1 class="font-display text-3xl text-ink">{{ currentStep.title }}</h1>
-    <p class="mt-2 text-sm text-ink-muted">{{ currentStep.subtitle }}</p>
+    <h1 class="font-display text-3xl text-ink">{{ $t(currentStep.title) }}</h1>
+    <p class="mt-2 text-sm text-ink-muted">{{ $t(currentStep.subtitle) }}</p>
 
     <div class="mt-8 min-h-[19rem]">
       <div v-if="currentStep.key === 'skin'" class="space-y-8">
-        <BaseRadioGroup v-model="form.skinType" :options="SKIN_TYPE_OPTIONS" label="Skin type" />
+        <BaseRadioGroup
+          v-model="form.skinType"
+          :options="vocab.skinTypeOptions.value"
+          :label="$t('ONBOARDING.SKIN_TYPE_LABEL')"
+        />
         <BaseRadioGroup
           v-model="form.sensitivity"
-          :options="SENSITIVITY_OPTIONS"
-          label="How reactive is your skin?"
+          :options="vocab.sensitivityOptions.value"
+          :label="$t('ONBOARDING.SENSITIVITY_LABEL')"
         />
       </div>
 
@@ -125,33 +128,35 @@ useSeo({
         v-else-if="currentStep.key === 'concerns'"
         v-model="form.concernSlugs"
         :items="concerns"
+        kind="concern"
       />
 
       <ProfileChoiceGrid
         v-else-if="currentStep.key === 'goals'"
         v-model="form.goalSlugs"
         :items="goals"
+        kind="goal"
       />
 
       <div v-else-if="currentStep.key === 'preferences'" class="space-y-8">
         <BaseRadioGroup
           v-model="form.fragrancePreference"
-          :options="FRAGRANCE_OPTIONS"
-          label="Fragrance"
+          :options="vocab.fragranceOptions.value"
+          :label="$t('ONBOARDING.FRAGRANCE_LABEL')"
           :columns="3"
         />
 
         <div class="space-y-4 rounded-lg border border-line bg-surface p-4">
           <BaseSwitch
             v-model="form.veganPreference"
-            label="Prefer vegan formulas"
-            hint="We will rank vegan products higher and flag ones that are not."
+            :label="$t('ONBOARDING.VEGAN_LABEL')"
+            :hint="$t('ONBOARDING.VEGAN_HINT')"
           />
           <div class="border-t border-line pt-4">
             <BaseSwitch
               v-model="form.crueltyFreePreference"
-              label="Prefer cruelty-free brands"
-              hint="Based on what the brand states."
+              :label="$t('ONBOARDING.CRUELTY_FREE_LABEL')"
+              :hint="$t('ONBOARDING.CRUELTY_FREE_HINT')"
             />
           </div>
         </div>
@@ -161,9 +166,9 @@ useSeo({
           :options="brands"
           option-label="name"
           track-by="id"
-          label="Brands to skip"
-          placeholder="Search brands…"
-          hint="Anything you never want to see recommended."
+          :label="$t('ONBOARDING.EXCLUDED_BRANDS')"
+          :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
+          :hint="$t('ONBOARDING.EXCLUDED_BRANDS_HINT')"
           multiple
         />
       </div>
@@ -171,8 +176,8 @@ useSeo({
       <BaseRadioGroup
         v-else-if="currentStep.key === 'budget'"
         v-model="form.budget"
-        :options="BUDGET_OPTIONS"
-        label="Typical budget for one product"
+        :options="vocab.budgetOptions.value"
+        :label="$t('ONBOARDING.BUDGET_LABEL')"
         :columns="3"
       />
     </div>
@@ -191,9 +196,9 @@ useSeo({
         variant="ghost"
         :disabled="step === 0"
         @click="step = Math.max(0, step - 1)"
-      >Back</BaseButton>
+      >{{ $t('COMMON.BACK') }}</BaseButton>
       <BaseButton size="lg" :loading="saving" @click="next">
-        {{ isLast ? 'See my matches' : 'Continue' }}
+        {{ isLast ? $t('ONBOARDING.FINISH') : $t('COMMON.CONTINUE') }}
         <template #icon><BaseIcon v-if="!isLast" name="arrow-right" :size="17" /></template>
       </BaseButton>
     </div>

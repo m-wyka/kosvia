@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import {
-  BUDGET_OPTIONS,
-  FRAGRANCE_OPTIONS,
-  SENSITIVITY_OPTIONS,
-  SKIN_TYPE_OPTIONS,
-  type BeautyProfileDto,
-  type BrandDto,
-  type IngredientDto,
-  type UpdateBeautyProfilePayload,
+import type {
+  BeautyProfileDto,
+  BrandDto,
+  IngredientDto,
+  UpdateBeautyProfilePayload,
 } from '@kosvia/shared';
 
 definePageMeta({ middleware: 'auth' });
@@ -17,7 +13,10 @@ const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
 const router = useRouter();
+const localePath = useLocalePath();
 const { concerns, goals, brands } = useProfileOptions();
+const { t } = useI18n();
+const vocab = useVocabulary();
 
 const { data: profile, pending, error, refresh } = await useApiFetch<BeautyProfileDto | null>(
   '/profile',
@@ -84,7 +83,7 @@ async function save() {
     const updated = await api<BeautyProfileDto>('/profile', { method: 'PATCH', body: payload });
     auth.markProfileComplete(updated);
     await refresh();
-    toast.success('Profile updated — your matches have been recalculated');
+    toast.success(t('PROFILE.SAVED'));
   } catch (caught) {
     toast.error(message(caught));
   } finally {
@@ -94,10 +93,14 @@ async function save() {
 
 async function signOut() {
   await auth.logout();
-  await router.push('/');
+  await router.push(localePath('/'));
 }
 
-useSeo({ title: 'Your beauty profile', description: 'Edit your Kosvia beauty profile.', noindex: true });
+useSeo(() => ({
+  title: t('SEO.PROFILE.TITLE'),
+  description: t('SEO.PROFILE.DESCRIPTION'),
+  noindex: true,
+}));
 </script>
 
 <template>
@@ -111,8 +114,10 @@ useSeo({ title: 'Your beauty profile', description: 'Edit your Kosvia beauty pro
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <BaseBadge v-if="auth.user?.subscriptionStatus === 'PREMIUM'" tone="blush">Premium</BaseBadge>
-        <BaseButton variant="ghost" size="sm" @click="signOut">Sign out</BaseButton>
+        <BaseBadge v-if="auth.user?.subscriptionStatus === 'PREMIUM'" tone="blush">
+          {{ $t('PROFILE.PREMIUM') }}
+        </BaseBadge>
+        <BaseButton variant="ghost" size="sm" @click="signOut">{{ $t('COMMON.SIGN_OUT') }}</BaseButton>
       </div>
     </header>
 
@@ -126,59 +131,71 @@ useSeo({ title: 'Your beauty profile', description: 'Edit your Kosvia beauty pro
 
     <form v-else class="mt-10 space-y-8" @submit.prevent="save">
       <BaseCard>
-        <h2 class="font-display text-xl text-ink">Your skin</h2>
+        <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.SKIN_TITLE') }}</h2>
         <div class="mt-5 space-y-7">
-          <BaseRadioGroup v-model="form.skinType" :options="SKIN_TYPE_OPTIONS" label="Skin type" />
+          <BaseRadioGroup
+            v-model="form.skinType"
+            :options="vocab.skinTypeOptions.value"
+            :label="$t('ONBOARDING.SKIN_TYPE_LABEL')"
+          />
           <BaseRadioGroup
             v-model="form.sensitivity"
-            :options="SENSITIVITY_OPTIONS"
-            label="How reactive is your skin?"
+            :options="vocab.sensitivityOptions.value"
+            :label="$t('ONBOARDING.SENSITIVITY_LABEL')"
           />
         </div>
       </BaseCard>
 
       <BaseCard>
-        <h2 class="font-display text-xl text-ink">What bothers you</h2>
-        <p class="mt-1 text-sm text-ink-muted">Products addressing these will score higher.</p>
-        <ProfileChoiceGrid v-model="form.concernSlugs" :items="concerns" class="mt-4" />
+        <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.CONCERNS_TITLE') }}</h2>
+        <p class="mt-1 text-sm text-ink-muted">{{ $t('PROFILE.CONCERNS_SUBTITLE') }}</p>
+        <ProfileChoiceGrid v-model="form.concernSlugs" :items="concerns" kind="concern" class="mt-4" />
       </BaseCard>
 
       <BaseCard>
-        <h2 class="font-display text-xl text-ink">What you want</h2>
-        <p class="mt-1 text-sm text-ink-muted">The direction a good routine should be pulling in.</p>
-        <ProfileChoiceGrid v-model="form.goalSlugs" :items="goals" class="mt-4" />
+        <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.GOALS_TITLE') }}</h2>
+        <p class="mt-1 text-sm text-ink-muted">{{ $t('PROFILE.GOALS_SUBTITLE') }}</p>
+        <ProfileChoiceGrid v-model="form.goalSlugs" :items="goals" kind="goal" class="mt-4" />
       </BaseCard>
 
       <BaseCard>
-        <h2 class="font-display text-xl text-ink">Preferences</h2>
+        <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.PREFERENCES_TITLE') }}</h2>
         <div class="mt-5 space-y-7">
           <BaseRadioGroup
             v-model="form.fragrancePreference"
-            :options="FRAGRANCE_OPTIONS"
-            label="Fragrance"
+            :options="vocab.fragranceOptions.value"
+            :label="$t('ONBOARDING.FRAGRANCE_LABEL')"
             :columns="3"
           />
-          <BaseRadioGroup v-model="form.budget" :options="BUDGET_OPTIONS" label="Budget per product" :columns="3" />
+          <BaseRadioGroup
+            v-model="form.budget"
+            :options="vocab.budgetOptions.value"
+            :label="$t('PROFILE.BUDGET_LABEL')"
+            :columns="3"
+          />
 
           <div class="space-y-4 rounded-lg border border-line bg-surface-muted p-4">
-            <BaseSwitch v-model="form.veganPreference" label="Prefer vegan formulas" />
+            <BaseSwitch v-model="form.veganPreference" :label="$t('ONBOARDING.VEGAN_LABEL')" />
             <div class="border-t border-line pt-4">
-              <BaseSwitch v-model="form.crueltyFreePreference" label="Prefer cruelty-free brands" />
+              <BaseSwitch
+                v-model="form.crueltyFreePreference"
+                :label="$t('ONBOARDING.CRUELTY_FREE_LABEL')"
+              />
             </div>
           </div>
         </div>
       </BaseCard>
 
       <BaseCard>
-        <h2 class="font-display text-xl text-ink">Brands and ingredients</h2>
+        <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.BRANDS_TITLE') }}</h2>
         <div class="mt-5 space-y-5">
           <BaseSelect
             v-model="form.preferredBrands"
             :options="brands"
             option-label="name"
             track-by="id"
-            label="Brands you like"
-            placeholder="Search brands…"
+            :label="$t('PROFILE.PREFERRED_BRANDS')"
+            :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
             multiple
           />
           <BaseSelect
@@ -186,8 +203,8 @@ useSeo({ title: 'Your beauty profile', description: 'Edit your Kosvia beauty pro
             :options="brands"
             option-label="name"
             track-by="id"
-            label="Brands to skip"
-            placeholder="Search brands…"
+            :label="$t('ONBOARDING.EXCLUDED_BRANDS')"
+            :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
             multiple
           />
           <BaseSelect
@@ -195,9 +212,9 @@ useSeo({ title: 'Your beauty profile', description: 'Edit your Kosvia beauty pro
             :options="ingredientResults ?? []"
             option-label="inciName"
             track-by="id"
-            label="Ingredients to avoid"
-            placeholder="Search by INCI name…"
-            hint="Products containing these will be marked and pushed down your results."
+            :label="$t('PROFILE.EXCLUDED_INGREDIENTS')"
+            :placeholder="$t('PROFILE.INGREDIENT_PLACEHOLDER')"
+            :hint="$t('PROFILE.EXCLUDED_INGREDIENTS_HINT')"
             :loading="ingredientStatus === 'pending'"
             multiple
             @search-change="ingredientQuery = $event"
@@ -207,7 +224,7 @@ useSeo({ title: 'Your beauty profile', description: 'Edit your Kosvia beauty pro
 
       <div class="sticky bottom-20 z-10 flex justify-end lg:bottom-4">
         <BaseButton type="submit" size="lg" :loading="saving" class="shadow-lg">
-          Save profile
+          {{ $t('PROFILE.SAVE') }}
         </BaseButton>
       </div>
     </form>

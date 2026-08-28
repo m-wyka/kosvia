@@ -35,7 +35,7 @@ onMounted(() => compare.hydrate());
                 type="button"
                 class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full
                        bg-ink text-ink-inverse shadow-xs"
-                :aria-label="`Remove ${item.name} from comparison`"
+                :aria-label="$t('COMPARE.TRAY.REMOVE', { name: item.name })"
                 @click="compare.remove(item.id)"
               >
                 <BaseIcon name="close" :size="11" />
@@ -45,11 +45,13 @@ onMounted(() => compare.hydrate());
 
           <div class="flex shrink-0 items-center gap-2">
             <span class="hidden text-xs text-ink-muted sm:block">
-              {{ compare.count }} of {{ compare.MAX_ITEMS }}
+              {{ $t('COMPARE.TRAY.COUNT', { current: compare.count, max: compare.MAX_ITEMS }) }}
             </span>
-            <BaseButton size="sm" variant="ghost" @click="compare.clear()">Clear</BaseButton>
+            <BaseButton size="sm" variant="ghost" @click="compare.clear()">
+              {{ $t('COMMON.CLEAR') }}
+            </BaseButton>
             <BaseButton size="sm" :to="compare.compareLink" :disabled="!compare.canCompare">
-              Compare
+              {{ $t('COMPARE.TRAY.COMPARE') }}
             </BaseButton>
           </div>
         </div>

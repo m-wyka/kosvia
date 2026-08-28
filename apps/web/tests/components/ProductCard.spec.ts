@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import type { ProductSummaryDto } from '@kosvia/shared';
-import { resetTestGlobals } from '../setup';
+import { resetTestGlobals, setTestLocale } from '../setup';
 import ProductCard from '../../layers/core/app/components/product/ProductCard.vue';
 
 const product = (overrides: Partial<ProductSummaryDto> = {}): ProductSummaryDto => ({
@@ -40,8 +40,27 @@ describe('ProductCard', () => {
     const text = component.text();
     expect(text).toContain('Kalmé');
     expect(text).toContain('Ceramide Barrier Cream');
-    expect(text).toContain('59,99 PLN');
+    expect(text).toContain('59.99 PLN');
     expect(text).toContain('92% match');
+  });
+
+  it('renders in Polish when the locale changes', () => {
+    setTestLocale('pl');
+    const component = mount(ProductCard, { props: { product: product() } });
+    const text = component.text();
+
+    // Prices follow Polish conventions, and the tags come from the locale file.
+    expect(text).toContain('59,99 zł');
+    expect(text).toContain('92% dopasowania');
+    expect(text).toContain('Bezzapachowe');
+  });
+
+  it('translates the favourite control label', () => {
+    setTestLocale('pl');
+    const component = mount(ProductCard, { props: { product: product() } });
+    expect(component.get('[aria-pressed]').attributes('aria-label')).toBe(
+      'Dodaj Ceramide Barrier Cream do ulubionych',
+    );
   });
 
   it('links to the product page by slug', async () => {

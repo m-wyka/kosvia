@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { formatPrice, type IngredientScoreBreakdownDto, type ProductDto } from '@kosvia/shared';
+import type { IngredientScoreBreakdownDto, ProductDto } from '@kosvia/shared';
 
 /**
  * The product page — the most important SEO surface in the product, and the
  * screen where the whole proposition has to land in one scroll on a phone.
  */
 const route = useRoute();
+const { t } = useI18n();
+const vocab = useVocabulary();
+const format = useFormat();
 const slug = computed(() => String(route.params.slug));
 
 const { data: product, error, refresh } = await useApiFetch<ProductDto>(
@@ -16,7 +19,7 @@ const { data: product, error, refresh } = await useApiFetch<ProductDto>(
 if (error.value) {
   throw createError({
     statusCode: error.value.statusCode ?? 404,
-    statusMessage: 'We could not find that product.',
+    statusMessage: t('PRODUCT.NOT_FOUND'),
     fatal: true,
   });
 }
@@ -57,7 +60,10 @@ async function createAlert() {
       body: { productId: product.value.id, targetPrice: alertPrice.value },
     });
     alertOpen.value = false;
-    toast.success('Price alert created', { label: 'View alerts', to: '/price-alerts' });
+    toast.success(t('PRODUCT.ALERT_MODAL.CREATED'), {
+      label: t('PRODUCT.ALERT_MODAL.VIEW_ALERTS'),
+      to: '/price-alerts',
+    });
   } catch (caught) {
     toast.error(message(caught));
   } finally {
@@ -69,10 +75,16 @@ const facts = computed(() => {
   const value = product.value;
   if (!value) return [];
   return [
-    { label: 'Size', value: formatVolume(value.volume, value.volumeUnit) },
-    { label: 'Price per 100 ml', value: value.pricePerHundredMl ? formatPrice(value.pricePerHundredMl) : null },
-    { label: 'Ingredients', value: `${value.ingredients.length} on the label` },
-    { label: 'Category', value: value.category.name },
+    { label: t('PRODUCT.SIZE'), value: formatVolume(value.volume, value.volumeUnit) },
+    {
+      label: t('PRODUCT.PRICE_PER_100'),
+      value: value.pricePerHundredMl ? format.price(value.pricePerHundredMl) : null,
+    },
+    {
+      label: t('PRODUCT.INGREDIENT_COUNT'),
+      value: t('PRODUCT.INGREDIENT_COUNT_VALUE', { count: value.ingredients.length }),
+    },
+    { label: t('PRODUCT.CATEGORY'), value: vocab.category(value.category.slug, value.category.name) },
   ].filter((fact) => fact.value);
 });
 
@@ -80,18 +92,20 @@ const badges = computed(() => {
   const value = product.value;
   if (!value) return [];
   const list: Array<{ label: string; tone: 'sage' | 'lavender' | 'peach' }> = [];
-  if (value.isFragranceFree) list.push({ label: 'Fragrance-free', tone: 'sage' });
-  if (value.isVegan) list.push({ label: 'Vegan', tone: 'lavender' });
-  if (value.isCrueltyFree) list.push({ label: 'Cruelty-free', tone: 'peach' });
+  if (value.isFragranceFree) list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });
+  if (value.isVegan) list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });
+  if (value.isCrueltyFree) list.push({ label: t('SEARCH.FILTER.CRUELTY_FREE'), tone: 'peach' });
   return list;
 });
 
 useSeo(() => ({
-  title: product.value ? `${product.value.brand.name} ${product.value.name}` : 'Product',
+  title: product.value
+    ? `${product.value.brand.name} ${product.value.name}`
+    : t('SEO.PRODUCT.FALLBACK_TITLE'),
   description: product.value
-    ? `${product.value.brand.name} ${product.value.name} — ingredient analysis, personal match score and prices across stores. ${
-        product.value.description?.slice(0, 90) ?? ''
-      }`.trim()
+    ? t('SEO.PRODUCT.DESCRIPTION', {
+        name: `${product.value.brand.name} ${product.value.name}`,
+      })
     : '',
   path: `/products/${slug.value}`,
   image: product.value?.imageUrl ?? undefined,
@@ -101,11 +115,14 @@ useSeo(() => ({
 useProductJsonLd(product);
 useBreadcrumbJsonLd(
   computed(() => [
-    { name: 'Home', path: '/' },
-    { name: 'Products', path: '/products' },
+    { name: t('NAV.HOME'), path: '/' },
+    { name: t('NAV.PRODUCTS'), path: '/products' },
     ...(product.value
       ? [
-          { name: product.value.category.name, path: `/products?category=${product.value.category.slug}` },
+          {
+            name: vocab.category(product.value.category.slug, product.value.category.name),
+            path: `/products?category=${product.value.category.slug}`,
+          },
           { name: product.value.name, path: `/products/${product.value.slug}` },
         ]
       : []),
@@ -116,13 +133,13 @@ useBreadcrumbJsonLd(
 <template>
   <div v-if="product" class="container-page py-6 sm:py-10">
     <nav aria-label="Breadcrumb" class="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
-      <NuxtLink to="/" class="hover:text-ink">Home</NuxtLink>
+      <NuxtLinkLocale to="/" class="hover:text-ink">{{ $t('NAV.HOME') }}</NuxtLinkLocale>
       <BaseIcon name="chevron-right" :size="12" />
-      <NuxtLink to="/products" class="hover:text-ink">Products</NuxtLink>
+      <NuxtLinkLocale to="/products" class="hover:text-ink">{{ $t('NAV.PRODUCTS') }}</NuxtLinkLocale>
       <BaseIcon name="chevron-right" :size="12" />
-      <NuxtLink :to="`/products?category=${product.category.slug}`" class="hover:text-ink">
-        {{ product.category.name }}
-      </NuxtLink>
+      <NuxtLinkLocale :to="`/products?category=${product.category.slug}`" class="hover:text-ink">
+        {{ vocab.category(product.category.slug, product.category.name) }}
+      </NuxtLinkLocale>
     </nav>
 
     <!-- Hero -->
@@ -139,10 +156,10 @@ useBreadcrumbJsonLd(
       </div>
 
       <div class="min-w-0">
-        <NuxtLink
+        <NuxtLinkLocale
           :to="`/products?brand=${product.brand.slug}`"
           class="text-sm font-medium tracking-wide text-ink-muted uppercase underline-offset-4 hover:text-ink hover:underline"
-        >{{ product.brand.name }}</NuxtLink>
+        >{{ product.brand.name }}</NuxtLinkLocale>
 
         <h1 class="mt-1.5 font-display text-3xl leading-tight text-ink sm:text-4xl">
           {{ product.name }}
@@ -175,7 +192,7 @@ useBreadcrumbJsonLd(
             <template #icon>
               <BaseIcon :name="onShelf ? 'check' : 'plus'" :size="17" />
             </template>
-            {{ onShelf ? 'On your shelf' : 'Add to my shelf' }}
+            {{ onShelf ? $t('PRODUCT.ON_SHELF') : $t('PRODUCT.ADD_TO_SHELF') }}
           </BaseButton>
 
           <BaseButton
@@ -184,12 +201,12 @@ useBreadcrumbJsonLd(
             @click="compare.toggle(product)"
           >
             <template #icon><BaseIcon name="compare" :size="17" /></template>
-            {{ inComparison ? 'In comparison' : 'Compare' }}
+            {{ inComparison ? $t('PRODUCT.IN_COMPARISON') : $t('PRODUCT.COMPARE') }}
           </BaseButton>
 
           <BaseButton size="lg" variant="ghost" @click="alertOpen = true">
             <template #icon><BaseIcon name="bell" :size="17" /></template>
-            Price alert
+            {{ $t('PRODUCT.PRICE_ALERT') }}
           </BaseButton>
         </div>
 
@@ -219,12 +236,12 @@ useBreadcrumbJsonLd(
     <div class="mt-12 grid gap-8 lg:grid-cols-[1fr_22rem] lg:gap-10">
       <div class="min-w-0 space-y-10">
         <section v-if="product.description">
-          <h2 class="font-display text-2xl text-ink">About this product</h2>
+          <h2 class="font-display text-2xl text-ink">{{ $t('PRODUCT.ABOUT_TITLE') }}</h2>
           <p class="mt-3 text-base leading-relaxed whitespace-pre-line text-ink-soft">
             {{ product.description }}
           </p>
           <div v-if="product.usage" class="mt-5 rounded-lg border border-line bg-surface p-4">
-            <p class="text-sm font-semibold text-ink">How to use it</p>
+            <p class="text-sm font-semibold text-ink">{{ $t('PRODUCT.USAGE_TITLE') }}</p>
             <p class="mt-1.5 text-sm leading-relaxed text-ink-soft">{{ product.usage }}</p>
           </div>
         </section>
@@ -236,11 +253,8 @@ useBreadcrumbJsonLd(
         />
 
         <section>
-          <h2 class="font-display text-2xl text-ink">What is in it</h2>
-          <p class="mt-1 mb-5 text-sm text-ink-muted">
-            Grouped by function. The number is the ingredient's position on the label — earlier
-            means more of it.
-          </p>
+          <h2 class="font-display text-2xl text-ink">{{ $t('PRODUCT.WHAT_IS_IN_IT') }}</h2>
+          <p class="mt-1 mb-5 text-sm text-ink-muted">{{ $t('PRODUCT.WHAT_IS_IN_IT_SUBTITLE') }}</p>
           <IngredientList :ingredients="product.ingredients" />
         </section>
 
@@ -259,34 +273,39 @@ useBreadcrumbJsonLd(
 
     <BaseModal
       v-model:open="alertOpen"
-      title="Set a price alert"
-      :description="`We will flag ${product.name} when it drops to your number.`"
+      :title="$t('PRODUCT.ALERT_MODAL.TITLE')"
+      :description="$t('PRODUCT.ALERT_MODAL.BODY', { name: product.name })"
       size="sm"
     >
       <BaseInput
         v-model="alertPrice"
-        label="Alert me at or below"
+        :label="$t('PRODUCT.ALERT_MODAL.LABEL')"
         type="number"
         inputmode="decimal"
-        :hint="product.lowestPrice ? `Currently ${formatPrice(product.lowestPrice)}` : undefined"
+        :hint="
+          product.lowestPrice
+            ? $t('PRODUCT.ALERT_MODAL.CURRENTLY', { price: format.price(product.lowestPrice) })
+            : undefined
+        "
       >
-        <template #suffix><span class="text-sm">PLN</span></template>
+        <template #suffix><span class="text-sm">{{ format.currencyUnit.value }}</span></template>
       </BaseInput>
       <p class="mt-4 text-xs leading-relaxed text-ink-muted">
-        Alerts are evaluated against the offers we hold. Background price watching and
-        notifications are not part of this build.
+        {{ $t('PRODUCT.ALERT_MODAL.NOTE') }}
       </p>
       <template #footer>
-        <BaseButton variant="ghost" @click="alertOpen = false">Cancel</BaseButton>
-        <BaseButton :loading="alertSaving" @click="createAlert">Create alert</BaseButton>
+        <BaseButton variant="ghost" @click="alertOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
+        <BaseButton :loading="alertSaving" @click="createAlert">
+          {{ $t('PRODUCT.ALERT_MODAL.CREATE') }}
+        </BaseButton>
       </template>
     </BaseModal>
   </div>
 
   <div v-else class="container-page py-20">
     <BaseErrorState
-      title="We could not load this product"
-      message="It may have been removed, or the connection dropped."
+      :title="$t('PRODUCT.NOT_FOUND_TITLE')"
+      :message="$t('PRODUCT.NOT_FOUND_BODY')"
       @retry="refresh()"
     />
   </div>

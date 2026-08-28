@@ -7,18 +7,17 @@
       </div>
 
       <h2 class="mx-auto max-w-2xl font-display text-3xl leading-tight text-ink sm:text-4xl">
-        You do not need to understand cosmetics. Kosvia will help you choose.
+        {{ $t('LANDING.CTA.TITLE') }}
       </h2>
-      <p class="mx-auto mt-4 max-w-xl text-base text-ink-muted">
-        Two minutes of questions, and every product in the catalogue gets a score that means
-        something to you specifically.
-      </p>
+      <p class="mx-auto mt-4 max-w-xl text-base text-ink-muted">{{ $t('LANDING.CTA.BODY') }}</p>
       <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
         <BaseButton to="/onboarding" size="lg">
-          Find my cosmetics
+          {{ $t('LANDING.CTA.PRIMARY') }}
           <template #icon><BaseIcon name="arrow-right" :size="18" /></template>
         </BaseButton>
-        <BaseButton to="/products" size="lg" variant="secondary">Browse the catalogue</BaseButton>
+        <BaseButton to="/products" size="lg" variant="secondary">
+          {{ $t('LANDING.CTA.SECONDARY') }}
+        </BaseButton>
       </div>
     </div>
   </section>

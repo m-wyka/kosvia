@@ -246,10 +246,32 @@ export interface ProductSearchResult extends PaginatedResult<ProductSummaryDto> 
 export type MatchTier = 'perfect' | 'great' | 'good' | 'fair' | 'poor';
 
 export interface MatchReason {
+  /** Stable identifier — the frontend translates on this, never on `label`. */
   code: string;
+  /**
+   * English rendering of the reason.
+   *
+   * Kept as the canonical form for API consumers and for the AI prompt, which
+   * reasons about text rather than keys. The UI ignores it and renders `code`
+   * plus `params` through its own translations.
+   */
   label: string;
   /** Signed contribution to the final score, for the "Why?" breakdown. */
   impact: number;
+  /** Raw values behind the sentence: slugs, enum members, numbers. */
+  params?: MatchReasonParams;
+}
+
+export interface MatchReasonParams {
+  skinType?: SkinType;
+  skinTypes?: SkinType[];
+  /** BeautyConcern slugs. */
+  concerns?: string[];
+  /** BeautyGoal slugs. */
+  goals?: string[];
+  /** INCI names, already human-readable in any language. */
+  ingredients?: string[];
+  budget?: number;
 }
 
 export interface PersonalMatchDto {

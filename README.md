@@ -39,6 +39,7 @@ price → I buy it
 | Layer     | Choice                                                        |
 | --------- | ------------------------------------------------------------- |
 | Frontend  | Nuxt 4 (SSR), Vue 3, TypeScript, Tailwind CSS 4, Pinia, VueUse |
+| i18n      | @nuxtjs/i18n — English and Polish, browser-detected, prefixed URLs |
 | Backend   | NestJS 11, TypeScript, REST, Passport JWT, class-validator     |
 | Database  | PostgreSQL 16, Prisma ORM                                      |
 | AI        | Provider abstraction — offline mock by default, Claude opt-in  |
@@ -161,6 +162,93 @@ kosvia/
 └── scripts/prepare-env.mjs
 ```
 
+## Languages
+
+Two locales, English and Polish, each with its own URL space:
+
+```
+/products/kalme-ceramide-barrier-cream      English
+/pl/products/kalme-ceramide-barrier-cream   Polish
+```
+
+`prefix_except_default` rather than a single shared URL, because both languages
+have to be separately indexable — a catalogue this content-heavy loses half its
+SEO surface otherwise. Every page emits a self-referencing canonical plus
+`hreflang` alternates, and `/sitemap.xml` lists both locales with `xhtml:link`
+alternates so a crawler pairs them instead of reading them as duplicates.
+
+The language is detected from the browser on first visit and remembered in the
+`kosvia_locale` cookie. Detection only redirects from the site root: a link
+someone shared in Polish must stay Polish, and redirecting on every route makes
+the switcher fight the detector.
+
+### Where the strings live
+
+```
+apps/web/i18n/
+├── i18n.config.ts       vue-i18n runtime options, incl. the Polish plural rule
+└── locales/
+    ├── en.json          941 keys
+    └── pl.json          941 keys, same shape
+```
+
+Keys are `UPPER_SNAKE_CASE`, grouped by area:
+
+```json
+"ADMIN": {
+  "USERS": {
+    "TITLE": "Użytkownicy",
+    "COL_ROLE": "Rola"
+  }
+}
+```
+
+Polish has three plural forms where English has two, so `i18n.config.ts`
+registers a CLDR-correct rule for it — otherwise "5 produkty" instead of
+"5 produktów":
+
+```
+1 produkt · 2-4 produkty · 5+ produktów · 12-14 produktów
+```
+
+### Translating what the API says
+
+The backend answers in English, which is right for an API. The UI never renders
+those strings; it renders the **identifier** next to them:
+
+| The API sends | The UI translates on |
+| --- | --- |
+| `{ slug: "eye-care", name: "Eye care" }` | `VOCAB.CATEGORY.EYE_CARE` |
+| `{ code: "budget-over", label: "Well above your 100 PLN budget", params: { budget: 100 } }` | `MATCH.BUDGET_OVER` + params |
+| `availability: "LOW_STOCK"` | `VOCAB.AVAILABILITY.LOW_STOCK` |
+
+`useVocabulary()` bridges slugs and enum members to keys; `useMatchReason()`
+renders a Personal Match reason from its code and raw params. Both fall back to
+the API's English wording for anything the frontend does not recognise, so a new
+reason shipped by the backend degrades to English rather than showing a raw key.
+
+`useFormat()` handles money and dates per locale: `59.99 PLN` in English,
+`59,99 zł` in Polish.
+
+**Not translated:** free-text catalogue content — product names, product
+descriptions, ingredient descriptions. That needs translated columns in the
+database, not a lookup table, and is listed under "Next steps".
+
+### Keeping the two files honest
+
+```bash
+npm run i18n:check -w @kosvia/web
+```
+
+Fails the build when a key is used but undefined, or defined in one locale and
+not the other; reports keys nobody uses any more. It understands dynamically
+built keys (`` `VOCAB.TAG.${tag}` ``) by prefix. `npm test` runs it first.
+
+The test suite also asserts that no Polish value is byte-identical to its English
+counterpart outside an explicit allowlist of loanwords and technical terms
+(`Slug`, `INCI`, `Premium`, `Retinoid`…) — that catches a translation someone
+forgot to write.
+
 ### Why layers
 
 `layers/core` owns the design system and the API client; `layers/admin` extends
@@ -170,6 +258,9 @@ without forking a single component.
 
 Two things layers need that are easy to miss:
 
+- **A bare `@` in a translation.** vue-i18n reads it as linked-message syntax,
+  so `you@example.com` fails to compile the message at render time. Escape it as
+  `{'@'}`.
 - **Tailwind source roots.** Tailwind 4 scans outward from the stylesheet's own
   directory, so it cannot see sibling layers on its own. Every app root is
   declared with `@source` at the top of
@@ -402,7 +493,11 @@ Roughly in the order I would do them:
    and product compatibility instead of the current greedy pass.
 6. **Barcode scanning** — `BarcodeDetector` where available, a WASM fallback
    elsewhere.
-7. **Caching** — the discovery feed and facet counts are the obvious candidates.
+7. **Translated catalogue content** — product and ingredient copy currently
+   exists once, in English. The shape is a `translations` table keyed by
+   `(entity, entityId, locale, field)`, read through the same fallback the
+   frontend vocabulary already uses.
+8. **Caching** — the discovery feed and facet counts are the obvious candidates.
 
 ---
 
