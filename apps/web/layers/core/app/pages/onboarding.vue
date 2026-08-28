@@ -9,7 +9,27 @@ import type {
   UpdateBeautyProfilePayload,
 } from '@kosvia/shared';
 
-definePageMeta({ layout: 'focused', middleware: 'auth' });
+definePageMeta({
+  layout: 'focused',
+  middleware: [
+    'auth',
+    /**
+     * The wizard is for the first pass only. Anyone who already has a profile
+     * is sent to /profile, which edits the same fields plus preferred brands
+     * and excluded ingredients — and, unlike the focused layout here, has
+     * navigation. Without this the landing CTA drops a returning user into a
+     * five-step form with no way out but finishing it.
+     */
+    () => {
+      // Deliberately synchronous. The `auth` middleware above has already
+      // resolved the session, so `hasBeautyProfile` is the answer without a
+      // second request — and awaiting inside route middleware would lose the
+      // Nuxt instance before `navigateTo` runs (NUXT_E1001).
+      const auth = useAuthStore();
+      if (!auth.needsOnboarding) return navigateTo(useLocalePath()('/profile'));
+    },
+  ],
+});
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -20,8 +40,9 @@ const { concerns, goals, brands } = useProfileOptions();
 const { t } = useI18n();
 const vocab = useVocabulary();
 
-// Null before onboarding has ever run, which is the common case on this page.
-const existing = await auth.loadProfile();
+// Already resolved by the middleware above, and null by the time we get here —
+// a profile that exists never reaches this component. Read rather than refetch.
+const existing = auth.profile;
 
 const form = reactive({
   skinType: (existing?.skinType ?? 'UNKNOWN') as SkinType,
