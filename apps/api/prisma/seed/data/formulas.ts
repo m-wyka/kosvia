@@ -1,0 +1,564 @@
+/**
+ * Product archetypes — DEMO DATA.
+ *
+ * Each archetype is a realistic, plausibly-ordered INCI list for a type of
+ * product. The seed combines archetypes with brands to produce the catalogue,
+ * which gives us ~100 products whose ingredient lists actually make sense for
+ * the scoring engine, without copying any real product's formula or copy.
+ *
+ * Every `inci` entry must exist in ingredients.ts — the seed fails loudly if not.
+ */
+
+import type { SkinTypeSeed } from './ingredients';
+
+export interface FormulaSeed {
+  key: string;
+  /** Category slug. */
+  category: string;
+  /** Product name suffix, appended after the brand name. */
+  name: string;
+  shortPurpose: string;
+  volume: number;
+  volumeUnit: string;
+  /** Reference price in PLN for a mid-tier brand. */
+  basePrice: number;
+  targetSkinTypes: SkinTypeSeed[];
+  highlights: string[];
+  usage: string;
+  description: string;
+  /** Ordered INCI list, most abundant first. */
+  inci: string[];
+  /** Appended when the brand-specific variant is scented. */
+  fragranceInci?: string[];
+}
+
+const PRESERVATIVES = ['Phenoxyethanol', 'Ethylhexylglycerin', 'Disodium EDTA'];
+
+export const FORMULAS: FormulaSeed[] = [
+  /* ------------------------------------------------------------ cleansers -- */
+  {
+    key: 'gentle-gel-cleanser',
+    category: 'cleansers',
+    name: 'Gentle Gel Cleanser',
+    shortPurpose: 'daily gel cleanser',
+    volume: 200,
+    volumeUnit: 'ml',
+    basePrice: 42,
+    targetSkinTypes: ['NORMAL', 'COMBINATION', 'SENSITIVE'],
+    highlights: ['Sugar-derived cleansing agents', 'pH close to the skin’s own', 'Rinses without a tight feel'],
+    usage: 'Massage onto damp skin morning and evening, then rinse with lukewarm water.',
+    description:
+      'A low-foaming gel that removes sunscreen, sweat and the day without stripping. The cleansing agents are sugar-derived, and glycerin and panthenol stay behind so skin does not feel tight afterwards.',
+    inci: ['Aqua', 'Coco-Glucoside', 'Glycerin', 'Lauryl Glucoside', 'Betaine', 'Panthenol', 'Allantoin', 'Sodium Hyaluronate', 'Citric Acid', 'Xanthan Gum', ...PRESERVATIVES],
+    fragranceInci: ['Parfum', 'Limonene'],
+  },
+  {
+    key: 'cream-cleanser',
+    category: 'cleansers',
+    name: 'Comfort Cream Cleanser',
+    shortPurpose: 'creamy cleanser for dry skin',
+    volume: 150,
+    volumeUnit: 'ml',
+    basePrice: 46,
+    targetSkinTypes: ['DRY', 'SENSITIVE'],
+    highlights: ['Non-foaming', 'Leaves a soft after-feel', 'Fragrance-free base'],
+    usage: 'Massage onto dry or damp skin, then rinse or remove with a soft cloth.',
+    description:
+      'A milky, non-foaming cleanser for skin that feels tight after washing. Built on gentle surfactants with squalane and shea butter so the barrier is left intact.',
+    inci: ['Aqua', 'Glycerin', 'Caprylic/Capric Triglyceride', 'Sodium Cocoyl Isethionate', 'Cetearyl Alcohol', 'Squalane', 'Shea Butter', 'Glyceryl Stearate', 'Panthenol', 'Oat Kernel Extract', 'Allantoin', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'oil-cleanser',
+    category: 'cleansers',
+    name: 'Melting Cleansing Oil',
+    shortPurpose: 'first-step oil cleanser',
+    volume: 190,
+    volumeUnit: 'ml',
+    basePrice: 55,
+    targetSkinTypes: ['NORMAL', 'DRY', 'COMBINATION'],
+    highlights: ['Dissolves sunscreen and make-up', 'Emulsifies with water', 'First step of a double cleanse'],
+    usage: 'Warm a few pumps between dry hands, massage over dry skin, add water to emulsify, then rinse.',
+    description:
+      'A lightweight oil that dissolves sunscreen and long-wear make-up on contact and rinses off cleanly. Designed as the first step of a double cleanse, before a water-based wash.',
+    inci: ['Caprylic/Capric Triglyceride', 'Sunflower Seed Oil', 'Polysorbate 20', 'Jojoba Seed Oil', 'Squalane', 'Tocopherol'],
+    fragranceInci: ['Parfum', 'Limonene', 'Linalool'],
+  },
+  {
+    key: 'micellar-water',
+    category: 'cleansers',
+    name: 'Micellar Cleansing Water',
+    shortPurpose: 'no-rinse micellar water',
+    volume: 400,
+    volumeUnit: 'ml',
+    basePrice: 28,
+    targetSkinTypes: ['NORMAL', 'SENSITIVE', 'COMBINATION'],
+    highlights: ['No-rinse formula', 'Fragrance-free', 'Suitable around the eyes'],
+    usage: 'Saturate a cotton pad and sweep over the face. Follow with a wash in the evening.',
+    description:
+      'A watery cleanser that lifts light make-up and surface grime with mild micelles. Comfortable around the eye area and useful as a quick first step.',
+    inci: ['Aqua', 'Glycerin', 'Poloxamer 184', 'Betaine', 'Panthenol', 'Allantoin', 'Disodium EDTA', 'Sodium Benzoate', 'Potassium Sorbate', 'Citric Acid'],
+  },
+  {
+    key: 'bha-cleanser',
+    category: 'cleansers',
+    name: 'Clarifying Wash',
+    shortPurpose: 'cleanser for congested skin',
+    volume: 150,
+    volumeUnit: 'ml',
+    basePrice: 44,
+    targetSkinTypes: ['OILY', 'COMBINATION'],
+    highlights: ['With salicylic acid', 'Fresh, non-squeaky finish', 'For congestion-prone skin'],
+    usage: 'Use once daily to start, in the evening. Always follow with sunscreen the next morning.',
+    description:
+      'A gel wash for skin that gets congested around the nose and chin. Salicylic acid is oil-soluble, so it works inside the pore rather than only on the surface.',
+    inci: ['Aqua', 'Coco-Glucoside', 'Glycerin', 'Cocamidopropyl Betaine', 'Salicylic Acid', 'Zinc PCA', 'Green Tea Leaf Extract', 'Panthenol', 'Sodium Hydroxide', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+
+  /* --------------------------------------------------------------- toners -- */
+  {
+    key: 'hydrating-toner',
+    category: 'toners',
+    name: 'Hydrating Toner',
+    shortPurpose: 'watery hydration layer',
+    volume: 200,
+    volumeUnit: 'ml',
+    basePrice: 48,
+    targetSkinTypes: ['DRY', 'NORMAL', 'SENSITIVE', 'COMBINATION'],
+    highlights: ['Five humectants', 'Alcohol-free', 'Layers under serum'],
+    usage: 'Pat onto damp skin after cleansing, before serum.',
+    description:
+      'A watery layer applied to damp skin so the steps after it have something to hold on to. Glycerin, sodium hyaluronate, betaine and trehalose work at different depths of the surface layer.',
+    inci: ['Aqua', 'Glycerin', 'Butylene Glycol', 'Sodium Hyaluronate', 'Betaine', 'Trehalose', 'Panthenol', 'Sodium PCA', 'Beta-Glucan', 'Allantoin', 'Caprylyl Glycol', ...PRESERVATIVES],
+  },
+  {
+    key: 'ferment-essence',
+    category: 'toners',
+    name: 'Ferment Essence',
+    shortPurpose: 'lightweight essence',
+    volume: 150,
+    volumeUnit: 'ml',
+    basePrice: 89,
+    targetSkinTypes: ['NORMAL', 'DRY', 'COMBINATION'],
+    highlights: ['Ferment-rich', 'Silky, fast-absorbing', 'Preps skin for serum'],
+    usage: 'Press a few drops into the skin after cleansing.',
+    description:
+      'A slightly viscous essence built around a yeast ferment filtrate, with niacinamide for evenness and beta-glucan for comfort. Absorbs in seconds and leaves no film.',
+    inci: ['Aqua', 'Saccharomyces Ferment Filtrate', 'Glycerin', 'Butylene Glycol', 'Niacinamide', 'Beta-Glucan', 'Sodium Hyaluronate', 'Lactobacillus Ferment', 'Panthenol', 'Allantoin', 'Xanthan Gum', ...PRESERVATIVES],
+    fragranceInci: ['Parfum', 'Linalool'],
+  },
+
+  /* ----------------------------------------------------------- exfoliants -- */
+  {
+    key: 'aha-exfoliant',
+    category: 'exfoliants',
+    name: 'Glycolic Renewing Solution',
+    shortPurpose: 'weekly AHA exfoliant',
+    volume: 100,
+    volumeUnit: 'ml',
+    basePrice: 62,
+    targetSkinTypes: ['NORMAL', 'OILY', 'COMBINATION'],
+    highlights: ['8% glycolic acid', 'Buffered with humectants', 'Use in the evening'],
+    usage: 'Apply with a cotton pad in the evening, two to three times a week. Sunscreen the next morning is essential.',
+    description:
+      'A leave-on liquid exfoliant with glycolic acid, buffered with glycerin and panthenol so it is less abrupt than a plain acid solution. Best introduced slowly.',
+    inci: ['Aqua', 'Glycolic Acid', 'Glycerin', 'Sodium Hydroxide', 'Panthenol', 'Allantoin', 'Aloe Barbadensis Leaf Juice', 'Licorice Root Extract', 'Sodium PCA', ...PRESERVATIVES],
+  },
+  {
+    key: 'bha-exfoliant',
+    category: 'exfoliants',
+    name: 'Pore Clarifying Liquid',
+    shortPurpose: 'BHA liquid exfoliant',
+    volume: 100,
+    volumeUnit: 'ml',
+    basePrice: 58,
+    targetSkinTypes: ['OILY', 'COMBINATION'],
+    highlights: ['2% salicylic acid', 'Fragrance-free', 'Targets congestion'],
+    usage: 'Apply to clean skin in the evening, starting two evenings a week.',
+    description:
+      'A leave-on BHA liquid for blackheads and congestion. Salicylic acid works inside the pore lining; green tea and panthenol keep the formula comfortable.',
+    inci: ['Aqua', 'Salicylic Acid', 'Glycerin', 'Propanediol', 'Green Tea Leaf Extract', 'Panthenol', 'Zinc PCA', 'Sodium Hydroxide', 'Allantoin', 'Hydroxyethylcellulose', ...PRESERVATIVES],
+  },
+  {
+    key: 'mandelic-exfoliant',
+    category: 'exfoliants',
+    name: 'Gentle Mandelic Toner',
+    shortPurpose: 'gentle acid toner',
+    volume: 120,
+    volumeUnit: 'ml',
+    basePrice: 64,
+    targetSkinTypes: ['SENSITIVE', 'COMBINATION', 'NORMAL'],
+    highlights: ['Large-molecule AHA', 'Fragrance-free', 'A softer entry to acids'],
+    usage: 'Apply in the evening, starting twice a week. Follow with sunscreen the next morning.',
+    description:
+      'Mandelic acid is a large molecule, so it moves into the skin slowly. That makes this a common starting point for people whose skin reacts to stronger acids.',
+    inci: ['Aqua', 'Mandelic Acid', 'Glycerin', 'Propanediol', 'Panthenol', 'Madecassoside', 'Allantoin', 'Sodium Hydroxide', 'Beta-Glucan', ...PRESERVATIVES],
+  },
+
+  /* --------------------------------------------------------------- serums -- */
+  {
+    key: 'ha-serum',
+    category: 'serums',
+    name: 'Multi-Weight Hydrating Serum',
+    shortPurpose: 'hydrating serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 59,
+    targetSkinTypes: ['DRY', 'NORMAL', 'OILY', 'COMBINATION', 'SENSITIVE'],
+    highlights: ['Three hyaluronic acid weights', 'Fragrance-free', 'Layers under any moisturiser'],
+    usage: 'Apply to damp skin, then seal with a moisturiser.',
+    description:
+      'A water-light serum combining large and small hyaluronic acid molecules with glycerin and panthenol. Works best applied to damp skin and sealed with a cream.',
+    inci: ['Aqua', 'Glycerin', 'Sodium Hyaluronate', 'Hyaluronic Acid', 'Propanediol', 'Panthenol', 'Betaine', 'Trehalose', 'Sodium PCA', 'Beta-Glucan', 'Allantoin', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'niacinamide-serum',
+    category: 'serums',
+    name: 'Niacinamide 10% Serum',
+    shortPurpose: 'tone and oil balance serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 46,
+    targetSkinTypes: ['OILY', 'COMBINATION', 'NORMAL'],
+    highlights: ['10% niacinamide', '1% zinc PCA', 'Fragrance-free'],
+    usage: 'Apply once or twice daily before moisturiser.',
+    description:
+      'A high-strength niacinamide serum with zinc PCA. Niacinamide is one of the most versatile actives available — it is studied for tone evenness, oil balance and barrier support at the same time.',
+    inci: ['Aqua', 'Niacinamide', 'Glycerin', 'Propanediol', 'Zinc PCA', 'Panthenol', 'Sodium Hyaluronate', 'Allantoin', 'Beta-Glucan', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'vitc-serum',
+    category: 'serums',
+    name: 'Vitamin C Brightening Serum',
+    shortPurpose: 'antioxidant serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 118,
+    targetSkinTypes: ['NORMAL', 'COMBINATION', 'OILY'],
+    highlights: ['15% L-ascorbic acid', 'With ferulic acid and vitamin E', 'Morning antioxidant step'],
+    usage: 'Apply in the morning on clean skin, before sunscreen.',
+    description:
+      'A morning antioxidant serum built on pure L-ascorbic acid, stabilised with ferulic acid and vitamin E. Pure vitamin C needs a low pH to work, which is why some skin feels a brief tingle.',
+    inci: ['Aqua', 'Ascorbic Acid', 'Propanediol', 'Glycerin', 'Ferulic Acid', 'Tocopherol', 'Sodium Hyaluronate', 'Panthenol', 'Disodium EDTA', 'Phenoxyethanol', 'Ethylhexylglycerin'],
+  },
+  {
+    key: 'gentle-vitc-serum',
+    category: 'serums',
+    name: 'Gentle Vitamin C Serum',
+    shortPurpose: 'mild antioxidant serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 92,
+    targetSkinTypes: ['SENSITIVE', 'DRY', 'NORMAL'],
+    highlights: ['Stable vitamin C derivative', 'No tingle', 'Fragrance-free'],
+    usage: 'Apply in the morning before sunscreen.',
+    description:
+      'Uses ascorbyl glucoside instead of pure ascorbic acid — it converts on the skin, works more gradually, and does not need the low pH that makes stronger vitamin C formulas sting.',
+    inci: ['Aqua', 'Ascorbyl Glucoside', 'Glycerin', 'Niacinamide', 'Alpha-Arbutin', 'Panthenol', 'Sodium Hyaluronate', 'Licorice Root Extract', 'Beta-Glucan', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'retinol-serum',
+    category: 'serums',
+    name: 'Retinol 0.3% Night Serum',
+    shortPurpose: 'evening retinoid',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 129,
+    targetSkinTypes: ['NORMAL', 'COMBINATION', 'OILY'],
+    highlights: ['0.3% encapsulated retinol', 'Buffered with squalane', 'Evening use only'],
+    usage: 'Start twice a week in the evening and build up slowly. Daily sunscreen is essential while using a retinoid.',
+    description:
+      'An evening retinol serum buffered with squalane and ceramides to make the adjustment period easier. Retinoids are the most studied ingredient class for skin texture and expression lines.',
+    inci: ['Aqua', 'Squalane', 'Glycerin', 'Retinol', 'Caprylic/Capric Triglyceride', 'Ceramide NP', 'Panthenol', 'Bisabolol', 'Tocopherol', 'Glyceryl Stearate', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'gentle-retinoid-serum',
+    category: 'serums',
+    name: 'Gradual Retinoid Serum',
+    shortPurpose: 'low-irritation retinoid',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 139,
+    targetSkinTypes: ['SENSITIVE', 'NORMAL', 'DRY'],
+    highlights: ['Next-generation retinoid ester', 'With centella', 'Fragrance-free'],
+    usage: 'Apply in the evening, starting every third night.',
+    description:
+      'Uses hydroxypinacolone retinoate, a retinoid ester that tends to be better tolerated than retinol, paired with centella and panthenol for comfort during the adjustment period.',
+    inci: ['Aqua', 'Squalane', 'Glycerin', 'Hydroxypinacolone Retinoate', 'Centella Asiatica Extract', 'Madecassoside', 'Panthenol', 'Ceramide NP', 'Bisabolol', 'Tocopherol', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'peptide-serum',
+    category: 'serums',
+    name: 'Peptide Firming Serum',
+    shortPurpose: 'peptide serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 149,
+    targetSkinTypes: ['NORMAL', 'DRY', 'COMBINATION'],
+    highlights: ['Four-peptide complex', 'Layers with retinoids', 'Fragrance-free'],
+    usage: 'Apply morning and evening before moisturiser.',
+    description:
+      'A peptide blend for people who want an anti-ageing step that layers with anything, including retinoids. Peptides are signal molecules rather than exfoliants, so they do not increase sun sensitivity.',
+    inci: ['Aqua', 'Glycerin', 'Acetyl Hexapeptide-8', 'Palmitoyl Tripeptide-1', 'Copper Tripeptide-1', 'Adenosine', 'Sodium Hyaluronate', 'Panthenol', 'Beta-Glucan', 'Ectoin', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'azelaic-serum',
+    category: 'serums',
+    name: 'Azelaic Tone Serum',
+    shortPurpose: 'tone and redness serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 74,
+    targetSkinTypes: ['SENSITIVE', 'COMBINATION', 'OILY'],
+    highlights: ['10% azelaic acid', 'Fragrance-free', 'For uneven tone and visible redness'],
+    usage: 'Apply a thin layer once or twice daily.',
+    description:
+      'A cream-textured serum with azelaic acid, an ingredient used both for evenness of tone and for skin that flushes easily. Some people feel a brief tingle in the first minutes.',
+    inci: ['Aqua', 'Azelaic Acid', 'Glycerin', 'Dimethicone', 'Squalane', 'Niacinamide', 'Panthenol', 'Allantoin', 'Bisabolol', 'Glyceryl Stearate', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'pigment-serum',
+    category: 'serums',
+    name: 'Dark Spot Serum',
+    shortPurpose: 'tone-evening serum',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 98,
+    targetSkinTypes: ['NORMAL', 'COMBINATION', 'DRY'],
+    highlights: ['Alpha-arbutin and tranexamic acid', 'Fragrance-free', 'Works gradually'],
+    usage: 'Apply twice daily. Consistent sunscreen use makes a large difference to results.',
+    description:
+      'Combines alpha-arbutin, tranexamic acid and niacinamide — three tone-evening ingredients that work on different steps of pigment formation. Results build over weeks, not days.',
+    inci: ['Aqua', 'Glycerin', 'Alpha-Arbutin', 'Tranexamic Acid', 'Niacinamide', 'Propanediol', 'Licorice Root Extract', 'Sodium Hyaluronate', 'Panthenol', 'Beta-Glucan', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+
+  /* --------------------------------------------------------- moisturizers -- */
+  {
+    key: 'gel-moisturizer',
+    category: 'moisturizers',
+    name: 'Oil-Free Gel Cream',
+    shortPurpose: 'lightweight gel moisturiser',
+    volume: 50,
+    volumeUnit: 'ml',
+    basePrice: 52,
+    targetSkinTypes: ['OILY', 'COMBINATION', 'NORMAL'],
+    highlights: ['Oil-free', 'Soft-matte finish', 'Sits well under make-up'],
+    usage: 'Apply morning and evening as the last hydrating step.',
+    description:
+      'A water-gel moisturiser with no oils at all, so it disappears into the skin and leaves a soft-matte finish. Niacinamide and zinc PCA address shine; silica keeps the finish from turning greasy by midday.',
+    inci: ['Aqua', 'Glycerin', 'Dimethicone', 'Niacinamide', 'Propanediol', 'Sodium Hyaluronate', 'Zinc PCA', 'Silica', 'Panthenol', 'Allantoin', 'Green Tea Leaf Extract', 'Ammonium Acryloyldimethyltaurate/VP Copolymer', ...PRESERVATIVES],
+  },
+  {
+    key: 'barrier-cream',
+    category: 'moisturizers',
+    name: 'Ceramide Barrier Cream',
+    shortPurpose: 'barrier-repair moisturiser',
+    volume: 50,
+    volumeUnit: 'ml',
+    basePrice: 68,
+    targetSkinTypes: ['DRY', 'SENSITIVE', 'NORMAL', 'COMBINATION'],
+    highlights: ['Three ceramides plus cholesterol', 'Fragrance-free', 'For a stressed barrier'],
+    usage: 'Apply morning and evening, or whenever skin feels tight.',
+    description:
+      'A cream built around the three lipids the skin barrier is made of — ceramides, cholesterol and fatty acids — in roughly the ratio skin uses them. The formula is deliberately fragrance-free.',
+    inci: ['Aqua', 'Glycerin', 'Caprylic/Capric Triglyceride', 'Cetearyl Alcohol', 'Squalane', 'Ceramide NP', 'Ceramide AP', 'Ceramide EOP', 'Cholesterol', 'Phytosphingosine', 'Dimethicone', 'Panthenol', 'Sodium Hyaluronate', 'Glyceryl Stearate', 'Cetearyl Glucoside', 'Allantoin', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'rich-night-cream',
+    category: 'moisturizers',
+    name: 'Rich Overnight Cream',
+    shortPurpose: 'rich night cream',
+    volume: 50,
+    volumeUnit: 'ml',
+    basePrice: 96,
+    targetSkinTypes: ['DRY', 'NORMAL'],
+    highlights: ['Shea butter and squalane', 'Cushiony overnight texture', 'For skin that feels tight at night'],
+    usage: 'Apply as the last step of an evening routine.',
+    description:
+      'A dense overnight cream for skin that feels tight by the evening. Shea butter and squalane soften, while petrolatum forms the film that keeps water from evaporating overnight.',
+    inci: ['Aqua', 'Glycerin', 'Shea Butter', 'Caprylic/Capric Triglyceride', 'Cetearyl Alcohol', 'Squalane', 'Petrolatum', 'Ceramide NP', 'Panthenol', 'Sodium Hyaluronate', 'Tocopherol', 'Glyceryl Stearate', 'PEG-100 Stearate', 'Allantoin', 'Xanthan Gum', ...PRESERVATIVES],
+    fragranceInci: ['Parfum', 'Linalool', 'Geraniol'],
+  },
+  {
+    key: 'soothing-moisturizer',
+    category: 'moisturizers',
+    name: 'Calming Cica Moisturiser',
+    shortPurpose: 'soothing moisturiser',
+    volume: 50,
+    volumeUnit: 'ml',
+    basePrice: 61,
+    targetSkinTypes: ['SENSITIVE', 'DRY', 'NORMAL'],
+    highlights: ['Centella and madecassoside', 'Fragrance-free', 'For skin that flushes easily'],
+    usage: 'Apply morning and evening, or after anything that leaves skin feeling reactive.',
+    description:
+      'A comfort-focused moisturiser for skin that flushes or stings easily. Centella, madecassoside, bisabolol and ectoin are all chosen for tolerance rather than for a fast visible effect.',
+    inci: ['Aqua', 'Glycerin', 'Squalane', 'Centella Asiatica Extract', 'Madecassoside', 'Panthenol', 'Ectoin', 'Bisabolol', 'Ceramide NP', 'Allantoin', 'Oat Kernel Extract', 'Sorbitan Olivate', 'Beta-Glucan', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+
+  /* ------------------------------------------------------------- eye care -- */
+  {
+    key: 'eye-cream',
+    category: 'eye-care',
+    name: 'Peptide Eye Cream',
+    shortPurpose: 'eye cream',
+    volume: 15,
+    volumeUnit: 'ml',
+    basePrice: 79,
+    targetSkinTypes: ['NORMAL', 'DRY', 'SENSITIVE'],
+    highlights: ['Peptides and caffeine-free', 'Fragrance-free', 'Sits well under concealer'],
+    usage: 'Tap a small amount around the orbital bone morning and evening.',
+    description:
+      'A light cream for the thinner skin around the eyes, with peptides, panthenol and a low level of squalane so it does not migrate into the eye.',
+    inci: ['Aqua', 'Glycerin', 'Squalane', 'Acetyl Hexapeptide-8', 'Palmitoyl Tripeptide-1', 'Adenosine', 'Sodium Hyaluronate', 'Panthenol', 'Ceramide NP', 'Allantoin', 'Dimethicone', 'Glyceryl Stearate', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+
+  /* ------------------------------------------------------------- sun care -- */
+  {
+    key: 'mineral-spf',
+    category: 'sun-care',
+    name: 'Mineral Sunscreen SPF 50',
+    shortPurpose: 'mineral SPF 50',
+    volume: 50,
+    volumeUnit: 'ml',
+    basePrice: 74,
+    targetSkinTypes: ['SENSITIVE', 'NORMAL', 'DRY'],
+    highlights: ['Zinc oxide and titanium dioxide', 'Fragrance-free', 'Tinted to reduce white cast'],
+    usage: 'Apply generously as the last step of a morning routine and reapply through the day.',
+    description:
+      'A mineral sunscreen using zinc oxide and titanium dioxide, lightly tinted with iron oxides so the white cast is far less visible. A common choice for skin that reacts to organic filters.',
+    inci: ['Aqua', 'Zinc Oxide', 'Titanium Dioxide', 'Caprylic/Capric Triglyceride', 'Glycerin', 'Squalane', 'Iron Oxides', 'Silica', 'Panthenol', 'Tocopherol', 'Allantoin', 'Glyceryl Stearate', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'fluid-spf',
+    category: 'sun-care',
+    name: 'Invisible Daily Fluid SPF 50+',
+    shortPurpose: 'lightweight SPF 50+',
+    volume: 50,
+    volumeUnit: 'ml',
+    basePrice: 82,
+    targetSkinTypes: ['OILY', 'COMBINATION', 'NORMAL'],
+    highlights: ['Modern broad-spectrum filters', 'No white cast', 'Weightless finish'],
+    usage: 'Apply as the last step every morning, rain or shine.',
+    description:
+      'A weightless daily fluid using modern photostable filters. Leaves no cast, layers under make-up, and includes niacinamide and vitamin E as a secondary antioxidant step.',
+    inci: ['Aqua', 'Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine', 'Diethylamino Hydroxybenzoyl Hexyl Benzoate', 'Ethylhexyl Methoxycinnamate', 'Glycerin', 'Dimethicone', 'Cyclopentasiloxane', 'Niacinamide', 'Silica', 'Tocopherol', 'Panthenol', 'Ammonium Acryloyldimethyltaurate/VP Copolymer', ...PRESERVATIVES],
+    fragranceInci: ['Parfum'],
+  },
+
+  /* ---------------------------------------------------------------- masks -- */
+  {
+    key: 'clay-mask',
+    category: 'masks',
+    name: 'Purifying Clay Mask',
+    shortPurpose: 'oil-absorbing mask',
+    volume: 75,
+    volumeUnit: 'ml',
+    basePrice: 49,
+    targetSkinTypes: ['OILY', 'COMBINATION'],
+    highlights: ['Kaolin and bentonite', 'With niacinamide', 'Ten-minute treatment'],
+    usage: 'Apply a thin layer once or twice a week and rinse after ten minutes — before it fully dries.',
+    description:
+      'A clay mask for weeks when skin feels congested. Kaolin and bentonite absorb surface oil; niacinamide and panthenol keep the after-feel from turning tight.',
+    inci: ['Aqua', 'Kaolin', 'Bentonite', 'Glycerin', 'Niacinamide', 'Charcoal Powder', 'Zinc PCA', 'Panthenol', 'Allantoin', 'Green Tea Leaf Extract', 'Xanthan Gum', ...PRESERVATIVES],
+  },
+  {
+    key: 'hydrating-mask',
+    category: 'masks',
+    name: 'Overnight Hydration Mask',
+    shortPurpose: 'overnight hydrating mask',
+    volume: 75,
+    volumeUnit: 'ml',
+    basePrice: 66,
+    targetSkinTypes: ['DRY', 'NORMAL', 'SENSITIVE'],
+    highlights: ['Leave-on overnight', 'Humectant-rich', 'Fragrance-free'],
+    usage: 'Apply a generous layer over your evening routine one to three times a week.',
+    description:
+      'A gel-cream you leave on overnight. Layers humectants under a light occlusive film so skin looks less dull in the morning after a dry or poorly-slept week.',
+    inci: ['Aqua', 'Glycerin', 'Butylene Glycol', 'Sodium Hyaluronate', 'Trehalose', 'Squalane', 'Dimethicone', 'Panthenol', 'Beta-Glucan', 'Ceramide NP', 'Allantoin', 'Sclerotium Gum', ...PRESERVATIVES],
+  },
+
+  /* ------------------------------------------------------------ face oils -- */
+  {
+    key: 'face-oil',
+    category: 'face-oils',
+    name: 'Nourishing Facial Oil',
+    shortPurpose: 'finishing face oil',
+    volume: 30,
+    volumeUnit: 'ml',
+    basePrice: 88,
+    targetSkinTypes: ['DRY', 'NORMAL'],
+    highlights: ['Cold-pressed plant oils', 'Seals in a moisturiser', 'Two to four drops is enough'],
+    usage: 'Warm two to four drops in the palms and press over your moisturiser as the final step.',
+    description:
+      'A blend of squalane, rosehip and marula pressed over a moisturiser to seal it in. Oils do not hydrate on their own — they slow the water already in your skin from evaporating.',
+    inci: ['Squalane', 'Rosehip Seed Oil', 'Marula Oil', 'Jojoba Seed Oil', 'Sunflower Seed Oil', 'Argan Oil', 'Evening Primrose Oil', 'Tocopherol'],
+    fragranceInci: ['Parfum', 'Linalool', 'Geraniol', 'Citronellol'],
+  },
+
+  /* ----------------------------------------------------------- body/hands -- */
+  {
+    key: 'body-lotion',
+    category: 'body-lotions',
+    name: 'Daily Body Lotion',
+    shortPurpose: 'everyday body lotion',
+    volume: 400,
+    volumeUnit: 'ml',
+    basePrice: 39,
+    targetSkinTypes: ['DRY', 'NORMAL', 'SENSITIVE'],
+    highlights: ['With urea and ceramides', 'Absorbs quickly', 'Large everyday size'],
+    usage: 'Apply to damp skin after showering.',
+    description:
+      'A fast-absorbing body lotion with urea, glycerin and ceramides. Urea both hydrates and softens the rough texture that shows up on shins and elbows in winter.',
+    inci: ['Aqua', 'Glycerin', 'Urea', 'Caprylic/Capric Triglyceride', 'Cetearyl Alcohol', 'Shea Butter', 'Ceramide NP', 'Panthenol', 'Sodium Lactate', 'Dimethicone', 'Glyceryl Stearate', 'Allantoin', 'Xanthan Gum', ...PRESERVATIVES],
+    fragranceInci: ['Parfum', 'Limonene', 'Linalool'],
+  },
+  {
+    key: 'hand-cream',
+    category: 'hand-care',
+    name: 'Repairing Hand Cream',
+    shortPurpose: 'rich hand cream',
+    volume: 75,
+    volumeUnit: 'ml',
+    basePrice: 29,
+    targetSkinTypes: ['DRY', 'NORMAL'],
+    highlights: ['Rich but not greasy', 'Survives frequent hand washing', 'Pocket size'],
+    usage: 'Apply through the day, particularly after washing your hands.',
+    description:
+      'A dense hand cream for hands that are washed often. Shea butter and petrolatum form the protective layer; urea and glycerin do the hydrating underneath it.',
+    inci: ['Aqua', 'Glycerin', 'Shea Butter', 'Petrolatum', 'Cetearyl Alcohol', 'Urea', 'Panthenol', 'Allantoin', 'Dimethicone', 'Glyceryl Stearate', 'Tocopherol', 'Xanthan Gum', ...PRESERVATIVES],
+    fragranceInci: ['Parfum', 'Limonene'],
+  },
+
+  /* ---------------------------------------------------------------- hair --- */
+  {
+    key: 'shampoo',
+    category: 'shampoos',
+    name: 'Everyday Gentle Shampoo',
+    shortPurpose: 'daily shampoo',
+    volume: 300,
+    volumeUnit: 'ml',
+    basePrice: 34,
+    targetSkinTypes: ['NORMAL', 'SENSITIVE'],
+    highlights: ['Mild surfactant blend', 'Suitable for frequent washing', 'Colour-safe'],
+    usage: 'Massage into wet scalp, rinse, and repeat if needed.',
+    description:
+      'A mild everyday shampoo that cleans the scalp without stripping lengths. Panthenol derivatives and hydrolysed wheat protein give body without weighing hair down.',
+    inci: ['Aqua', 'Sodium Laureth Sulfate', 'Cocamidopropyl Betaine', 'Coco-Glucoside', 'Glycerin', 'Panthenyl Ethyl Ether', 'Hydrolyzed Wheat Protein', 'Betaine', 'Citric Acid', 'Sodium Benzoate', 'Sodium Hydroxide'],
+    fragranceInci: ['Parfum', 'Limonene', 'Linalool'],
+  },
+  {
+    key: 'conditioner',
+    category: 'conditioners',
+    name: 'Smoothing Conditioner',
+    shortPurpose: 'daily conditioner',
+    volume: 250,
+    volumeUnit: 'ml',
+    basePrice: 36,
+    targetSkinTypes: ['NORMAL'],
+    highlights: ['Detangles instantly', 'Non-weighing', 'Colour-safe'],
+    usage: 'Apply to mid-lengths and ends, leave for a minute, then rinse.',
+    description:
+      'A daily conditioner that detangles on contact. Conditioning agents sit on the hair surface to reduce friction; argan oil and panthenol add shine without heaviness.',
+    inci: ['Aqua', 'Cetearyl Alcohol', 'Behentrimonium Chloride', 'Glycerin', 'Cetrimonium Chloride', 'Argan Oil', 'Panthenyl Ethyl Ether', 'Hydrolyzed Wheat Protein', 'Dimethicone', 'Citric Acid', ...PRESERVATIVES],
+    fragranceInci: ['Parfum', 'Linalool'],
+  },
+];

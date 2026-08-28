@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import type { NuxtError } from '#app';
+
+/**
+ * The error page. Never shows a status code as the headline — people do not
+ * read HTTP, and "404" is not an explanation.
+ */
+const props = defineProps<{ error: NuxtError }>();
+
+const isMissing = computed(() => props.error.statusCode === 404);
+
+const copy = computed(() =>
+  isMissing.value
+    ? {
+        title: 'We could not find that page',
+        body: 'The link may be out of date, or the product may no longer be in our catalogue.',
+      }
+    : {
+        title: 'Something went wrong',
+        body: 'That is on us. Try again in a moment, or head back to the catalogue.',
+      },
+);
+
+useHead({ title: copy.value.title });
+</script>
+
+<template>
+  <div class="flex min-h-dvh flex-col bg-canvas">
+    <header class="container-page flex h-16 shrink-0 items-center">
+      <NuxtLink to="/" aria-label="Kosvia home"><AppLogo /></NuxtLink>
+    </header>
+
+    <main class="container-page flex flex-1 items-center justify-center py-12">
+      <div class="max-w-md text-center">
+        <span
+          class="mx-auto flex size-14 items-center justify-center rounded-2xl"
+          :class="isMissing ? 'bg-surface-muted text-ink-muted' : 'bg-critical-soft text-critical'"
+        >
+          <BaseIcon :name="isMissing ? 'search' : 'alert'" :size="26" />
+        </span>
+
+        <h1 class="mt-6 font-display text-3xl text-ink">{{ copy.title }}</h1>
+        <p class="mt-3 text-base text-ink-muted">{{ copy.body }}</p>
+
+        <div class="mt-8 flex flex-col justify-center gap-2.5 sm:flex-row">
+          <BaseButton size="lg" @click="clearError({ redirect: '/products' })">
+            Browse products
+          </BaseButton>
+          <BaseButton size="lg" variant="secondary" @click="clearError({ redirect: '/' })">
+            Go home
+          </BaseButton>
+        </div>
+
+        <p v-if="error.statusCode" class="mt-8 text-xs text-ink-faint">
+          Error {{ error.statusCode }}
+        </p>
+      </div>
+    </main>
+  </div>
+</template>

@@ -1,0 +1,40 @@
+{
+  "name": "kosvia",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kosvia \u2014 AI Beauty Shopper. Monorepo (Nuxt 4 + NestJS + PostgreSQL/Prisma).",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "postinstall": "node scripts/prepare-env.mjs && npm run build -w @kosvia/shared",
+    "dev": "npm run build -w @kosvia/shared && run-p dev:shared dev:api dev:web",
+    "dev:shared": "npm run dev -w @kosvia/shared",
+    "dev:api": "npm run dev -w @kosvia/api",
+    "dev:web": "npm run dev -w @kosvia/web",
+    "build": "npm run build -w @kosvia/shared && npm run build -w @kosvia/api && npm run build -w @kosvia/web",
+    "start": "run-p start:api start:web",
+    "start:api": "npm run start -w @kosvia/api",
+    "start:web": "npm run preview -w @kosvia/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:generate": "npm run db:generate -w @kosvia/api",
+    "db:migrate": "npm run db:migrate -w @kosvia/api",
+    "db:seed": "npm run db:seed -w @kosvia/api",
+    "db:reset": "npm run db:reset -w @kosvia/api",
+    "db:studio": "npm run db:studio -w @kosvia/api",
+    "setup": "npm install && npm run db:up && npm run db:migrate && npm run db:seed",
+    "env": "node scripts/prepare-env.mjs"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.2"
+  }
+}

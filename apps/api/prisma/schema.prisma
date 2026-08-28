@@ -1,0 +1,459 @@
+// Kosvia — database schema
+//
+// Design notes:
+//  * Relational wherever a relationship carries meaning (product ↔ ingredient
+//    position, profile ↔ concerns/goals, offers ↔ stores). JSON is only used
+//    for the AI suggestion payload, which is genuinely document-shaped.
+//  * Every column used for filtering or sorting at catalogue scale is indexed;
+//    the schema is meant to hold hundreds of thousands of products.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* -------------------------------------------------------------------------- */
+/* Enums                                                                      */
+/* -------------------------------------------------------------------------- */
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  FREE
+  PREMIUM
+  CANCELLED
+}
+
+enum SkinType {
+  DRY
+  OILY
+  COMBINATION
+  NORMAL
+  SENSITIVE
+  UNKNOWN
+}
+
+enum SensitivityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  UNKNOWN
+}
+
+enum FragrancePreference {
+  NO_PREFERENCE
+  PREFER_FRAGRANCE_FREE
+  REQUIRE_FRAGRANCE_FREE
+}
+
+enum BudgetTier {
+  UNDER_30
+  UNDER_50
+  UNDER_100
+  UNDER_200
+  NO_LIMIT
+}
+
+enum Availability {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  UNKNOWN
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+/// Where a category sits in a skincare routine. Powers routine gap analysis
+/// and the future smart-basket builder.
+enum RoutineStep {
+  CLEANSER
+  TONER
+  EXFOLIANT
+  SERUM
+  EYE
+  MOISTURIZER
+  SPF
+  MASK
+  TREATMENT
+  BODY
+  HAIR
+  MAKEUP
+  OTHER
+}
+
+/* -------------------------------------------------------------------------- */
+/* Identity                                                                   */
+/* -------------------------------------------------------------------------- */
+
+model User {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  passwordHash       String
+  name               String?
+  role               UserRole           @default(USER)
+  subscriptionStatus SubscriptionStatus @default(FREE)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  beautyProfile BeautyProfile?
+  shelfItems    UserShelfItem[]
+  priceAlerts   PriceAlert[]
+  conversations AIConversation[]
+  comparisons   ProductComparison[]
+  refreshTokens RefreshToken[]
+
+  @@index([role])
+  @@map("users")
+}
+
+/// Hashed refresh tokens, one row per active session. Enables real logout and
+/// refresh-token rotation without keeping raw tokens anywhere.
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  userAgent String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+/* -------------------------------------------------------------------------- */
+/* Beauty profile                                                             */
+/* -------------------------------------------------------------------------- */
+
+model BeautyProfile {
+  id                    String              @id @default(cuid())
+  userId                String              @unique
+  skinType              SkinType            @default(UNKNOWN)
+  sensitivity           SensitivityLevel    @default(UNKNOWN)
+  budget                BudgetTier          @default(NO_LIMIT)
+  fragrancePreference   FragrancePreference @default(NO_PREFERENCE)
+  veganPreference       Boolean             @default(false)
+  crueltyFreePreference Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  concerns            BeautyConcern[] @relation("ProfileConcerns")
+  goals               BeautyGoal[]    @relation("ProfileGoals")
+  preferredBrands     Brand[]         @relation("ProfilePreferredBrands")
+  excludedBrands      Brand[]         @relation("ProfileExcludedBrands")
+  excludedIngredients Ingredient[]    @relation("ProfileExcludedIngredients")
+
+  @@map("beauty_profiles")
+}
+
+model BeautyConcern {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  description String?
+
+  profiles    BeautyProfile[] @relation("ProfileConcerns")
+  ingredients Ingredient[]    @relation("IngredientTargetsConcerns")
+
+  @@map("beauty_concerns")
+}
+
+model BeautyGoal {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  description String?
+
+  profiles    BeautyProfile[] @relation("ProfileGoals")
+  ingredients Ingredient[]    @relation("IngredientSupportsGoals")
+
+  @@map("beauty_goals")
+}
+
+/* -------------------------------------------------------------------------- */
+/* Catalogue                                                                  */
+/* -------------------------------------------------------------------------- */
+
+model Brand {
+  id            String  @id @default(cuid())
+  name          String
+  slug          String  @unique
+  logo          String?
+  description   String?
+  isVegan       Boolean @default(false)
+  isCrueltyFree Boolean @default(false)
+
+  products          Product[]
+  preferredByProfiles BeautyProfile[] @relation("ProfilePreferredBrands")
+  excludedByProfiles  BeautyProfile[] @relation("ProfileExcludedBrands")
+
+  @@index([name])
+  @@map("brands")
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  parentId    String?
+  routineStep RoutineStep @default(OTHER)
+  /// Ordering hint for navigation menus.
+  sortOrder   Int         @default(0)
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+  @@index([routineStep])
+  @@map("categories")
+}
+
+model Product {
+  id              String     @id @default(cuid())
+  ean             String?    @unique
+  name            String
+  slug            String     @unique
+  brandId         String
+  categoryId      String
+  description     String?
+  usage           String?
+  imageUrl        String?
+  volume          Float?
+  volumeUnit      String?    @default("ml")
+  /// Marketing-free factual highlights shown on the product page.
+  highlights      String[]   @default([])
+  isFragranceFree Boolean    @default(false)
+  isVegan         Boolean    @default(false)
+  isCrueltyFree   Boolean    @default(false)
+  /// Skin types the manufacturer positions the product for.
+  targetSkinTypes SkinType[] @default([])
+  /// Denormalised deterministic ingredient quality score (0-100), recomputed
+  /// whenever the ingredient list changes. Keeps list queries cheap.
+  ingredientScore Int        @default(50)
+  /// Denormalised cheapest active offer price, for sorting/filtering at scale.
+  lowestPrice     Decimal?   @db.Decimal(10, 2)
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  brand       Brand               @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  category    Category            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  ingredients ProductIngredient[]
+  offers      ProductOffer[]
+  priceHistory PriceHistory[]
+  shelfItems  UserShelfItem[]
+  priceAlerts PriceAlert[]
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([lowestPrice])
+  @@index([ingredientScore])
+  @@index([isActive, categoryId])
+  @@index([name])
+  @@map("products")
+}
+
+model Ingredient {
+  id                String     @id @default(cuid())
+  inciName          String     @unique
+  slug              String     @unique
+  commonName        String?
+  description       String?
+  /// What the ingredient does, in plain language ("binds water in the skin").
+  functions         String[]   @default([])
+  /// Machine-readable functional tags, see INGREDIENT_TAGS in @kosvia/shared.
+  tags              String[]   @default([])
+  /// Neutral, informational note about when to take care. Never a health claim.
+  concerns          String?
+  comedogenicRating Int?
+  /// -2 (often poorly tolerated by reactive skin) … +2 (actively soothing).
+  sensitivityImpact Int        @default(0)
+  goodForSkinTypes  SkinType[] @default([])
+  isActiveIngredient Boolean   @default(false)
+
+  products        ProductIngredient[]
+  targetsConcerns BeautyConcern[]     @relation("IngredientTargetsConcerns")
+  supportsGoals   BeautyGoal[]        @relation("IngredientSupportsGoals")
+  excludedByProfiles BeautyProfile[]  @relation("ProfileExcludedIngredients")
+
+  @@index([inciName])
+  @@map("ingredients")
+}
+
+/// The join carries data: INCI position is meaningful (earlier = more of it).
+model ProductIngredient {
+  id                 String  @id @default(cuid())
+  productId          String
+  ingredientId       String
+  position           Int
+  concentrationRange String?
+
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, ingredientId])
+  @@index([ingredientId])
+  @@index([productId, position])
+  @@map("product_ingredients")
+}
+
+/* -------------------------------------------------------------------------- */
+/* Commerce (seeded demo data only — no scraping)                             */
+/* -------------------------------------------------------------------------- */
+
+model Store {
+  id                   String  @id @default(cuid())
+  name                 String
+  slug                 String  @unique
+  logo                 String?
+  websiteUrl           String?
+  /// e.g. "https://example.com/p/{sku}?aff=kosvia" — used once affiliate
+  /// programmes are connected. Not used in the MVP.
+  affiliateUrlTemplate String?
+
+  offers       ProductOffer[]
+  priceHistory PriceHistory[]
+
+  @@map("stores")
+}
+
+model ProductOffer {
+  id            String       @id @default(cuid())
+  productId     String
+  storeId       String
+  price         Decimal      @db.Decimal(10, 2)
+  currency      String       @default("PLN")
+  url           String?
+  availability  Availability @default(IN_STOCK)
+  lastCheckedAt DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, storeId])
+  @@index([productId, price])
+  @@index([storeId])
+  @@map("product_offers")
+}
+
+/// Append-only price log. Populated by the seed today, by feed importers later.
+model PriceHistory {
+  id         String   @id @default(cuid())
+  productId  String
+  storeId    String
+  price      Decimal  @db.Decimal(10, 2)
+  currency   String   @default("PLN")
+  recordedAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([productId, recordedAt])
+  @@map("price_history")
+}
+
+/* -------------------------------------------------------------------------- */
+/* User-owned data                                                            */
+/* -------------------------------------------------------------------------- */
+
+model UserShelfItem {
+  id         String    @id @default(cuid())
+  userId     String
+  productId  String
+  addedAt    DateTime  @default(now())
+  openedAt   DateTime?
+  finishedAt DateTime?
+  isFavorite Boolean   @default(false)
+  notes      String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId, addedAt])
+  @@map("user_shelf_items")
+}
+
+model PriceAlert {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String
+  targetPrice Decimal  @db.Decimal(10, 2)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  notifiedAt  DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId, active])
+  @@map("price_alerts")
+}
+
+/// Comparison history — lets us restore a comparison from a shared link and,
+/// later, learn which products people weigh against each other.
+model ProductComparison {
+  id         String   @id @default(cuid())
+  userId     String?
+  productIds String[]
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("product_comparisons")
+}
+
+/* -------------------------------------------------------------------------- */
+/* AI Beauty Shopper                                                          */
+/* -------------------------------------------------------------------------- */
+
+model AIConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIMessage[]
+
+  @@index([userId, updatedAt])
+  @@map("ai_conversations")
+}
+
+model AIMessage {
+  id             String      @id @default(cuid())
+  conversationId String
+  role           MessageRole
+  content        String
+  /// Structured product suggestions rendered as cards in the chat. Genuinely
+  /// document-shaped, and always derived from real rows retrieved beforehand.
+  suggestions    Json?
+  createdAt      DateTime    @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("ai_messages")
+}

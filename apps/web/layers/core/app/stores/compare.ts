@@ -1,0 +1,70 @@
+import { defineStore } from 'pinia';
+import type { ProductSummaryDto } from '@kosvia/shared';
+
+const MAX_ITEMS = 4;
+
+/**
+ * The comparison tray.
+ *
+ * Kept in localStorage so a comparison survives a page reload — people
+ * routinely open products in new tabs while building one.
+ */
+export const useCompareStore = defineStore('compare', () => {
+  const items = ref<ProductSummaryDto[]>([]);
+  const hydrated = ref(false);
+
+  const count = computed(() => items.value.length);
+  const isFull = computed(() => items.value.length >= MAX_ITEMS);
+  const canCompare = computed(() => items.value.length >= 2);
+  const compareLink = computed(
+    () => `/compare?products=${items.value.map((item) => item.slug).join(',')}`,
+  );
+
+  function has(productId: string): boolean {
+    return items.value.some((item) => item.id === productId);
+  }
+
+  function toggle(product: ProductSummaryDto): 'added' | 'removed' | 'full' {
+    if (has(product.id)) {
+      items.value = items.value.filter((item) => item.id !== product.id);
+      persist();
+      return 'removed';
+    }
+    if (isFull.value) return 'full';
+    items.value = [...items.value, product];
+    persist();
+    return 'added';
+  }
+
+  function remove(productId: string): void {
+    items.value = items.value.filter((item) => item.id !== productId);
+    persist();
+  }
+
+  function clear(): void {
+    items.value = [];
+    persist();
+  }
+
+  function persist(): void {
+    if (!import.meta.client) return;
+    try {
+      localStorage.setItem('kosvia:compare', JSON.stringify(items.value));
+    } catch {
+      // Private browsing and blocked storage are not errors worth surfacing.
+    }
+  }
+
+  function hydrate(): void {
+    if (hydrated.value || !import.meta.client) return;
+    hydrated.value = true;
+    try {
+      const raw = localStorage.getItem('kosvia:compare');
+      if (raw) items.value = JSON.parse(raw) as ProductSummaryDto[];
+    } catch {
+      items.value = [];
+    }
+  }
+
+  return { items, count, isFull, canCompare, compareLink, has, toggle, remove, clear, hydrate, MAX_ITEMS };
+});

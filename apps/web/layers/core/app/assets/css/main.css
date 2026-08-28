@@ -1,0 +1,244 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   Source detection
+   --------------------------------------------------------------------------
+   Tailwind 4 scans outward from the stylesheet's own directory. This file
+   lives in `layers/core/app/assets/css`, so without these declarations it only
+   ever sees itself and generates nothing. Each app root has to be named
+   explicitly — including the admin layer, which is a sibling of this one.
+   ========================================================================== */
+
+@source "../../../../../app";
+@source "../../../../core";
+@source "../../../../admin";
+
+/* ==========================================================================
+   Kosvia design tokens
+   --------------------------------------------------------------------------
+   Every colour, radius, shadow and duration used in the product is declared
+   here. Components reference tokens, never raw hex values, so the whole visual
+   identity can be re-themed from this one block.
+
+   Direction: warm off-white canvas, charcoal text, and muted blush / peach /
+   sage / lavender accents. Deliberately not a pink cosmetics site.
+   ========================================================================== */
+
+@theme {
+  /* --- surfaces ---------------------------------------------------------- */
+  --color-canvas: #faf7f4;
+  --color-canvas-deep: #f3ede7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8f5f2;
+  --color-overlay: rgb(26 22 20 / 0.42);
+
+  /* --- text -------------------------------------------------------------- */
+  --color-ink: #1a1614;
+  --color-ink-soft: #4a423d;
+  --color-ink-muted: #7d736c;
+  --color-ink-faint: #a89e97;
+  --color-ink-inverse: #fdfbfa;
+
+  /* --- lines ------------------------------------------------------------- */
+  --color-line: #ece4dc;
+  --color-line-strong: #ddd2c8;
+
+  /* --- brand accents ----------------------------------------------------- */
+  --color-blush: #d4897a;
+  --color-blush-soft: #f7e8e4;
+  --color-blush-deep: #b56d5f;
+
+  --color-peach: #e0a97f;
+  --color-peach-soft: #fbeee1;
+
+  --color-lavender: #9b93c4;
+  --color-lavender-soft: #eeecf7;
+
+  --color-sage: #7d9a83;
+  --color-sage-soft: #e8f0e9;
+
+  --color-sand: #c6b39c;
+  --color-sand-soft: #f4efe8;
+
+  /* --- semantic ---------------------------------------------------------- */
+  --color-positive: #4f7a5b;
+  --color-positive-soft: #e6efe8;
+  --color-caution: #a9762f;
+  --color-caution-soft: #fbf0df;
+  --color-critical: #a94e44;
+  --color-critical-soft: #fae9e7;
+  --color-info: #4a6b8a;
+  --color-info-soft: #e7eef4;
+
+  /* --- typography -------------------------------------------------------- */
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter,
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: ui-serif, 'New York', 'Iowan Old Style', Georgia, 'Times New Roman',
+    serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+
+  /* --- radii ------------------------------------------------------------- */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.375rem;
+  --radius-2xl: 1.75rem;
+  --radius-pill: 999px;
+
+  /* --- elevation --------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgb(26 22 20 / 0.04);
+  --shadow-sm: 0 1px 3px rgb(26 22 20 / 0.05), 0 1px 2px rgb(26 22 20 / 0.03);
+  --shadow-md: 0 4px 16px -4px rgb(26 22 20 / 0.08), 0 2px 6px -2px rgb(26 22 20 / 0.04);
+  --shadow-lg: 0 16px 40px -12px rgb(26 22 20 / 0.14), 0 4px 12px -4px rgb(26 22 20 / 0.06);
+  --shadow-focus: 0 0 0 3px rgb(212 137 122 / 0.28);
+
+  /* --- motion ------------------------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One visible, consistent focus ring across the whole product. */
+  :focus-visible {
+    outline: 2px solid var(--color-blush-deep);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: var(--color-blush-soft);
+    color: var(--color-ink);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border: 3px solid var(--color-canvas);
+    border-radius: var(--radius-pill);
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  max-width: 78rem;
+
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Bottom navigation on iOS must clear the home indicator. */
+@utility safe-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@utility hide-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* ==========================================================================
+   Motion — every animation here is skipped under prefers-reduced-motion
+   ========================================================================== */
+
+@keyframes kosvia-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes kosvia-shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@keyframes kosvia-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+@layer components {
+  .animate-fade-up {
+    animation: kosvia-fade-up var(--duration-slow) var(--ease-out-soft) both;
+  }
+
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-surface-muted) 25%,
+      var(--color-canvas-deep) 37%,
+      var(--color-surface-muted) 63%
+    );
+    background-size: 200% 100%;
+    animation: kosvia-shimmer 1.4s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+  }
+
+  .animate-pop {
+    animation: kosvia-pop var(--duration-base) var(--ease-out-soft);
+  }
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity var(--duration-base) var(--ease-out-soft),
+    transform var(--duration-base) var(--ease-out-soft);
+}
+.page-enter-from { opacity: 0; transform: translateY(6px); }
+.page-leave-to { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton { animation: none; background: var(--color-surface-muted); }
+}
