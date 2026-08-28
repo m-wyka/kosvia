@@ -6,7 +6,7 @@ definePageMeta({ middleware: 'auth' });
 const api = useApi();
 const auth = useAuthStore();
 const message = useApiMessage();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const { data: conversations, refresh: refreshConversations } = await useApiFetch<AiConversationDto[]>(
   '/ai/conversations',
@@ -60,7 +60,11 @@ async function send(text?: string) {
   try {
     const response = await api<AiChatResponse>('/ai/chat', {
       method: 'POST',
-      body: { message: content, conversationId: conversationId.value ?? undefined },
+      body: {
+        message: content,
+        conversationId: conversationId.value ?? undefined,
+        locale: locale.value,
+      },
     });
     conversationId.value = response.conversationId;
     messages.value = [...messages.value, response.message];

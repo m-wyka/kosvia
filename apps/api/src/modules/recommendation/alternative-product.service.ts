@@ -1,5 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { AlternativeGroupDto, AlternativeKind, ProductSummaryDto } from '@kosvia/shared';
+import type {
+  AlternativeGroupDto,
+  AlternativeKind,
+  LocalisedText,
+  ProductSummaryDto,
+} from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { PRODUCT_INCLUDE, type ProductRow } from '../products/product.select';
@@ -46,7 +51,7 @@ export class AlternativeProductService {
       kind: AlternativeKind,
       title: string,
       description: string,
-      picks: Array<{ entry: Scored; reason: string }>,
+      picks: Array<{ entry: Scored; reason: LocalisedText }>,
     ) => {
       if (!picks.length) return;
       groups.push({
@@ -63,10 +68,17 @@ export class AlternativeProductService {
         .filter((entry) => entry.price !== null && entry.price < self.price! * 0.95)
         .sort((a, b) => a.price! - b.price! || b.match - a.match)
         .slice(0, GROUP_SIZE)
-        .map((entry) => ({
-          entry,
-          reason: `${Math.round((1 - entry.price! / self.price!) * 100)}% less than ${subject.name}`,
-        }));
+        .map((entry) => {
+          const percent = Math.round((1 - entry.price! / self.price!) * 100);
+          return {
+            entry,
+            reason: {
+              code: 'alt-cheaper',
+              text: `${percent}% less than ${subject.name}`,
+              params: { percent, product: subject.name },
+            },
+          };
+        });
       push('cheaper', 'Cheaper', `Same routine step as ${subject.name}, for less.`, cheaper);
     }
 
@@ -77,7 +89,11 @@ export class AlternativeProductService {
       .slice(0, GROUP_SIZE)
       .map((entry) => ({
         entry,
-        reason: `${entry.match}% match — ${entry.match - self.match} points above this product`,
+        reason: {
+          code: 'alt-better-match',
+          text: `${entry.match}% match — ${entry.match - self.match} points above this product`,
+          params: { score: entry.match, delta: entry.match - self.match },
+        },
       }));
     push('better-match', 'Better match', 'Closer to your profile than the product you are viewing.', betterMatch);
 
@@ -90,7 +106,11 @@ export class AlternativeProductService {
       .slice(0, GROUP_SIZE)
       .map(({ entry }) => ({
         entry,
-        reason: `${entry.match}% match at ${entry.price!.toFixed(2)} PLN`,
+        reason: {
+          code: 'alt-better-value',
+          text: `${entry.match}% match at ${entry.price!.toFixed(2)} PLN`,
+          params: { score: entry.match, price: entry.price! },
+        },
       }));
     push('better-value', 'Better value', 'The strongest match per złoty in this routine step.', value);
 
@@ -105,7 +125,11 @@ export class AlternativeProductService {
       .slice(0, GROUP_SIZE)
       .map(({ entry, overlap }) => ({
         entry,
-        reason: `${Math.round(overlap * 100)}% of the key ingredients overlap`,
+        reason: {
+          code: 'alt-similar-ingredients',
+          text: `${Math.round(overlap * 100)}% of the key ingredients overlap`,
+          params: { percent: Math.round(overlap * 100) },
+        },
       }));
     push(
       'similar-ingredients',
@@ -122,7 +146,12 @@ export class AlternativeProductService {
       .slice(0, GROUP_SIZE)
       .map((entry) => ({
         entry,
-        reason: `Another ${subject.category.name.toLowerCase()} option`,
+        reason: {
+          code: 'alt-similar-purpose',
+          text: `Another ${subject.category.name.toLowerCase()} option`,
+          // The slug lets a client name the category in its own language.
+          params: { category: subject.category.slug },
+        },
       }));
     push(
       'similar-purpose',

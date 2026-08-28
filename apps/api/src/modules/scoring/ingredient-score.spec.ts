@@ -8,7 +8,7 @@ describe('computeIngredientScore', () => {
   it('returns a neutral score and a note when there is no ingredient list', () => {
     const result = computeIngredientScore([]);
     expect(result.score).toBe(50);
-    expect(result.notes[0]).toMatch(/no ingredient list/i);
+    expect(result.notes[0]?.code).toBe('ingredient-no-list');
   });
 
   it('rewards actives and supportive ingredients', () => {
@@ -23,13 +23,15 @@ describe('computeIngredientScore', () => {
     const early = computeIngredientScore(list(AQUA, PARFUM, GLYCERIN, NIACINAMIDE));
     const late = computeIngredientScore(list(AQUA, GLYCERIN, NIACINAMIDE, PARFUM));
     expect(early.score).toBeLessThan(late.score);
-    expect(early.notes.some((note) => /fragrance appears high/i.test(note))).toBe(true);
+    expect(early.notes.some((note) => note.code === 'ingredient-fragrance-high')).toBe(true);
   });
 
   it('counts fragrance as a potential irritant without calling it harmful', () => {
     const result = computeIngredientScore(list(AQUA, PARFUM));
     expect(result.potentialIrritantCount).toBe(1);
-    expect(result.notes.join(' ')).not.toMatch(/toxic|dangerous|harmful|bad/i);
+    expect(result.notes.map((note) => note.text).join(' ')).not.toMatch(
+      /toxic|dangerous|harmful|bad/i,
+    );
   });
 
   it('flags a high comedogenic rating only when it appears high in the list', () => {
@@ -38,8 +40,8 @@ describe('computeIngredientScore', () => {
     const buried = computeIngredientScore(
       list(AQUA, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, heavy),
     );
-    expect(early.notes.some((n) => /congesting/i.test(n))).toBe(true);
-    expect(buried.notes.some((n) => /congesting/i.test(n))).toBe(false);
+    expect(early.notes.some((n) => n.code === 'ingredient-comedogenic')).toBe(true);
+    expect(buried.notes.some((n) => n.code === 'ingredient-comedogenic')).toBe(false);
   });
 
   it('never leaves the 0-100 range', () => {

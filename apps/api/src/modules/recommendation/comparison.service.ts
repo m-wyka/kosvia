@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { pricePerHundred } from '@kosvia/shared';
-import type { ComparisonResultDto, ComparisonRowDto, ComparisonVerdictDto } from '@kosvia/shared';
+import type {
+  ComparisonResultDto,
+  ComparisonRowDto,
+  ComparisonVerdictDto,
+  LocalisedText,
+} from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { PRODUCT_INCLUDE, type ProductRow } from '../products/product.select';
@@ -148,39 +153,69 @@ export class ComparisonService {
     const runnerUp = ranked[1];
     const fullName = (product: ComparisonResultDto['products'][number]) =>
       `${product.brand.name} ${product.name}`;
-    const reasons: string[] = [];
+    const reasons: LocalisedText[] = [];
 
-    if (matches[winner.index] > matches[runnerUp.index]) {
-      reasons.push(
-        `Highest Personal Match at ${matches[winner.index]}%, against ${matches[runnerUp.index]}% for ${fullName(runnerUp.product)}.`,
-      );
-    } else if (matches[winner.index] === matches[runnerUp.index]) {
-      reasons.push(
-        `Ties with ${fullName(runnerUp.product)} on Personal Match at ${matches[winner.index]}%, so the decision comes down to value.`,
-      );
+    const winnerScore = matches[winner.index]!;
+    const rivalScore = matches[runnerUp.index]!;
+    const rival = fullName(runnerUp.product);
+
+    if (winnerScore > rivalScore) {
+      reasons.push({
+        code: 'verdict-highest-match',
+        text: `Highest Personal Match at ${winnerScore}%, against ${rivalScore}% for ${rival}.`,
+        params: { score: winnerScore, rivalScore, rival },
+      });
+    } else if (winnerScore === rivalScore) {
+      reasons.push({
+        code: 'verdict-tied-match',
+        text: `Ties with ${rival} on Personal Match at ${winnerScore}%, so the decision comes down to value.`,
+        params: { score: winnerScore, rival },
+      });
     } else {
-      reasons.push(
-        `Slightly lower match than ${fullName(runnerUp.product)}, but it wins on the other measures.`,
-      );
+      reasons.push({
+        code: 'verdict-lower-match',
+        text: `Slightly lower match than ${rival}, but it wins on the other measures.`,
+        params: { rival },
+      });
     }
 
-    if (perHundred[winner.index] !== null && bestValue !== null) {
+    const winnerPerHundred = perHundred[winner.index];
+    if (winnerPerHundred !== null && winnerPerHundred !== undefined && bestValue !== null) {
       reasons.push(
-        perHundred[winner.index] === bestValue
-          ? `Best value in this comparison at ${perHundred[winner.index]!.toFixed(2)} PLN per 100 ml.`
-          : `Costs ${perHundred[winner.index]!.toFixed(2)} PLN per 100 ml.`,
+        winnerPerHundred === bestValue
+          ? {
+              code: 'verdict-best-value',
+              text: `Best value in this comparison at ${winnerPerHundred.toFixed(2)} PLN per 100 ml.`,
+              params: { price: winnerPerHundred },
+            }
+          : {
+              code: 'verdict-value',
+              text: `Costs ${winnerPerHundred.toFixed(2)} PLN per 100 ml.`,
+              params: { price: winnerPerHundred },
+            },
       );
     }
 
     if (winner.product.isFragranceFree) {
-      reasons.push('Fragrance-free, which keeps it usable if your skin reacts easily.');
+      reasons.push({
+        code: 'verdict-fragrance-free',
+        text: 'Fragrance-free, which keeps it usable if your skin reacts easily.',
+      });
     }
-    reasons.push(`Ingredient score of ${winner.product.ingredientScore} out of 100.`);
+    reasons.push({
+      code: 'verdict-ingredient-score',
+      text: `Ingredient score of ${winner.product.ingredientScore} out of 100.`,
+      params: { score: winner.product.ingredientScore },
+    });
 
     return {
       productId: winner.product.id,
       productName: fullName(winner.product),
-      summary: `Kosvia recommends ${fullName(winner.product)}.`,
+      summary: {
+        code: 'verdict-summary',
+        text: `Kosvia recommends ${fullName(winner.product)}.`,
+        params: { product: fullName(winner.product) },
+      },
       reasons,
     };
   }

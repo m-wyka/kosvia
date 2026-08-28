@@ -1,11 +1,74 @@
 import { Injectable } from '@nestjs/common';
-import { formatPrice } from '@kosvia/shared';
+import type { LocalisedText } from '@kosvia/shared';
+import { formatMoney, renderLocalised, vocabTerm } from '../../../common/i18n/phrases';
 import type {
   AdvisorContext,
   AIProvider,
+  AnswerLocale,
   ProductAnalysisContext,
   RecommendationExplanationContext,
 } from './ai-provider.interface';
+
+/**
+ * Sentence fragments per language.
+ *
+ * The offline provider composes prose from retrieved data, so it needs its own
+ * phrasing for each locale — it has no model to write for it. Kept small on
+ * purpose: this is a fallback that must work with no network and no API key.
+ * The *contents* of the sentences — match reasons, routine notes — are rendered
+ * from the shared phrase table instead, so they read the same here as they do
+ * anywhere else in the interface.
+ */
+const COPY: Record<AnswerLocale, Record<string, (v: Record<string, string>) => string>> = {
+  en: {
+    nothing: (v) => `I looked for ${v.intent}, but nothing in the catalogue fits closely enough to recommend.`,
+    widen: () => 'Try widening the budget or relaxing one preference — I will run the search again.',
+    owned: (v) => `You already have ${v.products} on your shelf, which covers a lot of this already.`,
+    best: (v) =>
+      `The closest fit is ${v.product} at ${v.price}${v.score ? `, a ${v.score}% match` : ''}${v.reason ? ` — ${v.reason}` : ''}.`,
+    warning: (v) => `One thing to weigh up: ${v.warning}.`,
+    cheaper: (v) =>
+      `If you would rather spend less, ${v.product} comes in at ${v.price}${v.score ? ` and still scores ${v.score}%` : ''}.`,
+    noProfile: () =>
+      'These scores are based on formula quality alone — complete your beauty profile and I can rank them against your skin.',
+    routine: (v) =>
+      `Here is a ${v.count}-step routine built around your profile${v.total ? `, coming to ${v.total}` : ''}: ${v.steps}.`,
+    routineNone: () => 'I could not put a routine together inside that budget.',
+    intentAny: () => 'products',
+    intentStep: (v) => `a ${v.step}`,
+    intentUnder: (v) => `${v.what} under ${v.price}`,
+    formulaScore: (v) => `${v.product} scores ${v.score} out of 100 on formula quality.`,
+    keyIngredients: (v) => `The ingredients doing most of the work here are ${v.ingredients}.`,
+    matchScore: (v) => `${v.product} comes out at ${v.score}%.`,
+    mostlyBecause: (v) => `That is mostly because ${v.reasons}.`,
+    nothingPulling: () => 'There is not much in your profile pulling it up or down.',
+    against: (v) => `Working against it: ${v.warnings}.`,
+  },
+  pl: {
+    nothing: (v) => `Szukałam ${v.intent}, ale nic w katalogu nie pasuje na tyle dobrze, żeby to polecić.`,
+    widen: () => 'Spróbuj podnieść budżet albo poluzować jedną preferencję — przeszukam katalog jeszcze raz.',
+    owned: (v) => `Masz już na półce ${v.products}, co w dużej mierze to pokrywa.`,
+    best: (v) =>
+      `Najbliżej jest ${v.product} za ${v.price}${v.score ? `, ${v.score}% dopasowania` : ''}${v.reason ? ` — ${v.reason}` : ''}.`,
+    warning: (v) => `Jedna rzecz do rozważenia: ${v.warning}.`,
+    cheaper: (v) =>
+      `Jeśli wolisz wydać mniej, ${v.product} kosztuje ${v.price}${v.score ? ` i wciąż ma ${v.score}% dopasowania` : ''}.`,
+    noProfile: () =>
+      'Te wyniki opierają się wyłącznie na jakości składu — uzupełnij profil, a ocenię je pod Twoją skórę.',
+    routine: (v) =>
+      `Oto ${v.count}-etapowa rutyna dobrana pod Twój profil${v.total ? `, w sumie ${v.total}` : ''}: ${v.steps}.`,
+    routineNone: () => 'Nie udało mi się złożyć rutyny w tym budżecie.',
+    intentAny: () => 'produktów',
+    intentStep: (v) => `produktu z kategorii ${v.step}`,
+    intentUnder: (v) => `${v.what} do ${v.price}`,
+    formulaScore: (v) => `${v.product} ma ${v.score} na 100 punktów za jakość składu.`,
+    keyIngredients: (v) => `Najwięcej pracy wykonują tu składniki: ${v.ingredients}.`,
+    matchScore: (v) => `${v.product} wypada na ${v.score}%.`,
+    mostlyBecause: (v) => `Głównie dlatego, że ${v.reasons}.`,
+    nothingPulling: () => 'W Twoim profilu nie ma nic, co mocno podnosiłoby lub obniżało ten wynik.',
+    against: (v) => `Na minus: ${v.warnings}.`,
+  },
+};
 
 /**
  * The default provider. Composes an answer from the structured data the
@@ -20,13 +83,15 @@ export class MockAIProvider implements AIProvider {
   readonly name = 'mock';
 
   async generateResponse(context: AdvisorContext): Promise<string> {
-    const { retrieved, profileSummary, intentSummary } = context;
+    const { retrieved, profileSummary } = context;
+    const locale = context.locale ?? 'en';
+    const copy = COPY[locale] ?? COPY.en;
+    const say = (entry: LocalisedText) => renderLocalised(entry, locale);
+    const list = (entries: LocalisedText[]) =>
+      entries.map((entry) => say(entry).toLowerCase()).join(', ');
 
     if (!retrieved.length) {
-      return [
-        `I looked for ${intentSummary}, but nothing in the catalogue fits closely enough to recommend.`,
-        'Try widening the budget or relaxing one preference — I will run the search again.',
-      ].join('\n\n');
+      return [copy.nothing!({ intent: this.describeIntent(context) }), copy.widen!({})].join('\n\n');
     }
 
     const owned = retrieved.filter((entry) => entry.role === 'already-owned');
@@ -41,79 +106,108 @@ export class MockAIProvider implements AIProvider {
       const steps = retrieved.filter((entry) => entry.role === 'best-match');
       paragraphs.push(
         steps.length
-          ? `Here is a ${steps.length}-step routine built around your profile${
-              context.routineTotal ? `, coming to ${formatPrice(context.routineTotal)}` : ''
-            }: ${steps
-              .map((entry) => `${entry.label ?? 'a product'} — ${entry.product.brand.name} ${entry.product.name}`)
-              .join('; ')}.`
-          : 'I could not put a routine together inside that budget.',
+          ? copy.routine!({
+              count: String(steps.length),
+              total: context.routineTotal ? formatMoney(context.routineTotal, locale) : '',
+              steps: steps
+                .map(
+                  (entry) =>
+                    `${entry.label ? say(entry.label) : ''} — ${entry.product.brand.name} ${entry.product.name}`,
+                )
+                .join('; '),
+            })
+          : copy.routineNone!({}),
       );
-      for (const note of context.routineNotes ?? []) paragraphs.push(note);
+      for (const note of context.routineNotes ?? []) paragraphs.push(say(note));
       return paragraphs.join('\n\n');
     }
 
     if (owned.length) {
       paragraphs.push(
-        `You already have ${owned
-          .map((entry) => `${entry.product.brand.name} ${entry.product.name}`)
-          .join(' and ')} on your shelf, which covers a lot of this already.`,
+        copy.owned!({
+          products: owned
+            .map((entry) => `${entry.product.brand.name} ${entry.product.name}`)
+            .join(', '),
+        }),
       );
     }
 
     if (best) {
-      const reason = best.reasons.slice(0, 2).join(', and ').toLowerCase();
       paragraphs.push(
-        `The closest fit is ${best.product.brand.name} ${best.product.name} at ${formatPrice(
-          best.product.lowestPrice,
-        )}${best.matchScore ? `, a ${best.matchScore}% match` : ''}${reason ? ` — ${reason}` : ''}.`,
+        copy.best!({
+          product: `${best.product.brand.name} ${best.product.name}`,
+          price: formatMoney(best.product.lowestPrice, locale),
+          score: best.matchScore ? String(best.matchScore) : '',
+          reason: list(best.reasons.slice(0, 2)),
+        }),
       );
       if (best.warnings.length) {
-        paragraphs.push(`One thing to weigh up: ${best.warnings[0].toLowerCase()}.`);
+        paragraphs.push(copy.warning!({ warning: say(best.warnings[0]!).toLowerCase() }));
       }
     }
 
     if (cheaper && cheaper.product.id !== best?.product.id) {
       paragraphs.push(
-        `If you would rather spend less, ${cheaper.product.brand.name} ${cheaper.product.name} comes in at ${formatPrice(
-          cheaper.product.lowestPrice,
-        )}${cheaper.matchScore ? ` and still scores ${cheaper.matchScore}%` : ''}.`,
+        copy.cheaper!({
+          product: `${cheaper.product.brand.name} ${cheaper.product.name}`,
+          price: formatMoney(cheaper.product.lowestPrice, locale),
+          score: cheaper.matchScore ? String(cheaper.matchScore) : '',
+        }),
       );
     }
 
-    if (!profileSummary) {
-      paragraphs.push(
-        'These scores are based on formula quality alone — complete your beauty profile and I can rank them against your skin.',
-      );
-    }
+    if (!profileSummary) paragraphs.push(copy.noProfile!({}));
 
     return paragraphs.join('\n\n');
   }
 
   async analyzeProduct(context: ProductAnalysisContext): Promise<string> {
     const { product, ingredientHighlights, ingredientScore, notes } = context;
+    const locale = context.locale ?? 'en';
+    const copy = COPY[locale] ?? COPY.en;
     const named = ingredientHighlights.slice(0, 4).map((entry) => entry.name);
 
     const lines = [
-      `${product.brand.name} ${product.name} scores ${ingredientScore} out of 100 on formula quality.`,
+      copy.formulaScore!({
+        product: `${product.brand.name} ${product.name}`,
+        score: String(ingredientScore),
+      }),
     ];
-    if (named.length) {
-      lines.push(`The ingredients doing most of the work here are ${named.join(', ')}.`);
-    }
-    lines.push(...notes.slice(0, 2));
+    if (named.length) lines.push(copy.keyIngredients!({ ingredients: named.join(', ') }));
+    lines.push(...notes.slice(0, 2).map((note) => renderLocalised(note, locale)));
     return lines.join(' ');
   }
 
   async explainRecommendation(context: RecommendationExplanationContext): Promise<string> {
     const { score, reasons, warnings, product } = context;
+    const locale = context.locale ?? 'en';
+    const copy = COPY[locale] ?? COPY.en;
+    const list = (entries: LocalisedText[]) =>
+      entries.map((entry) => renderLocalised(entry, locale).toLowerCase()).join(', ');
+
     const parts = [
-      `${product.brand.name} ${product.name} comes out at ${score}%.`,
+      copy.matchScore!({ product: `${product.brand.name} ${product.name}`, score: String(score) }),
       reasons.length
-        ? `That is mostly because ${reasons.slice(0, 3).join(', ').toLowerCase()}.`
-        : 'There is not much in your profile pulling it up or down.',
+        ? copy.mostlyBecause!({ reasons: list(reasons.slice(0, 3)) })
+        : copy.nothingPulling!({}),
     ];
-    if (warnings.length) {
-      parts.push(`Working against it: ${warnings.slice(0, 2).join(', ').toLowerCase()}.`);
-    }
+    if (warnings.length) parts.push(copy.against!({ warnings: list(warnings.slice(0, 2)) }));
     return parts.join(' ');
+  }
+
+  /**
+   * Restates what the question was understood to be asking for. Built from the
+   * structured intent rather than the English `intentSummary`, which exists for
+   * the model-backed prompt and the conversation record.
+   */
+  private describeIntent(context: AdvisorContext): string {
+    const locale = context.locale ?? 'en';
+    const copy = COPY[locale] ?? COPY.en;
+    const step = context.intent?.routineStep;
+    const what = step
+      ? copy.intentStep!({ step: vocabTerm('ROUTINE_STEP', step, locale).toLowerCase() })
+      : copy.intentAny!({});
+    const maxPrice = context.intent?.maxPrice;
+    return maxPrice ? copy.intentUnder!({ what, price: formatMoney(maxPrice, locale) }) : what;
   }
 }

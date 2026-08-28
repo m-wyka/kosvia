@@ -6,6 +6,7 @@ const router = useRouter();
 const compare = useCompareStore();
 const { t } = useI18n();
 const format = useFormat();
+const localise = useLocalisedText();
 
 onMounted(() => {
   compare.hydrate();
@@ -93,15 +94,17 @@ useSeo(() => ({
             <BaseIcon name="sparkles" :size="20" />
           </span>
           <div class="min-w-0 flex-1">
-            <h2 class="font-display text-xl text-ink sm:text-2xl">{{ data.verdict.summary }}</h2>
+            <h2 class="font-display text-xl text-ink sm:text-2xl">
+              {{ localise(data.verdict.summary) }}
+            </h2>
             <ul class="mt-3 space-y-1.5">
               <li
                 v-for="reason in data.verdict.reasons"
-                :key="reason"
+                :key="reason.code"
                 class="flex items-start gap-2 text-sm text-ink-soft"
               >
                 <BaseIcon name="check" :size="15" class="mt-0.5 shrink-0 text-sage" />
-                {{ reason }}
+                {{ localise(reason) }}
               </li>
             </ul>
           </div>

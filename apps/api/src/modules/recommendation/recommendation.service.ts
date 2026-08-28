@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, type RoutineStep } from '@prisma/client';
-import type { DiscoveryFeedDto, DiscoverySectionDto, ProductSummaryDto } from '@kosvia/shared';
+import type {
+  DiscoveryFeedDto,
+  DiscoverySectionDto,
+  LocalisedText,
+  ProductSummaryDto,
+} from '@kosvia/shared';
 import { BUDGET_CEILING } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
@@ -22,8 +27,13 @@ export interface RoutinePlan {
   budget: number;
   totalPrice: number;
   averageMatch: number;
-  steps: Array<{ step: RoutineStep; label: string; product: ProductSummaryDto | null; reason: string }>;
-  notes: string[];
+  steps: Array<{
+    step: RoutineStep;
+    label: string;
+    product: ProductSummaryDto | null;
+    reason: LocalisedText;
+  }>;
+  notes: LocalisedText[];
 }
 
 /**
@@ -212,7 +222,7 @@ export class RecommendationService {
     const totalFloor = affordableSteps.reduce((sum, step) => sum + (floors.get(step) ?? 0), 0);
 
     const chosen = new Map<RoutineStep, RoutinePlan['steps'][number]>();
-    const notes: string[] = [];
+    const notes: LocalisedText[] = [];
     const skipped: string[] = [];
     let spent = 0;
 
@@ -221,9 +231,11 @@ export class RecommendationService {
     // first, most important step.
     const canAffordAll = totalFloor <= budget && affordableSteps.length === CORE_ROUTINE.length;
     if (!canAffordAll && affordableSteps.length === CORE_ROUTINE.length) {
-      notes.push(
-        `A complete four-step routine starts at about ${totalFloor.toFixed(2)} PLN, so ${budget} PLN will not cover all of it. Sun protection and a moisturiser are the two worth keeping.`,
-      );
+      notes.push({
+        code: 'routine-over-floor',
+        text: `A complete four-step routine starts at about ${totalFloor.toFixed(2)} PLN, so ${budget} PLN will not cover all of it. Sun protection and a moisturiser are the two worth keeping.`,
+        params: { floor: Math.round(totalFloor * 100) / 100, budget },
+      });
     }
 
     let reserved = canAffordAll ? totalFloor : 0;
@@ -237,7 +249,11 @@ export class RecommendationService {
           step,
           label,
           product: null,
-          reason: `We do not have a ${label.toLowerCase()} in the catalogue yet.`,
+          reason: {
+            code: 'routine-step-absent',
+            text: `We do not have a ${label.toLowerCase()} in the catalogue yet.`,
+            params: { step },
+          },
         });
         continue;
       }
@@ -261,8 +277,18 @@ export class RecommendationService {
         label,
         product,
         reason: product
-          ? (product.personalMatch?.reasons[0]?.label ?? 'Best available match for this step')
-          : `Nothing here fits what is left of the budget — the cheapest is ${floor.toFixed(2)} PLN.`,
+          ? (product.personalMatch?.reasons[0]
+              ? {
+                  code: `match:${product.personalMatch.reasons[0].code}`,
+                  text: product.personalMatch.reasons[0].label,
+                  params: (product.personalMatch.reasons[0].params ?? {}) as LocalisedText['params'],
+                }
+              : { code: 'routine-step-best', text: 'Best available match for this step' })
+          : {
+              code: 'routine-step-unaffordable',
+              text: `Nothing here fits what is left of the budget — the cheapest is ${floor.toFixed(2)} PLN.`,
+              params: { price: floor },
+            },
       });
     }
 
@@ -280,15 +306,22 @@ export class RecommendationService {
       const missing = steps
         .filter((entry) => !entry.product)
         .map((entry) => entry.label.toLowerCase());
-      notes.push(
-        `Missing from this plan: ${formatList(missing)}. Raising the budget by about ${shortfall} PLN would cover the whole routine.`,
-      );
+      notes.push({
+        code: 'routine-missing',
+        text: `Missing from this plan: ${formatList(missing)}. Raising the budget by about ${shortfall} PLN would cover the whole routine.`,
+        params: { steps: missing.join(', '), shortfall },
+      });
     } else if (budget - spent > 20) {
-      notes.push(
-        `You have ${(budget - spent).toFixed(2)} PLN left — an exfoliant or an eye cream would be the next step.`,
-      );
+      notes.push({
+        code: 'routine-leftover',
+        text: `You have ${(budget - spent).toFixed(2)} PLN left — an exfoliant or an eye cream would be the next step.`,
+        params: { amount: Math.round((budget - spent) * 100) / 100 },
+      });
     }
-    notes.push('Introduce one new active product at a time so you can tell what is working.');
+    notes.push({
+      code: 'routine-introduce-slowly',
+      text: 'Introduce one new active product at a time so you can tell what is working.',
+    });
 
     return {
       budget,

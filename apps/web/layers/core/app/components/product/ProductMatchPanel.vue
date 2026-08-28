@@ -13,6 +13,7 @@ const props = defineProps<{ match: PersonalMatchDto; slug: string }>();
 const auth = useAuthStore();
 const api = useApi();
 const reasonLabel = useMatchReason();
+const { locale } = useI18n();
 
 const open = ref(false);
 const explanation = ref<string | null>(null);
@@ -23,7 +24,11 @@ async function explain() {
   if (!open.value || explanation.value || explaining.value) return;
   explaining.value = true;
   try {
-    const result = await api<{ explanation: string }>(`/ai/products/${props.slug}/why`);
+    // The paragraph is composed server-side, so the server needs to know which
+    // language to compose it in.
+    const result = await api<{ explanation: string }>(
+      `/ai/products/${props.slug}/why?locale=${locale.value}`,
+    );
     explanation.value = result.explanation;
   } catch {
     explanation.value = null;

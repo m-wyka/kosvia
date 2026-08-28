@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AiChatResponse, AiConversationDto } from '@kosvia/shared';
@@ -17,7 +17,7 @@ export class AIController {
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Ask the AI Beauty Shopper a question' })
   chat(@CurrentUser() user: AuthenticatedUser, @Body() dto: ChatDto): Promise<AiChatResponse> {
-    return this.ai.chat(user.id, dto.message, dto.conversationId);
+    return this.ai.chat(user.id, dto.message, dto.conversationId, dto.locale ?? 'en');
   }
 
   @Get('conversations')
@@ -46,8 +46,11 @@ export class AIController {
   @Get('products/:slug/explain')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Plain-language read of a product’s formula' })
-  explainProduct(@Param('slug') slug: string): Promise<{ explanation: string }> {
-    return this.ai.explainProduct(slug);
+  explainProduct(
+    @Param('slug') slug: string,
+    @Query('locale') locale?: string,
+  ): Promise<{ explanation: string }> {
+    return this.ai.explainProduct(slug, locale === 'pl' ? 'pl' : 'en');
   }
 
   @OptionalAuth()
@@ -57,7 +60,8 @@ export class AIController {
   explainMatch(
     @CurrentUser() user: AuthenticatedUser | null,
     @Param('slug') slug: string,
+    @Query('locale') locale?: string,
   ): Promise<{ explanation: string }> {
-    return this.ai.explainMatch(user?.id ?? null, slug);
+    return this.ai.explainMatch(user?.id ?? null, slug, locale === 'pl' ? 'pl' : 'en');
   }
 }

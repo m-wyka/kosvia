@@ -1,4 +1,5 @@
-import type { ProductSummaryDto } from '@kosvia/shared';
+import type { LocalisedText, ProductSummaryDto } from '@kosvia/shared';
+import type { AnswerLocale } from '../../../common/i18n/phrases';
 
 /**
  * AIProvider — the seam between Kosvia and whichever model we run on.
@@ -10,9 +11,15 @@ import type { ProductSummaryDto } from '@kosvia/shared';
  * inventing a catalogue.
  */
 
+export type { AnswerLocale };
+
+export const LOCALE_NAMES: Record<AnswerLocale, string> = { en: 'English', pl: 'Polish' };
+
 export interface AdvisorContext {
   /** The user's question, verbatim. */
   question: string;
+  /** Language the answer must be written in. */
+  locale: AnswerLocale;
   /** Short plain-language description of the user's profile, or null. */
   profileSummary: string | null;
   /** What the user already owns, as "Brand Product (category)" lines. */
@@ -26,31 +33,40 @@ export interface AdvisorContext {
   /** True when the retrieved products form a whole routine, not a shortlist. */
   isRoutine?: boolean;
   routineTotal?: number | null;
-  routineNotes?: string[];
+  routineNotes?: LocalisedText[];
+  /** Structured read of the question, so a provider can restate it in any language. */
+  intent?: { routineStep: string | null; maxPrice: number | null };
 }
 
 export interface RetrievedProduct {
   role: 'best-match' | 'cheaper' | 'alternative' | 'already-owned';
   /** Overrides the role's default card label — e.g. a routine step name. */
-  label?: string;
+  label?: LocalisedText;
   product: ProductSummaryDto;
   matchScore: number | null;
-  reasons: string[];
-  warnings: string[];
+  /**
+   * Carried as `{ code, text, params }` rather than plain strings: the offline
+   * provider composes its answer from these and has to do so in the reader's
+   * language. The model-backed provider only ever reads `text`.
+   */
+  reasons: LocalisedText[];
+  warnings: LocalisedText[];
 }
 
 export interface ProductAnalysisContext {
+  locale: AnswerLocale;
   product: ProductSummaryDto;
   ingredientHighlights: Array<{ name: string; tags: string[]; note: string | null }>;
   ingredientScore: number;
-  notes: string[];
+  notes: LocalisedText[];
 }
 
 export interface RecommendationExplanationContext {
+  locale: AnswerLocale;
   product: ProductSummaryDto;
   score: number;
-  reasons: string[];
-  warnings: string[];
+  reasons: LocalisedText[];
+  warnings: LocalisedText[];
   profileSummary: string | null;
 }
 
@@ -78,5 +94,6 @@ export const SAFETY_RULES = [
   'Kosvia is not a medical service. Do not diagnose, and do not claim a product will cure or treat a condition.',
   'Describe ingredients informationally. Never call an ingredient toxic, dangerous or bad.',
   'Be concise and concrete. Two or three short paragraphs at most, no bullet-point walls.',
+  'Write the answer in the language named in the prompt. Product, brand and INCI names stay as given.',
   'Do not repeat the full product cards — the interface renders them beneath your answer.',
 ].join('\n');

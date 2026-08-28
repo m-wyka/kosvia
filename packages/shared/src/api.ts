@@ -262,6 +262,21 @@ export interface MatchReason {
   params?: MatchReasonParams;
 }
 
+/**
+ * A sentence the API generated, in a form a client can re-render in its own
+ * language.
+ *
+ * The same contract as MatchReason, generalised: `code` is what the UI
+ * translates on, `text` is the canonical English for API consumers and for the
+ * AI prompt, and `params` carries the raw values behind the wording. A client
+ * that does not recognise the code falls back to `text`.
+ */
+export interface LocalisedText {
+  code: string;
+  text: string;
+  params?: Record<string, string | number | string[]>;
+}
+
 export interface MatchReasonParams {
   skinType?: SkinType;
   skinTypes?: SkinType[];
@@ -288,7 +303,7 @@ export interface IngredientScoreBreakdownDto {
   activeCount: number;
   supportiveCount: number;
   potentialIrritantCount: number;
-  notes: string[];
+  notes: LocalisedText[];
 }
 
 export type AlternativeKind =
@@ -302,7 +317,7 @@ export interface AlternativeGroupDto {
   kind: AlternativeKind;
   title: string;
   description: string;
-  products: Array<ProductSummaryDto & { alternativeReason: string }>;
+  products: Array<ProductSummaryDto & { alternativeReason: LocalisedText }>;
 }
 
 export interface ComparisonRowDto {
@@ -319,8 +334,8 @@ export interface ComparisonRowDto {
 export interface ComparisonVerdictDto {
   productId: string;
   productName: string;
-  summary: string;
-  reasons: string[];
+  summary: LocalisedText;
+  reasons: LocalisedText[];
 }
 
 export interface ComparisonResultDto {
@@ -346,15 +361,15 @@ export interface ShelfItemDto {
 export interface RoutineObservationDto {
   kind: 'overlap' | 'gap' | 'ingredient-overlap' | 'balance';
   severity: 'info' | 'notice';
-  title: string;
-  detail: string;
+  title: LocalisedText;
+  detail: LocalisedText;
   productIds: string[];
 }
 
 export interface RoutineAnalysisDto {
   itemCount: number;
   coveredCategories: string[];
-  missingCategories: Array<{ slug: string; name: string; why: string }>;
+  missingCategories: Array<{ slug: string; name: string; why: LocalisedText }>;
   observations: RoutineObservationDto[];
 }
 
@@ -378,8 +393,9 @@ export interface PriceAlertDto {
 
 export interface AiProductSuggestion {
   role: 'best-match' | 'cheaper' | 'alternative' | 'already-owned';
-  label: string;
-  reason: string;
+  /** Overrides the role's default card label — e.g. a routine step name. */
+  label: LocalisedText | null;
+  reason: LocalisedText | null;
   product: ProductSummaryDto;
 }
 
@@ -394,6 +410,8 @@ export interface AiMessageDto {
 export interface AiChatRequest {
   message: string;
   conversationId?: string;
+  /** Language the answer should be written in. Defaults to English. */
+  locale?: 'en' | 'pl';
 }
 
 export interface AiChatResponse {

@@ -24,6 +24,7 @@ import pl from '../i18n/locales/pl.json';
 import { useVocabulary } from '../layers/core/app/composables/useVocabulary';
 import { useFormat } from '../layers/core/app/composables/useFormat';
 import { useMatchReason } from '../layers/core/app/composables/useMatchReason';
+import { useLocalisedText } from '../layers/core/app/composables/useLocalisedText';
 
 /**
  * The shared components are registered globally rather than stubbed, so a card
@@ -66,15 +67,22 @@ function lookup(locale: string, key: string): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-function translate(key: string, params?: Record<string, unknown> | number): string {
+function translate(
+  key: string,
+  params?: Record<string, unknown> | number,
+  plural?: number,
+): string {
   const locale = activeLocale.value;
-  const template = lookup(locale, key) ?? lookup('en', key);
+  let template = lookup(locale, key) ?? lookup('en', key);
   if (template === undefined) return key;
 
-  if (typeof params === 'number' && template.includes('|')) {
+  // vue-i18n takes the count either on its own — t(key, 3) — or after the
+  // named params, as t(key, params, 3).
+  const count = typeof params === 'number' ? params : plural;
+  if (typeof count === 'number' && template.includes('|')) {
     const forms = template.split('|').map((form) => form.trim());
-    const chosen = forms[pluralIndex(locale, params, forms.length)] ?? forms[0]!;
-    return chosen.replace(/\{count\}/g, String(params));
+    template = forms[pluralIndex(locale, count, forms.length)] ?? forms[0]!;
+    if (typeof params === 'number') return template.replace(/\{count\}/g, String(count));
   }
 
   const values = (typeof params === 'object' && params !== null ? params : {}) as Record<
@@ -124,7 +132,7 @@ Object.assign(globalThis, {
   onKeyStroke: () => undefined,
 });
 
-Object.assign(globalThis, { useVocabulary, useFormat, useMatchReason });
+Object.assign(globalThis, { useVocabulary, useFormat, useMatchReason, useLocalisedText });
 
 /** A minimal comparison tray, so cards can be mounted without Pinia. */
 const comparisonIds = ref<string[]>([]);

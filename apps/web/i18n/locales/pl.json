@@ -220,8 +220,8 @@
   "MATCH": {
     "BRAND_EXCLUDED": "Poprosiłaś nas o pomijanie tej marki",
     "INGREDIENT_EXCLUDED": "Zawiera {ingredients}, których unikasz",
-    "SKIN_TYPE": "Stworzony dla skóry {skinType}",
-    "SKIN_TYPE_MISMATCH": "Kierowany do skóry {skinTypes}",
+    "SKIN_TYPE": "Stworzony dla typu skóry: {skinType}",
+    "SKIN_TYPE_MISMATCH": "Kierowany do typu skóry: {skinTypes}",
     "SKIN_TYPE_INGREDIENTS": "Składniki pasują do Twojego typu skóry",
     "CONCERNS": "Działa na: {concerns}",
     "CONCERNS_NONE": "Nic tu nie odpowiada bezpośrednio na Twoje problemy",
@@ -633,6 +633,13 @@
         "BETTER_VALUE": "Lepsza wartość",
         "SIMILAR_INGREDIENTS": "Podobny skład",
         "SIMILAR_PURPOSE": "To samo zadanie, inna formuła"
+      },
+      "DESCRIPTION": {
+        "CHEAPER": "Ten sam etap rutyny, w niższej cenie.",
+        "BETTER_MATCH": "Wyżej oceniane pod Twój profil urodowy.",
+        "BETTER_VALUE": "Najlepsze dopasowanie w przeliczeniu na złotówkę na tym etapie rutyny.",
+        "SIMILAR_INGREDIENTS": "Formuły zbudowane w dużej mierze na tym samym składzie.",
+        "SIMILAR_PURPOSE": "Inne produkty, które robią to, co {product}."
       }
     },
     "ALERT_MODAL": {
@@ -1143,5 +1150,47 @@
         "CANCELLED": "Anulowany"
       }
     }
+  },
+  "GENERATED": {
+    "ALT_CHEAPER": "{percent}% taniej niż {product}",
+    "ALT_BETTER_MATCH": "{score}% dopasowania — o {delta} pkt więcej niż ten produkt",
+    "ALT_BETTER_VALUE": "{score}% dopasowania za {price}",
+    "ALT_SIMILAR_INGREDIENTS": "{percent}% kluczowych składników się pokrywa",
+    "ALT_SIMILAR_PURPOSE": "Inna opcja z kategorii {category}",
+    "VERDICT_SUMMARY": "Kosvia poleca {product}.",
+    "VERDICT_HIGHEST_MATCH": "Najwyższe dopasowanie — {score}%, wobec {rivalScore}% dla {rival}.",
+    "VERDICT_TIED_MATCH": "Remis z {rival} przy {score}% dopasowania, więc decyduje stosunek ceny do jakości.",
+    "VERDICT_LOWER_MATCH": "Nieco niższe dopasowanie niż {rival}, ale wygrywa pozostałymi parametrami.",
+    "VERDICT_BEST_VALUE": "Najkorzystniejszy w tym zestawieniu — {price} za 100 ml.",
+    "VERDICT_VALUE": "Kosztuje {price} za 100 ml.",
+    "VERDICT_FRAGRANCE_FREE": "Bezzapachowy, więc pozostaje do użycia, jeśli Twoja skóra łatwo reaguje.",
+    "VERDICT_INGREDIENT_SCORE": "Ocena składu: {score} na 100.",
+    "ROUTINE_OVERLAP_TITLE": "{count} produkty robią to samo | {count} produkty robią to samo | {count} produktów robi to samo",
+    "ROUTINE_OVERLAP_DETAIL": "{products} — wszystkie są na tym samym etapie rutyny. To w porządku, jeśli je rotujesz; warto wiedzieć, jeśli myślałaś, że robią co innego.",
+    "ROUTINE_DUPLICATE_TITLE": "Niemal identyczne formuły",
+    "ROUTINE_DUPLICATE_DETAIL": "{first} i {second} mają większość kluczowych składników wspólnych. Jeśli wymieniasz jeden, prawdopodobnie nie potrzebujesz obu.",
+    "ROUTINE_ACTIVES_TITLE": "Kilka mocnych aktywów na jednej półce",
+    "ROUTINE_ACTIVES_DETAIL": "{count} Twoich produktów zawiera kwas złuszczający albo retinoid wysoko w składzie. Wiele osób rozdziela je na różne wieczory zamiast nakładać razem.",
+    "ROUTINE_GENTLE_TITLE": "Łagodna, wspierająca półka",
+    "ROUTINE_GENTLE_DETAIL": "Nie ma tu mocnych produktów kuracyjnych — to samo oczyszczanie, nawilżanie i ochrona. To solidna baza, jeśli jesteś zadowolona z wyglądu swojej skóry.",
+    "ROUTINE_GAP_TITLE": "Brak: {category}",
+    "GAP_CLEANSER": "Każda rutyna zaczyna się od zmycia dnia.",
+    "GAP_MOISTURIZER": "Zatrzymuje nawilżenie po wszystkich innych krokach.",
+    "GAP_SPF": "Krok o najbardziej oczywistym długofalowym wpływie na skórę.",
+    "ROUTINE_OVER_FLOOR": "Pełna czteroetapowa rutyna zaczyna się od około {floor}, więc {budget} zł jej nie pokryje. Ochrona przeciwsłoneczna i krem nawilżający to dwa kroki warte zachowania.",
+    "ROUTINE_MISSING": "Brakuje w tym planie: {steps}. Podniesienie budżetu o około {shortfall} zł pokryłoby całą rutynę.",
+    "ROUTINE_LEFTOVER": "Zostało Ci {amount} — kolejnym krokiem byłby peeling kwasowy albo krem pod oczy.",
+    "ROUTINE_INTRODUCE_SLOWLY": "Wprowadzaj po jednym nowym produkcie aktywnym, żeby wiedzieć, co działa.",
+    "ROUTINE_STEP_ABSENT": "Nie mamy jeszcze w katalogu produktu z kategorii {step}.",
+    "ROUTINE_STEP_BEST": "Najlepsze dostępne dopasowanie na tym etapie",
+    "ROUTINE_STEP_UNAFFORDABLE": "Nic tu nie mieści się w tym, co zostało z budżetu — najtańszy kosztuje {price}.",
+    "ROUTINE_STEP_NAME": "{step}",
+    "AI_AVAILABLE_FROM": "Dostępny od {price}",
+    "INGREDIENT_NO_LIST": "Nie mamy jeszcze składu tego produktu.",
+    "INGREDIENT_NO_ACTIVES": "Brak wyraźnych składników aktywnych — to produkt wspierający, a nie kuracyjny.",
+    "INGREDIENT_MANY_ACTIVES": "{count} składnik aktywny, więc wprowadzaj go powoli obok innych kuracji. | {count} składniki aktywne, więc wprowadzaj je powoli obok innych kuracji. | {count} składników aktywnych, więc wprowadzaj je powoli obok innych kuracji.",
+    "INGREDIENT_FRAGRANCE_HIGH": "Zapach jest wysoko w składzie — warto o tym wiedzieć, jeśli Twoja skóra łatwo reaguje.",
+    "INGREDIENT_COMEDOGENIC": "Zawiera składnik wysoko w składzie, który bywa opisywany jako zatykający pory.",
+    "INGREDIENT_SUPPORTIVE": "Duża część formuły nawilża, zmiękcza lub wspiera barierę skórną."
   }
 }

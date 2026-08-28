@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
+import type { LocalisedText } from '@kosvia/shared';
 import { formatPrice } from '@kosvia/shared';
 import {
+  LOCALE_NAMES,
   SAFETY_RULES,
   type AdvisorContext,
   type AIProvider,
@@ -9,6 +11,14 @@ import {
   type RecommendationExplanationContext,
 } from './ai-provider.interface';
 import { MockAIProvider } from './mock-ai.provider';
+
+/**
+ * Generated sentences as prompt material. The model is told which language to
+ * answer in and translates these itself, so the English `text` is what it sees —
+ * only the offline provider renders them from the phrase table.
+ */
+const sentences = (entries: LocalisedText[]): string =>
+  entries.map((entry) => entry.text).join('; ');
 
 /**
  * Claude-backed provider. Enabled with AI_PROVIDER=anthropic and an AI_API_KEY.
@@ -43,8 +53,8 @@ export class AnthropicAIProvider implements AIProvider {
                 entry.product.lowestPriceStore ? ` at ${entry.product.lowestPriceStore.name}` : ''
               }`,
               `   personal match: ${entry.matchScore ?? 'n/a'}`,
-              entry.reasons.length ? `   in its favour: ${entry.reasons.join('; ')}` : '',
-              entry.warnings.length ? `   against it: ${entry.warnings.join('; ')}` : '',
+              entry.reasons.length ? `   in its favour: ${sentences(entry.reasons)}` : '',
+              entry.warnings.length ? `   against it: ${sentences(entry.warnings)}` : '',
             ]
               .filter(Boolean)
               .join('\n'),
@@ -53,6 +63,8 @@ export class AnthropicAIProvider implements AIProvider {
       : '(nothing matched the search)';
 
     const prompt = [
+      `ANSWER LANGUAGE: ${LOCALE_NAMES[context.locale]}`,
+      '',
       `USER QUESTION: ${context.question}`,
       '',
       `WHAT KOSVIA SEARCHED FOR: ${context.intentSummary}`,
@@ -62,7 +74,9 @@ export class AnthropicAIProvider implements AIProvider {
             `THIS IS A FULL ROUTINE, NOT A SHORTLIST. Describe the plan as a whole${
               context.routineTotal ? ` (total ${context.routineTotal.toFixed(2)} PLN)` : ''
             }, one sentence per step.`,
-            ...(context.routineNotes?.length ? [`NOTES TO WORK IN: ${context.routineNotes.join(' ')}`] : []),
+            ...(context.routineNotes?.length
+              ? [`NOTES TO WORK IN: ${sentences(context.routineNotes)}`]
+              : []),
           ]
         : []),
       '',
@@ -80,6 +94,7 @@ export class AnthropicAIProvider implements AIProvider {
   async analyzeProduct(context: ProductAnalysisContext): Promise<string> {
     const prompt = [
       `Explain this formula to a shopper in two or three sentences.`,
+      `ANSWER LANGUAGE: ${LOCALE_NAMES[context.locale]}`,
       '',
       `PRODUCT: ${context.product.brand.name} ${context.product.name} (${context.product.category.name})`,
       `INGREDIENT SCORE: ${context.ingredientScore}/100`,
@@ -87,7 +102,7 @@ export class AnthropicAIProvider implements AIProvider {
       ...context.ingredientHighlights.map(
         (entry) => `- ${entry.name} [${entry.tags.join(', ')}]${entry.note ? ` — ${entry.note}` : ''}`,
       ),
-      context.notes.length ? `NOTES: ${context.notes.join(' ')}` : '',
+      context.notes.length ? `NOTES: ${sentences(context.notes)}` : '',
     ]
       .filter(Boolean)
       .join('\n');
@@ -99,11 +114,12 @@ export class AnthropicAIProvider implements AIProvider {
     const prompt = [
       'Explain this Personal Match score in two or three sentences, in second person.',
       'The score and the reasons were computed by Kosvia — restate them, do not recalculate.',
+      `ANSWER LANGUAGE: ${LOCALE_NAMES[context.locale]}`,
       '',
       `PRODUCT: ${context.product.brand.name} ${context.product.name}`,
       `SCORE: ${context.score}%`,
-      `IN ITS FAVOUR: ${context.reasons.join('; ') || 'nothing notable'}`,
-      `AGAINST IT: ${context.warnings.join('; ') || 'nothing notable'}`,
+      `IN ITS FAVOUR: ${sentences(context.reasons) || 'nothing notable'}`,
+      `AGAINST IT: ${sentences(context.warnings) || 'nothing notable'}`,
       `PROFILE: ${context.profileSummary ?? '(no profile)'}`,
     ].join('\n');
 

@@ -9,6 +9,7 @@ const message = useApiMessage();
 const route = useRoute();
 const { t } = useI18n();
 const vocab = useVocabulary();
+const localise = useLocalisedText();
 
 const { data: items, pending, error, refresh } = await useApiFetch<ShelfItemDto[]>('/shelf', {
   key: 'shelf',
@@ -156,7 +157,7 @@ useSeo(() => ({
         <ul class="space-y-3">
           <li
             v-for="observation in analysis.observations"
-            :key="observation.title"
+            :key="`${observation.kind}-${observation.title.code}-${observation.productIds.join()}`"
             class="flex items-start gap-3 rounded-xl border bg-surface p-4"
             :class="observation.severity === 'notice' ? 'border-caution/30' : 'border-line'"
           >
@@ -167,8 +168,10 @@ useSeo(() => ({
               <BaseIcon :name="observation.severity === 'notice' ? 'alert' : 'info'" :size="17" />
             </span>
             <div class="min-w-0">
-              <p class="text-sm font-medium text-ink">{{ observation.title }}</p>
-              <p class="mt-1 text-sm leading-relaxed text-ink-muted">{{ observation.detail }}</p>
+              <p class="text-sm font-medium text-ink">{{ localise(observation.title) }}</p>
+              <p class="mt-1 text-sm leading-relaxed text-ink-muted">
+                {{ localise(observation.detail) }}
+              </p>
             </div>
           </li>
         </ul>
@@ -195,7 +198,7 @@ useSeo(() => ({
                     <span class="block text-sm font-medium text-ink group-hover:underline">
                       {{ vocab.category(gap.slug, gap.name) }}
                     </span>
-                    <span class="block text-xs text-ink-muted">{{ gap.why }}</span>
+                    <span class="block text-xs text-ink-muted">{{ localise(gap.why) }}</span>
                   </span>
                   <BaseIcon name="chevron-right" :size="15" class="mt-0.5 shrink-0 text-ink-faint" />
                 </NuxtLinkLocale>

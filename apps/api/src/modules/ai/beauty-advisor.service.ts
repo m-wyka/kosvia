@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import type { RoutineStep } from '@prisma/client';
 import type { AiProductSuggestion, ProductSummaryDto } from '@kosvia/shared';
-import { BUDGET_CEILING, formatPrice } from '@kosvia/shared';
+import { BUDGET_CEILING } from '@kosvia/shared';
+import { toLocalisedReason } from '../../common/i18n/phrases';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RecommendationService, type RoutinePlan } from '../recommendation/recommendation.service';
 import { ProductsService } from '../products/products.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import type { ViewerContext } from '../profile/viewer-context.service';
-import type { AdvisorContext, RetrievedProduct } from './providers/ai-provider.interface';
+import type { AdvisorContext, AnswerLocale, RetrievedProduct } from './providers/ai-provider.interface';
 
 /**
  * BeautyAdvisorService — the retrieval half of the AI Beauty Shopper.
@@ -124,7 +125,7 @@ export class BeautyAdvisorService {
           role: 'already-owned',
           product: summary,
           matchScore: summary.personalMatch?.score ?? null,
-          reasons: ['Already on your shelf'],
+          reasons: [{ code: 'match:already-owned', text: 'Already on your shelf' }],
           warnings: [],
         });
       }
@@ -137,11 +138,11 @@ export class BeautyAdvisorService {
         if (!step.product) continue;
         retrieved.push({
           role: 'best-match',
-          label: step.label,
+          label: { code: 'routine-step-name', text: step.label, params: { step: step.step } },
           product: step.product,
           matchScore: step.product.personalMatch?.score ?? null,
           reasons: [step.reason],
-          warnings: step.product.personalMatch?.warnings.map((w) => w.label) ?? [],
+          warnings: step.product.personalMatch?.warnings.map(toLocalisedReason) ?? [],
         });
       }
       return { retrieved, routine: plan };
@@ -159,8 +160,8 @@ export class BeautyAdvisorService {
         role: index === 0 ? 'best-match' : 'alternative',
         product,
         matchScore: product.personalMatch?.score ?? null,
-        reasons: product.personalMatch?.reasons.slice(0, 3).map((r) => r.label) ?? [],
-        warnings: product.personalMatch?.warnings.slice(0, 2).map((w) => w.label) ?? [],
+        reasons: product.personalMatch?.reasons.slice(0, 3).map(toLocalisedReason) ?? [],
+        warnings: product.personalMatch?.warnings.slice(0, 2).map(toLocalisedReason) ?? [],
       });
     });
 
@@ -182,8 +183,8 @@ export class BeautyAdvisorService {
           role: 'cheaper',
           product,
           matchScore: product.personalMatch?.score ?? null,
-          reasons: product.personalMatch?.reasons.slice(0, 2).map((r) => r.label) ?? [],
-          warnings: product.personalMatch?.warnings.slice(0, 1).map((w) => w.label) ?? [],
+          reasons: product.personalMatch?.reasons.slice(0, 2).map(toLocalisedReason) ?? [],
+          warnings: product.personalMatch?.warnings.slice(0, 1).map(toLocalisedReason) ?? [],
         });
       }
     }
@@ -196,6 +197,7 @@ export class BeautyAdvisorService {
     question: string,
     viewer: ViewerContext,
     history: AdvisorContext['history'],
+    locale: AnswerLocale = 'en',
   ): Promise<{ context: AdvisorContext; retrieved: RetrievedProduct[]; intent: ParsedIntent }> {
     const intent = this.parseIntent(question, viewer);
     const { retrieved, routine } = await this.retrieve(intent, viewer);
@@ -215,9 +217,11 @@ export class BeautyAdvisorService {
       retrieved,
       context: {
         question,
+        locale,
         isRoutine: routine !== null,
         routineTotal: routine?.totalPrice ?? null,
         routineNotes: routine?.notes ?? [],
+        intent: { routineStep: intent.routineStep, maxPrice: intent.maxPrice },
         intentSummary: intent.summary,
         profileSummary: this.describeProfile(viewer),
         shelfSummary,
@@ -227,19 +231,24 @@ export class BeautyAdvisorService {
     };
   }
 
+  /**
+   * The cards rendered under the answer. `label` is left null for the ordinary
+   * roles — the interface already has its own wording for those — and set only
+   * when retrieval has something more specific to say, such as a routine step.
+   */
   toSuggestions(retrieved: RetrievedProduct[]): AiProductSuggestion[] {
-    const labels: Record<RetrievedProduct['role'], string> = {
-      'best-match': 'Best match',
-      cheaper: 'Cheaper option',
-      alternative: 'Also worth a look',
-      'already-owned': 'Already yours',
-    };
     return retrieved.map((entry) => ({
       role: entry.role,
-      label: entry.label ?? labels[entry.role],
+      label: entry.label ?? null,
       reason:
         entry.reasons[0] ??
-        (entry.product.lowestPrice ? `Available from ${formatPrice(entry.product.lowestPrice)}` : ''),
+        (entry.product.lowestPrice
+          ? {
+              code: 'ai-available-from',
+              text: `Available from ${entry.product.lowestPrice} PLN`,
+              params: { price: entry.product.lowestPrice },
+            }
+          : null),
       product: entry.product satisfies ProductSummaryDto,
     }));
   }

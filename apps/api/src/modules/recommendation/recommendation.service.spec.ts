@@ -99,16 +99,17 @@ describe('RecommendationService.buildRoutine', () => {
 
   it('says what is missing, in application order, and what it would cost to fix', async () => {
     const plan = await build(100);
-    const note = plan.notes.find((entry) => entry.startsWith('Missing from this plan'));
+    const note = plan.notes.find((entry) => entry.code === 'routine-missing');
 
     expect(note).toBeDefined();
-    expect(note).toContain('treatment serum');
-    expect(note).toMatch(/Raising the budget by about \d+ PLN/);
+    // The client renders from code + params; `text` stays the canonical English.
+    expect(note!.params?.steps).toContain('treatment serum');
+    expect(note!.text).toMatch(/Raising the budget by about \d+ PLN/);
   });
 
   it('offers the leftover as a next step when everything fit', async () => {
     const plan = await build(400);
-    expect(plan.notes.join(' ')).toMatch(/PLN left/);
+    expect(plan.notes.some((note) => note.code === 'routine-leftover')).toBe(true);
   });
 
   it('spends more of a larger budget rather than always buying the cheapest', async () => {
@@ -122,7 +123,8 @@ describe('RecommendationService.buildRoutine', () => {
     const serum = plan.steps.find((step) => step.step === 'SERUM')!;
 
     expect(serum.product).toBeNull();
-    expect(serum.reason).toMatch(/do not have a treatment serum/i);
+    expect(serum.reason.code).toBe('routine-step-absent');
+    expect(serum.reason.text).toMatch(/do not have a treatment serum/i);
     // The rest of the routine is still built.
     expect(plan.steps.filter((step) => step.product).length).toBe(3);
   });

@@ -1,4 +1,4 @@
-import type { IngredientScoreBreakdownDto } from '@kosvia/shared';
+import type { IngredientScoreBreakdownDto, LocalisedText } from '@kosvia/shared';
 import { clamp, positionWeight, type ScorableProductIngredient } from './types';
 
 /**
@@ -49,7 +49,9 @@ export function computeIngredientScore(
       activeCount: 0,
       supportiveCount: 0,
       potentialIrritantCount: 0,
-      notes: ['No ingredient list on file for this product yet.'],
+      notes: [
+        { code: 'ingredient-no-list', text: 'No ingredient list on file for this product yet.' },
+      ],
     };
   }
 
@@ -60,7 +62,7 @@ export function computeIngredientScore(
   let activeCount = 0;
   let supportiveCount = 0;
   let potentialIrritantCount = 0;
-  const notes: string[] = [];
+  const notes: LocalisedText[] = [];
 
   let fragranceHigh = false;
   let comedogenicHigh = false;
@@ -110,18 +112,34 @@ export function computeIngredientScore(
   const score = clamp(Math.round(50 + (benefit - penalty) * (4.6 / listWeight)), 0, 100);
 
   if (activeCount === 0) {
-    notes.push('No headline actives — this is a supporting-role product rather than a treatment.');
+    notes.push({
+      code: 'ingredient-no-actives',
+      text: 'No headline actives — this is a supporting-role product rather than a treatment.',
+    });
   } else if (activeCount >= 3) {
-    notes.push(`${activeCount} active ingredients, so introduce it alongside other treatments slowly.`);
+    notes.push({
+      code: 'ingredient-many-actives',
+      text: `${activeCount} active ingredients, so introduce it alongside other treatments slowly.`,
+      params: { count: activeCount },
+    });
   }
   if (fragranceHigh) {
-    notes.push('Fragrance appears high in the list, which is worth knowing if your skin reacts easily.');
+    notes.push({
+      code: 'ingredient-fragrance-high',
+      text: 'Fragrance appears high in the list, which is worth knowing if your skin reacts easily.',
+    });
   }
   if (comedogenicHigh) {
-    notes.push('Contains an ingredient often reported as congesting, high in the list.');
+    notes.push({
+      code: 'ingredient-comedogenic',
+      text: 'Contains an ingredient often reported as congesting, high in the list.',
+    });
   }
   if (supportiveCount >= 6) {
-    notes.push('A large share of the formula is hydrating, softening or barrier-supporting.');
+    notes.push({
+      code: 'ingredient-supportive',
+      text: 'A large share of the formula is hydrating, softening or barrier-supporting.',
+    });
   }
 
   return { score, activeCount, supportiveCount, potentialIrritantCount, notes };

@@ -19,6 +19,7 @@ const highlights = computed(() =>
 );
 
 const { t } = useI18n();
+const localise = useLocalisedText();
 
 const stats = computed(() => [
   {
@@ -70,11 +71,11 @@ const stats = computed(() => [
     <ul v-if="breakdown?.notes.length" class="mt-5 space-y-2">
       <li
         v-for="note in breakdown.notes"
-        :key="note"
+        :key="note.code"
         class="flex items-start gap-2 rounded-md bg-surface-muted px-3 py-2 text-xs leading-relaxed text-ink-soft"
       >
         <BaseIcon name="info" :size="14" class="mt-px shrink-0 text-ink-faint" />
-        <span>{{ note }}</span>
+        <span>{{ localise(note) }}</span>
       </li>
     </ul>
   </BaseCard>

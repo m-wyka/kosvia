@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class ChatDto {
@@ -9,4 +9,7 @@ export class ChatDto {
   message!: string;
 
   @IsOptional() @IsString() conversationId?: string;
+
+  /** Language the answer should be written in. Defaults to English. */
+  @IsOptional() @IsIn(['en', 'pl']) locale?: 'en' | 'pl';
 }

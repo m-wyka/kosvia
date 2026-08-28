@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { AlternativeGroupDto } from '@kosvia/shared';
 
-const props = defineProps<{ slug: string }>();
+const props = defineProps<{ slug: string; name: string }>();
 
 const { data, pending, error, refresh } = await useApiFetch<AlternativeGroupDto[]>(
   () => `/products/${props.slug}/alternatives`,
   { key: `alternatives-${props.slug}`, lazy: true, default: () => [] },
 );
 
+const localise = useLocalisedText();
 const active = ref<string | null>(null);
 watchEffect(() => {
   if (!active.value && data.value?.length) active.value = data.value[0]!.kind;
@@ -56,14 +57,23 @@ const current = computed(
         "
       />
 
-      <p v-if="current" class="mt-3 text-sm text-ink-muted">{{ current.description }}</p>
+      <!-- The API's own `title`/`description` stay English; the kind is what we
+           translate on, exactly as with the tab labels above. -->
+      <p v-if="current" class="mt-3 text-sm text-ink-muted">
+        {{
+          $t(
+            `PRODUCT.ALTERNATIVES.DESCRIPTION.${current.kind.replace(/-/g, '_').toUpperCase()}`,
+            { product: props.name },
+          )
+        }}
+      </p>
 
       <div v-if="current" class="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <ProductCard
           v-for="product in current.products"
           :key="product.id"
           :product="product"
-          :note="product.alternativeReason"
+          :note="localise(product.alternativeReason)"
           show-compare
         />
       </div>

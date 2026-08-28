@@ -188,8 +188,8 @@ the switcher fight the detector.
 apps/web/i18n/
 ├── i18n.config.ts       vue-i18n runtime options, incl. the Polish plural rule
 └── locales/
-    ├── en.json          941 keys
-    └── pl.json          941 keys, same shape
+    ├── en.json          986 keys
+    └── pl.json          986 keys, same shape
 ```
 
 Keys are `UPPER_SNAKE_CASE`, grouped by area:
@@ -230,9 +230,44 @@ reason shipped by the backend degrades to English rather than showing a raw key.
 `useFormat()` handles money and dates per locale: `59.99 PLN` in English,
 `59,99 zł` in Polish.
 
-**Not translated:** free-text catalogue content — product names, product
-descriptions, ingredient descriptions. That needs translated columns in the
-database, not a lookup table, and is listed under "Next steps".
+#### Whole sentences the API composes
+
+Some of what Kosvia says is not a label but a sentence the backend assembled:
+a routine observation, a comparison verdict, why an alternative is worth a look,
+a note about a formula. Those travel as `LocalisedText`:
+
+```ts
+{ code: 'routine-overlap-title', text: '2 products doing the same job', params: { count: 2 } }
+```
+
+`useLocalisedText()` renders it: the code becomes a key in `GENERATED` (or in
+`MATCH`, for a Personal Match reason forwarded verbatim under a `match:` prefix),
+identifier params like `category`, `step`, `concerns` and `goals` go through the
+vocabulary, money params through `useFormat`, and a `count` param selects the
+plural form. An unknown code falls back to `text`.
+
+#### The one place the server has to translate
+
+The offline AI provider composes a paragraph out of those same fragments, so by
+the time the answer reaches the browser there are no codes left to translate. It
+therefore renders them server-side, from a **copy** of the `MATCH`, `GENERATED`
+and `VOCAB` namespaces:
+
+```bash
+npm run sync:phrases -w @kosvia/api    # copies apps/web/i18n/locales/*.json
+```
+
+`apps/api/src/common/i18n/phrases.generated.ts` is generated, never edited, and
+`phrases.spec.ts` fails the build if it has drifted from the locale files — the
+strings still live in exactly one place. `/ai/chat` takes the locale in its body,
+`/ai/products/:slug/why` and `/explain` as a query param; the model-backed
+provider is simply told which language to answer in and reads the English
+`text` as prompt material.
+
+**Not translated:** free-text catalogue content — product names, descriptions,
+highlights, ingredient descriptions — and anything a user typed themselves
+(shelf notes, their own chat messages). Catalogue content needs translated
+columns in the database, not a lookup table, and is listed under "Next steps".
 
 ### Keeping the two files honest
 

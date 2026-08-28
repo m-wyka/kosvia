@@ -258,7 +258,7 @@ useBreadcrumbJsonLd(
           <IngredientList :ingredients="product.ingredients" />
         </section>
 
-        <ProductAlternatives :slug="product.slug" />
+        <ProductAlternatives :slug="product.slug" :name="product.name" />
       </div>
 
       <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">

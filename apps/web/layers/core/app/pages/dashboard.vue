@@ -9,6 +9,7 @@ const { data, pending, error, refresh } = await useApiFetch<DashboardDto>('/dash
 });
 
 const { t } = useI18n();
+const localise = useLocalisedText();
 
 const stats = computed(() => [
   { label: t('DASHBOARD.STAT_SHELF'), value: data.value?.shelfCount ?? 0, to: '/shelf', icon: 'shelf' as const },
@@ -94,7 +95,7 @@ useSeo(() => ({
         <ul class="mt-4 space-y-3">
           <li
             v-for="observation in observations"
-            :key="observation.title"
+            :key="observation.title.code"
             class="flex items-start gap-3 rounded-xl border border-line bg-surface p-4"
           >
             <span
@@ -104,8 +105,10 @@ useSeo(() => ({
               <BaseIcon :name="observation.severity === 'notice' ? 'alert' : 'info'" :size="16" />
             </span>
             <div class="min-w-0">
-              <p class="text-sm font-medium text-ink">{{ observation.title }}</p>
-              <p class="mt-0.5 text-sm leading-relaxed text-ink-muted">{{ observation.detail }}</p>
+              <p class="text-sm font-medium text-ink">{{ localise(observation.title) }}</p>
+              <p class="mt-0.5 text-sm leading-relaxed text-ink-muted">
+                {{ localise(observation.detail) }}
+              </p>
             </div>
           </li>
         </ul>

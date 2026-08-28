@@ -59,8 +59,13 @@ describe('ComparisonService', () => {
 
     expect(result.verdict).not.toBeNull();
     expect(result.verdict!.productId).toBe('b');
-    expect(result.verdict!.summary).toMatch(/^Kosvia recommends /);
     expect(result.verdict!.reasons.length).toBeGreaterThan(1);
+
+    // The client renders from the code; `text` stays the canonical English.
+    expect(result.verdict!.summary.code).toBe('verdict-summary');
+    expect(result.verdict!.summary.text).toMatch(/^Kosvia recommends /);
+    expect(result.verdict!.summary.params?.product).toBe('Brand b Product b');
+    expect(result.verdict!.reasons.every((reason) => reason.code.startsWith('verdict-'))).toBe(true);
   });
 
   it('records the comparison for signed-in users only', async () => {

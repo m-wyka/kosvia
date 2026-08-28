@@ -21,9 +21,12 @@ const { t } = useI18n();
 const format = useFormat();
 
 /**
- * The API sends an English `label` alongside the machine-readable `role`; we
- * translate the role and ignore the label, exactly as with match reasons.
+ * A suggestion carries a machine-readable `role` and, when retrieval has
+ * something more specific to say than the role's own wording — a routine step
+ * name — a translatable `label`. The label wins when it is there.
  */
+const localise = useLocalisedText();
+
 const roleLabel = (role: keyof typeof ROLE_TONE) =>
   t(`AI.ROLE.${role.replace(/-/g, '_').toUpperCase()}`);
 </script>
@@ -63,7 +66,7 @@ const roleLabel = (role: keyof typeof ROLE_TONE) =>
             />
             <span class="min-w-0 flex-1">
               <BaseBadge :tone="ROLE_TONE[suggestion.role]" size="xs">
-                {{ roleLabel(suggestion.role) }}
+                {{ suggestion.label ? localise(suggestion.label) : roleLabel(suggestion.role) }}
               </BaseBadge>
               <span class="mt-1.5 block truncate text-2xs tracking-wide text-ink-muted uppercase">
                 {{ suggestion.product.brand.name }}
@@ -72,7 +75,7 @@ const roleLabel = (role: keyof typeof ROLE_TONE) =>
                 {{ suggestion.product.name }}
               </span>
               <span v-if="suggestion.reason" class="mt-0.5 block truncate text-xs text-ink-muted">
-                {{ suggestion.reason }}
+                {{ localise(suggestion.reason) }}
               </span>
             </span>
             <span class="shrink-0 text-right">

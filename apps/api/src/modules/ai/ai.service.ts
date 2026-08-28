@@ -13,8 +13,9 @@ import { PersonalMatchService } from '../scoring/personal-match.service';
 import { IngredientScoreService } from '../scoring/ingredient-score.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
+import { toLocalisedReason } from '../../common/i18n/phrases';
 import { BeautyAdvisorService } from './beauty-advisor.service';
-import { AI_PROVIDER, type AIProvider } from './providers/ai-provider.interface';
+import { AI_PROVIDER, type AIProvider, type AnswerLocale } from './providers/ai-provider.interface';
 
 @Injectable()
 export class AIService {
@@ -28,7 +29,12 @@ export class AIService {
     private readonly ingredientScore: IngredientScoreService,
   ) {}
 
-  async chat(userId: string, message: string, conversationId?: string): Promise<AiChatResponse> {
+  async chat(
+    userId: string,
+    message: string,
+    conversationId?: string,
+    locale: AnswerLocale = 'en',
+  ): Promise<AiChatResponse> {
     const viewer = await this.viewers.load(userId);
     const conversation = await this.resolveConversation(userId, conversationId, message);
 
@@ -41,7 +47,7 @@ export class AIService {
       data: { conversationId: conversation.id, role: 'USER', content: message },
     });
 
-    const { context, retrieved } = await this.advisor.buildContext(message, viewer, history);
+    const { context, retrieved } = await this.advisor.buildContext(message, viewer, history, locale);
     const answer = await this.provider.generateResponse(context);
     const suggestions = this.advisor.toSuggestions(retrieved);
 
@@ -108,13 +114,14 @@ export class AIService {
   }
 
   /** Natural-language read of a formula, for the product page. */
-  async explainProduct(slug: string): Promise<{ explanation: string }> {
+  async explainProduct(slug: string, locale: AnswerLocale = 'en'): Promise<{ explanation: string }> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
     if (!row) throw new NotFoundException('We could not find that product.');
 
     const scorable = toScorable(row);
     const breakdown = this.ingredientScore.compute(scorable.ingredients);
     const explanation = await this.provider.analyzeProduct({
+      locale,
       product: toProductSummary(row),
       ingredientScore: breakdown.score,
       notes: breakdown.notes,
@@ -135,7 +142,11 @@ export class AIService {
   }
 
   /** The "Why?" behind a Personal Match score, in plain language. */
-  async explainMatch(userId: string | null, slug: string): Promise<{ explanation: string }> {
+  async explainMatch(
+    userId: string | null,
+    slug: string,
+    locale: AnswerLocale = 'en',
+  ): Promise<{ explanation: string }> {
     const viewer = await this.viewers.load(userId);
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
     if (!row) throw new NotFoundException('We could not find that product.');
@@ -147,10 +158,11 @@ export class AIService {
     });
 
     const explanation = await this.provider.explainRecommendation({
+      locale,
       product: toProductSummary(row, score),
       score: score.score,
-      reasons: score.reasons.map((r) => r.label),
-      warnings: score.warnings.map((w) => w.label),
+      reasons: score.reasons.map(toLocalisedReason),
+      warnings: score.warnings.map(toLocalisedReason),
       profileSummary: viewer.profile
         ? `${viewer.profile.skinType.toLowerCase()} skin, ${viewer.profile.sensitivity.toLowerCase()} sensitivity`
         : null,

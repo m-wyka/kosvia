@@ -6,6 +6,7 @@ import { resetTestGlobals, setTestLocale } from '../setup';
 declare const useVocabulary: typeof import('../../layers/core/app/composables/useVocabulary').useVocabulary;
 declare const useMatchReason: typeof import('../../layers/core/app/composables/useMatchReason').useMatchReason;
 declare const useFormat: typeof import('../../layers/core/app/composables/useFormat').useFormat;
+declare const useLocalisedText: typeof import('../../layers/core/app/composables/useLocalisedText').useLocalisedText;
 
 const flatten = (node: Record<string, unknown>, prefix = ''): string[] =>
   Object.entries(node).flatMap(([key, value]) =>
@@ -64,6 +65,9 @@ describe('locale files', () => {
       'ADMIN.USERS.COL_PLAN',
       'ADMIN.USERS.PLAN.PREMIUM',
       'SEO.ADMIN.TITLE',
+      // Nothing but the interpolated routine step, which the vocabulary
+      // translates on its own.
+      'GENERATED.ROUTINE_STEP_NAME',
     ]);
 
     const read = (source: unknown, key: string) =>
@@ -74,6 +78,42 @@ describe('locale files', () => {
     );
 
     expect(unexpected).toEqual([]);
+  });
+});
+
+describe('sentences the API generated', () => {
+  beforeEach(() => resetTestGlobals());
+
+  it('translates a forwarded match reason, vocabulary params and all', () => {
+    setTestLocale('pl');
+    const localise = useLocalisedText();
+
+    expect(
+      localise({
+        code: 'match:goals',
+        text: 'Works towards hydration',
+        params: { goals: ['hydration'] },
+      }),
+    ).toBe('Wspiera cele: nawilżenie');
+  });
+
+  it('translates its own namespace, formats money and picks a Polish plural', () => {
+    setTestLocale('pl');
+    const localise = useLocalisedText();
+
+    expect(localise({ code: 'ai-available-from', text: '', params: { price: 24 } })).toBe(
+      'Dostępny od 24,00 zł',
+    );
+    expect(
+      localise({ code: 'ingredient-many-actives', text: '', params: { count: 5 } }),
+    ).toMatch(/^5 składników aktywnych/);
+  });
+
+  it('falls back to the API text for a code it does not know', () => {
+    setTestLocale('pl');
+    expect(useLocalisedText()({ code: 'something-new', text: 'Straight from the API.' })).toBe(
+      'Straight from the API.',
+    );
   });
 });
 

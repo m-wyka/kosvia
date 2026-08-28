@@ -52,7 +52,11 @@ describe('AlternativeProductService', () => {
     );
     const groups = await service.forProduct('subject', ANON);
     const cheaper = groups.find((group) => group.kind === 'cheaper');
-    expect(cheaper!.products[0].alternativeReason).toContain('50%');
+    const reason = cheaper!.products[0]!.alternativeReason;
+
+    expect(reason.code).toBe('alt-cheaper');
+    expect(reason.params?.percent).toBe(50);
+    expect(reason.text).toContain('50%');
   });
 
   it('never suggests the product being viewed', async () => {
