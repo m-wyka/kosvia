@@ -330,6 +330,11 @@ const id = useId();
   color: var(--color-ink-soft);
   transition: background-color var(--duration-fast);
 }
+/* Rows carry a filled background, so two adjacent selected ones merge into a
+   single blob without a gap between them. */
+.kosvia-select .multiselect__element + .multiselect__element {
+  margin-top: 0.25rem;
+}
 .kosvia-select .multiselect__option--highlight {
   background: var(--color-surface-muted);
   color: var(--color-ink);
