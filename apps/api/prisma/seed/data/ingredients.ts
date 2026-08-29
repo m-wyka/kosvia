@@ -1387,3 +1387,23 @@ export const INGREDIENTS: IngredientSeed[] = [
     sensitivityImpact: 0,
   },
 ];
+
+export interface IngredientAliasSeed {
+  inci: string;
+  alias: string;
+  kind: 'SYNONYM' | 'TRANSLATION' | 'TYPO' | 'TRADE_NAME' | 'CI_NUMBER';
+}
+
+/** Label spellings the INCI matcher should resolve without going to the queue. */
+export const INGREDIENT_ALIASES: IngredientAliasSeed[] = [
+  { inci: 'Aqua', alias: 'Water', kind: 'SYNONYM' },
+  { inci: 'Aqua', alias: 'Eau', kind: 'TRANSLATION' },
+  { inci: 'Aqua', alias: 'Woda', kind: 'TRANSLATION' },
+  { inci: 'Parfum', alias: 'Fragrance', kind: 'SYNONYM' },
+  { inci: 'Parfum', alias: 'Aroma', kind: 'SYNONYM' },
+  { inci: 'Glycerin', alias: 'Glycerine', kind: 'SYNONYM' },
+  { inci: 'Glycerin', alias: 'Glicerin', kind: 'TYPO' },
+  { inci: 'Niacinamide', alias: 'Nicotinamide', kind: 'SYNONYM' },
+  { inci: 'Sodium Hyaluronate', alias: 'Hyaluronic Acid Sodium Salt', kind: 'SYNONYM' },
+  { inci: 'Titanium Dioxide', alias: 'CI 77891', kind: 'CI_NUMBER' },
+];

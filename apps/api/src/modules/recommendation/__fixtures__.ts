@@ -98,6 +98,7 @@ export function row(options: RowOptions): ProductRow {
       ingredient: {
         id: ingredientId,
         inciName: ingredientId,
+        normalizedName: ingredientId,
         slug: ingredientId,
         commonName: null,
         description: null,

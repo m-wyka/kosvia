@@ -13,7 +13,15 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Availability, RoutineStep, SkinType, SubscriptionStatus, UserRole } from '@prisma/client';
+import {
+  AliasKind,
+  Availability,
+  RoutineStep,
+  SkinType,
+  SubscriptionStatus,
+  TokenStatus,
+  UserRole,
+} from '@prisma/client';
 
 export class AdminListQueryDto {
   @IsOptional() @IsString() @MaxLength(120) q?: string;
@@ -85,6 +93,21 @@ export class UpsertProductDto {
   @ValidateNested({ each: true })
   @Type(() => ProductIngredientInputDto)
   ingredients?: ProductIngredientInputDto[];
+}
+
+export class ImportLabelDto {
+  @IsString() @MaxLength(10_000) rawLabel!: string;
+}
+
+export class UnmatchedTokenQueryDto {
+  @IsOptional() @IsEnum(TokenStatus) status?: TokenStatus;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) page?: number;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100) pageSize?: number;
+}
+
+export class MapTokenDto {
+  @IsString() ingredientId!: string;
+  @IsOptional() @IsEnum(AliasKind) kind?: AliasKind;
 }
 
 export class UpsertStoreDto {

@@ -3,6 +3,7 @@ import {
   SKIN_TYPES,
   type BrandDto,
   type CategoryDto,
+  type LabelImportResultDto,
   type ProductDto,
   type SkinType,
 } from '@kosvia/shared';
@@ -72,6 +73,23 @@ const modalOpen = ref(false);
 const editing = ref<ProductRow | null>(null);
 const loadingDetail = ref(false);
 const form = reactive({ ...EMPTY_FORM });
+const labelText = ref('');
+const importingLabel = ref(false);
+const labelResult = ref<LabelImportResultDto | null>(null);
+const toast = useToast();
+const apiMessage = useApiMessage();
+
+const labelResultSummary = computed(() => {
+  const result = labelResult.value;
+  if (!result) {
+    return '';
+  }
+  return t('ADMIN.PRODUCTS.LABEL_RESULT', {
+    matched: result.matched,
+    total: result.total,
+    ratio: Math.round(result.recognizedRatio * 100),
+  });
+});
 
 const collectLeafCategories = (
   nodes: CategoryDto[],
@@ -123,8 +141,10 @@ const openEdit = async (row: ProductRow) => {
   editing.value = row;
   modalOpen.value = true;
   loadingDetail.value = true;
+  labelResult.value = null;
   try {
     const detail = await api<ProductDto & { isActive: boolean }>(`/admin/products/${row.id}`);
+    labelText.value = detail.ingredients.map((entry) => entry.ingredient.inciName).join(', ');
     Object.assign(form, {
       name: detail.name,
       slug: detail.slug,
@@ -175,6 +195,26 @@ const save = async () => {
     : await create(body, t('ADMIN.PRODUCTS.CREATED'));
   if (result) {
     modalOpen.value = false;
+  }
+};
+
+const importLabel = async () => {
+  const product = editing.value;
+  if (!product || !labelText.value.trim()) {
+    return;
+  }
+  importingLabel.value = true;
+  try {
+    labelResult.value = await api<LabelImportResultDto>(
+      `/admin/products/${product.id}/ingredients/label`,
+      { method: 'PUT', body: { rawLabel: labelText.value } },
+    );
+    toast.success(t('ADMIN.PRODUCTS.LABEL_IMPORTED'));
+    await refresh();
+  } catch (caught) {
+    toast.error(apiMessage(caught));
+  } finally {
+    importingLabel.value = false;
   }
 };
 
@@ -384,7 +424,36 @@ useSeo(() => ({
           <BaseSwitch v-model="form.isActive" :label="$t('ADMIN.PRODUCTS.VISIBLE')" />
         </div>
 
-        <p class="rounded-lg bg-info-soft px-3.5 py-2.5 text-xs leading-relaxed text-info">
+        <div v-if="editing" class="space-y-3 rounded-lg border border-line p-4">
+          <BaseTextarea
+            v-model="labelText"
+            :label="$t('ADMIN.PRODUCTS.LABEL_TITLE')"
+            :hint="$t('ADMIN.PRODUCTS.LABEL_HINT')"
+            :placeholder="$t('ADMIN.PRODUCTS.LABEL_PLACEHOLDER')"
+            :rows="4"
+          />
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span v-if="labelResult" class="text-xs text-ink-muted">
+              {{ labelResultSummary }}
+            </span>
+            <BaseButton
+              size="sm"
+              variant="secondary"
+              :loading="importingLabel"
+              :disabled="!labelText.trim()"
+              @click="importLabel"
+            >
+              {{ $t('ADMIN.PRODUCTS.LABEL_IMPORT') }}
+            </BaseButton>
+          </div>
+          <p
+            v-if="labelResult?.unmatched.length"
+            class="rounded-lg bg-warning-soft px-3.5 py-2.5 text-xs leading-relaxed text-warning"
+          >
+            {{ $t('ADMIN.PRODUCTS.LABEL_UNMATCHED', { tokens: labelResult.unmatched.join(', ') }) }}
+          </p>
+        </div>
+        <p v-else class="rounded-lg bg-info-soft px-3.5 py-2.5 text-xs leading-relaxed text-info">
           {{ $t('ADMIN.PRODUCTS.INGREDIENT_NOTE') }}
         </p>
       </div>

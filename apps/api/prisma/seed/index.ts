@@ -12,8 +12,9 @@ import { PrismaClient, Prisma, type SkinType } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { computeIngredientScore } from '../../src/modules/scoring/ingredient-score';
 import type { ScorableProductIngredient } from '../../src/modules/scoring/types';
+import { normalizeToken } from '../../src/modules/inci/inci-parser';
 import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
-import { INGREDIENTS } from './data/ingredients';
+import { INGREDIENTS, INGREDIENT_ALIASES } from './data/ingredients';
 import { FORMULAS } from './data/formulas';
 
 const prisma = new PrismaClient();
@@ -97,8 +98,11 @@ async function reset(): Promise<void> {
   await prisma.userShelfItem.deleteMany();
   await prisma.priceHistory.deleteMany();
   await prisma.productOffer.deleteMany();
+  await prisma.productSubmission.deleteMany();
+  await prisma.unmatchedToken.deleteMany();
   await prisma.productIngredient.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.ingredientAlias.deleteMany();
   await prisma.ingredient.deleteMany();
   await prisma.store.deleteMany();
   await prisma.category.deleteMany();
@@ -186,6 +190,7 @@ async function main(): Promise<void> {
     await prisma.ingredient.create({
       data: {
         inciName: ingredient.inci,
+        normalizedName: normalizeToken(ingredient.inci),
         slug,
         commonName: ingredient.common ?? null,
         description: ingredient.description,
@@ -217,6 +222,21 @@ async function main(): Promise<void> {
     include: { targetsConcerns: true, supportsGoals: true },
   });
   const ingredientByInci = new Map(ingredients.map((i) => [i.inciName, i]));
+
+  console.log('› Ingredient aliases');
+  for (const alias of INGREDIENT_ALIASES) {
+    const ingredient = ingredientByInci.get(alias.inci);
+    if (!ingredient)
+      throw new Error(`Alias "${alias.alias}" points at unknown INCI "${alias.inci}"`);
+    await prisma.ingredientAlias.create({
+      data: {
+        ingredientId: ingredient.id,
+        alias: normalizeToken(alias.alias),
+        aliasRaw: alias.alias,
+        kind: alias.kind,
+      },
+    });
+  }
 
   /* ------------------------------------------------------------ products -- */
 

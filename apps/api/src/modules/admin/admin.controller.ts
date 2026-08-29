@@ -21,8 +21,13 @@ import {
   type AuthenticatedUser,
 } from '../../common/decorators/current-user.decorator';
 import { AdminService } from './admin.service';
+import { InciImportService } from '../inci/inci-import.service';
+import { UnmatchedTokenService } from '../inci/unmatched-token.service';
 import {
   AdminListQueryDto,
+  ImportLabelDto,
+  MapTokenDto,
+  UnmatchedTokenQueryDto,
   UpdateUserDto,
   UpsertBrandDto,
   UpsertCategoryDto,
@@ -38,7 +43,11 @@ import {
 @UseGuards(RolesGuard)
 @Roles('ADMIN')
 export class AdminController {
-  constructor(private readonly admin: AdminService) {}
+  constructor(
+    private readonly admin: AdminService,
+    private readonly inciImport: InciImportService,
+    private readonly unmatchedTokens: UnmatchedTokenService,
+  ) {}
 
   @Get('stats')
   @ApiOperation({ summary: 'Catalogue and usage counters' })
@@ -95,6 +104,30 @@ export class AdminController {
     return this.admin.deleteIngredient(id);
   }
 
+  /* ---------------------------------------------------------- INCI queue -- */
+  @Get('inci/queue')
+  @ApiOperation({ summary: 'Label tokens that did not match the dictionary, most frequent first' })
+  listUnmatchedTokens(@Query() query: UnmatchedTokenQueryDto) {
+    return this.unmatchedTokens.list(query);
+  }
+  @Post('inci/queue/:id/map')
+  @ApiOperation({ summary: 'Record the token as an alias and re-match every product using it' })
+  mapUnmatchedToken(@Param('id') id: string, @Body() dto: MapTokenDto) {
+    return this.unmatchedTokens.mapToIngredient(id, dto.ingredientId, dto.kind ?? 'SYNONYM');
+  }
+  @Post('inci/queue/:id/new-ingredient')
+  @ApiOperation({ summary: 'Create a dictionary entry from the token and re-match products' })
+  async createIngredientFromToken(@Param('id') id: string, @Body() dto: UpsertIngredientDto) {
+    const ingredient = await this.admin.createIngredient(dto);
+    return this.unmatchedTokens.mapToIngredient(id, ingredient.id, 'SYNONYM', 'NEW_INGREDIENT');
+  }
+  @Post('inci/queue/:id/ignore') ignoreUnmatchedToken(@Param('id') id: string) {
+    return this.unmatchedTokens.ignore(id);
+  }
+  @Post('inci/queue/:id/reopen') reopenUnmatchedToken(@Param('id') id: string) {
+    return this.unmatchedTokens.reopen(id);
+  }
+
   /* ------------------------------------------------------------ products -- */
   @Get('products') listProducts(@Query() query: AdminListQueryDto) {
     return this.admin.listProducts(query);
@@ -104,6 +137,11 @@ export class AdminController {
   }
   @Post('products') createProduct(@Body() dto: UpsertProductDto) {
     return this.admin.createProduct(dto);
+  }
+  @Put('products/:id/ingredients/label')
+  @ApiOperation({ summary: 'Replace the ingredient list by parsing label text' })
+  importProductLabel(@Param('id') id: string, @Body() dto: ImportLabelDto) {
+    return this.inciImport.applyLabel(id, dto.rawLabel);
   }
   @Put('products/:id') updateProduct(@Param('id') id: string, @Body() dto: UpsertProductDto) {
     return this.admin.updateProduct(id, dto);

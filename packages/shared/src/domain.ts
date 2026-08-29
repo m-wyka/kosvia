@@ -34,6 +34,12 @@ export type Availability = (typeof AVAILABILITY_STATES)[number];
 export const MESSAGE_ROLES = ['USER', 'ASSISTANT'] as const;
 export type MessageRole = (typeof MESSAGE_ROLES)[number];
 
+export const ALIAS_KINDS = ['SYNONYM', 'TRANSLATION', 'TYPO', 'TRADE_NAME', 'CI_NUMBER'] as const;
+export type AliasKind = (typeof ALIAS_KINDS)[number];
+
+export const TOKEN_STATUSES = ['PENDING', 'MAPPED', 'NEW_INGREDIENT', 'IGNORED'] as const;
+export type TokenStatus = (typeof TOKEN_STATUSES)[number];
+
 /** Ingredient functional tags — drives the grouped ingredient UI. */
 export const INGREDIENT_TAGS = [
   'humectant',

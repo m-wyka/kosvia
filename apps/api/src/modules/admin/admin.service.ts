@@ -5,6 +5,7 @@ import type { AdminStatsDto, PaginatedResult } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { computeIngredientScore } from '../scoring/ingredient-score';
 import { PRODUCT_INCLUDE } from '../products/product.select';
+import { normalizeToken } from '../inci/inci-parser';
 import { toScorable } from '../products/product.mapper';
 import type {
   AdminListQueryDto,
@@ -175,6 +176,7 @@ export class AdminService {
     return this.prisma.ingredient.create({
       data: {
         inciName: dto.inciName,
+        normalizedName: normalizeToken(dto.inciName),
         slug: slugify(dto.inciName),
         commonName: dto.commonName ?? null,
         description: dto.description ?? null,
@@ -197,6 +199,7 @@ export class AdminService {
       where: { id },
       data: {
         inciName: dto.inciName,
+        normalizedName: normalizeToken(dto.inciName),
         commonName: dto.commonName ?? null,
         description: dto.description ?? null,
         concerns: dto.concerns ?? null,

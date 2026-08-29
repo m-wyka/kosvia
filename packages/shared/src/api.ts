@@ -7,6 +7,7 @@ import type {
   SensitivityLevel,
   SkinType,
   SubscriptionStatus,
+  TokenStatus,
   UserRole,
 } from './domain.js';
 
@@ -457,4 +458,34 @@ export interface AdminStatsDto {
   offers: number;
   shelfItems: number;
   conversations: number;
+}
+
+/** Outcome of importing a product's ingredient list from label text. */
+export interface LabelImportResultDto {
+  total: number;
+  matched: number;
+  /** Label tokens (as printed) that did not resolve to the dictionary. */
+  unmatched: string[];
+  /** Position-weighted share of tokens matched with confidence ≥ 0.9. */
+  recognizedRatio: number;
+  hasMayContainSection: boolean;
+}
+
+/** A label token the matcher could not resolve, aggregated across products. */
+export interface UnmatchedTokenDto {
+  id: string;
+  normalized: string;
+  rawSamples: string[];
+  occurrenceCount: number;
+  suggestedIngredient: { id: string; inciName: string } | null;
+  suggestedScore: number | null;
+  status: TokenStatus;
+  resolvedAt: string | null;
+  createdAt: string;
+}
+
+export interface TokenResolutionDto {
+  token: UnmatchedTokenDto;
+  rematchedRows: number;
+  affectedProducts: number;
 }

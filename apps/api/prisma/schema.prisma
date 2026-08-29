@@ -111,6 +111,7 @@ model User {
   conversations AIConversation[]
   comparisons   ProductComparison[]
   refreshTokens RefreshToken[]
+  submissions   ProductSubmission[]
 
   @@index([role])
   @@map("users")
@@ -258,6 +259,7 @@ model Product {
   ingredients ProductIngredient[]
   offers      ProductOffer[]
   priceHistory PriceHistory[]
+  submissions ProductSubmission[]
   shelfItems  UserShelfItem[]
   priceAlerts PriceAlert[]
 
@@ -273,6 +275,8 @@ model Product {
 model Ingredient {
   id                String     @id @default(cuid())
   inciName          String     @unique
+  /// Lowercase, ASCII-folded `inciName` — the key the INCI matcher looks up.
+  normalizedName    String
   slug              String     @unique
   commonName        String?
   description       String?
@@ -290,11 +294,13 @@ model Ingredient {
 
   products        ProductIngredient[]
   aliases         IngredientAlias[]
+  suggestedFor    UnmatchedToken[]
   targetsConcerns BeautyConcern[]     @relation("IngredientTargetsConcerns")
   supportsGoals   BeautyGoal[]        @relation("IngredientSupportsGoals")
   excludedByProfiles BeautyProfile[]  @relation("ProfileExcludedIngredients")
 
   @@index([inciName])
+  @@index([normalizedName])
   @@map("ingredients")
 }
 
@@ -341,6 +347,63 @@ enum AliasKind {
   TYPO
   TRADE_NAME
   CI_NUMBER
+}
+
+/// Label tokens the matcher could not resolve, aggregated across products so
+/// the admin queue can fix the most frequent ones first.
+model UnmatchedToken {
+  id                    String      @id @default(cuid())
+  normalized            String      @unique
+  rawSamples            String[]    @default([])
+  occurrenceCount       Int         @default(1)
+  suggestedIngredientId String?
+  suggestedScore        Float?
+  status                TokenStatus @default(PENDING)
+  resolvedAt            DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  suggestedIngredient Ingredient? @relation(fields: [suggestedIngredientId], references: [id], onDelete: SetNull)
+
+  @@index([status, occurrenceCount])
+  @@map("unmatched_tokens")
+}
+
+enum TokenStatus {
+  PENDING
+  MAPPED
+  NEW_INGREDIENT
+  IGNORED
+}
+
+/// A user-submitted label (photo and/or text) waiting for review. Nothing
+/// here reaches the catalogue without going through the admin queue.
+model ProductSubmission {
+  id            String           @id @default(cuid())
+  userId        String?
+  productId     String?
+  ean           String?
+  imageUrl      String?
+  rawLabel      String?
+  extractedText String?
+  status        SubmissionStatus @default(PENDING)
+  reviewNote    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([ean])
+  @@map("product_submissions")
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 /* -------------------------------------------------------------------------- */
