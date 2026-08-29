@@ -51,7 +51,7 @@ useSeo(() => ({
 </script>
 
 <template>
-  <div v-if="ingredient" class="container-page max-w-4xl py-8 sm:py-12">
+  <div v-if="ingredient" class="container-page py-8 sm:py-12">
     <nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-xs text-ink-muted">
       <NuxtLinkLocale to="/" class="hover:text-ink">{{ $t('NAV.HOME') }}</NuxtLinkLocale>
       <BaseIcon name="chevron-right" :size="12" />

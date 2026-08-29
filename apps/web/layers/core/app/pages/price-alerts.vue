@@ -59,7 +59,7 @@ useSeo(() => ({
 </script>
 
 <template>
-  <div class="container-page max-w-4xl py-8 sm:py-12">
+  <div class="container-page py-8 sm:py-12">
     <header class="mb-8">
       <h1 class="font-display text-3xl text-ink sm:text-4xl">{{ $t('ALERTS.TITLE') }}</h1>
       <p class="mt-2 text-sm text-ink-muted">{{ $t('ALERTS.SUBTITLE') }}</p>

@@ -10,14 +10,12 @@ const format = useFormat();
   <section class="relative overflow-hidden">
     <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
       <div
-        class="absolute -top-32 -left-24 size-[34rem] rounded-full bg-blush-soft blur-3xl opacity-70"
+        class="absolute -top-32 -left-24 size-136 rounded-full bg-blush-soft blur-3xl opacity-70"
       />
       <div
-        class="absolute -top-16 right-0 size-[28rem] rounded-full bg-lavender-soft blur-3xl opacity-60"
+        class="absolute -top-16 right-0 size-112 rounded-full bg-lavender-soft blur-3xl opacity-60"
       />
-      <div
-        class="absolute top-64 left-1/3 size-[24rem] rounded-full bg-sage-soft blur-3xl opacity-50"
-      />
+      <div class="absolute top-64 left-1/3 size-96 rounded-full bg-sage-soft blur-3xl opacity-50" />
     </div>
 
     <div

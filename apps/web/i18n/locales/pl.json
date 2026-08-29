@@ -1126,7 +1126,7 @@
       "TITLE": "Importy",
       "SUBTITLE": "Każdy import wsadowy, najnowsze na górze. Uruchomienia są idempotentne i wznawialne — patrz docs/spec/01.",
       "EMPTY": "Żaden import jeszcze nie działał",
-      "HOW_TO": "Uruchom z workspace API: npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]",
+      "HOW_TO": "Uruchom z workspace API: npm run import:obf -w {'@'}kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]",
       "COL_SOURCE": "Źródło",
       "COL_STATUS": "Status",
       "COL_PARAMS": "Parametry",

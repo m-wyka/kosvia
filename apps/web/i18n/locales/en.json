@@ -1029,7 +1029,7 @@
       "TITLE": "Imports",
       "SUBTITLE": "Every batch import, newest first. Runs are idempotent and resumable — see docs/spec/01.",
       "EMPTY": "No imports have run yet",
-      "HOW_TO": "Run from the API workspace: npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]",
+      "HOW_TO": "Run from the API workspace: npm run import:obf -w {'@'}kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]",
       "COL_SOURCE": "Source",
       "COL_STATUS": "Status",
       "COL_PARAMS": "Parameters",
