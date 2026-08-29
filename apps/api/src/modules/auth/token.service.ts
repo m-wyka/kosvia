@@ -58,11 +58,22 @@ export class TokenService {
   }
 
   /** Returns the owning user id and rotates the token, or null if it is not usable. */
+  /**
+   * Rotation with reuse detection: a refresh token is single-use, so seeing an
+   * already-revoked one means either the user or an attacker holds a stale
+   * copy. We cannot tell which, so every session of that user is revoked and
+   * both parties have to sign in again.
+   */
   async consumeRefreshToken(raw: string): Promise<string | null> {
     const record = await this.prisma.refreshToken.findUnique({
       where: { tokenHash: this.hash(raw) },
     });
-    if (!record || record.revokedAt || record.expiresAt < new Date()) return null;
+    if (!record) return null;
+    if (record.revokedAt) {
+      await this.revokeAllForUser(record.userId);
+      return null;
+    }
+    if (record.expiresAt < new Date()) return null;
 
     await this.prisma.refreshToken.update({
       where: { id: record.id },

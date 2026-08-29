@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 
 const DEFAULT_API_URL = 'http://localhost:3001';
+const API_PROXY_BASE = '/api';
 const DEFAULT_SITE_URL = 'http://localhost:3000';
 
 export default defineNuxtConfig({
@@ -50,7 +51,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     apiInternalUrl: process.env.API_INTERNAL_URL || process.env.API_URL || DEFAULT_API_URL,
     public: {
-      apiBase: process.env.API_URL || DEFAULT_API_URL,
+      // The browser goes through the same-origin Nitro proxy (server/routes/api).
+      apiBase: API_PROXY_BASE,
       siteUrl: process.env.FRONTEND_URL || DEFAULT_SITE_URL,
       siteName: 'Kosvia',
     },
@@ -58,7 +60,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      htmlAttrs: { lang: 'en' },
+      htmlAttrs: { lang: 'pl' },
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },

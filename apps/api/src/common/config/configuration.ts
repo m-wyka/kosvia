@@ -51,7 +51,7 @@ export default (): AppConfig => {
       refreshTtl: process.env.JWT_REFRESH_TTL ?? '30d',
     },
     cookie: {
-      domain: process.env.COOKIE_DOMAIN ?? 'localhost',
+      domain: process.env.COOKIE_DOMAIN ?? '',
       secure: process.env.COOKIE_SECURE === 'true',
     },
     ai: {

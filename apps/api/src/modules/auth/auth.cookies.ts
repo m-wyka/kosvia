@@ -4,7 +4,8 @@ export const ACCESS_TOKEN_COOKIE = 'kosvia_at';
 export const REFRESH_TOKEN_COOKIE = 'kosvia_rt';
 
 export interface CookieSettings {
-  domain: string;
+  /** Only set when the API is deliberately served from a sibling host; empty behind the Nitro proxy. */
+  domain?: string;
   secure: boolean;
 }
 
@@ -19,17 +20,25 @@ export interface CookieSettings {
  * session and bounces to the login page instead. Since the token is HttpOnly
  * and SameSite-restricted either way, the broader scope costs little and makes
  * SSR sessions actually work.
+ *
+ * SameSite is always Lax: the browser reaches the API through the same-origin
+ * Nitro proxy, so the cookies are first-party in every environment. `None`
+ * would only be needed for a cross-site API host — and it is exactly the
+ * setting browsers keep tightening.
  */
 function baseOptions(settings: CookieSettings, maxAge: number): CookieOptions {
   return {
     httpOnly: true,
     secure: settings.secure,
-    sameSite: settings.secure ? 'none' : 'lax',
-    domain: settings.domain === 'localhost' ? undefined : settings.domain,
+    sameSite: 'lax',
+    domain: cookieDomain(settings),
     maxAge,
     path: '/',
   };
 }
+
+const cookieDomain = (settings: CookieSettings): string | undefined =>
+  settings.domain && settings.domain !== 'localhost' ? settings.domain : undefined;
 
 export function setAuthCookies(
   res: Response,
@@ -53,7 +62,8 @@ export function clearAuthCookies(res: Response, settings: CookieSettings): void 
   const common = {
     httpOnly: true,
     secure: settings.secure,
-    sameSite: settings.secure ? 'none' : 'lax',
+    sameSite: 'lax',
+    domain: cookieDomain(settings),
   } as const;
   res.clearCookie(ACCESS_TOKEN_COOKIE, { ...common, path: '/' });
   res.clearCookie(REFRESH_TOKEN_COOKIE, { ...common, path: '/' });

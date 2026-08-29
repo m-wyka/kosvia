@@ -97,7 +97,7 @@ export class AuthController {
 
   private get cookieSettings(): CookieSettings {
     return {
-      domain: this.config.get<string>('cookie.domain', 'localhost'),
+      domain: this.config.get<string>('cookie.domain', ''),
       secure: this.config.get<boolean>('cookie.secure', false),
     };
   }

@@ -100,18 +100,18 @@ One file at the repository root: `.env` (copied from `.env.example` on install).
 `npm run env` redistributes it to `apps/api/.env` and `apps/web/.env` — the web
 app receives only the URL variables, never database credentials or JWT secrets.
 
-| Variable                                    | Purpose                                                 |
-| ------------------------------------------- | ------------------------------------------------------- |
-| `DATABASE_URL`                              | PostgreSQL connection string                            |
-| `JWT_SECRET`, `JWT_REFRESH_SECRET`          | Token signing. **Required in production** — no fallback |
-| `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`         | `15m` / `30d` by default                                |
-| `COOKIE_DOMAIN`, `COOKIE_SECURE`            | Set `COOKIE_SECURE=true` behind HTTPS                   |
-| `API_PORT`, `API_URL`                       | Where the API listens, and where the browser reaches it |
-| `API_INTERNAL_URL`                          | Where the Nuxt server reaches the API during SSR        |
-| `FRONTEND_URL`                              | Drives CORS and canonical URLs                          |
-| `AI_PROVIDER`                               | `mock` (default, offline) or `anthropic`                |
-| `AI_API_KEY`, `AI_MODEL`                    | Only needed when `AI_PROVIDER=anthropic`                |
-| `SEED_USER_PASSWORD`, `SEED_ADMIN_PASSWORD` | Demo account passwords, seed only                       |
+| Variable                                    | Purpose                                                                           |
+| ------------------------------------------- | --------------------------------------------------------------------------------- |
+| `DATABASE_URL`                              | PostgreSQL connection string                                                      |
+| `JWT_SECRET`, `JWT_REFRESH_SECRET`          | Token signing. **Required in production** — no fallback                           |
+| `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`         | `15m` / `30d` by default                                                          |
+| `COOKIE_DOMAIN`, `COOKIE_SECURE`            | Leave the domain empty; set `COOKIE_SECURE=true` behind HTTPS                     |
+| `API_PORT`, `API_URL`                       | Where the API listens; direct address for tooling and docs                        |
+| `API_INTERNAL_URL`                          | Where the Nuxt server reaches the API — SSR and the `/api` proxy the browser uses |
+| `FRONTEND_URL`                              | Drives CORS and canonical URLs                                                    |
+| `AI_PROVIDER`                               | `mock` (default, offline) or `anthropic`                                          |
+| `AI_API_KEY`, `AI_MODEL`                    | Only needed when `AI_PROVIDER=anthropic`                                          |
+| `SEED_USER_PASSWORD`, `SEED_ADMIN_PASSWORD` | Demo account passwords, seed only                                                 |
 
 No secrets are committed. `.env` is gitignored; `.env.example` holds placeholders.
 
@@ -417,8 +417,10 @@ a personal `personalMatch`; anonymous, it falls back to formula quality.
 
 ### Security
 
-Argon-grade password hashing (bcrypt, 12 rounds), HttpOnly + SameSite cookies for
-both tokens, refresh-token rotation with hashed storage and single use, global
+Argon-grade password hashing (bcrypt, 12 rounds), HttpOnly + SameSite=Lax cookies
+for both tokens served first-party through the Nuxt `/api` proxy, refresh-token
+rotation with hashed storage, single use and reuse detection (a replayed token
+revokes every session of that user), global
 JWT guard with explicit opt-outs, role guard on `/admin`, Helmet, credentialed
 CORS pinned to `FRONTEND_URL`, whitelisted DTO validation that strips unknown
 fields, and rate limits tightened on auth and AI endpoints.
