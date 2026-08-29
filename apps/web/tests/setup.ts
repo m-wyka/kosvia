@@ -98,7 +98,7 @@ const useI18nStub = () => ({
   te: (key: string) => lookup(activeLocale.value, key) !== undefined,
   locale: activeLocale,
   locales: computed(() => [{ code: 'en' }, { code: 'pl' }]),
-  defaultLocale: 'en',
+  defaultLocale: 'pl',
 });
 
 Object.assign(globalThis, {
@@ -123,7 +123,7 @@ Object.assign(globalThis, {
   useRoute: () => ({ path: '/', query: {}, params: {}, fullPath: '/' }),
   useRouter: () => ({ push: () => Promise.resolve(), replace: () => Promise.resolve() }),
   useRuntimeConfig: () => ({ public: { siteUrl: 'http://localhost:3000', siteName: 'Kosvia' } }),
-  useLocalePath: () => (path: string) => (activeLocale.value === 'en' ? path : `/pl${path}`),
+  useLocalePath: () => (path: string) => (activeLocale.value === 'pl' ? path : `/en${path}`),
   onKeyStroke: () => undefined,
 });
 

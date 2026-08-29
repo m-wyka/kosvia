@@ -90,7 +90,7 @@ export class MockAIProvider implements AIProvider {
 
   async generateResponse(context: AdvisorContext): Promise<string> {
     const { retrieved, profileSummary } = context;
-    const locale = context.locale ?? 'en';
+    const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;
     const say = (entry: LocalisedText) => renderLocalised(entry, locale);
     const list = (entries: LocalisedText[]) =>
@@ -171,7 +171,7 @@ export class MockAIProvider implements AIProvider {
 
   async analyzeProduct(context: ProductAnalysisContext): Promise<string> {
     const { product, ingredientHighlights, ingredientScore, notes } = context;
-    const locale = context.locale ?? 'en';
+    const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;
     const named = ingredientHighlights.slice(0, 4).map((entry) => entry.name);
 
@@ -188,7 +188,7 @@ export class MockAIProvider implements AIProvider {
 
   async explainRecommendation(context: RecommendationExplanationContext): Promise<string> {
     const { score, reasons, warnings, product } = context;
-    const locale = context.locale ?? 'en';
+    const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;
     const list = (entries: LocalisedText[]) =>
       entries.map((entry) => renderLocalised(entry, locale).toLowerCase()).join(', ');
@@ -209,7 +209,7 @@ export class MockAIProvider implements AIProvider {
    * the model-backed prompt and the conversation record.
    */
   private describeIntent(context: AdvisorContext): string {
-    const locale = context.locale ?? 'en';
+    const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;
     const step = context.intent?.routineStep;
     const what = step

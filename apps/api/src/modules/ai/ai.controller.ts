@@ -30,7 +30,7 @@ export class AIController {
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Ask the AI Beauty Shopper a question' })
   chat(@CurrentUser() user: AuthenticatedUser, @Body() dto: ChatDto): Promise<AiChatResponse> {
-    return this.ai.chat(user.id, dto.message, dto.conversationId, dto.locale ?? 'en');
+    return this.ai.chat(user.id, dto.message, dto.conversationId, dto.locale ?? 'pl');
   }
 
   @Get('conversations')

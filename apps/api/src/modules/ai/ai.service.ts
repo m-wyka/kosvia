@@ -33,7 +33,7 @@ export class AIService {
     userId: string,
     message: string,
     conversationId?: string,
-    locale: AnswerLocale = 'en',
+    locale: AnswerLocale = 'pl',
   ): Promise<AiChatResponse> {
     const viewer = await this.viewers.load(userId);
     const conversation = await this.resolveConversation(userId, conversationId, message);
@@ -124,7 +124,7 @@ export class AIService {
   /** Natural-language read of a formula, for the product page. */
   async explainProduct(
     slug: string,
-    locale: AnswerLocale = 'en',
+    locale: AnswerLocale = 'pl',
   ): Promise<{ explanation: string }> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
     if (!row) throw new NotFoundException('We could not find that product.');
@@ -157,7 +157,7 @@ export class AIService {
   async explainMatch(
     userId: string | null,
     slug: string,
-    locale: AnswerLocale = 'en',
+    locale: AnswerLocale = 'pl',
   ): Promise<{ explanation: string }> {
     const viewer = await this.viewers.load(userId);
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });

@@ -12,7 +12,7 @@ interface CategoryNode {
 }
 
 const LOCALES = ['en', 'pl'] as const;
-const DEFAULT_LOCALE = 'en';
+const DEFAULT_LOCALE = 'pl';
 const PRODUCTS_PAGE_SIZE = 60;
 const MAX_PRODUCT_PAGES = 50;
 const CACHE_MAX_AGE_SECONDS = 3600;

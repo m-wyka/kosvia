@@ -215,7 +215,7 @@ export class BeautyAdvisorService {
     question: string,
     viewer: ViewerContext,
     history: AdvisorContext['history'],
-    locale: AnswerLocale = 'en',
+    locale: AnswerLocale = 'pl',
   ): Promise<{ context: AdvisorContext; retrieved: RetrievedProduct[]; intent: ParsedIntent }> {
     const intent = this.parseIntent(question, viewer);
     const { retrieved, routine } = await this.retrieve(intent, viewer);

@@ -16,7 +16,7 @@ export default defineNuxtConfig({
       { code: 'en', language: 'en-GB', name: 'English', file: 'en.json' },
       { code: 'pl', language: 'pl-PL', name: 'Polski', file: 'pl.json' },
     ],
-    defaultLocale: 'en',
+    defaultLocale: 'pl',
     vueI18n: './i18n.config.ts',
     strategy: 'prefix_except_default',
     detectBrowserLanguage: {
@@ -25,8 +25,14 @@ export default defineNuxtConfig({
       cookieCrossOrigin: false,
       redirectOn: 'root',
       alwaysRedirect: false,
-      fallbackLocale: 'en',
+      fallbackLocale: 'pl',
     },
+  },
+
+  // Polish moved from /pl/* to the root; keep old links and any indexed URLs alive.
+  routeRules: {
+    '/pl': { redirect: { to: '/', statusCode: 301 } },
+    '/pl/**': { redirect: { to: '/**', statusCode: 301 } },
   },
 
   ssr: true,
