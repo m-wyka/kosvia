@@ -51,6 +51,7 @@
     "ACCOUNT": "Your account",
     "ALL_PRODUCTS": "All products",
     "INGREDIENT_LIBRARY": "Ingredient library",
+    "ABOUT_DATA": "About the data",
     "RIGHTS": "© {year} Kosvia. Demo build."
   },
   "VOCAB": {
@@ -569,6 +570,8 @@
     "INGREDIENT_COUNT_VALUE": "{count} on the label",
     "CATEGORY": "Category",
     "ABOUT_TITLE": "About this product",
+    "SOURCE_ATTRIBUTION": "Product data: {source} ({license})",
+    "SOURCE_LINK": "About the data",
     "USAGE_TITLE": "How to use it",
     "WHAT_IS_IN_IT": "What is in it",
     "WHAT_IS_IN_IT_SUBTITLE": "Grouped by function. The number is the ingredient's position on the label — earlier means more of it.",
@@ -856,6 +859,7 @@
       "CATEGORIES": "Categories",
       "INGREDIENTS": "Ingredients",
       "INCI_QUEUE": "INCI queue",
+      "IMPORTS": "Imports",
       "STORES": "Stores",
       "OFFERS": "Offers",
       "USERS": "Users",
@@ -994,6 +998,27 @@
       "IGNORED": "Token ignored",
       "REOPENED": "Token back in the queue"
     },
+    "IMPORTS": {
+      "TITLE": "Imports",
+      "SUBTITLE": "Every batch import, newest first. Runs are idempotent and resumable — see docs/spec/01.",
+      "EMPTY": "No imports have run yet",
+      "HOW_TO": "Run from the API workspace: npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]",
+      "COL_SOURCE": "Source",
+      "COL_STATUS": "Status",
+      "COL_PARAMS": "Parameters",
+      "COL_CREATED": "Created",
+      "COL_UPDATED": "Updated",
+      "COL_SKIPPED": "Skipped",
+      "COL_QUEUED": "Queued",
+      "COL_FAILED": "Failed",
+      "COL_STARTED": "Started",
+      "DRY_RUN": "Dry run",
+      "STATUS_RUNNING": "Running",
+      "STATUS_COMPLETED": "Completed",
+      "STATUS_FAILED": "Failed",
+      "STATUS_INTERRUPTED": "Interrupted",
+      "ERRORS": "{count} errors — last: {last}"
+    },
     "PRODUCTS": {
       "TITLE": "Products",
       "SUBTITLE": "Saving a product recomputes its ingredient score.",
@@ -1119,6 +1144,10 @@
       "TITLE": "Kosvia — your personal AI for choosing cosmetics",
       "DESCRIPTION": "Kosvia analyses cosmetics, their INCI ingredients, prices and your personal preferences, then tells you which product actually fits you — and where it is cheapest."
     },
+    "ABOUT_DATA": {
+      "TITLE": "About the data",
+      "DESCRIPTION": "Where Kosvia’s product and ingredient data comes from and under which licences."
+    },
     "DISCOVER": {
       "TITLE": "Discover cosmetics chosen for you",
       "DESCRIPTION": "Browse cosmetics by category, concern and budget. Every product is scored against your skin, your goals and what you already own."
@@ -1189,6 +1218,8 @@
       "INGREDIENTS_DESCRIPTION": "Manage the INCI reference.",
       "INCI_QUEUE": "INCI queue · Admin",
       "INCI_QUEUE_DESCRIPTION": "Resolve unmatched label tokens.",
+      "IMPORTS": "Imports · Admin",
+      "IMPORTS_DESCRIPTION": "Batch import history.",
       "STORES": "Stores · Admin",
       "STORES_DESCRIPTION": "Manage demo retailers.",
       "OFFERS": "Offers · Admin",
@@ -1238,5 +1269,17 @@
     "INGREDIENT_FRAGRANCE_HIGH": "Fragrance appears high in the list, which is worth knowing if your skin reacts easily.",
     "INGREDIENT_COMEDOGENIC": "Contains an ingredient often reported as congesting, high in the list.",
     "INGREDIENT_SUPPORTIVE": "A large share of the formula is hydrating, softening or barrier-supporting."
+  },
+  "ABOUT_DATA": {
+    "TITLE": "About the data",
+    "INTRO": "Kosvia combines several sources. Each product records where it came from, and we show that on its page.",
+    "OBF_TITLE": "Open Beauty Facts",
+    "OBF_BODY": "Part of the catalogue — barcodes, names, brands, categories and ingredient lists — comes from Open Beauty Facts, a collaborative, open database of cosmetics. The database is made available under the Open Database License (ODbL); individual contents are licensed under the Database Contents License (DbCL). Product photos from Open Beauty Facts are licensed CC BY-SA.",
+    "OBF_LINK": "Visit Open Beauty Facts",
+    "OWN_TITLE": "What is Kosvia’s own",
+    "OWN_BODY": "Ingredient scores, Personal Match, explanations and comparisons are computed by Kosvia’s own algorithms from the underlying facts. They are not part of any third-party database.",
+    "DEMO_TITLE": "Demo data",
+    "DEMO_BODY": "Products without a listed source are demonstration data created for development: invented brands, generated prices and illustrated packaging.",
+    "CONTACT": "Spotted an error in the data? Corrections to Open Beauty Facts records are best made directly on their site; everything else — write to us."
   }
 }

@@ -15,6 +15,12 @@ const RECOGNIZED_THRESHOLD = 0.9;
 
 type ProductIngredientRowInput = Omit<Prisma.ProductIngredientCreateManyInput, 'productId'>;
 
+/** Who is writing this label — stamped on every row for attribution and import safety. */
+export interface LabelProvenance {
+  sourceId?: string;
+  isManuallyEdited?: boolean;
+}
+
 interface ResolvedToken {
   token: ParsedToken;
   rows: ProductIngredientRowInput[];
@@ -33,7 +39,11 @@ export class InciImportService {
     private readonly unmatchedTokens: UnmatchedTokenService,
   ) {}
 
-  async applyLabel(productId: string, rawLabel: string): Promise<LabelImportResultDto> {
+  async applyLabel(
+    productId: string,
+    rawLabel: string,
+    provenance: LabelProvenance = {},
+  ): Promise<LabelImportResultDto> {
     if (!(await this.prisma.product.count({ where: { id: productId } }))) {
       throw new NotFoundException('That product does not exist.');
     }
@@ -47,7 +57,12 @@ export class InciImportService {
     await this.prisma.$transaction([
       this.prisma.productIngredient.deleteMany({ where: { productId } }),
       this.prisma.productIngredient.createMany({
-        data: rows.map((row) => ({ ...row, productId })),
+        data: rows.map((row) => ({
+          ...row,
+          productId,
+          sourceId: provenance.sourceId ?? null,
+          isManuallyEdited: provenance.isManuallyEdited ?? false,
+        })),
       }),
     ]);
 

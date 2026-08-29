@@ -13,6 +13,7 @@ import * as bcrypt from 'bcryptjs';
 import { computeIngredientScore } from '../../src/modules/scoring/ingredient-score';
 import type { ScorableProductIngredient } from '../../src/modules/scoring/types';
 import { normalizeToken } from '../../src/modules/inci/inci-parser';
+import { DATA_SOURCES, MANUAL_SOURCE_CODE } from '../../src/modules/import/data-sources';
 import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
 import { INGREDIENTS, INGREDIENT_ALIASES } from './data/ingredients';
 import { FORMULAS } from './data/formulas';
@@ -110,6 +111,8 @@ async function reset(): Promise<void> {
   await prisma.beautyProfile.deleteMany();
   await prisma.beautyConcern.deleteMany();
   await prisma.beautyGoal.deleteMany();
+  await prisma.importRun.deleteMany();
+  await prisma.dataSource.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
 }
@@ -164,6 +167,12 @@ async function main(): Promise<void> {
     })),
   });
   const stores = await prisma.store.findMany({ orderBy: { slug: 'asc' } });
+
+  console.log('› Data sources');
+  await prisma.dataSource.createMany({ data: DATA_SOURCES });
+  const manualSource = await prisma.dataSource.findUniqueOrThrow({
+    where: { code: MANUAL_SOURCE_CODE },
+  });
 
   console.log('› Brands');
   await prisma.brand.createMany({
@@ -324,6 +333,7 @@ async function main(): Promise<void> {
           isCrueltyFree: brandSeed.isCrueltyFree,
           targetSkinTypes: formula.targetSkinTypes as SkinType[],
           ingredientScore: score,
+          sourceId: manualSource.id,
           ingredients: { create: productIngredients },
         },
       });

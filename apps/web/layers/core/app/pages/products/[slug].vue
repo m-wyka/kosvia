@@ -192,7 +192,7 @@ useBreadcrumbJsonLd(
           {{ product.brand.name }}
         </NuxtLinkLocale>
 
-        <h1 class="mt-1.5 font-display text-3xl leading-tight text-ink sm:text-4xl">
+        <h1 class="mt-1.5 font-display text-3xl leading-tight text-ink sm:text-4xl font-semibold">
           {{ product.name }}
         </h1>
 
@@ -273,6 +273,19 @@ useBreadcrumbJsonLd(
             <p class="mt-1.5 text-sm leading-relaxed text-ink-soft">{{ product.usage }}</p>
           </div>
         </section>
+
+        <p v-if="product.source?.attribution" class="text-xs leading-relaxed text-ink-muted">
+          {{
+            $t('PRODUCT.SOURCE_ATTRIBUTION', {
+              source: product.source.name,
+              license: product.source.license,
+            })
+          }}
+          ·
+          <NuxtLinkLocale to="/about-data" class="underline-offset-4 hover:underline">
+            {{ $t('PRODUCT.SOURCE_LINK') }}
+          </NuxtLinkLocale>
+        </p>
 
         <IngredientSummary
           :ingredients="product.ingredients"

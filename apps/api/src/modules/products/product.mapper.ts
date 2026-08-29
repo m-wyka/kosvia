@@ -119,6 +119,7 @@ export function toProductDto(row: ProductRow, personalMatch?: PersonalMatchDto |
     })),
     offers: row.offers.map(toOfferDto),
     pricePerHundredMl: pricePerHundred(summary.lowestPrice, row.volume, row.volumeUnit),
+    source: row.source,
   };
 }
 

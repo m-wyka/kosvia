@@ -6,6 +6,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { computeIngredientScore } from '../scoring/ingredient-score';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { normalizeToken } from '../inci/inci-parser';
+import { MANUAL_SOURCE_CODE } from '../import/data-sources';
 import { toScorable } from '../products/product.mapper';
 import type {
   AdminListQueryDto,
@@ -265,10 +266,16 @@ export class AdminService {
 
   async createProduct(dto: UpsertProductDto) {
     const ingredients = dto.ingredients && (await this.resolveIngredientRows(dto.ingredients));
+    const manualSource = await this.prisma.dataSource.findUnique({
+      where: { code: MANUAL_SOURCE_CODE },
+      select: { id: true },
+    });
     const product = await this.prisma.product.create({
       data: {
         ...this.productScalars(dto),
         slug: dto.slug ?? slugify(dto.name),
+        isManuallyEdited: true,
+        sourceId: manualSource?.id ?? null,
         ...(ingredients && { ingredients: { create: ingredients } }),
       },
     });
@@ -280,7 +287,11 @@ export class AdminService {
     await this.assertExists('product', id);
     await this.prisma.product.update({
       where: { id },
-      data: { ...this.productScalars(dto), ...(dto.slug && { slug: dto.slug }) },
+      data: {
+        ...this.productScalars(dto),
+        ...(dto.slug && { slug: dto.slug }),
+        isManuallyEdited: true,
+      },
     });
 
     if (dto.ingredients) {
@@ -460,6 +471,7 @@ export class AdminService {
         ingredientId: entry.ingredientId,
         rawText: entry.rawText ?? inciName,
         position: entry.position,
+        isManuallyEdited: true,
         concentrationRange: entry.concentrationRange ?? null,
       };
     });

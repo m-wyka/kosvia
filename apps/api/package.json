@@ -17,7 +17,8 @@
     "db:reset": "prisma migrate reset --force",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "sync:phrases": "node scripts/sync-phrases.mjs"
+    "sync:phrases": "node scripts/sync-phrases.mjs",
+    "import:obf": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/import-obf.ts"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed/index.ts"

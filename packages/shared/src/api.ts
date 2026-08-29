@@ -200,6 +200,16 @@ export interface ProductDto extends ProductSummaryDto {
   ingredients: ProductIngredientDto[];
   offers: ProductOfferDto[];
   pricePerHundredMl: number | null;
+  /** Where the record came from; drives the licence attribution on the page. */
+  source: DataSourceDto | null;
+}
+
+export interface DataSourceDto {
+  code: string;
+  name: string;
+  license: string;
+  attribution: string | null;
+  url: string | null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -491,6 +501,24 @@ export interface UnmatchedTokenDto {
   status: TokenStatus;
   resolvedAt: string | null;
   createdAt: string;
+}
+
+export type ImportRunStatus = 'RUNNING' | 'COMPLETED' | 'FAILED' | 'INTERRUPTED';
+
+export interface ImportRunDto {
+  id: string;
+  source: { code: string; name: string };
+  status: ImportRunStatus;
+  isDryRun: boolean;
+  params: Record<string, unknown> | null;
+  created: number;
+  updated: number;
+  skipped: number;
+  queued: number;
+  failed: number;
+  errors: string[];
+  startedAt: string;
+  finishedAt: string | null;
 }
 
 export interface TokenResolutionDto {

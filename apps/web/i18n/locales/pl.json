@@ -51,6 +51,7 @@
     "ACCOUNT": "Twoje konto",
     "ALL_PRODUCTS": "Wszystkie produkty",
     "INGREDIENT_LIBRARY": "Baza składników",
+    "ABOUT_DATA": "O danych",
     "RIGHTS": "© {year} Kosvia. Wersja demonstracyjna."
   },
   "VOCAB": {
@@ -569,6 +570,8 @@
     "INGREDIENT_COUNT_VALUE": "{count} na etykiecie",
     "CATEGORY": "Kategoria",
     "ABOUT_TITLE": "O tym produkcie",
+    "SOURCE_ATTRIBUTION": "Dane produktu: {source} ({license})",
+    "SOURCE_LINK": "O danych",
     "USAGE_TITLE": "Jak stosować",
     "WHAT_IS_IN_IT": "Co jest w środku",
     "WHAT_IS_IN_IT_SUBTITLE": "Pogrupowane według działania. Liczba to pozycja składnika na etykiecie — im wcześniej, tym więcej.",
@@ -848,6 +851,10 @@
       "TITLE": "Kosvia — Twoje osobiste AI do wybierania kosmetyków",
       "DESCRIPTION": "Kosvia analizuje kosmetyki, ich składy INCI, ceny i Twoje preferencje, a potem mówi, który produkt naprawdę do Ciebie pasuje — i gdzie jest najtańszy."
     },
+    "ABOUT_DATA": {
+      "TITLE": "O danych",
+      "DESCRIPTION": "Skąd pochodzą dane o produktach i składnikach w Kosvii i na jakich licencjach."
+    },
     "DISCOVER": {
       "TITLE": "Odkrywaj kosmetyki dobrane dla Ciebie",
       "DESCRIPTION": "Przeglądaj kosmetyki według kategorii, problemu i budżetu. Każdy produkt oceniany pod Twoją skórę, cele i to, co już masz."
@@ -918,6 +925,8 @@
       "INGREDIENTS_DESCRIPTION": "Zarządzaj bazą INCI.",
       "INCI_QUEUE": "Kolejka INCI · Admin",
       "INCI_QUEUE_DESCRIPTION": "Rozstrzygaj niedopasowane tokeny z etykiet.",
+      "IMPORTS": "Importy · Admin",
+      "IMPORTS_DESCRIPTION": "Historia importów wsadowych.",
       "STORES": "Sklepy · Admin",
       "STORES_DESCRIPTION": "Zarządzaj sklepami demonstracyjnymi.",
       "OFFERS": "Oferty · Admin",
@@ -939,6 +948,7 @@
       "CATEGORIES": "Kategorie",
       "INGREDIENTS": "Składniki",
       "INCI_QUEUE": "Kolejka INCI",
+      "IMPORTS": "Importy",
       "STORES": "Sklepy",
       "OFFERS": "Oferty",
       "USERS": "Użytkownicy",
@@ -1076,6 +1086,27 @@
       "RESOLVED": "Gotowe — {rows} pozycji dopasowanych ponownie w {products} produktach",
       "IGNORED": "Token zignorowany",
       "REOPENED": "Token wrócił do kolejki"
+    },
+    "IMPORTS": {
+      "TITLE": "Importy",
+      "SUBTITLE": "Każdy import wsadowy, najnowsze na górze. Uruchomienia są idempotentne i wznawialne — patrz docs/spec/01.",
+      "EMPTY": "Żaden import jeszcze nie działał",
+      "HOW_TO": "Uruchom z workspace API: npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]",
+      "COL_SOURCE": "Źródło",
+      "COL_STATUS": "Status",
+      "COL_PARAMS": "Parametry",
+      "COL_CREATED": "Utworzone",
+      "COL_UPDATED": "Zaktualizowane",
+      "COL_SKIPPED": "Pominięte",
+      "COL_QUEUED": "Do weryfikacji",
+      "COL_FAILED": "Błędy",
+      "COL_STARTED": "Start",
+      "DRY_RUN": "Na sucho",
+      "STATUS_RUNNING": "W toku",
+      "STATUS_COMPLETED": "Zakończony",
+      "STATUS_FAILED": "Nieudany",
+      "STATUS_INTERRUPTED": "Przerwany",
+      "ERRORS": "{count} błędów — ostatni: {last}"
     },
     "PRODUCTS": {
       "TITLE": "Produkty",
@@ -1238,5 +1269,17 @@
     "INGREDIENT_FRAGRANCE_HIGH": "Zapach jest wysoko w składzie — warto o tym wiedzieć, jeśli Twoja skóra łatwo reaguje.",
     "INGREDIENT_COMEDOGENIC": "Zawiera składnik wysoko w składzie, który bywa opisywany jako zatykający pory.",
     "INGREDIENT_SUPPORTIVE": "Duża część formuły nawilża, zmiękcza lub wspiera barierę skórną."
+  },
+  "ABOUT_DATA": {
+    "TITLE": "O danych",
+    "INTRO": "Kosvia łączy kilka źródeł. Każdy produkt ma zapisane pochodzenie i pokazujemy je na jego stronie.",
+    "OBF_TITLE": "Open Beauty Facts",
+    "OBF_BODY": "Część katalogu — kody kreskowe, nazwy, marki, kategorie i listy składników — pochodzi z Open Beauty Facts, otwartej, tworzonej społecznościowo bazy kosmetyków. Baza jest udostępniana na licencji Open Database License (ODbL), a zawartość rekordów na Database Contents License (DbCL). Zdjęcia produktów z Open Beauty Facts są na licencji CC BY-SA.",
+    "OBF_LINK": "Odwiedź Open Beauty Facts",
+    "OWN_TITLE": "Co jest własne",
+    "OWN_BODY": "Oceny składu, Personal Match, wyjaśnienia i porównania są wynikiem własnych algorytmów Kosvii liczonych na podstawie faktów. Nie są częścią żadnej bazy zewnętrznej.",
+    "DEMO_TITLE": "Dane demonstracyjne",
+    "DEMO_BODY": "Produkty bez podanego źródła to dane demonstracyjne stworzone na potrzeby rozwoju: wymyślone marki, wygenerowane ceny i ilustracyjne opakowania.",
+    "CONTACT": "Widzisz błąd w danych? Poprawki rekordów Open Beauty Facts najlepiej wnosić bezpośrednio na ich stronie; w pozostałych sprawach — napisz do nas."
   }
 }

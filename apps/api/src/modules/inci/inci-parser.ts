@@ -58,17 +58,25 @@ export const splitMayContain = (label: string): { main: string; mayContain: stri
   return { main, mayContain };
 };
 
+const isDigit = (character: string | undefined): boolean =>
+  character !== undefined && character >= '0' && character <= '9';
+
+/** "1,2-Hexanediol" — a comma between digits is part of the name, not a separator. */
+const isCommaInsideNumber = (text: string, index: number): boolean =>
+  text[index] === ',' && isDigit(text[index - 1]) && isDigit(text[index + 1]);
+
 export const tokenize = (text: string): string[] => {
   const tokens: string[] = [];
   let buffer = '';
   let depth = 0;
-  for (const character of text) {
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
     if (OPENING_BRACKETS.has(character)) {
       depth += 1;
     } else if (CLOSING_BRACKETS.has(character)) {
       depth = Math.max(0, depth - 1);
     }
-    if (TOKEN_SEPARATORS.has(character) && depth === 0) {
+    if (TOKEN_SEPARATORS.has(character) && depth === 0 && !isCommaInsideNumber(text, index)) {
       tokens.push(buffer);
       buffer = '';
     } else {

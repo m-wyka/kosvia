@@ -10,6 +10,7 @@ import { Prisma } from '@prisma/client';
 export const PRODUCT_INCLUDE = Prisma.validator<Prisma.ProductInclude>()({
   brand: true,
   category: true,
+  source: { select: { code: true, name: true, license: true, attribution: true, url: true } },
   ingredients: {
     orderBy: { position: 'asc' },
     include: {

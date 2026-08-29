@@ -254,6 +254,12 @@ model Product {
   /// Generated in SQL from name, highlights and description — see the
   /// add_search_extensions_and_indexes migration. Prisma never writes it.
   searchVector    Unsupported("tsvector")?
+  sourceId        String?
+  /// The record's identifier inside its source (barcode for Open Beauty Facts).
+  sourceRef       String?
+  sourceUpdatedAt DateTime?
+  /// Set by the admin UI; imports leave such rows alone.
+  isManuallyEdited Boolean  @default(false)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -263,6 +269,7 @@ model Product {
   offers      ProductOffer[]
   priceHistory PriceHistory[]
   submissions ProductSubmission[]
+  source      DataSource?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   shelfItems  UserShelfItem[]
   priceAlerts PriceAlert[]
 
@@ -272,6 +279,7 @@ model Product {
   @@index([ingredientScore])
   @@index([isActive, categoryId])
   @@index([name])
+  @@unique([sourceId, sourceRef])
   @@map("products")
 }
 
@@ -298,6 +306,8 @@ model Ingredient {
   products        ProductIngredient[]
   aliases         IngredientAlias[]
   suggestedFor    UnmatchedToken[]
+  sourceId        String?
+  source          DataSource?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   targetsConcerns BeautyConcern[]     @relation("IngredientTargetsConcerns")
   supportsGoals   BeautyGoal[]        @relation("IngredientSupportsGoals")
   excludedByProfiles BeautyProfile[]  @relation("ProfileExcludedIngredients")
@@ -319,9 +329,12 @@ model ProductIngredient {
   isAfterMayContain  Boolean @default(false)
   matchConfidence    Float   @default(1.0)
   concentrationRange String?
+  sourceId           String?
+  isManuallyEdited   Boolean @default(false)
 
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   ingredient Ingredient? @relation(fields: [ingredientId], references: [id], onDelete: SetNull)
+  source     DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
 
   @@unique([productId, position])
   @@index([ingredientId])
@@ -409,6 +422,57 @@ enum SubmissionStatus {
   REJECTED
 }
 
+/// Where a record came from — required for ODbL/CC attribution and to keep
+/// third-party data separable from our own. See 01_DANE_ZRODLA.md.
+model DataSource {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        String
+  license     String
+  attribution String?
+  url         String?
+
+  products           Product[]
+  ingredients        Ingredient[]
+  productIngredients ProductIngredient[]
+  offers             ProductOffer[]
+  importRuns         ImportRun[]
+
+  @@map("data_sources")
+}
+
+/// Audit trail and resume cursor for every batch import.
+model ImportRun {
+  id         String          @id @default(cuid())
+  sourceId   String
+  status     ImportRunStatus @default(RUNNING)
+  isDryRun   Boolean         @default(false)
+  /// Free-form arguments the run was started with (category, limit…).
+  params     Json?
+  /// Where to pick up after an interruption — page number, category…
+  cursor     Json?
+  created    Int             @default(0)
+  updated    Int             @default(0)
+  skipped    Int             @default(0)
+  queued     Int             @default(0)
+  failed     Int             @default(0)
+  errors     String[]        @default([])
+  startedAt  DateTime        @default(now())
+  finishedAt DateTime?
+
+  source DataSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId, startedAt])
+  @@map("import_runs")
+}
+
+enum ImportRunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  INTERRUPTED
+}
+
 /// One row per search, no viewer identity: tells us which queries return
 /// nothing and which brands people look for that we do not stock yet.
 model SearchLog {
@@ -454,6 +518,8 @@ model ProductOffer {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
+  sourceId String?
+  source   DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
 

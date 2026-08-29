@@ -109,6 +109,12 @@ export const LABEL_FIXTURES: LabelFixture[] = [
     mayContainFrom: 3,
   },
   {
+    name: 'comma inside a chemical locant is not a separator',
+    raw: 'Aqua, 1,2-Hexanediol, Caprylyl Glycol, 2,3-Butanediol',
+    expectedRaw: ['Aqua', '1,2-Hexanediol', 'Caprylyl Glycol', '2,3-Butanediol'],
+    expectedNormalized: ['aqua', '1 2-hexanediol', 'caprylyl glycol', '2 3-butanediol'],
+  },
+  {
     name: 'trailing separator and double spaces',
     raw: 'Aqua,  Glycerin ,Niacinamide, ',
     expectedRaw: ['Aqua', 'Glycerin', 'Niacinamide'],

@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AdminStatsDto } from '@kosvia/shared';
+import type { AdminStatsDto, ImportRunDto } from '@kosvia/shared';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import {
@@ -23,6 +23,7 @@ import {
 import { AdminService } from './admin.service';
 import { InciImportService } from '../inci/inci-import.service';
 import { UnmatchedTokenService } from '../inci/unmatched-token.service';
+import { ImportRunService } from '../import/import-run.service';
 import {
   AdminListQueryDto,
   ImportLabelDto,
@@ -47,7 +48,30 @@ export class AdminController {
     private readonly admin: AdminService,
     private readonly inciImport: InciImportService,
     private readonly unmatchedTokens: UnmatchedTokenService,
+    private readonly importRuns: ImportRunService,
   ) {}
+
+  /* -------------------------------------------------------------- imports -- */
+  @Get('import/runs')
+  @ApiOperation({ summary: 'Recent batch imports with their counters and errors' })
+  async listImportRuns(): Promise<ImportRunDto[]> {
+    const runs = await this.importRuns.list();
+    return runs.map((run) => ({
+      id: run.id,
+      source: run.source,
+      status: run.status,
+      isDryRun: run.isDryRun,
+      params: (run.params as Record<string, unknown> | null) ?? null,
+      created: run.created,
+      updated: run.updated,
+      skipped: run.skipped,
+      queued: run.queued,
+      failed: run.failed,
+      errors: run.errors,
+      startedAt: run.startedAt.toISOString(),
+      finishedAt: run.finishedAt?.toISOString() ?? null,
+    }));
+  }
 
   @Get('stats')
   @ApiOperation({ summary: 'Catalogue and usage counters' })
@@ -141,7 +165,7 @@ export class AdminController {
   @Put('products/:id/ingredients/label')
   @ApiOperation({ summary: 'Replace the ingredient list by parsing label text' })
   importProductLabel(@Param('id') id: string, @Body() dto: ImportLabelDto) {
-    return this.inciImport.applyLabel(id, dto.rawLabel);
+    return this.inciImport.applyLabel(id, dto.rawLabel, { isManuallyEdited: true });
   }
   @Put('products/:id') updateProduct(@Param('id') id: string, @Body() dto: UpsertProductDto) {
     return this.admin.updateProduct(id, dto);
