@@ -56,6 +56,7 @@ export class UpsertIngredientDto {
 
 export class ProductIngredientInputDto {
   @IsString() ingredientId!: string;
+  @IsOptional() @IsString() @MaxLength(200) rawText?: string;
   @Type(() => Number) @IsInt() @Min(1) position!: number;
   @IsOptional() @IsString() @MaxLength(40) concentrationRange?: string;
 }

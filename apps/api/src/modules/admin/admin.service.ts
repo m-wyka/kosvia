@@ -8,6 +8,7 @@ import { PRODUCT_INCLUDE } from '../products/product.select';
 import { toScorable } from '../products/product.mapper';
 import type {
   AdminListQueryDto,
+  ProductIngredientInputDto,
   UpdateUserDto,
   UpsertBrandDto,
   UpsertCategoryDto,
@@ -260,19 +261,12 @@ export class AdminService {
   }
 
   async createProduct(dto: UpsertProductDto) {
+    const ingredients = dto.ingredients && (await this.resolveIngredientRows(dto.ingredients));
     const product = await this.prisma.product.create({
       data: {
         ...this.productScalars(dto),
         slug: dto.slug ?? slugify(dto.name),
-        ...(dto.ingredients && {
-          ingredients: {
-            create: dto.ingredients.map((entry) => ({
-              ingredientId: entry.ingredientId,
-              position: entry.position,
-              concentrationRange: entry.concentrationRange ?? null,
-            })),
-          },
-        }),
+        ...(ingredients && { ingredients: { create: ingredients } }),
       },
     });
     await this.recomputeScores([product.id]);
@@ -289,14 +283,10 @@ export class AdminService {
     if (dto.ingredients) {
       // Replacing the list wholesale keeps positions consistent — partial
       // edits would let two ingredients claim the same position.
+      const ingredients = await this.resolveIngredientRows(dto.ingredients);
       await this.prisma.productIngredient.deleteMany({ where: { productId: id } });
       await this.prisma.productIngredient.createMany({
-        data: dto.ingredients.map((entry) => ({
-          productId: id,
-          ingredientId: entry.ingredientId,
-          position: entry.position,
-          concentrationRange: entry.concentrationRange ?? null,
-        })),
+        data: ingredients.map((entry) => ({ ...entry, productId: id })),
       });
     }
 
@@ -447,6 +437,30 @@ export class AdminService {
   }
 
   /* ------------------------------------------------------------ internals -- */
+
+  /**
+   * Admin input references dictionary entries by id; the label text defaults
+   * to the INCI name so every row satisfies the `rawText` invariant.
+   */
+  private async resolveIngredientRows(entries: ProductIngredientInputDto[]) {
+    const ingredients = await this.prisma.ingredient.findMany({
+      where: { id: { in: entries.map((entry) => entry.ingredientId) } },
+      select: { id: true, inciName: true },
+    });
+    const inciNameById = new Map(ingredients.map((row) => [row.id, row.inciName]));
+    return entries.map((entry) => {
+      const inciName = inciNameById.get(entry.ingredientId);
+      if (!inciName) {
+        throw new BadRequestException(`Unknown ingredient "${entry.ingredientId}".`);
+      }
+      return {
+        ingredientId: entry.ingredientId,
+        rawText: entry.rawText ?? inciName,
+        position: entry.position,
+        concentrationRange: entry.concentrationRange ?? null,
+      };
+    });
+  }
 
   private productScalars(dto: UpsertProductDto) {
     return {

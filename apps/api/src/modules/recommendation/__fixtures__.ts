@@ -90,7 +90,10 @@ export function row(options: RowOptions): ProductRow {
       id: `${id}-${ingredientId}`,
       productId: id,
       ingredientId,
+      rawText: ingredientId,
       position: index + 1,
+      isAfterMayContain: false,
+      matchConfidence: 1,
       concentrationRange: null,
       ingredient: {
         id: ingredientId,

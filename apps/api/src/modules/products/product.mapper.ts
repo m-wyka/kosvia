@@ -11,7 +11,11 @@ import type {
   StoreDto,
 } from '@kosvia/shared';
 import type { ScorableProduct } from '../scoring/types';
-import type { ProductRow } from './product.select';
+import {
+  hasMatchedIngredient,
+  type MatchedProductIngredientRow,
+  type ProductRow,
+} from './product.select';
 
 export function decimalToNumber(value: Prisma.Decimal | number | null | undefined): number | null {
   if (value === null || value === undefined) return null;
@@ -39,7 +43,7 @@ export function toCategoryDto(category: ProductRow['category']): CategoryDto {
 }
 
 export function toIngredientDto(
-  ingredient: ProductRow['ingredients'][number]['ingredient'],
+  ingredient: MatchedProductIngredientRow['ingredient'],
 ): IngredientDto {
   return {
     id: ingredient.id,
@@ -108,7 +112,7 @@ export function toProductDto(row: ProductRow, personalMatch?: PersonalMatchDto |
     description: row.description,
     usage: row.usage,
     highlights: row.highlights,
-    ingredients: row.ingredients.map((entry) => ({
+    ingredients: row.ingredients.filter(hasMatchedIngredient).map((entry) => ({
       position: entry.position,
       concentrationRange: entry.concentrationRange,
       ingredient: toIngredientDto(entry.ingredient),
@@ -133,7 +137,7 @@ export function toScorable(row: ProductRow): ScorableProduct {
     targetSkinTypes: row.targetSkinTypes,
     ingredientScore: row.ingredientScore,
     lowestPrice: offer ? decimalToNumber(offer.price) : decimalToNumber(row.lowestPrice),
-    ingredients: row.ingredients.map((entry) => ({
+    ingredients: row.ingredients.filter(hasMatchedIngredient).map((entry) => ({
       position: entry.position,
       ingredient: {
         id: entry.ingredient.id,

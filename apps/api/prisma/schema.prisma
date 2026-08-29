@@ -289,6 +289,7 @@ model Ingredient {
   isActiveIngredient Boolean   @default(false)
 
   products        ProductIngredient[]
+  aliases         IngredientAlias[]
   targetsConcerns BeautyConcern[]     @relation("IngredientTargetsConcerns")
   supportsGoals   BeautyGoal[]        @relation("IngredientSupportsGoals")
   excludedByProfiles BeautyProfile[]  @relation("ProfileExcludedIngredients")
@@ -298,20 +299,48 @@ model Ingredient {
 }
 
 /// The join carries data: INCI position is meaningful (earlier = more of it).
+/// `ingredientId` is null when the label token could not be matched to the
+/// dictionary — `rawText` always keeps what the label said.
 model ProductIngredient {
   id                 String  @id @default(cuid())
   productId          String
-  ingredientId       String
+  ingredientId       String?
+  rawText            String
   position           Int
+  isAfterMayContain  Boolean @default(false)
+  matchConfidence    Float   @default(1.0)
   concentrationRange String?
 
-  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient Ingredient? @relation(fields: [ingredientId], references: [id], onDelete: SetNull)
+
+  @@unique([productId, position])
+  @@index([ingredientId])
+  @@map("product_ingredients")
+}
+
+model IngredientAlias {
+  id           String    @id @default(cuid())
+  ingredientId String
+  /// Normalised form used for matching (lowercase, no diacritics).
+  alias        String    @unique
+  /// The alias exactly as it appeared on a label.
+  aliasRaw     String
+  kind         AliasKind
+  confidence   Float     @default(1.0)
+
   ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, ingredientId])
   @@index([ingredientId])
-  @@index([productId, position])
-  @@map("product_ingredients")
+  @@map("ingredient_aliases")
+}
+
+enum AliasKind {
+  SYNONYM
+  TRANSLATION
+  TYPO
+  TRADE_NAME
+  CI_NUMBER
 }
 
 /* -------------------------------------------------------------------------- */

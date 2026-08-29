@@ -7,7 +7,7 @@ import type {
 } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
-import { PRODUCT_INCLUDE, type ProductRow } from '../products/product.select';
+import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../products/product.select';
 import { decimalToNumber, toProductSummary, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
 
@@ -129,7 +129,10 @@ export class AlternativeProductService {
 
     /* -------------------------------------------------- similar ingredients */
     const subjectIngredients = new Set(
-      subject.ingredients.filter((i) => i.position <= 14).map((i) => i.ingredientId),
+      subject.ingredients
+        .filter(hasMatchedIngredient)
+        .filter((i) => i.position <= 14)
+        .map((i) => i.ingredientId),
     );
     const similar = others
       .map((entry) => ({ entry, overlap: this.overlap(subjectIngredients, entry.row) }))
@@ -209,7 +212,10 @@ export class AlternativeProductService {
   /** Jaccard overlap over the meaningful (high-position) part of both lists. */
   private overlap(subjectIngredients: Set<string>, candidate: ProductRow): number {
     const other = new Set(
-      candidate.ingredients.filter((i) => i.position <= 14).map((i) => i.ingredientId),
+      candidate.ingredients
+        .filter(hasMatchedIngredient)
+        .filter((i) => i.position <= 14)
+        .map((i) => i.ingredientId),
     );
     if (!subjectIngredients.size || !other.size) return 0;
     let shared = 0;

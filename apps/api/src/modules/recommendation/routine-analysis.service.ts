@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { RoutineStep } from '@prisma/client';
 import type { LocalisedText, RoutineAnalysisDto, RoutineObservationDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { PRODUCT_INCLUDE } from '../products/product.select';
+import { PRODUCT_INCLUDE, hasMatchedIngredient } from '../products/product.select';
 
 /**
  * Routine analysis for My Shelf.
@@ -82,10 +82,16 @@ export class RoutineAnalysisService {
         const a = items[i].product;
         const b = items[j].product;
         const setA = new Set(
-          a.ingredients.filter((x) => x.position <= 10).map((x) => x.ingredientId),
+          a.ingredients
+            .filter(hasMatchedIngredient)
+            .filter((x) => x.position <= 10)
+            .map((x) => x.ingredientId),
         );
         const setB = new Set(
-          b.ingredients.filter((x) => x.position <= 10).map((x) => x.ingredientId),
+          b.ingredients
+            .filter(hasMatchedIngredient)
+            .filter((x) => x.position <= 10)
+            .map((x) => x.ingredientId),
         );
         if (!setA.size || !setB.size) continue;
         let shared = 0;
@@ -112,12 +118,14 @@ export class RoutineAnalysisService {
     /* -------------------------------------------------------- active load --- */
     const activeProducts = items.filter((item) =>
       item.product.ingredients.some(
-        (entry) => entry.ingredient.isActiveIngredient && entry.position <= 8,
+        (entry) =>
+          hasMatchedIngredient(entry) && entry.ingredient.isActiveIngredient && entry.position <= 8,
       ),
     );
     const exfoliantOrRetinoid = items.filter((item) =>
       item.product.ingredients.some(
         (entry) =>
+          hasMatchedIngredient(entry) &&
           entry.position <= 8 &&
           (entry.ingredient.tags.includes('exfoliant') ||
             entry.ingredient.tags.includes('retinoid')),

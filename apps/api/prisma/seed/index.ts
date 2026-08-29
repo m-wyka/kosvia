@@ -265,6 +265,7 @@ async function main(): Promise<void> {
           throw new Error(`Formula ${formula.key} references unknown INCI "${inci}"`);
         productIngredients.push({
           position: idx + 1,
+          rawText: inci,
           ingredient: { connect: { id: ingredient.id } },
         });
         scorable.push({

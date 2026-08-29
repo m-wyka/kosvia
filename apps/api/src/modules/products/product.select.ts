@@ -28,3 +28,15 @@ export const PRODUCT_INCLUDE = Prisma.validator<Prisma.ProductInclude>()({
 });
 
 export type ProductRow = Prisma.ProductGetPayload<{ include: typeof PRODUCT_INCLUDE }>;
+
+export type ProductIngredientRow = ProductRow['ingredients'][number];
+
+/** A label entry that was matched to the ingredient dictionary. */
+export type MatchedProductIngredientRow = ProductIngredientRow & {
+  ingredientId: string;
+  ingredient: NonNullable<ProductIngredientRow['ingredient']>;
+};
+
+export const hasMatchedIngredient = (
+  entry: ProductIngredientRow,
+): entry is MatchedProductIngredientRow => entry.ingredient !== null;

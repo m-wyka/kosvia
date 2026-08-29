@@ -8,7 +8,7 @@ import type {
 } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
-import { PRODUCT_INCLUDE, type ProductRow } from '../products/product.select';
+import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../products/product.select';
 import { toProductDto, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
 
@@ -87,6 +87,7 @@ export class ComparisonService {
         ordered.map(
           (row) =>
             row.ingredients
+              .filter(hasMatchedIngredient)
               .filter((entry) => entry.ingredient.isActiveIngredient)
               .slice(0, 3)
               .map((entry) => entry.ingredient.commonName ?? entry.ingredient.inciName)

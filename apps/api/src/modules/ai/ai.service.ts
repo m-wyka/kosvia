@@ -11,7 +11,7 @@ import { ViewerContextService } from '../profile/viewer-context.service';
 import { ProductsService } from '../products/products.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { IngredientScoreService } from '../scoring/ingredient-score.service';
-import { PRODUCT_INCLUDE } from '../products/product.select';
+import { PRODUCT_INCLUDE, hasMatchedIngredient } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
 import { toLocalisedReason } from '../../common/i18n/phrases';
 import { BeautyAdvisorService } from './beauty-advisor.service';
@@ -137,6 +137,7 @@ export class AIService {
       ingredientScore: breakdown.score,
       notes: breakdown.notes,
       ingredientHighlights: row.ingredients
+        .filter(hasMatchedIngredient)
         .filter(
           (entry) =>
             entry.ingredient.isActiveIngredient ||

@@ -183,7 +183,7 @@ watch(
             {{ $t(link.label) }}
           </NuxtLinkLocale>
 
-          <div class="!mt-4 flex flex-col gap-2 border-t border-line pt-4">
+          <div class="mt-4! flex flex-col gap-2 border-t border-line pt-4">
             <LocaleSwitcher variant="stacked" class="mb-2 sm:hidden" />
 
             <template v-if="isAuthenticated">
