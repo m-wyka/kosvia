@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia';
-import type { AuthResponse, BeautyProfileDto, UserDto } from '@kosvia/shared';
+import type {
+  AuthResponse,
+  BeautyProfileDto,
+  ConsentType,
+  ConsentsDto,
+  RegisterPayload,
+  UserDto,
+} from '@kosvia/shared';
 
 const FALLBACK_DISPLAY_NAME = 'there';
 
@@ -57,14 +64,38 @@ export const useAuthStore = defineStore('auth', () => {
     return response.user;
   };
 
-  const register = async (email: string, password: string, name?: string): Promise<UserDto> => {
+  const register = async (payload: RegisterPayload): Promise<UserDto> => {
     const response = await api()<AuthResponse>('/auth/register', {
       method: 'POST',
-      body: { email, password, name: name || undefined },
+      body: { ...payload, name: payload.name || undefined },
     });
     user.value = response.user;
     ready.value = true;
     return response.user;
+  };
+
+  const hasConsent = (type: ConsentType): boolean => user.value?.consents[type] ?? false;
+
+  const setConsent = async (type: ConsentType, granted: boolean): Promise<void> => {
+    const consents = await api()<ConsentsDto>('/account/consents', {
+      method: 'PUT',
+      body: { type, granted },
+    });
+    if (user.value) {
+      user.value = { ...user.value, consents: consents.current };
+    }
+    if (type === 'BEAUTY_PROFILE_HEALTH' && !granted) {
+      profile.value = null;
+      if (user.value) {
+        user.value = { ...user.value, hasBeautyProfile: false };
+      }
+    }
+  };
+
+  const setDeletionScheduledFor = (value: string | null): void => {
+    if (user.value) {
+      user.value = { ...user.value, deletionScheduledFor: value };
+    }
   };
 
   const logout = async (): Promise<void> => {
@@ -97,5 +128,8 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     markProfileComplete,
+    hasConsent,
+    setConsent,
+    setDeletionScheduledFor,
   };
 });

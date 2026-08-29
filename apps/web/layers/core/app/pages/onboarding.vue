@@ -23,7 +23,8 @@ definePageMeta({
 });
 
 const { profile: existingProfile } = storeToRefs(useAuthStore());
-const { markProfileComplete } = useAuthStore();
+const { markProfileComplete, hasConsent } = useAuthStore();
+const hasHealthConsent = computed(() => hasConsent('BEAUTY_PROFILE_HEALTH'));
 const router = useRouter();
 const localePath = useLocalePath();
 const api = useApi();
@@ -108,7 +109,16 @@ useSeo(() => ({
 </script>
 
 <template>
-  <div class="w-full max-w-2xl">
+  <div v-if="!hasHealthConsent" class="w-full py-8">
+    <AccountConsentGate
+      type="BEAUTY_PROFILE_HEALTH"
+      :title="$t('CONSENT.HEALTH_TITLE')"
+      :body="$t('CONSENT.HEALTH_BODY')"
+      :checkbox-label="$t('CONSENT.HEALTH_LABEL')"
+      :confirm-label="$t('CONSENT.HEALTH_CONFIRM')"
+    />
+  </div>
+  <div v-else class="w-full max-w-2xl">
     <div class="mb-8">
       <div class="mb-2 flex items-center justify-between text-xs text-ink-muted">
         <span>{{ $t('ONBOARDING.STEP', { current: step + 1, total: steps.length }) }}</span>

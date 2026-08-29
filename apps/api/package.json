@@ -19,7 +19,8 @@
     "db:studio": "prisma studio",
     "sync:phrases": "node scripts/sync-phrases.mjs",
     "import:obf": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/import-obf.ts",
-    "traits:recompute": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/recompute-traits.ts"
+    "traits:recompute": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/recompute-traits.ts",
+    "account:purge": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/purge-accounts.ts"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed/index.ts"

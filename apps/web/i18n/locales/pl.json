@@ -52,6 +52,7 @@
     "ALL_PRODUCTS": "Wszystkie produkty",
     "INGREDIENT_LIBRARY": "Baza składników",
     "ABOUT_DATA": "O danych",
+    "PRIVACY": "Prywatność",
     "RIGHTS": "© {year} Kosvia. Wersja demonstracyjna."
   },
   "VOCAB": {
@@ -426,6 +427,9 @@
     "PASSWORD": "Hasło",
     "NAME": "Imię",
     "NAME_OPTIONAL": "Opcjonalne",
+    "BIRTH_DATE": "Data urodzenia",
+    "BIRTH_DATE_HINT": "Z Kosvii można korzystać od {age} roku życia.",
+    "TOO_YOUNG": "Kosvia jest dostępna od {age} roku życia.",
     "SIGN_IN": "Zaloguj się",
     "NO_ACCOUNT": "Pierwszy raz tutaj?",
     "CREATE_ACCOUNT": "Załóż konto",
@@ -816,7 +820,22 @@
     "EXCLUDED_INGREDIENTS_HINT": "Produkty z tymi składnikami zostaną oznaczone i przesunięte niżej w wynikach.",
     "INGREDIENT_PLACEHOLDER": "Szukaj po nazwie INCI…",
     "SAVE": "Zapisz profil",
-    "SAVED": "Profil zaktualizowany — dopasowania przeliczone"
+    "SAVED": "Profil zaktualizowany — dopasowania przeliczone",
+    "PRIVACY": {
+      "TITLE": "Prywatność i Twoje dane",
+      "SUBTITLE": "Udzielone zgody, kopia wszystkiego, co przechowujemy, i wyjście.",
+      "CONSENT_SAVED": "Zgoda zaktualizowana",
+      "HEALTH_WITHDRAW_CONFIRM": "Wycofanie tej zgody usuwa Twój profil urodowy. Kontynuować?",
+      "EXPORT": "Pobierz moje dane (JSON)",
+      "DELETE": "Usuń moje konto",
+      "DELETE_TITLE": "Usuń konto",
+      "DELETE_BODY": "Konto zostanie usunięte po 7 dniach karencji razem z profilem, półką, alertami i rozmowami z AI. Zaloguj się w tym czasie, żeby anulować. Potwierdź hasłem.",
+      "DELETE_CONFIRM": "Usuń moje konto",
+      "DELETE_SCHEDULED": "Konto zaplanowane do usunięcia. Zaloguj się w ciągu 7 dni, jeśli zmienisz zdanie.",
+      "DELETE_PENDING": "To konto zostanie usunięte {date}.",
+      "DELETE_CANCEL": "Zachowaj konto",
+      "DELETE_CANCELLED": "Usunięcie anulowane — witaj z powrotem"
+    }
   },
   "SCAN": {
     "TITLE": "Zeskanuj produkt",
@@ -856,6 +875,10 @@
     "ABOUT_DATA": {
       "TITLE": "O danych",
       "DESCRIPTION": "Skąd pochodzą dane o produktach i składnikach w Kosvii i na jakich licencjach."
+    },
+    "PRIVACY": {
+      "TITLE": "Polityka prywatności",
+      "DESCRIPTION": "Co Kosvia o Tobie przechowuje, po co i co możesz z tym zrobić."
     },
     "DISCOVER": {
       "TITLE": "Odkrywaj kosmetyki dobrane dla Ciebie",
@@ -1270,7 +1293,8 @@
     "INGREDIENT_MANY_ACTIVES": "{count} składnik aktywny, więc wprowadzaj go powoli obok innych kuracji. | {count} składniki aktywne, więc wprowadzaj je powoli obok innych kuracji. | {count} składników aktywnych, więc wprowadzaj je powoli obok innych kuracji.",
     "INGREDIENT_FRAGRANCE_HIGH": "Zapach jest wysoko w składzie — warto o tym wiedzieć, jeśli Twoja skóra łatwo reaguje.",
     "INGREDIENT_COMEDOGENIC": "Zawiera składnik wysoko w składzie, który bywa opisywany jako zatykający pory.",
-    "INGREDIENT_SUPPORTIVE": "Duża część formuły nawilża, zmiękcza lub wspiera barierę skórną."
+    "INGREDIENT_SUPPORTIVE": "Duża część formuły nawilża, zmiękcza lub wspiera barierę skórną.",
+    "AI_MEDICAL_FALLBACK": "Mogę opisać, co robią te składniki, ale nie mogę udzielać porad medycznych. Jeśli chodzi o chorobę skóry lub reakcję, porozmawiaj z dermatologiem."
   },
   "ABOUT_DATA": {
     "TITLE": "O danych",
@@ -1283,5 +1307,48 @@
     "DEMO_TITLE": "Dane demonstracyjne",
     "DEMO_BODY": "Produkty bez podanego źródła to dane demonstracyjne stworzone na potrzeby rozwoju: wymyślone marki, wygenerowane ceny i ilustracyjne opakowania.",
     "CONTACT": "Widzisz błąd w danych? Poprawki rekordów Open Beauty Facts najlepiej wnosić bezpośrednio na ich stronie; w pozostałych sprawach — napisz do nas."
+  },
+  "CONSENT": {
+    "TERMS_LABEL": "Akceptuję regulamin",
+    "PRIVACY_LABEL": "Zapoznałam/em się z polityką prywatności",
+    "HEALTH_LABEL": "Wyrażam zgodę na przetwarzanie przez Kosvię informacji o mojej skórze",
+    "HEALTH_HINT": "Typ cery, problemy, wrażliwość i składniki, których unikasz, to dane o zdrowiu. Bez tej zgody nie ma profilu urodowego ani Personal Match — cała reszta działa.",
+    "AI_LABEL": "Wyrażam zgodę na wysyłanie zanonimizowanej wersji mojego profilu do dostawcy modelu AI",
+    "AI_HINT": "Tylko typ cery, problemy, cele i budżet — nigdy imię, e-mail ani identyfikator konta. Potrzebne do AI Shoppera i wyjaśnień AI.",
+    "MARKETING_LABEL": "Chcę od czasu do czasu dostawać nowości produktowe e-mailem",
+    "MARKETING_HINT": "Opcjonalne. Możesz wyłączyć w każdej chwili.",
+    "REGISTER_NOTE": "Dwie zgody dotyczące skóry i AI są dobrowolne — możesz je wyrazić lub wycofać później w profilu.",
+    "PRIVACY_LINK": "Polityka prywatności",
+    "WITHDRAW_NOTE": "Tę zgodę możesz wycofać w każdej chwili w profilu; wycofanie usuwa dane, których dotyczy.",
+    "HEALTH_TITLE": "Zanim zapytamy o Twoją skórę",
+    "HEALTH_BODY": "Profil urodowy przechowuje informacje o Twojej skórze — jej typ, co Ci przeszkadza, jak reaguje i jakich składników unikasz. W świetle prawa to dane o zdrowiu, więc potrzebujemy Twojej wyraźnej zgody, zanim cokolwiek zapiszemy.",
+    "HEALTH_CONFIRM": "Przejdź do profilu",
+    "AI_TITLE": "Zanim porozmawiasz z AI Shopperem",
+    "AI_BODY": "Żeby odpowiedzi pasowały do Ciebie, Kosvia wysyła dostawcy modelu zanonimizowane streszczenie profilu — typ cery, problemy, cele, budżet. Imię, e-mail i identyfikator konta nigdy nie są dołączane. Z całego katalogu możesz korzystać bez tego.",
+    "AI_CONFIRM": "Otwórz AI Shoppera"
+  },
+  "PRIVACY": {
+    "TITLE": "Polityka prywatności",
+    "INTRO": "Ta strona wyjaśnia, co Kosvia o Tobie przechowuje, po co, na jakiej podstawie prawnej i co możesz z tym zrobić.",
+    "DRAFT_NOTE": "Wersja robocza inżynierska: opisuje dokładnie to, co robi oprogramowanie. Nie została jeszcze zweryfikowana przez prawnika — zostanie przed komercyjnym uruchomieniem.",
+    "WHAT_TITLE": "Co przechowujemy",
+    "WHAT_BODY": "Konto: e-mail, hash hasła, opcjonalne imię, data urodzenia (tylko do weryfikacji wieku), ostatnia aktywność.\nProfil urodowy (tylko za Twoją zgodą): typ cery, wrażliwość, problemy, cele, budżet, preferencje zapachowe i etyczne, marki i składniki, których unikasz.\nPółka, alerty cenowe, porównania i rozmowy z AI, które tworzysz.\nHistoria zgód: na którą wersję dokumentu i kiedy się zgodzono, oraz solony hash adresu IP.",
+    "BASIS_TITLE": "Dlaczego wolno nam to przetwarzać",
+    "BASIS_BODY": "Konto i logowanie: wykonanie umowy (art. 6 ust. 1 lit. b RODO).\nProfil urodowy i Personal Match: Twoja wyraźna zgoda (art. 9 ust. 2 lit. a), bo informacje o skórze to dane o zdrowiu.\nWysyłanie zanonimizowanego profilu do dostawcy modelu AI: osobna zgoda.\nAlerty cenowe i półka: wykonanie umowy.\nLogi bezpieczeństwa: nasz uzasadniony interes w utrzymaniu bezpieczeństwa usługi (art. 6 ust. 1 lit. f).",
+    "HEALTH_TITLE": "Twoja skóra to dane o zdrowiu",
+    "HEALTH_BODY": "Typ cery, trądzik, zaczerwienienia, wrażliwość i alergie opisują Twój stan fizyczny. Zapisujemy je dopiero po zaznaczeniu osobnego, niezaznaczonego pola, a zgodę możesz wycofać w każdej chwili w profilu. Wycofanie natychmiast usuwa profil urodowy; reszta konta działa dalej.",
+    "AI_TITLE": "Dostawca modelu AI",
+    "AI_BODY": "Za Twoją zgodą AI Shopper wysyła dostawcy modelu zanonimizowany kontekst: typ cery, problemy, cele, budżet, preferencje oraz produkty pobrane z naszego katalogu. Każde żądanie przechodzi przez sanitizer usuwający e-mail, imię, identyfikator konta i wszystko, co wygląda jak adres. Dostawca działa jako nasz podmiot przetwarzający na podstawie umowy powierzenia; prosimy o zerową retencję danych i region UE, gdy jest dostępny.",
+    "MATCH_TITLE": "Jak liczony jest Personal Match",
+    "MATCH_BODY": "Wynik liczy własny, deterministyczny algorytm Kosvii na podstawie listy składników i Twojego profilu: dopasowanie do typu cery, pokrycie problemów i celów, jakość formuły, zapach, budżet, preferencje etyczne i to, co już masz. Każdy punkt ma nazwany powód, który widzisz pod „Dlaczego taki wynik?”. AI tylko opisuje wynik słowami; nigdy nie tworzy liczby. Wynik nie wywołuje wobec Ciebie skutków prawnych ani podobnie istotnych.",
+    "RIGHTS_TITLE": "Twoje prawa",
+    "RIGHTS_BODY": "Dostęp i przenoszenie: pobierz wszystko, co przechowujemy, jako JSON w swoim profilu.\nSprostowanie: edytuj profil w każdej chwili.\nUsunięcie: usuń konto ze swojego profilu. Twarde usunięcie następuje po 7 dniach karencji; zostaje wyłącznie hash identyfikatora konta jako dowód.\nWycofanie zgody: wyłącz dowolną zgodę w profilu.\nSkarga: możesz ją złożyć do Prezesa UODO.",
+    "RETENTION_TITLE": "Jak długo przechowujemy",
+    "RETENTION_BODY": "Tak długo, jak istnieje Twoje konto. Kopie zapasowe rotują w ciągu 30 dni, więc usunięte dane znikają z nich w tym okresie. Konta nieaktywne przez 24 miesiące są ostrzegane, a potem usuwane.",
+    "COOKIES_TITLE": "Ciasteczka",
+    "COOKIES_BODY": "Kosvia używa wyłącznie ciasteczek niezbędnych: dwóch sesyjnych HttpOnly i wyboru języka. Nie ma analityki zewnętrznej ani trackerów reklamowych, więc baner nie jest potrzebny.",
+    "MEDICAL_TITLE": "To nie jest usługa medyczna",
+    "MEDICAL_BODY": "Kosvia dostarcza informacji o produktach kosmetycznych i ich składnikach. Nie jest wyrobem ani usługą medyczną, nie diagnozuje ani nie leczy chorób skóry i nie zastępuje konsultacji z dermatologiem. Odpowiedzi AI są sprawdzane pod kątem stwierdzeń medycznych, zanim je zobaczysz.",
+    "VERSION": "Wersja z {date}."
   }
 }

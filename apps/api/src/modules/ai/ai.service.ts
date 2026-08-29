@@ -13,8 +13,12 @@ import { PersonalMatchService } from '../scoring/personal-match.service';
 import { IngredientScoreService } from '../scoring/ingredient-score.service';
 import { PRODUCT_INCLUDE, hasMatchedIngredient } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
-import { toLocalisedReason } from '../../common/i18n/phrases';
+import { renderLocalised, toLocalisedReason } from '../../common/i18n/phrases';
+
+const MEDICAL_FALLBACK_EN =
+  'I can describe what these ingredients do, but I cannot give medical advice. If this is about a skin condition or a reaction, please talk to a dermatologist.';
 import { BeautyAdvisorService } from './beauty-advisor.service';
+import { findMedicalLanguage, REPHRASE_INSTRUCTION } from './medical-language';
 import { AI_PROVIDER, type AIProvider, type AnswerLocale } from './providers/ai-provider.interface';
 
 @Injectable()
@@ -53,7 +57,7 @@ export class AIService {
       history,
       locale,
     );
-    const answer = await this.provider.generateResponse(context);
+    const answer = await this.safeAnswer(context, locale);
     const suggestions = this.advisor.toSuggestions(retrieved);
 
     const saved = await this.prisma.aIMessage.create({
@@ -180,6 +184,24 @@ export class AIService {
         : null,
     });
     return { explanation };
+  }
+
+  /**
+   * One rewrite when the model slips into medical language; if it still
+   * does, a neutral fallback goes out instead of the model's words.
+   */
+  private async safeAnswer(
+    context: Parameters<AIProvider['generateResponse']>[0],
+    locale: AnswerLocale,
+  ): Promise<string> {
+    const first = await this.provider.generateResponse(context);
+    if (!findMedicalLanguage(first)) return first;
+    const second = await this.provider.generateResponse({
+      ...context,
+      rewriteInstruction: REPHRASE_INSTRUCTION,
+    });
+    if (!findMedicalLanguage(second)) return second;
+    return renderLocalised({ code: 'ai.medical_fallback', text: MEDICAL_FALLBACK_EN }, locale);
   }
 
   private async resolveConversation(

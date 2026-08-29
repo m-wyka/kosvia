@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type {
+  AccountExportDto,
+  ConsentType,
   BeautyProfileDto,
   BrandDto,
   IngredientDto,
@@ -9,7 +11,9 @@ import type {
 definePageMeta({ middleware: 'auth' });
 
 const { user, displayName } = storeToRefs(useAuthStore());
-const { markProfileComplete, logout } = useAuthStore();
+const { markProfileComplete, logout, hasConsent, setConsent, setDeletionScheduledFor } =
+  useAuthStore();
+const format = useFormat();
 const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
@@ -95,6 +99,84 @@ const signOut = async () => {
   await router.push(localePath('/'));
 };
 
+const consentBusy = ref<ConsentType | null>(null);
+const exporting = ref(false);
+const deleteModalOpen = ref(false);
+const deletePassword = ref('');
+const deleting = ref(false);
+const cancellingDeletion = ref(false);
+
+const PRIVACY_CONSENTS: Array<{ type: ConsentType; label: string; hint: string }> = [
+  { type: 'BEAUTY_PROFILE_HEALTH', label: 'CONSENT.HEALTH_LABEL', hint: 'CONSENT.HEALTH_HINT' },
+  { type: 'AI_PROCESSING', label: 'CONSENT.AI_LABEL', hint: 'CONSENT.AI_HINT' },
+  { type: 'MARKETING_EMAIL', label: 'CONSENT.MARKETING_LABEL', hint: 'CONSENT.MARKETING_HINT' },
+];
+
+const toggleConsent = async (type: ConsentType, granted: boolean) => {
+  if (
+    type === 'BEAUTY_PROFILE_HEALTH' &&
+    !granted &&
+    !window.confirm(t('PROFILE.PRIVACY.HEALTH_WITHDRAW_CONFIRM'))
+  ) {
+    return;
+  }
+  consentBusy.value = type;
+  try {
+    await setConsent(type, granted);
+    toast.success(t('PROFILE.PRIVACY.CONSENT_SAVED'));
+  } catch (caught) {
+    toast.error(message(caught));
+  } finally {
+    consentBusy.value = null;
+  }
+};
+
+const exportData = async () => {
+  exporting.value = true;
+  try {
+    const data = await api<AccountExportDto>('/account/export');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `kosvia-export-${data.exportedAt.slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  } catch (caught) {
+    toast.error(message(caught));
+  } finally {
+    exporting.value = false;
+  }
+};
+
+const requestDeletion = async () => {
+  deleting.value = true;
+  try {
+    await api('/account', { method: 'DELETE', body: { password: deletePassword.value } });
+    deleteModalOpen.value = false;
+    toast.success(t('PROFILE.PRIVACY.DELETE_SCHEDULED'));
+    await logout();
+    await router.push(localePath('/'));
+  } catch (caught) {
+    toast.error(message(caught));
+  } finally {
+    deleting.value = false;
+  }
+};
+
+const cancelDeletion = async () => {
+  cancellingDeletion.value = true;
+  try {
+    await api('/account/deletion/cancel', { method: 'POST' });
+    setDeletionScheduledFor(null);
+    toast.success(t('PROFILE.PRIVACY.DELETE_CANCELLED'));
+  } catch (caught) {
+    toast.error(message(caught));
+  } finally {
+    cancellingDeletion.value = false;
+  }
+};
+
 watchEffect(() => {
   const value = profile.value;
   if (!value || typeof value !== 'object') {
@@ -129,6 +211,24 @@ useSeo(() => ({
         </BaseButton>
       </div>
     </header>
+
+    <div
+      v-if="user?.deletionScheduledFor"
+      class="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-critical-soft px-4 py-3 text-sm text-critical"
+      role="alert"
+    >
+      <span>
+        {{ $t('PROFILE.PRIVACY.DELETE_PENDING', { date: format.date(user.deletionScheduledFor) }) }}
+      </span>
+      <BaseButton
+        size="sm"
+        variant="secondary"
+        :loading="cancellingDeletion"
+        @click="cancelDeletion"
+      >
+        {{ $t('PROFILE.PRIVACY.DELETE_CANCEL') }}
+      </BaseButton>
+    </div>
 
     <BaseErrorState v-if="error" class="mt-8" @retry="refresh()" />
 
@@ -242,5 +342,63 @@ useSeo(() => ({
         </BaseButton>
       </div>
     </form>
+
+    <BaseCard class="mt-10">
+      <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.PRIVACY.TITLE') }}</h2>
+      <p class="mt-1 text-sm text-ink-muted">{{ $t('PROFILE.PRIVACY.SUBTITLE') }}</p>
+
+      <div class="mt-5 space-y-4">
+        <BaseSwitch
+          v-for="consent in PRIVACY_CONSENTS"
+          :key="consent.type"
+          :model-value="hasConsent(consent.type)"
+          :label="$t(consent.label)"
+          :hint="$t(consent.hint)"
+          :disabled="consentBusy === consent.type"
+          @update:model-value="toggleConsent(consent.type, Boolean($event))"
+        />
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-5">
+        <BaseButton variant="secondary" size="sm" :loading="exporting" @click="exportData">
+          {{ $t('PROFILE.PRIVACY.EXPORT') }}
+        </BaseButton>
+        <BaseButton variant="danger" size="sm" @click="deleteModalOpen = true">
+          {{ $t('PROFILE.PRIVACY.DELETE') }}
+        </BaseButton>
+        <NuxtLinkLocale
+          to="/privacy"
+          class="text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+        >
+          {{ $t('CONSENT.PRIVACY_LINK') }}
+        </NuxtLinkLocale>
+      </div>
+    </BaseCard>
+
+    <BaseModal v-model:open="deleteModalOpen" :title="$t('PROFILE.PRIVACY.DELETE_TITLE')">
+      <p class="text-sm leading-relaxed text-ink-soft">
+        {{ $t('PROFILE.PRIVACY.DELETE_BODY') }}
+      </p>
+      <BaseInput
+        v-model="deletePassword"
+        class="mt-4"
+        :label="$t('AUTH.PASSWORD')"
+        type="password"
+        autocomplete="current-password"
+      />
+      <template #footer>
+        <BaseButton variant="ghost" @click="deleteModalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
+        <BaseButton
+          variant="danger"
+          :loading="deleting"
+          :disabled="!deletePassword"
+          @click="requestDeletion"
+        >
+          {{ $t('PROFILE.PRIVACY.DELETE_CONFIRM') }}
+        </BaseButton>
+      </template>
+    </BaseModal>
   </div>
 </template>

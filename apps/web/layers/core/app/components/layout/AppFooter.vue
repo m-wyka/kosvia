@@ -10,6 +10,7 @@ const groups = [
       { to: '/ingredients', label: 'FOOTER.INGREDIENT_LIBRARY' },
       { to: '/compare', label: 'NAV.COMPARE' },
       { to: '/about-data', label: 'FOOTER.ABOUT_DATA' },
+      { to: '/privacy', label: 'FOOTER.PRIVACY' },
     ],
   },
   {

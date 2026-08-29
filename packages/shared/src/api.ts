@@ -6,6 +6,7 @@ import type {
   MessageRole,
   SensitivityLevel,
   SkinType,
+  ConsentType,
   SubscriptionStatus,
   TokenStatus,
   UserRole,
@@ -32,6 +33,10 @@ export interface ApiErrorBody {
   statusCode: number;
   error: string;
   message: string | string[];
+  /** Machine-readable reason, e.g. CONSENT_REQUIRED. */
+  code?: string;
+  /** Which consent is missing when `code` is CONSENT_REQUIRED. */
+  consent?: ConsentType;
   path?: string;
   timestamp?: string;
 }
@@ -40,6 +45,9 @@ export interface ApiErrorBody {
 /* Auth & user                                                                */
 /* -------------------------------------------------------------------------- */
 
+/** Which consents are currently in force — the latest event per type. */
+export type ConsentState = Record<ConsentType, boolean>;
+
 export interface UserDto {
   id: string;
   email: string;
@@ -47,7 +55,48 @@ export interface UserDto {
   role: UserRole;
   subscriptionStatus: SubscriptionStatus;
   hasBeautyProfile: boolean;
+  consents: ConsentState;
+  /** Set while an account deletion is pending; the hard delete runs at this time. */
+  deletionScheduledFor: string | null;
   createdAt: string;
+}
+
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  name?: string;
+  /** ISO date (YYYY-MM-DD); the account is refused under MINIMUM_AGE. */
+  birthDate: string;
+  acceptTerms: boolean;
+  acceptPrivacy: boolean;
+  healthConsent?: boolean;
+  aiConsent?: boolean;
+}
+
+export interface ConsentEventDto {
+  type: ConsentType;
+  version: string;
+  granted: boolean;
+  createdAt: string;
+}
+
+export interface ConsentsDto {
+  current: ConsentState;
+  history: ConsentEventDto[];
+}
+
+/** Error body code the API returns when an endpoint needs a consent the user has not given. */
+export const CONSENT_REQUIRED_CODE = 'CONSENT_REQUIRED';
+
+export interface AccountExportDto {
+  exportedAt: string;
+  account: Omit<UserDto, 'consents' | 'deletionScheduledFor'> & { birthDate: string | null };
+  beautyProfile: BeautyProfileDto | null;
+  consents: ConsentEventDto[];
+  shelf: unknown[];
+  priceAlerts: unknown[];
+  comparisons: unknown[];
+  conversations: unknown[];
 }
 
 export interface AuthResponse {

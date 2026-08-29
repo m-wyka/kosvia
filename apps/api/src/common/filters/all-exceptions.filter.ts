@@ -26,6 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string | string[] = 'Something went wrong on our side.';
     let error = 'Internal Server Error';
+    let extras: Pick<ApiErrorBody, 'code' | 'consent'> = {};
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -33,9 +34,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
       if (typeof body === 'string') {
         message = body;
       } else if (typeof body === 'object' && body !== null) {
-        const shaped = body as { message?: string | string[]; error?: string };
+        const shaped = body as {
+          message?: string | string[];
+          error?: string;
+          code?: string;
+          consent?: ApiErrorBody['consent'];
+        };
         message = shaped.message ?? exception.message;
         error = shaped.error ?? exception.name;
+        extras = {
+          ...(shaped.code && { code: shaped.code }),
+          ...(shaped.consent && { consent: shaped.consent }),
+        };
       }
       if (error === 'Internal Server Error') error = exception.name;
     } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
@@ -65,6 +75,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: status,
       error,
       message,
+      ...extras,
       path: request.url,
       timestamp: new Date().toISOString(),
     };

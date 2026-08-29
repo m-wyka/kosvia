@@ -37,6 +37,30 @@ export type MessageRole = (typeof MESSAGE_ROLES)[number];
 export const ALIAS_KINDS = ['SYNONYM', 'TRANSLATION', 'TYPO', 'TRADE_NAME', 'CI_NUMBER'] as const;
 export type AliasKind = (typeof ALIAS_KINDS)[number];
 
+export const CONSENT_TYPES = [
+  'TERMS',
+  'PRIVACY',
+  'BEAUTY_PROFILE_HEALTH',
+  'AI_PROCESSING',
+  'MARKETING_EMAIL',
+] as const;
+export type ConsentType = (typeof CONSENT_TYPES)[number];
+
+/**
+ * Bump a version when the wording of that document changes; users are asked
+ * to agree again to the new version.
+ */
+export const CONSENT_VERSIONS: Record<ConsentType, string> = {
+  TERMS: 'terms-2026-08-29',
+  PRIVACY: 'privacy-2026-08-29',
+  BEAUTY_PROFILE_HEALTH: 'health-2026-08-29',
+  AI_PROCESSING: 'ai-2026-08-29',
+  MARKETING_EMAIL: 'marketing-2026-08-29',
+};
+
+/** Minimum age to use the service without parental consent (Poland). */
+export const MINIMUM_AGE = 16;
+
 export const TOKEN_STATUSES = ['PENDING', 'MAPPED', 'NEW_INGREDIENT', 'IGNORED'] as const;
 export type TokenStatus = (typeof TOKEN_STATUSES)[number];
 

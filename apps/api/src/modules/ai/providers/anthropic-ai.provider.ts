@@ -6,11 +6,11 @@ import {
   LOCALE_NAMES,
   SAFETY_RULES,
   type AdvisorContext,
-  type AIProvider,
   type ProductAnalysisContext,
   type RecommendationExplanationContext,
 } from './ai-provider.interface';
 import { MockAIProvider } from './mock-ai.provider';
+import { SanitizedAIProvider } from './sanitized-ai.provider';
 
 /**
  * Generated sentences as prompt material. The model is told which language to
@@ -29,7 +29,7 @@ const sentences = (entries: LocalisedText[]): string =>
  * plainer answer beats a broken chat.
  */
 @Injectable()
-export class AnthropicAIProvider implements AIProvider {
+export class AnthropicAIProvider extends SanitizedAIProvider {
   readonly name = 'anthropic';
   private readonly logger = new Logger(AnthropicAIProvider.name);
   private readonly client: Anthropic;
@@ -39,10 +39,11 @@ export class AnthropicAIProvider implements AIProvider {
     apiKey: string,
     private readonly model: string,
   ) {
+    super();
     this.client = new Anthropic({ apiKey });
   }
 
-  async generateResponse(context: AdvisorContext): Promise<string> {
+  protected async generate(context: AdvisorContext): Promise<string> {
     const retrieved = context.retrieved.length
       ? context.retrieved
           .map((entry, index) =>
@@ -88,10 +89,17 @@ export class AnthropicAIProvider implements AIProvider {
       retrieved,
     ].join('\n');
 
-    return this.complete(prompt, () => this.fallback.generateResponse(context), context.history);
+    const fullPrompt = context.rewriteInstruction
+      ? `${prompt}\n\nREWRITE: ${context.rewriteInstruction}`
+      : prompt;
+    return this.complete(
+      fullPrompt,
+      () => this.fallback.generateResponse(context),
+      context.history,
+    );
   }
 
-  async analyzeProduct(context: ProductAnalysisContext): Promise<string> {
+  protected async analyze(context: ProductAnalysisContext): Promise<string> {
     const prompt = [
       `Explain this formula to a shopper in two or three sentences.`,
       `ANSWER LANGUAGE: ${LOCALE_NAMES[context.locale]}`,
@@ -111,7 +119,7 @@ export class AnthropicAIProvider implements AIProvider {
     return this.complete(prompt, () => this.fallback.analyzeProduct(context));
   }
 
-  async explainRecommendation(context: RecommendationExplanationContext): Promise<string> {
+  protected async explain(context: RecommendationExplanationContext): Promise<string> {
     const prompt = [
       'Explain this Personal Match score in two or three sentences, in second person.',
       'The score and the reasons were computed by Kosvia — restate them, do not recalculate.',

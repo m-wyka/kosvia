@@ -47,7 +47,10 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponse> {
-    const session = await this.auth.register(dto, req.headers['user-agent']);
+    const session = await this.auth.register(dto, {
+      userAgent: req.headers['user-agent'],
+      ip: req.ip,
+    });
     return this.respond(session, res);
   }
 

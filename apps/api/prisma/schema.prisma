@@ -102,6 +102,11 @@ model User {
   name               String?
   role               UserRole           @default(USER)
   subscriptionStatus SubscriptionStatus @default(FREE)
+  /// Age gate (16+ in Poland for information-society services). Optional for
+  /// accounts created before the gate existed.
+  birthDate          DateTime?
+  /// Last login or token refresh — drives the inactivity retention policy.
+  lastActiveAt       DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -112,9 +117,71 @@ model User {
   comparisons   ProductComparison[]
   refreshTokens RefreshToken[]
   submissions   ProductSubmission[]
+  consents      UserConsent[]
+  deletionRequest AccountDeletionRequest?
 
   @@index([role])
   @@map("users")
+}
+
+enum ConsentType {
+  TERMS
+  PRIVACY
+  BEAUTY_PROFILE_HEALTH
+  AI_PROCESSING
+  MARKETING_EMAIL
+}
+
+/// Consent is an event with history, never a boolean on User: we have to be
+/// able to show when, and to which document version, someone agreed.
+model UserConsent {
+  id        String      @id @default(cuid())
+  userId    String
+  type      ConsentType
+  version   String
+  granted   Boolean
+  grantedAt DateTime?
+  revokedAt DateTime?
+  /// SHA-256 of the IP with a server salt — never the raw address.
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, createdAt])
+  @@map("user_consents")
+}
+
+enum DeletionStatus {
+  PENDING
+  CANCELLED
+  EXECUTED
+}
+
+/// A 7-day grace period before the hard delete, so "I changed my mind" works.
+model AccountDeletionRequest {
+  id          String         @id @default(cuid())
+  userId      String         @unique
+  status      DeletionStatus @default(PENDING)
+  requestedAt DateTime       @default(now())
+  executeAt   DateTime
+  cancelledAt DateTime?
+  executedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, executeAt])
+  @@map("account_deletion_requests")
+}
+
+/// Proof that a deletion happened, with nothing personal left behind.
+model DeletionAudit {
+  id        String   @id @default(cuid())
+  idHash    String
+  deletedAt DateTime @default(now())
+
+  @@map("deletion_audits")
 }
 
 /// Hashed refresh tokens, one row per active session. Enables real logout and

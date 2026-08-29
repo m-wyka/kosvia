@@ -1,4 +1,14 @@
-import { IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  Equals,
+  IsBoolean,
+  IsDateString,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class RegisterDto {
@@ -19,6 +29,18 @@ export class RegisterDto {
   @MaxLength(80)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   name?: string;
+
+  @IsDateString({}, { message: 'Enter your date of birth.' })
+  birthDate!: string;
+
+  @Equals(true, { message: 'You need to accept the terms of service.' })
+  acceptTerms!: boolean;
+
+  @Equals(true, { message: 'You need to accept the privacy policy.' })
+  acceptPrivacy!: boolean;
+
+  @IsOptional() @IsBoolean() healthConsent?: boolean;
+  @IsOptional() @IsBoolean() aiConsent?: boolean;
 }
 
 export class LoginDto {

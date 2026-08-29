@@ -14,6 +14,7 @@ import { computeIngredientScore } from '../../src/modules/scoring/ingredient-sco
 import type { ScorableProductIngredient } from '../../src/modules/scoring/types';
 import { normalizeToken } from '../../src/modules/inci/inci-parser';
 import { DATA_SOURCES, MANUAL_SOURCE_CODE } from '../../src/modules/import/data-sources';
+import { CONSENT_VERSIONS, type ConsentType } from '@kosvia/shared';
 import { ProductTraitsService } from '../../src/modules/scoring/product-traits.service';
 import type { PrismaService } from '../../src/common/prisma/prisma.service';
 import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
@@ -62,6 +63,14 @@ function roundVolume(value: number): number {
   const step = value >= 200 ? 50 : value >= 100 ? 25 : value >= 40 ? 10 : 5;
   return Math.max(step, Math.round(value / step) * step);
 }
+
+const consentRows = (types: ConsentType[]) =>
+  types.map((type) => ({
+    type,
+    version: CONSENT_VERSIONS[type],
+    granted: true,
+    grantedAt: new Date(),
+  }));
 
 /** Deterministic, checksum-valid EAN-13. */
 function makeEan(index: number): string {
@@ -408,7 +417,9 @@ async function main(): Promise<void> {
       email: 'admin@kosvia.app',
       name: 'Kosvia Admin',
       role: 'ADMIN',
+      birthDate: new Date('1990-01-01'),
       passwordHash: await bcrypt.hash(adminPassword, 12),
+      consents: { create: consentRows(['TERMS', 'PRIVACY']) },
     },
   });
 
@@ -418,7 +429,11 @@ async function main(): Promise<void> {
       name: 'Demo User',
       role: 'USER',
       subscriptionStatus: 'PREMIUM',
+      birthDate: new Date('1992-05-14'),
       passwordHash: await bcrypt.hash(userPassword, 12),
+      consents: {
+        create: consentRows(['TERMS', 'PRIVACY', 'BEAUTY_PROFILE_HEALTH', 'AI_PROCESSING']),
+      },
       beautyProfile: {
         create: {
           skinType: 'COMBINATION',

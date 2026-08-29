@@ -1,4 +1,5 @@
 import {
+  UseGuards,
   Body,
   Controller,
   Delete,
@@ -10,6 +11,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { RequiresConsent } from '../../common/decorators/requires-consent.decorator';
+import { ConsentGuard } from '../../common/guards/consent.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AiChatResponse, AiConversationDto } from '@kosvia/shared';
 import {
@@ -22,6 +25,8 @@ import { ChatDto } from './dto/chat.dto';
 
 @ApiTags('ai')
 @Controller('ai')
+@UseGuards(ConsentGuard)
+@RequiresConsent('AI_PROCESSING')
 export class AIController {
   constructor(private readonly ai: AIService) {}
 

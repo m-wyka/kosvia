@@ -7,6 +7,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { ConsentService } from '../account/consent.service';
 
 /**
  * "No profile yet" is the normal state during onboarding, so the endpoint has
@@ -31,6 +32,7 @@ describe('GET /profile', () => {
       providers: [
         ProfileService,
         { provide: PrismaService, useValue: prismaDouble },
+        { provide: ConsentService, useValue: { hasConsent: async () => true } },
         { provide: APP_FILTER, useClass: AllExceptionsFilter },
       ],
     })

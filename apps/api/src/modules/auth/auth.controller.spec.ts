@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { ConsentService } from '../account/consent.service';
 import { TokenService } from './token.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -22,6 +23,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
  * Prisma is replaced with an in-memory double so the whole HTTP path — pipes,
  * guards, cookies, error shape — is exercised without needing a database.
  */
+const REGISTRATION = {
+  birthDate: '1990-06-15',
+  acceptTerms: true,
+  acceptPrivacy: true,
+};
+
 describe('Auth API', () => {
   let app: INestApplication;
   let users: Array<{
@@ -43,8 +50,27 @@ describe('Auth API', () => {
     revokedAt: Date | null;
   }>;
 
+  const consentServiceStub = {
+    record: jest.fn(async () => undefined),
+    recordMany: jest.fn(async () => undefined),
+    currentState: jest.fn(async () => ({
+      TERMS: true,
+      PRIVACY: true,
+      BEAUTY_PROFILE_HEALTH: false,
+      AI_PROCESSING: false,
+      MARKETING_EMAIL: false,
+    })),
+    history: jest.fn(async () => []),
+    hasConsent: jest.fn(async () => true),
+  };
+
   const prismaDouble = {
+    accountDeletionRequest: { findFirst: jest.fn(async () => null) },
     user: {
+      update: jest.fn(
+        async ({ where }: { where: { id: string } }) =>
+          users.find((u) => u.id === where.id) ?? null,
+      ),
       findUnique: jest.fn(
         async ({ where }: { where: { email?: string; id?: string } }) =>
           users.find((u) => (where.email ? u.email === where.email : u.id === where.id)) ?? null,
@@ -121,6 +147,7 @@ describe('Auth API', () => {
         TokenService,
         JwtStrategy,
         { provide: PrismaService, useValue: prismaDouble },
+        { provide: ConsentService, useValue: consentServiceStub },
         { provide: APP_GUARD, useClass: JwtAuthGuard },
         { provide: APP_FILTER, useClass: AllExceptionsFilter },
       ],
@@ -162,7 +189,12 @@ describe('Auth API', () => {
     it('creates an account and sets both auth cookies', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: 'New@Kosvia.app', password: 'StrongPass1', name: 'New User' })
+        .send({
+          ...REGISTRATION,
+          email: 'New@Kosvia.app',
+          password: 'StrongPass1',
+          name: 'New User',
+        })
         .expect(201);
 
       expect(res.body.user.email).toBe('new@kosvia.app'); // normalised
@@ -178,7 +210,7 @@ describe('Auth API', () => {
     it('never stores the password in plain text', async () => {
       await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: 'hash@kosvia.app', password: 'StrongPass1' })
+        .send({ ...REGISTRATION, email: 'hash@kosvia.app', password: 'StrongPass1' })
         .expect(201);
 
       const stored = users.find((u) => u.email === 'hash@kosvia.app')!;
@@ -193,23 +225,63 @@ describe('Auth API', () => {
     ])('rejects a %s password with a helpful message', async (_label, password) => {
       const res = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: 'weak@kosvia.app', password })
+        .send({ ...REGISTRATION, email: 'weak@kosvia.app', password })
         .expect(400);
       expect(res.body.message).toBeDefined();
       expect(users.some((u) => u.email === 'weak@kosvia.app')).toBe(false);
     });
 
+    it('refuses anyone under 16 and records no consents', async () => {
+      const thisYear = new Date().getFullYear();
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          ...REGISTRATION,
+          birthDate: `${thisYear - 12}-01-01`,
+          email: 'kid@kosvia.app',
+          password: 'StrongPass1',
+        })
+        .expect(400);
+      expect(users.some((u) => u.email === 'kid@kosvia.app')).toBe(false);
+    });
+
+    it('requires the terms and privacy checkboxes and records the optional consents', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          ...REGISTRATION,
+          acceptTerms: false,
+          email: 'noterms@kosvia.app',
+          password: 'StrongPass1',
+        })
+        .expect(400);
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          ...REGISTRATION,
+          healthConsent: true,
+          email: 'consent@kosvia.app',
+          password: 'StrongPass1',
+        })
+        .expect(201);
+      expect(consentServiceStub.recordMany).toHaveBeenLastCalledWith(
+        expect.any(String),
+        { TERMS: true, PRIVACY: true, BEAUTY_PROFILE_HEALTH: true },
+        expect.anything(),
+      );
+    });
+
     it('rejects an invalid email', async () => {
       await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: 'not-an-email', password: 'StrongPass1' })
+        .send({ ...REGISTRATION, email: 'not-an-email', password: 'StrongPass1' })
         .expect(400);
     });
 
     it('refuses a duplicate email with 409', async () => {
       await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: 'demo@kosvia.app', password: 'StrongPass1' })
+        .send({ ...REGISTRATION, email: 'demo@kosvia.app', password: 'StrongPass1' })
         .expect(409);
     });
 

@@ -92,6 +92,8 @@ export const PHRASES = {
         'Contains an ingredient often reported as congesting, high in the list.',
       INGREDIENT_SUPPORTIVE:
         'A large share of the formula is hydrating, softening or barrier-supporting.',
+      AI_MEDICAL_FALLBACK:
+        'I can describe what these ingredients do, but I cannot give medical advice. If this is about a skin condition or a reaction, please talk to a dermatologist.',
     },
     VOCAB: {
       SKIN_TYPE: {
@@ -348,6 +350,8 @@ export const PHRASES = {
       INGREDIENT_COMEDOGENIC:
         'Zawiera składnik wysoko w składzie, który bywa opisywany jako zatykający pory.',
       INGREDIENT_SUPPORTIVE: 'Duża część formuły nawilża, zmiękcza lub wspiera barierę skórną.',
+      AI_MEDICAL_FALLBACK:
+        'Mogę opisać, co robią te składniki, ale nie mogę udzielać porad medycznych. Jeśli chodzi o chorobę skóry lub reakcję, porozmawiaj z dermatologiem.',
     },
     VOCAB: {
       SKIN_TYPE: {

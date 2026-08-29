@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import type { BeautyProfileDto, TaxonomyItemDto } from '@kosvia/shared';
@@ -7,6 +17,8 @@ import {
   type AuthenticatedUser,
 } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { RequiresConsent } from '../../common/decorators/requires-consent.decorator';
+import { ConsentGuard } from '../../common/guards/consent.guard';
 import { ProfileService } from './profile.service';
 import { UpdateBeautyProfileDto } from './dto/update-profile.dto';
 
@@ -39,7 +51,9 @@ export class ProfileController {
   }
 
   @Patch()
-  @ApiOperation({ summary: 'Create or update the beauty profile' })
+  @UseGuards(ConsentGuard)
+  @RequiresConsent('BEAUTY_PROFILE_HEALTH')
+  @ApiOperation({ summary: 'Create or update the beauty profile (needs the health-data consent)' })
   update(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateBeautyProfileDto,

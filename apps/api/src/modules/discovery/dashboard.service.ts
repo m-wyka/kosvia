@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { DashboardDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { toUserDto } from '../auth/auth.service';
+import { ConsentService } from '../account/consent.service';
 import { ProfileService } from '../profile/profile.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { RecommendationService } from '../recommendation/recommendation.service';
@@ -16,6 +17,7 @@ export class DashboardService {
     private readonly viewers: ViewerContextService,
     private readonly recommendations: RecommendationService,
     private readonly routine: RoutineAnalysisService,
+    private readonly consents: ConsentService,
   ) {}
 
   async load(userId: string): Promise<DashboardDto> {
@@ -28,13 +30,20 @@ export class DashboardService {
       this.prisma.priceAlert.count({ where: { userId, active: true } }),
     ]);
 
+    const [consents, deletion] = await Promise.all([
+      this.consents.currentState(userId),
+      this.prisma.accountDeletionRequest.findFirst({
+        where: { userId, status: 'PENDING' },
+        select: { executeAt: true },
+      }),
+    ]);
     const [recommended, routineAnalysis] = await Promise.all([
       this.recommendations.getPersonalizedProducts(viewer, { limit: 6 }),
       shelfCount > 0 ? this.routine.analyse(userId) : Promise.resolve(null),
     ]);
 
     return {
-      user: toUserDto(user, Boolean(profile)),
+      user: toUserDto(user, Boolean(profile), consents, deletion?.executeAt ?? null),
       profile,
       shelfCount,
       favoriteCount,

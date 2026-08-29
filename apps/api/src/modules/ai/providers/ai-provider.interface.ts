@@ -36,6 +36,8 @@ export interface AdvisorContext {
   routineNotes?: LocalisedText[];
   /** Structured read of the question, so a provider can restate it in any language. */
   intent?: { routineStep: string | null; maxPrice: number | null };
+  /** Set on a retry after the medical-language check rejected the first answer. */
+  rewriteInstruction?: string;
 }
 
 export interface RetrievedProduct {

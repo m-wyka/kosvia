@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { LocalisedText } from '@kosvia/shared';
 import { formatMoney, renderLocalised, vocabTerm } from '../../../common/i18n/phrases';
+import { SanitizedAIProvider } from './sanitized-ai.provider';
 import type {
   AdvisorContext,
   AIProvider,
@@ -85,10 +86,10 @@ const COPY: Record<AnswerLocale, Record<string, (v: Record<string, string>) => s
  * This is what makes `npm run dev` work offline on a fresh clone.
  */
 @Injectable()
-export class MockAIProvider implements AIProvider {
+export class MockAIProvider extends SanitizedAIProvider {
   readonly name = 'mock';
 
-  async generateResponse(context: AdvisorContext): Promise<string> {
+  protected async generate(context: AdvisorContext): Promise<string> {
     const { retrieved, profileSummary } = context;
     const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;
@@ -169,7 +170,7 @@ export class MockAIProvider implements AIProvider {
     return paragraphs.join('\n\n');
   }
 
-  async analyzeProduct(context: ProductAnalysisContext): Promise<string> {
+  protected async analyze(context: ProductAnalysisContext): Promise<string> {
     const { product, ingredientHighlights, ingredientScore, notes } = context;
     const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;
@@ -186,7 +187,7 @@ export class MockAIProvider implements AIProvider {
     return lines.join(' ');
   }
 
-  async explainRecommendation(context: RecommendationExplanationContext): Promise<string> {
+  protected async explain(context: RecommendationExplanationContext): Promise<string> {
     const { score, reasons, warnings, product } = context;
     const locale = context.locale ?? 'pl';
     const copy = COPY[locale] ?? COPY.en;

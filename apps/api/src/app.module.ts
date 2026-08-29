@@ -18,6 +18,7 @@ import { PriceAlertsModule } from './modules/price-alerts/price-alerts.module';
 import { AIModule } from './modules/ai/ai.module';
 import { DiscoveryModule } from './modules/discovery/discovery.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { AccountModule } from './modules/account/account.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -42,6 +43,7 @@ import { HealthController } from './health.controller';
     AIModule,
     DiscoveryModule,
     AdminModule,
+    AccountModule,
   ],
   controllers: [HealthController],
   providers: [

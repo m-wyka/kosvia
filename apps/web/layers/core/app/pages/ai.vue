@@ -7,6 +7,8 @@ const STARTER_COUNT = 5;
 
 const api = useApi();
 const { displayName } = storeToRefs(useAuthStore());
+const { hasConsent } = useAuthStore();
+const hasAiConsent = computed(() => hasConsent('AI_PROCESSING'));
 const message = useApiMessage();
 const { t, locale } = useI18n();
 
@@ -104,7 +106,16 @@ useSeo(() => ({
 
 <template>
   <div class="container-page py-6 sm:py-10">
-    <div class="grid gap-8 lg:grid-cols-[1fr_17rem]">
+    <div v-if="!hasAiConsent" class="py-8">
+      <AccountConsentGate
+        type="AI_PROCESSING"
+        :title="$t('CONSENT.AI_TITLE')"
+        :body="$t('CONSENT.AI_BODY')"
+        :checkbox-label="$t('CONSENT.AI_LABEL')"
+        :confirm-label="$t('CONSENT.AI_CONFIRM')"
+      />
+    </div>
+    <div v-else class="grid gap-8 lg:grid-cols-[1fr_17rem]">
       <div class="flex min-h-[70dvh] min-w-0 flex-col">
         <header class="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>

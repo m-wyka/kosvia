@@ -52,6 +52,7 @@
     "ALL_PRODUCTS": "All products",
     "INGREDIENT_LIBRARY": "Ingredient library",
     "ABOUT_DATA": "About the data",
+    "PRIVACY": "Privacy",
     "RIGHTS": "© {year} Kosvia. Demo build."
   },
   "VOCAB": {
@@ -426,6 +427,9 @@
     "PASSWORD": "Password",
     "NAME": "Name",
     "NAME_OPTIONAL": "Optional",
+    "BIRTH_DATE": "Date of birth",
+    "BIRTH_DATE_HINT": "You need to be at least {age} to use Kosvia.",
+    "TOO_YOUNG": "Kosvia is available from the age of {age}.",
     "SIGN_IN": "Sign in",
     "NO_ACCOUNT": "New here?",
     "CREATE_ACCOUNT": "Create an account",
@@ -816,7 +820,22 @@
     "EXCLUDED_INGREDIENTS_HINT": "Products containing these will be marked and pushed down your results.",
     "INGREDIENT_PLACEHOLDER": "Search by INCI name…",
     "SAVE": "Save profile",
-    "SAVED": "Profile updated — your matches have been recalculated"
+    "SAVED": "Profile updated — your matches have been recalculated",
+    "PRIVACY": {
+      "TITLE": "Privacy and your data",
+      "SUBTITLE": "Consents you have given, a copy of everything we hold, and the way out.",
+      "CONSENT_SAVED": "Consent updated",
+      "HEALTH_WITHDRAW_CONFIRM": "Withdrawing this consent deletes your beauty profile. Continue?",
+      "EXPORT": "Download my data (JSON)",
+      "DELETE": "Delete my account",
+      "DELETE_TITLE": "Delete your account",
+      "DELETE_BODY": "Your account will be deleted after a 7-day grace period, together with your profile, shelf, alerts and AI conversations. Sign in during those 7 days to cancel. Confirm with your password.",
+      "DELETE_CONFIRM": "Delete my account",
+      "DELETE_SCHEDULED": "Your account is scheduled for deletion. Sign in within 7 days if you change your mind.",
+      "DELETE_PENDING": "This account will be deleted on {date}.",
+      "DELETE_CANCEL": "Keep my account",
+      "DELETE_CANCELLED": "Deletion cancelled — welcome back"
+    }
   },
   "SCAN": {
     "TITLE": "Scan a product",
@@ -1150,6 +1169,10 @@
       "TITLE": "About the data",
       "DESCRIPTION": "Where Kosvia’s product and ingredient data comes from and under which licences."
     },
+    "PRIVACY": {
+      "TITLE": "Privacy policy",
+      "DESCRIPTION": "What Kosvia stores about you, why, and what you can do about it."
+    },
     "DISCOVER": {
       "TITLE": "Discover cosmetics chosen for you",
       "DESCRIPTION": "Browse cosmetics by category, concern and budget. Every product is scored against your skin, your goals and what you already own."
@@ -1270,7 +1293,8 @@
     "INGREDIENT_MANY_ACTIVES": "{count} active ingredient, so introduce it alongside other treatments slowly. | {count} active ingredients, so introduce it alongside other treatments slowly.",
     "INGREDIENT_FRAGRANCE_HIGH": "Fragrance appears high in the list, which is worth knowing if your skin reacts easily.",
     "INGREDIENT_COMEDOGENIC": "Contains an ingredient often reported as congesting, high in the list.",
-    "INGREDIENT_SUPPORTIVE": "A large share of the formula is hydrating, softening or barrier-supporting."
+    "INGREDIENT_SUPPORTIVE": "A large share of the formula is hydrating, softening or barrier-supporting.",
+    "AI_MEDICAL_FALLBACK": "I can describe what these ingredients do, but I cannot give medical advice. If this is about a skin condition or a reaction, please talk to a dermatologist."
   },
   "ABOUT_DATA": {
     "TITLE": "About the data",
@@ -1283,5 +1307,48 @@
     "DEMO_TITLE": "Demo data",
     "DEMO_BODY": "Products without a listed source are demonstration data created for development: invented brands, generated prices and illustrated packaging.",
     "CONTACT": "Spotted an error in the data? Corrections to Open Beauty Facts records are best made directly on their site; everything else — write to us."
+  },
+  "CONSENT": {
+    "TERMS_LABEL": "I accept the terms of service",
+    "PRIVACY_LABEL": "I have read the privacy policy",
+    "HEALTH_LABEL": "I consent to Kosvia processing information about my skin",
+    "HEALTH_HINT": "Skin type, concerns, sensitivities and ingredients you avoid count as health data. Without this consent there is no beauty profile and no Personal Match — everything else works.",
+    "AI_LABEL": "I consent to an anonymised version of my profile being sent to the AI model provider",
+    "AI_HINT": "Only skin type, concerns, goals and budget — never your name, e-mail or account id. Needed for the AI Shopper and AI explanations.",
+    "MARKETING_LABEL": "Send me occasional product news by e-mail",
+    "MARKETING_HINT": "Optional. You can switch this off at any time.",
+    "REGISTER_NOTE": "The two consents about your skin and the AI are optional and can be given or withdrawn later in your profile.",
+    "PRIVACY_LINK": "Privacy policy",
+    "WITHDRAW_NOTE": "You can withdraw this consent at any time in your profile; withdrawing it deletes the data it covers.",
+    "HEALTH_TITLE": "Before we ask about your skin",
+    "HEALTH_BODY": "The beauty profile stores information about your skin — its type, what bothers you, how reactive it is, and ingredients you avoid. Legally this is health data, so we need your explicit consent before we can save any of it.",
+    "HEALTH_CONFIRM": "Continue to the profile",
+    "AI_TITLE": "Before you talk to the AI Shopper",
+    "AI_BODY": "To write answers that fit you, Kosvia sends an anonymised summary of your profile — skin type, concerns, goals, budget — to the model provider. Your name, e-mail and account id are never included. You can use the whole catalogue without this.",
+    "AI_CONFIRM": "Open the AI Shopper"
+  },
+  "PRIVACY": {
+    "TITLE": "Privacy policy",
+    "INTRO": "This page explains what Kosvia stores about you, why, on which legal basis, and what you can do about it.",
+    "DRAFT_NOTE": "Engineering draft: written to describe exactly what the software does. It has not yet been reviewed by a lawyer and will be before commercial launch.",
+    "WHAT_TITLE": "What we store",
+    "WHAT_BODY": "Account: e-mail, password hash, optional name, date of birth (age check only), last activity.\nBeauty profile (only with your consent): skin type, sensitivity, concerns, goals, budget, fragrance and ethical preferences, brands and ingredients you avoid.\nShelf, price alerts, product comparisons and AI conversations you create.\nConsent history: which document version you agreed to, when, and a salted hash of your IP address.",
+    "BASIS_TITLE": "Why we may process it",
+    "BASIS_BODY": "Account and sign-in: performance of a contract (art. 6(1)(b) GDPR).\nBeauty profile and Personal Match: your explicit consent (art. 9(2)(a)), because information about your skin is health data.\nSending an anonymised profile to the AI model provider: separate consent.\nPrice alerts and your shelf: performance of a contract.\nSecurity logs: our legitimate interest in keeping the service safe (art. 6(1)(f)).",
+    "HEALTH_TITLE": "Your skin is health data",
+    "HEALTH_BODY": "Skin type, acne, redness, sensitivities and allergies describe your physical condition. We only save them after you tick a separate, unticked box, and you can withdraw that consent at any time in your profile. Withdrawing it deletes the beauty profile immediately; the rest of your account keeps working.",
+    "AI_TITLE": "The AI model provider",
+    "AI_BODY": "With your consent, the AI Shopper sends the model provider an anonymised context: skin type, concerns, goals, budget, preferences and the products we retrieved from our own catalogue. Every request passes through a sanitiser that removes your e-mail, name, account id and anything that looks like an address. The provider acts as our processor under a data-processing agreement; we ask for zero data retention and an EU region where offered.",
+    "MATCH_TITLE": "How Personal Match is computed",
+    "MATCH_BODY": "Your score is calculated by Kosvia’s own deterministic algorithm from the ingredient list and your profile: skin-type fit, coverage of your concerns and goals, formula quality, fragrance, budget, ethical preferences and what you already own. Every point is attributed to a named reason you can see under “Why this score?”. The AI only describes the result in words; it never produces the number. The score has no legal or similarly significant effect on you.",
+    "RIGHTS_TITLE": "Your rights",
+    "RIGHTS_BODY": "Access and portability: download everything we hold as JSON from your profile.\nRectification: edit your profile at any time.\nErasure: delete your account from your profile. It is scheduled for hard deletion after a 7-day grace period; only a hash of the account id remains as proof.\nWithdrawal of consent: switch any consent off in your profile.\nComplaint: you may lodge one with the Polish supervisory authority (UODO).",
+    "RETENTION_TITLE": "How long we keep it",
+    "RETENTION_BODY": "For as long as your account exists. Backups rotate within 30 days, so deleted data leaves them in that period. Accounts inactive for 24 months are warned and then removed.",
+    "COOKIES_TITLE": "Cookies",
+    "COOKIES_BODY": "Kosvia uses only strictly necessary cookies: two HttpOnly session cookies and your language choice. There is no third-party analytics and no advertising tracker, so no cookie banner is needed.",
+    "MEDICAL_TITLE": "Not a medical service",
+    "MEDICAL_BODY": "Kosvia provides information about cosmetic products and their ingredients. It is not a medical device or service, does not diagnose or treat skin conditions, and does not replace a consultation with a dermatologist. AI answers are checked for medical claims before they are shown.",
+    "VERSION": "Version of {date}."
   }
 }
