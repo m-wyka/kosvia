@@ -540,6 +540,8 @@
       "FRAGRANCE_FREE": "Fragrance-free",
       "VEGAN": "Vegan",
       "CRUELTY_FREE": "Cruelty-free",
+      "SPF": "With SPF",
+      "WITH_COUNT": "{label} ({count})",
       "SKIN_TYPE": "Suits my skin type",
       "BRAND": "Brand"
     }

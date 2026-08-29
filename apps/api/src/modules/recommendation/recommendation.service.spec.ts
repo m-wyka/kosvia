@@ -1,6 +1,7 @@
 import { Prisma, type RoutineStep } from '@prisma/client';
 import { RecommendationService } from './recommendation.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
+import type { CoarseMatchService } from '../scoring/coarse-match.service';
 import type { PrismaService } from '../../common/prisma/prisma.service';
 import type { ViewerContext } from '../profile/viewer-context.service';
 import { row } from './__fixtures__';
@@ -15,6 +16,21 @@ const CATALOGUE: Record<RoutineStep, number[]> = {
   SPF: [64, 90],
 } as never;
 
+const rowFor = (step: RoutineStep | undefined, price: number) =>
+  row({
+    id: `${step ?? 'any'}-${price}`,
+    price,
+    routineStep: step ?? 'OTHER',
+    // Dearer options score better, so the builder has a real
+    // incentive to overspend if the allocation lets it.
+    ingredientScore: Math.min(95, 40 + price),
+  });
+
+/** Pass A stand-in: every candidate survives, in the order given. */
+const coarseMatchStub = {
+  topCandidates: jest.fn(async (ids: string[]) => ids.map((id) => ({ id, coarse: 0 }))),
+} as unknown as CoarseMatchService;
+
 function prismaFor(catalogue: Partial<Record<RoutineStep, number[]>>) {
   const stepOf = (where: Record<string, never>): RoutineStep | undefined =>
     (where?.category as { routineStep?: RoutineStep } | undefined)?.routineStep;
@@ -22,23 +38,18 @@ function prismaFor(catalogue: Partial<Record<RoutineStep, number[]>>) {
   return {
     product: {
       findMany: jest.fn(async ({ where }: { where: Record<string, never> }) => {
+        const wantedIds = (where?.id as { in?: string[] } | undefined)?.in;
+        if (wantedIds) {
+          return (Object.entries(catalogue) as Array<[RoutineStep, number[]]>)
+            .flatMap(([step, prices]) => prices.map((price) => rowFor(step, price)))
+            .filter((candidate) => wantedIds.includes(candidate.id));
+        }
         const step = stepOf(where);
         const prices = step ? (catalogue[step] ?? []) : Object.values(catalogue).flat();
         const ceiling = (where?.lowestPrice as { lte?: Prisma.Decimal } | undefined)?.lte;
         const max = ceiling ? Number(ceiling.toString()) : Number.POSITIVE_INFINITY;
 
-        return prices
-          .filter((price) => price <= max)
-          .map((price) =>
-            row({
-              id: `${step ?? 'any'}-${price}`,
-              price,
-              routineStep: step ?? 'OTHER',
-              // Dearer options score better, so the builder has a real
-              // incentive to overspend if the allocation lets it.
-              ingredientScore: Math.min(95, 40 + price),
-            }),
-          );
+        return prices.filter((price) => price <= max).map((price) => rowFor(step, price));
       }),
       aggregate: jest.fn(async ({ where }: { where: Record<string, never> }) => {
         const step = stepOf(where);
@@ -57,10 +68,11 @@ function prismaFor(catalogue: Partial<Record<RoutineStep, number[]>>) {
 
 describe('RecommendationService.buildRoutine', () => {
   const build = (budget: number, catalogue = CATALOGUE) =>
-    new RecommendationService(prismaFor(catalogue), new PersonalMatchService()).buildRoutine(
-      budget,
-      ANON,
-    );
+    new RecommendationService(
+      prismaFor(catalogue),
+      new PersonalMatchService(),
+      coarseMatchStub,
+    ).buildRoutine(budget, ANON);
 
   it('returns the four core steps in the order you apply them', async () => {
     const plan = await build(300);

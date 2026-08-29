@@ -2,9 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { AliasKind, TokenStatus, type Prisma } from '@prisma/client';
 import type { PaginatedResult, UnmatchedTokenDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { computeIngredientScore } from '../scoring/ingredient-score';
-import { PRODUCT_INCLUDE } from '../products/product.select';
-import { toScorable } from '../products/product.mapper';
+import { ProductTraitsService } from '../scoring/product-traits.service';
 import { normalizeToken } from './inci-parser';
 import { MATCH_CONFIDENCE, type IngredientSuggestion } from './inci-matcher.service';
 
@@ -40,7 +38,10 @@ type TokenRow = Prisma.UnmatchedTokenGetPayload<{ select: typeof TOKEN_SELECT }>
 
 @Injectable()
 export class UnmatchedTokenService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly traits: ProductTraitsService,
+  ) {}
 
   async record(
     normalized: string,
@@ -188,24 +189,8 @@ export class UnmatchedTokenService {
       data: { ingredientId, matchConfidence: confidence },
     });
     const productIds = [...new Set(rows.map((row) => row.productId))];
-    await this.recomputeScores(productIds);
+    await this.traits.refresh(productIds);
     return { rematchedRows: rows.length, affectedProducts: productIds.length };
-  }
-
-  private async recomputeScores(productIds: string[]): Promise<void> {
-    const products = await this.prisma.product.findMany({
-      where: { id: { in: productIds } },
-      include: PRODUCT_INCLUDE,
-    });
-    for (const row of products) {
-      const { score } = computeIngredientScore(toScorable(row).ingredients);
-      if (score !== row.ingredientScore) {
-        await this.prisma.product.update({
-          where: { id: row.id },
-          data: { ingredientScore: score },
-        });
-      }
-    }
   }
 
   private async requireToken(id: string): Promise<TokenRow> {

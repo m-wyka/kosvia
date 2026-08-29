@@ -3,11 +3,10 @@ import { Prisma } from '@prisma/client';
 import { slugify } from '@kosvia/shared';
 import type { AdminStatsDto, PaginatedResult } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { computeIngredientScore } from '../scoring/ingredient-score';
+import { ProductTraitsService } from '../scoring/product-traits.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { normalizeToken } from '../inci/inci-parser';
 import { MANUAL_SOURCE_CODE } from '../import/data-sources';
-import { toScorable } from '../products/product.mapper';
 import type {
   AdminListQueryDto,
   ProductIngredientInputDto,
@@ -31,7 +30,10 @@ import type {
  */
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly traits: ProductTraitsService,
+  ) {}
 
   async stats(): Promise<AdminStatsDto> {
     const [
@@ -528,19 +530,7 @@ export class AdminService {
 
   private async recomputeScores(productIds: string[]): Promise<void> {
     if (!productIds.length) return;
-    const rows = await this.prisma.product.findMany({
-      where: { id: { in: [...new Set(productIds)] } },
-      include: PRODUCT_INCLUDE,
-    });
-    for (const row of rows) {
-      const { score } = computeIngredientScore(toScorable(row).ingredients);
-      if (score !== row.ingredientScore) {
-        await this.prisma.product.update({
-          where: { id: row.id },
-          data: { ingredientScore: score },
-        });
-      }
-    }
+    await this.traits.refresh(productIds);
   }
 
   private async refreshLowestPrice(productId: string): Promise<void> {

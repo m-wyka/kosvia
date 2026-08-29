@@ -14,6 +14,8 @@ import { computeIngredientScore } from '../../src/modules/scoring/ingredient-sco
 import type { ScorableProductIngredient } from '../../src/modules/scoring/types';
 import { normalizeToken } from '../../src/modules/inci/inci-parser';
 import { DATA_SOURCES, MANUAL_SOURCE_CODE } from '../../src/modules/import/data-sources';
+import { ProductTraitsService } from '../../src/modules/scoring/product-traits.service';
+import type { PrismaService } from '../../src/common/prisma/prisma.service';
 import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
 import { INGREDIENTS, INGREDIENT_ALIASES } from './data/ingredients';
 import { FORMULAS } from './data/formulas';
@@ -513,6 +515,12 @@ async function main(): Promise<void> {
       },
     ],
   });
+
+  /* -------------------------------------------------------------- traits -- */
+
+  console.log('› Product traits');
+  const traitsService = new ProductTraitsService(prisma as unknown as PrismaService);
+  await traitsService.refreshAll();
 
   /* ------------------------------------------------------------- summary -- */
 

@@ -68,6 +68,7 @@ export class ProductQueryDto {
   @IsOptional() @IsBoolean() @Transform(toBoolean) fragranceFree?: boolean;
   @IsOptional() @IsBoolean() @Transform(toBoolean) vegan?: boolean;
   @IsOptional() @IsBoolean() @Transform(toBoolean) crueltyFree?: boolean;
+  @IsOptional() @IsBoolean() @Transform(toBoolean) spf?: boolean;
 
   @IsOptional() @IsEnum(PRODUCT_SORTS) sort?: ProductSort;
 

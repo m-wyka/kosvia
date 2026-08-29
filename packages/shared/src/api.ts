@@ -230,15 +230,25 @@ export interface ProductSearchQuery {
   fragranceFree?: boolean;
   vegan?: boolean;
   crueltyFree?: boolean;
+  spf?: boolean;
   sort?: ProductSort;
   page?: number;
   pageSize?: number;
+}
+
+/** How many products in the current result set carry each formula trait. */
+export interface FormulaFacetsDto {
+  fragranceFree: number;
+  vegan: number;
+  crueltyFree: number;
+  spf: number;
 }
 
 export interface ProductFacetsDto {
   brands: Array<BrandSummaryDto & { count: number }>;
   categories: Array<{ id: string; name: string; slug: string; count: number }>;
   priceRange: { min: number; max: number };
+  formula: FormulaFacetsDto;
 }
 
 /** A lightweight autocomplete hit — see GET /products/suggest. */

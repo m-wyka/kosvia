@@ -540,6 +540,8 @@
       "FRAGRANCE_FREE": "Bezzapachowe",
       "VEGAN": "Wegańskie",
       "CRUELTY_FREE": "Cruelty-free",
+      "SPF": "Z filtrem SPF",
+      "WITH_COUNT": "{label} ({count})",
       "SKIN_TYPE": "Pasuje do mojej skóry",
       "BRAND": "Marka"
     }

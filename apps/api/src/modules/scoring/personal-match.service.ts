@@ -71,7 +71,18 @@ export class PersonalMatchService {
    */
   score({ product, profile, shelf }: MatchInput): PersonalMatchDto {
     if (!profile) return this.genericScore(product);
+    return this.finalise(this.contributions(product, profile, shelf));
+  }
 
+  /**
+   * Every signed contribution before compression. Exposed so the coarse
+   * (pass A) bound can be checked against the exact delta in tests.
+   */
+  contributions(
+    product: ScorableProduct,
+    profile: ScorableProfile,
+    shelf?: ShelfSnapshot,
+  ): MatchReason[] {
     // Raw contributions are collected first and compressed at the end, so the
     // reported breakdown always adds up to the score the user sees.
     const raw: MatchReason[] = [];
@@ -306,7 +317,7 @@ export class PersonalMatchService {
       }
     }
 
-    return this.finalise(raw);
+    return raw;
   }
 
   /**

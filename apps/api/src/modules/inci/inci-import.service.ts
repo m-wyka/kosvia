@@ -2,10 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import type { LabelImportResultDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { computeIngredientScore } from '../scoring/ingredient-score';
 import { positionWeight } from '../scoring/types';
-import { PRODUCT_INCLUDE } from '../products/product.select';
-import { toScorable } from '../products/product.mapper';
+import { ProductTraitsService } from '../scoring/product-traits.service';
 import { InciMatcherService, type IngredientMatch } from './inci-matcher.service';
 import { parseLabel, type ParsedToken } from './inci-parser';
 import { UnmatchedTokenService } from './unmatched-token.service';
@@ -37,6 +35,7 @@ export class InciImportService {
     private readonly prisma: PrismaService,
     private readonly matcher: InciMatcherService,
     private readonly unmatchedTokens: UnmatchedTokenService,
+    private readonly traits: ProductTraitsService,
   ) {}
 
   async applyLabel(
@@ -74,7 +73,7 @@ export class InciImportService {
         }),
       ),
     );
-    await this.recomputeScore(productId);
+    await this.traits.refresh([productId]);
 
     const unmatched = resolved
       .filter((entry) => entry.unmatchedNormalized.length)
@@ -154,22 +153,5 @@ export class InciImportService {
       }
     }
     return total === 0 ? 0 : Number((weighted / total).toFixed(3));
-  }
-
-  async recomputeScore(productId: string): Promise<void> {
-    const row = await this.prisma.product.findUnique({
-      where: { id: productId },
-      include: PRODUCT_INCLUDE,
-    });
-    if (!row) {
-      return;
-    }
-    const { score } = computeIngredientScore(toScorable(row).ingredients);
-    if (score !== row.ingredientScore) {
-      await this.prisma.product.update({
-        where: { id: productId },
-        data: { ingredientScore: score },
-      });
-    }
   }
 }

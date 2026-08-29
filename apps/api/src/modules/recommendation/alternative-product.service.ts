@@ -7,6 +7,7 @@ import type {
 } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
+import { ProductTraitsService } from '../scoring/product-traits.service';
 import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../products/product.select';
 import { decimalToNumber, toProductSummary, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
@@ -18,6 +19,8 @@ type Scored = {
   match: number;
 };
 
+const FINGERPRINT_NEIGHBOURS = 12;
+const MIN_EXPLAINABLE_OVERLAP = 0.2;
 const GROUP_SIZE = 4;
 
 /**
@@ -32,6 +35,7 @@ export class AlternativeProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly match: PersonalMatchService,
+    private readonly traits: ProductTraitsService,
   ) {}
 
   async forProduct(idOrSlug: string, viewer: ViewerContext): Promise<AlternativeGroupDto[]> {
@@ -128,16 +132,28 @@ export class AlternativeProductService {
     );
 
     /* -------------------------------------------------- similar ingredients */
+    // Nearest fingerprints (05_WYSZUKIWARKA.md §7) pick the candidates; the
+    // ingredient overlap is what we can honestly explain to the user.
     const subjectIngredients = new Set(
       subject.ingredients
         .filter(hasMatchedIngredient)
         .filter((i) => i.position <= 14)
         .map((i) => i.ingredientId),
     );
+    const neighbours = await this.traits.similarByFingerprint(
+      subject.id,
+      subject.categoryId,
+      FINGERPRINT_NEIGHBOURS,
+    );
+    const neighbourById = new Map(neighbours.map((row) => [row.id, row.similarity]));
     const similar = others
+      .filter((entry) => neighbourById.has(entry.row.id))
       .map((entry) => ({ entry, overlap: this.overlap(subjectIngredients, entry.row) }))
-      .filter(({ overlap }) => overlap > 0.32)
-      .sort((a, b) => b.overlap - a.overlap)
+      .filter(({ overlap }) => overlap > MIN_EXPLAINABLE_OVERLAP)
+      .sort(
+        (a, b) =>
+          (neighbourById.get(b.entry.row.id) ?? 0) - (neighbourById.get(a.entry.row.id) ?? 0),
+      )
       .slice(0, GROUP_SIZE)
       .map(({ entry, overlap }) => ({
         entry,

@@ -9,9 +9,13 @@ import type {
 import { BUDGET_CEILING } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
+import { CoarseMatchService } from '../scoring/coarse-match.service';
 import { PRODUCT_INCLUDE, type ProductRow } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
+
+const COARSE_POOL_MIN = 80;
+const COARSE_POOL_FACTOR = 8;
 
 /** The steps a "basic routine" is made of, in the order you apply them. */
 const CORE_ROUTINE: RoutineStep[] = ['CLEANSER', 'SERUM', 'MOISTURIZER', 'SPF'];
@@ -47,6 +51,7 @@ export class RecommendationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly match: PersonalMatchService,
+    private readonly coarseMatch: CoarseMatchService,
   ) {}
 
   /** Top products for this viewer, optionally restricted to a routine step. */
@@ -73,13 +78,18 @@ export class RecommendationService {
         : {}),
     };
 
-    // Pull a generous candidate pool by formula quality, then re-rank on the
-    // personal score, which the database cannot express.
+    // Pass A narrows the whole filtered set with the SQL upper bound; pass B
+    // (rank) scores only those candidates exactly.
+    const matching = await this.prisma.product.findMany({ where, select: { id: true } });
+    const coarse = await this.coarseMatch.topCandidates(
+      matching.map((row) => row.id),
+      viewer.profile,
+      viewer.shelf,
+      Math.max(COARSE_POOL_MIN, limit * COARSE_POOL_FACTOR),
+    );
     const rows = await this.prisma.product.findMany({
-      where,
+      where: { id: { in: coarse.map((candidate) => candidate.id) } },
       include: PRODUCT_INCLUDE,
-      orderBy: [{ ingredientScore: 'desc' }, { lowestPrice: 'asc' }],
-      take: Math.max(80, limit * 8),
     });
 
     return this.rank(rows, viewer).slice(0, limit);

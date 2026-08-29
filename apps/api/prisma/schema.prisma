@@ -266,6 +266,7 @@ model Product {
   brand       Brand               @relation(fields: [brandId], references: [id], onDelete: Cascade)
   category    Category            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   ingredients ProductIngredient[]
+  traits      ProductTraits?
   offers      ProductOffer[]
   priceHistory PriceHistory[]
   submissions ProductSubmission[]
@@ -420,6 +421,58 @@ enum SubmissionStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+/// Denormalised, purely numeric view of a formula so the first pass of
+/// Personal Match runs as one SQL expression over the whole catalogue.
+/// Recomputed by ProductTraitsService whenever the ingredient list changes.
+model ProductTraits {
+  productId            String  @id
+  hasFragrance         Boolean @default(false)
+  hasFragranceAllergen Boolean @default(false)
+  hasAlcoholDenat      Boolean @default(false)
+  alcoholDenatPosition Int?
+  hasEssentialOils     Boolean @default(false)
+  hasSilicones         Boolean @default(false)
+  hasSpf               Boolean @default(false)
+
+  humectantScore       Float @default(0)
+  emollientScore       Float @default(0)
+  occlusiveScore       Float @default(0)
+  antioxidantScore     Float @default(0)
+  exfoliantScore       Float @default(0)
+  soothingScore        Float @default(0)
+  brighteningScore     Float @default(0)
+  antiAgingScore       Float @default(0)
+  sebumRegulationScore Float @default(0)
+
+  skinFitDry         Float @default(0)
+  skinFitOily        Float @default(0)
+  skinFitCombination Float @default(0)
+  skinFitNormal      Float @default(0)
+  skinFitSensitive   Float @default(0)
+  calmingLoad        Float @default(0)
+  irritantLoad       Float @default(0)
+
+  activeIngredientIds String[] @default([])
+  concernSlugs        String[] @default([])
+  goalSlugs           String[] @default([])
+  /// 64 dims: 0–19 tag shares, 20–63 hashed presence of headline actives. See product-traits.ts.
+  fingerprint         Unsupported("vector(64)")?
+
+  ingredientCount  Int   @default(0)
+  recognizedRatio  Float @default(0)
+  dataCompleteness Float @default(0)
+  traitsVersion    Int   @default(1)
+  computedAt       DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([activeIngredientIds], type: Gin)
+  @@index([concernSlugs], type: Gin)
+  @@index([goalSlugs], type: Gin)
+  @@index([hasFragrance, hasSpf])
+  @@map("product_traits")
 }
 
 /// Where a record came from — required for ODbL/CC attribution and to keep

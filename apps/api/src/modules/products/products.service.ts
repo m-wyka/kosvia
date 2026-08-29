@@ -4,6 +4,7 @@ import type {
   IngredientScoreBreakdownDto,
   PersonalMatchDto,
   ProductDto,
+  FormulaFacetsDto,
   ProductFacetsDto,
   ProductSearchResult,
   ProductSuggestionDto,
@@ -12,6 +13,7 @@ import type {
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { IngredientScoreService } from '../scoring/ingredient-score.service';
+import { CoarseMatchService } from '../scoring/coarse-match.service';
 import type { ViewerContext } from '../profile/viewer-context.service';
 import { PRODUCT_INCLUDE, type ProductRow } from './product.select';
 import { decimalToNumber, toProductDto, toProductSummary, toScorable } from './product.mapper';
@@ -35,6 +37,7 @@ export class ProductsService {
     private readonly prisma: PrismaService,
     private readonly match: PersonalMatchService,
     private readonly ingredientScore: IngredientScoreService,
+    private readonly coarseMatch: CoarseMatchService,
     @Inject(SEARCH_PROVIDER) private readonly searchProvider: SearchProvider,
   ) {}
 
@@ -46,10 +49,13 @@ export class ProductsService {
       ? await this.searchProvider.rankedCandidates(query.q, MAX_SEARCH_CANDIDATES)
       : null;
     const where = await this.buildWhere(query, candidates);
+    const sortsByPersonalMatch = query.sort === 'best-match' || query.sort === 'recommended';
     const result =
       candidates && this.sortsByRelevance(query.sort)
         ? await this.pageByRelevance(where, candidates, query, viewer)
-        : await this.pageByColumn(where, query, viewer);
+        : sortsByPersonalMatch
+          ? await this.pageByPersonalMatch(where, query, viewer)
+          : await this.pageByColumn(where, query, viewer);
 
     if (query.q) {
       this.logSearch(query.q, result.total, Date.now() - startedAt);
@@ -100,6 +106,52 @@ export class ProductsService {
     };
   }
 
+  /**
+   * Two-pass Personal Match (04_PERSONAL_MATCH.md §2): pass A ranks every
+   * product that survives the filters with an SQL upper bound, pass B scores
+   * only its top candidates exactly. Nothing that could reach the first page
+   * is ever cut off by a formula-quality pre-sort.
+   */
+  private async pageByPersonalMatch(
+    where: Prisma.ProductWhereInput,
+    query: ProductQueryDto,
+    viewer: ViewerContext,
+  ): Promise<ProductSearchResult> {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
+
+    const [matching, facets] = await Promise.all([
+      this.prisma.product.findMany({ where, select: { id: true } }),
+      this.facets(where),
+    ]);
+    const coarse = await this.coarseMatch.topCandidates(
+      matching.map((row) => row.id),
+      viewer.profile,
+      viewer.shelf,
+    );
+    const rows = await this.prisma.product.findMany({
+      where: { id: { in: coarse.map((candidate) => candidate.id) } },
+      include: PRODUCT_INCLUDE,
+    });
+
+    const items = this.decorate(rows, viewer)
+      .sort((a, b) => {
+        const byScore = (b.personalMatch?.score ?? 0) - (a.personalMatch?.score ?? 0);
+        if (byScore !== 0) return byScore;
+        return b.ingredientScore - a.ingredientScore || a.name.localeCompare(b.name);
+      })
+      .slice((page - 1) * pageSize, page * pageSize);
+
+    return {
+      items,
+      total: matching.length,
+      page,
+      pageSize,
+      pageCount: Math.max(1, Math.ceil(coarse.length / pageSize)),
+      facets,
+    };
+  }
+
   private async pageByColumn(
     where: Prisma.ProductWhereInput,
     query: ProductQueryDto,
@@ -108,35 +160,18 @@ export class ProductsService {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
 
-    // "best-match" and "recommended" depend on the per-user score, which the
-    // database does not know about, so those sorts are applied after scoring.
-    const needsClientSort = query.sort === 'best-match' || query.sort === 'recommended';
-    const dbSort = this.orderBy(query.sort);
-
     const [total, rows] = await Promise.all([
       this.prisma.product.count({ where }),
       this.prisma.product.findMany({
         where,
         include: PRODUCT_INCLUDE,
-        orderBy: dbSort,
-        // Client-side sorting needs a wider window than one page, but stays
-        // bounded so a huge catalogue never turns into a full table scan.
-        ...(needsClientSort
-          ? { take: Math.min(240, page * pageSize + pageSize * 4) }
-          : { skip: (page - 1) * pageSize, take: pageSize }),
+        orderBy: this.orderBy(query.sort),
+        skip: (page - 1) * pageSize,
+        take: pageSize,
       }),
     ]);
 
-    let items = this.decorate(rows, viewer);
-
-    if (needsClientSort) {
-      items = items.sort((a, b) => {
-        const byScore = (b.personalMatch?.score ?? 0) - (a.personalMatch?.score ?? 0);
-        if (byScore !== 0) return byScore;
-        return b.ingredientScore - a.ingredientScore;
-      });
-      items = items.slice((page - 1) * pageSize, page * pageSize);
-    }
+    const items = this.decorate(rows, viewer);
 
     return {
       items,
@@ -239,6 +274,7 @@ export class ProductsService {
     if (query.fragranceFree) and.push({ isFragranceFree: true });
     if (query.vegan) and.push({ isVegan: true });
     if (query.crueltyFree) and.push({ isCrueltyFree: true });
+    if (query.spf) and.push({ traits: { hasSpf: true } });
 
     if (query.minPrice !== undefined || query.maxPrice !== undefined) {
       if (
@@ -287,7 +323,7 @@ export class ProductsService {
   }
 
   private async facets(where: Prisma.ProductWhereInput): Promise<ProductFacetsDto> {
-    const [byBrand, byCategory, priceAgg] = await Promise.all([
+    const [byBrand, byCategory, priceAgg, formula] = await Promise.all([
       this.prisma.product.groupBy({ by: ['brandId'], where, _count: { _all: true } }),
       this.prisma.product.groupBy({ by: ['categoryId'], where, _count: { _all: true } }),
       this.prisma.product.aggregate({
@@ -295,6 +331,7 @@ export class ProductsService {
         _min: { lowestPrice: true },
         _max: { lowestPrice: true },
       }),
+      this.formulaCounts(where),
     ]);
 
     const [brands, categories] = await Promise.all([
@@ -327,6 +364,18 @@ export class ProductsService {
         min: decimalToNumber(priceAgg._min.lowestPrice) ?? 0,
         max: decimalToNumber(priceAgg._max.lowestPrice) ?? 0,
       },
+      formula,
     };
+  }
+
+  /** One round-trip for every boolean facet, over the same filtered set. */
+  private async formulaCounts(where: Prisma.ProductWhereInput): Promise<FormulaFacetsDto> {
+    const [fragranceFree, vegan, crueltyFree, spf] = await Promise.all([
+      this.prisma.product.count({ where: { AND: [where, { isFragranceFree: true }] } }),
+      this.prisma.product.count({ where: { AND: [where, { isVegan: true }] } }),
+      this.prisma.product.count({ where: { AND: [where, { isCrueltyFree: true }] } }),
+      this.prisma.product.count({ where: { AND: [where, { traits: { hasSpf: true } }] } }),
+    ]);
+    return { fragranceFree, vegan, crueltyFree, spf };
   }
 }

@@ -14,6 +14,7 @@ const FILTER_KEYS = [
   'fragranceFree',
   'vegan',
   'crueltyFree',
+  'spf',
 ];
 
 const props = defineProps<{
@@ -25,6 +26,10 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 const vocab = useVocabulary();
+const { t } = useI18n();
+
+const formulaLabel = (key: string, count: number | undefined): string =>
+  count === undefined ? t(key) : t('SEARCH.FILTER.WITH_COUNT', { label: t(key), count });
 
 const maxPrice = ref(Number(route.query.maxPrice ?? 0) || 0);
 
@@ -171,18 +176,23 @@ watch(
       <div class="space-y-2.5">
         <BaseCheckbox
           :model-value="query.fragranceFree === 'true'"
-          :label="$t('SEARCH.FILTER.FRAGRANCE_FREE')"
+          :label="formulaLabel('SEARCH.FILTER.FRAGRANCE_FREE', facets?.formula.fragranceFree)"
           @update:model-value="update({ fragranceFree: $event || undefined })"
         />
         <BaseCheckbox
           :model-value="query.vegan === 'true'"
-          :label="$t('SEARCH.FILTER.VEGAN')"
+          :label="formulaLabel('SEARCH.FILTER.VEGAN', facets?.formula.vegan)"
           @update:model-value="update({ vegan: $event || undefined })"
         />
         <BaseCheckbox
           :model-value="query.crueltyFree === 'true'"
-          :label="$t('SEARCH.FILTER.CRUELTY_FREE')"
+          :label="formulaLabel('SEARCH.FILTER.CRUELTY_FREE', facets?.formula.crueltyFree)"
           @update:model-value="update({ crueltyFree: $event || undefined })"
+        />
+        <BaseCheckbox
+          :model-value="query.spf === 'true'"
+          :label="formulaLabel('SEARCH.FILTER.SPF', facets?.formula.spf)"
+          @update:model-value="update({ spf: $event || undefined })"
         />
       </div>
     </section>
