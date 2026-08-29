@@ -36,7 +36,8 @@ export const useVocabulary = () => {
 
   const routineStep = (value: string) =>
     translateOr(`VOCAB.ROUTINE_STEP.${toTranslationKey(value)}`, value);
-  const tag = (value: string) => translateOr(`VOCAB.TAG.${toTranslationKey(value)}`, humanise(value));
+  const tag = (value: string) =>
+    translateOr(`VOCAB.TAG.${toTranslationKey(value)}`, humanise(value));
 
   const category = (slug: string, apiName?: string | null) =>
     translateOr(`VOCAB.CATEGORY.${toTranslationKey(slug)}`, apiName ?? humanise(slug));

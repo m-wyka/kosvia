@@ -2,7 +2,10 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Res } from 
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import type { BeautyProfileDto, TaxonomyItemDto } from '@kosvia/shared';
-import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthenticatedUser,
+} from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { ProfileService } from './profile.service';
 import { UpdateBeautyProfileDto } from './dto/update-profile.dto';

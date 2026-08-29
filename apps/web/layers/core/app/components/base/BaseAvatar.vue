@@ -3,17 +3,18 @@ const props = withDefaults(defineProps<{ name?: string | null; size?: number }>(
 
 const initials = computed(() => {
   const source = props.name?.trim();
-  if (!source) {return '?';}
-  const parts = source.split(/\s+/).filter(Boolean);
-  const initialsFromWords = parts.length > 1 ? `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}` : '';
+  if (!source) {
+    return '?';
+  }
+  const words = source.split(/\s+/).filter(Boolean);
+  const initialsFromWords = words.length > 1 ? `${words[0]?.[0] ?? ''}${words[1]?.[0] ?? ''}` : '';
   return (initialsFromWords || source.slice(0, 2)).toUpperCase();
 });
 </script>
 
 <template>
   <span
-    class="inline-flex shrink-0 items-center justify-center rounded-full bg-blush-soft
-           font-medium text-blush-deep select-none"
+    class="inline-flex shrink-0 items-center justify-center rounded-full bg-blush-soft font-medium text-blush-deep select-none"
     :style="{ width: `${size}px`, height: `${size}px`, fontSize: `${size * 0.36}px` }"
     aria-hidden="true"
   >

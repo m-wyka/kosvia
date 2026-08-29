@@ -9,7 +9,12 @@ const message = useApiMessage();
 const { t } = useI18n();
 const format = useFormat();
 
-const { data: alerts, pending, error, refresh } = await useApiFetch<PriceAlertDto[]>('/price-alerts', {
+const {
+  data: alerts,
+  pending,
+  error,
+  refresh,
+} = await useApiFetch<PriceAlertDto[]>('/price-alerts', {
   key: 'price-alerts',
   default: () => [],
 });
@@ -17,16 +22,16 @@ const { data: alerts, pending, error, refresh } = await useApiFetch<PriceAlertDt
 const triggered = computed(() => (alerts.value ?? []).filter((alert) => alert.triggered));
 const watching = computed(() => (alerts.value ?? []).filter((alert) => !alert.triggered));
 
-async function toggleActive(alert: PriceAlertDto) {
+const toggleActive = async (alert: PriceAlertDto) => {
   try {
     await api(`/price-alerts/${alert.id}`, { method: 'PATCH', body: { active: !alert.active } });
     await refresh();
   } catch (caught) {
     toast.error(message(caught));
   }
-}
+};
 
-async function remove(alert: PriceAlertDto) {
+const remove = async (alert: PriceAlertDto) => {
   try {
     await api(`/price-alerts/${alert.id}`, { method: 'DELETE' });
     await refresh();
@@ -34,15 +39,17 @@ async function remove(alert: PriceAlertDto) {
   } catch (caught) {
     toast.error(message(caught));
   }
-}
+};
 
-function distance(alert: PriceAlertDto): string {
-  if (alert.product.lowestPrice === null) {return t('ALERTS.NO_PRICE');}
+const distanceToTarget = (alert: PriceAlertDto): string => {
+  if (alert.product.lowestPrice === null) {
+    return t('ALERTS.NO_PRICE');
+  }
   const gap = alert.product.lowestPrice - alert.targetPrice;
   return gap <= 0
     ? t('ALERTS.BELOW', { amount: format.price(Math.abs(gap)) })
     : t('ALERTS.ABOVE', { amount: format.price(gap) });
-}
+};
 
 useSeo(() => ({
   title: t('SEO.ALERTS.TITLE'),
@@ -81,16 +88,28 @@ useSeo(() => ({
         </h2>
         <ul class="space-y-3">
           <li v-for="alert in triggered" :key="alert.id">
-            <div class="flex flex-wrap items-center gap-4 rounded-xl border border-positive/30 bg-positive-soft/40 p-4">
+            <div
+              class="flex flex-wrap items-center gap-4 rounded-xl border border-positive/30 bg-positive-soft/40 p-4"
+            >
               <NuxtLinkLocale :to="`/products/${alert.product.slug}`" class="w-16 shrink-0">
-                <ProductImage :src="alert.product.imageUrl" :alt="alert.product.name" ratio="square" class="rounded-md" />
+                <ProductImage
+                  :src="alert.product.imageUrl"
+                  :alt="alert.product.name"
+                  ratio="square"
+                  class="rounded-md"
+                />
               </NuxtLinkLocale>
               <div class="min-w-0 flex-1">
-                <p class="truncate text-2xs tracking-wide text-ink-muted uppercase">{{ alert.product.brand.name }}</p>
-                <NuxtLinkLocale :to="`/products/${alert.product.slug}`" class="text-sm font-medium text-ink hover:underline">
+                <p class="truncate text-2xs tracking-wide text-ink-muted uppercase">
+                  {{ alert.product.brand.name }}
+                </p>
+                <NuxtLinkLocale
+                  :to="`/products/${alert.product.slug}`"
+                  class="text-sm font-medium text-ink hover:underline"
+                >
                   {{ alert.product.name }}
                 </NuxtLinkLocale>
-                <p class="mt-0.5 text-xs text-positive">{{ distance(alert) }}</p>
+                <p class="mt-0.5 text-xs text-positive">{{ distanceToTarget(alert) }}</p>
               </div>
               <div class="text-right">
                 <p class="text-lg font-semibold tabular-nums text-ink">
@@ -118,14 +137,24 @@ useSeo(() => ({
             :class="!alert.active && 'opacity-60'"
           >
             <NuxtLinkLocale :to="`/products/${alert.product.slug}`" class="w-16 shrink-0">
-              <ProductImage :src="alert.product.imageUrl" :alt="alert.product.name" ratio="square" class="rounded-md" />
+              <ProductImage
+                :src="alert.product.imageUrl"
+                :alt="alert.product.name"
+                ratio="square"
+                class="rounded-md"
+              />
             </NuxtLinkLocale>
             <div class="min-w-0 flex-1">
-              <p class="truncate text-2xs tracking-wide text-ink-muted uppercase">{{ alert.product.brand.name }}</p>
-              <NuxtLinkLocale :to="`/products/${alert.product.slug}`" class="text-sm font-medium text-ink hover:underline">
+              <p class="truncate text-2xs tracking-wide text-ink-muted uppercase">
+                {{ alert.product.brand.name }}
+              </p>
+              <NuxtLinkLocale
+                :to="`/products/${alert.product.slug}`"
+                class="text-sm font-medium text-ink hover:underline"
+              >
                 {{ alert.product.name }}
               </NuxtLinkLocale>
-              <p class="mt-0.5 text-xs text-ink-muted">{{ distance(alert) }}</p>
+              <p class="mt-0.5 text-xs text-ink-muted">{{ distanceToTarget(alert) }}</p>
             </div>
             <div class="text-right">
               <p class="text-lg font-semibold tabular-nums text-ink">

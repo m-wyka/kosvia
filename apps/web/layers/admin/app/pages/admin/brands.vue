@@ -6,8 +6,27 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 type BrandRow = BrandDto & { _count: { products: number } };
 
-const resource = useAdminResource<BrandRow>('/admin/brands');
+const EMPTY_FORM = { name: '', slug: '', description: '', isVegan: false, isCrueltyFree: false };
+
+const {
+  rows,
+  total,
+  pageCount,
+  page,
+  search,
+  pending,
+  error,
+  saving,
+  refresh,
+  create,
+  update,
+  remove,
+} = useAdminResource<BrandRow>('/admin/brands');
 const { t } = useI18n();
+
+const editing = ref<BrandRow | null>(null);
+const modalOpen = ref(false);
+const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
   { key: 'name', label: t('ADMIN.BRANDS.COL_NAME') },
@@ -17,17 +36,13 @@ const columns = computed<TableColumn[]>(() => [
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
-const editing = ref<BrandRow | null>(null);
-const modalOpen = ref(false);
-const form = reactive({ name: '', slug: '', description: '', isVegan: false, isCrueltyFree: false });
-
-function openCreate() {
+const openCreate = () => {
   editing.value = null;
-  Object.assign(form, { name: '', slug: '', description: '', isVegan: false, isCrueltyFree: false });
+  Object.assign(form, EMPTY_FORM);
   modalOpen.value = true;
-}
+};
 
-function openEdit(brand: BrandRow) {
+const openEdit = (brand: BrandRow) => {
   editing.value = brand;
   Object.assign(form, {
     name: brand.name,
@@ -37,9 +52,9 @@ function openEdit(brand: BrandRow) {
     isCrueltyFree: brand.isCrueltyFree,
   });
   modalOpen.value = true;
-}
+};
 
-async function save() {
+const save = async () => {
   const body = {
     name: form.name,
     slug: form.slug || undefined,
@@ -48,15 +63,19 @@ async function save() {
     isCrueltyFree: form.isCrueltyFree,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, t('ADMIN.BRANDS.SAVED'))
-    : await resource.create(body, t('ADMIN.BRANDS.CREATED'));
-  if (result) {modalOpen.value = false;}
-}
+    ? await update(editing.value.id, body, t('ADMIN.BRANDS.SAVED'))
+    : await create(body, t('ADMIN.BRANDS.CREATED'));
+  if (result) {
+    modalOpen.value = false;
+  }
+};
 
-async function confirmDelete(brand: BrandRow) {
-  if (!confirm(t('ADMIN.CONFIRM_DELETE', { name: brand.name }))) {return;}
-  await resource.remove(brand.id, t('ADMIN.BRANDS.DELETED'));
-}
+const confirmDelete = async (brand: BrandRow) => {
+  if (!confirm(t('ADMIN.CONFIRM_DELETE', { name: brand.name }))) {
+    return;
+  }
+  await remove(brand.id, t('ADMIN.BRANDS.DELETED'));
+};
 
 useSeo(() => ({
   title: t('SEO.ADMIN.BRANDS'),
@@ -69,7 +88,7 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.BRANDS.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.BRANDS.SUBTITLE')"
     >
       <template #actions>
@@ -81,21 +100,21 @@ useSeo(() => ({
     </AdminPageHeader>
 
     <AdminToolbar
-      v-model:search="resource.search.value"
-      :page="resource.page.value"
-      :page-count="resource.pageCount.value"
-      :total="resource.total.value"
+      v-model:search="search"
+      :page="page"
+      :page-count="pageCount"
+      :total="total"
       :placeholder="$t('ADMIN.BRANDS.SEARCH_PLACEHOLDER')"
-      @update:page="resource.page.value = $event"
+      @update:page="page = $event"
     />
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.BRANDS.EMPTY')"
     >
       <template #cell-name="{ row }">
@@ -165,8 +184,10 @@ useSeo(() => ({
         </div>
       </div>
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
-        <BaseButton :loading="resource.saving.value" :disabled="!form.name" @click="save">
+        <BaseButton variant="ghost" @click="modalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
+        <BaseButton :loading="saving" :disabled="!form.name" @click="save">
           {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.BRANDS.CREATE') }}
         </BaseButton>
       </template>

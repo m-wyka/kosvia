@@ -71,10 +71,10 @@
   --color-info-soft: #e7eef4;
 
   /* --- typography -------------------------------------------------------- */
-  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter,
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-display: ui-serif, 'New York', 'Iowan Old Style', Georgia, 'Times New Roman',
-    serif;
+  --font-sans:
+    ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --font-display: ui-serif, 'New York', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   --text-2xs: 0.6875rem;
@@ -122,7 +122,9 @@
     text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     letter-spacing: -0.018em;
     text-wrap: balance;
   }
@@ -148,7 +150,10 @@
     scrollbar-width: thin;
     scrollbar-color: var(--color-line-strong) transparent;
   }
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
   ::-webkit-scrollbar-thumb {
     background: var(--color-line-strong);
     border: 3px solid var(--color-canvas);
@@ -178,7 +183,9 @@
 
 @utility hide-scrollbar {
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ==========================================================================
@@ -186,19 +193,35 @@
    ========================================================================== */
 
 @keyframes kosvia-fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes kosvia-shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes kosvia-pop {
-  0% { transform: scale(1); }
-  45% { transform: scale(1.22); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @layer components {
@@ -225,11 +248,17 @@
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity var(--duration-base) var(--ease-out-soft),
+  transition:
+    opacity var(--duration-base) var(--ease-out-soft),
     transform var(--duration-base) var(--ease-out-soft);
 }
-.page-enter-from { opacity: 0; transform: translateY(6px); }
-.page-leave-to { opacity: 0; }
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-leave-to {
+  opacity: 0;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -240,5 +269,8 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .skeleton { animation: none; background: var(--color-surface-muted); }
+  .skeleton {
+    animation: none;
+    background: var(--color-surface-muted);
+  }
 }

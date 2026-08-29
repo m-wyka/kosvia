@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import type { ProductSummaryDto } from "@kosvia/shared";
+import type { ProductSummaryDto } from '@kosvia/shared';
 
-/**
- * A horizontally scrolling product row.
- *
- * Deliberately a scroll container rather than a carousel library: it is
- * keyboard- and touch-native, needs no JavaScript to work, and the arrow
- * buttons are a progressive enhancement on top.
- */
+const EDGE_THRESHOLD_PX = 4;
+const SCROLL_STEP_RATIO = 0.8;
+const SKELETON_COUNT = 5;
+
 const props = defineProps<{
   title: string;
   subtitle?: string | null;
@@ -20,19 +17,21 @@ const track = ref<HTMLElement | null>(null);
 const atStart = ref(true);
 const atEnd = ref(false);
 
-function updateEdges() {
-  const el = track.value;
-  if (!el) {return;}
-  atStart.value = el.scrollLeft <= 4;
-  atEnd.value = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
-}
+const updateEdges = () => {
+  const element = track.value;
+  if (!element) {
+    return;
+  }
+  atStart.value = element.scrollLeft <= EDGE_THRESHOLD_PX;
+  atEnd.value = element.scrollLeft + element.clientWidth >= element.scrollWidth - EDGE_THRESHOLD_PX;
+};
 
-function scrollBy(direction: -1 | 1) {
+const scrollTrack = (direction: -1 | 1) => {
   track.value?.scrollBy({
-    left: direction * Math.round(track.value.clientWidth * 0.8),
-    behavior: "smooth",
+    left: direction * Math.round(track.value.clientWidth * SCROLL_STEP_RATIO),
+    behavior: 'smooth',
   });
-}
+};
 
 onMounted(updateEdges);
 watch(
@@ -55,15 +54,16 @@ watch(
           v-if="seeAllTo"
           :to="seeAllTo"
           class="text-sm font-medium text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline"
-          >{{ $t("COMMON.SEE_ALL") }}</NuxtLinkLocale
         >
+          {{ $t('COMMON.SEE_ALL') }}
+        </NuxtLinkLocale>
         <div class="hidden gap-1 sm:flex">
           <button
             type="button"
             class="flex size-8 items-center justify-center rounded-full border border-line text-ink-soft transition-colors hover:border-line-strong hover:bg-surface disabled:opacity-35"
             :disabled="atStart"
             :aria-label="$t('PRODUCT.SCROLL_LEFT')"
-            @click="scrollBy(-1)"
+            @click="scrollTrack(-1)"
           >
             <BaseIcon name="chevron-left" :size="16" />
           </button>
@@ -72,7 +72,7 @@ watch(
             class="flex size-8 items-center justify-center rounded-full border border-line text-ink-soft transition-colors hover:border-line-strong hover:bg-surface disabled:opacity-35"
             :disabled="atEnd"
             :aria-label="$t('PRODUCT.SCROLL_RIGHT')"
-            @click="scrollBy(1)"
+            @click="scrollTrack(1)"
           >
             <BaseIcon name="chevron-right" :size="16" />
           </button>
@@ -86,11 +86,7 @@ watch(
       @scroll.passive="updateEdges"
     >
       <template v-if="loading">
-        <div
-          v-for="index in 5"
-          :key="`s-${index}`"
-          class="w-54 shrink-0 sm:w-60"
-        >
+        <div v-for="index in SKELETON_COUNT" :key="`s-${index}`" class="w-54 shrink-0 sm:w-60">
           <ProductCardSkeleton />
         </div>
       </template>

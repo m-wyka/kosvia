@@ -206,12 +206,7 @@ export interface ProductDto extends ProductSummaryDto {
 /* -------------------------------------------------------------------------- */
 
 export type ProductSort =
-  | 'recommended'
-  | 'price-asc'
-  | 'price-desc'
-  | 'best-match'
-  | 'ingredient-score'
-  | 'newest';
+  'recommended' | 'price-asc' | 'price-desc' | 'best-match' | 'ingredient-score' | 'newest';
 
 export interface ProductSearchQuery {
   q?: string;
@@ -307,11 +302,7 @@ export interface IngredientScoreBreakdownDto {
 }
 
 export type AlternativeKind =
-  | 'cheaper'
-  | 'better-match'
-  | 'better-value'
-  | 'similar-ingredients'
-  | 'similar-purpose';
+  'cheaper' | 'better-match' | 'better-value' | 'similar-ingredients' | 'similar-purpose';
 
 export interface AlternativeGroupDto {
   kind: AlternativeKind;

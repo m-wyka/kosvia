@@ -1,35 +1,8 @@
 <script setup lang="ts">
 import type { CategoryDto, ProductSearchResult, ProductSort } from '@kosvia/shared';
 
-/**
- * Catalogue search.
- *
- * All state lives in the URL: `/products?category=moisturizers&maxPrice=70`
- * is a real, linkable, indexable page rather than a client-side view.
- */
-const route = useRoute();
-const router = useRouter();
-const shelf = useShelf();
-const { t } = useI18n();
-const vocab = useVocabulary();
-
-const queryString = computed(() => {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(route.query)) {
-    if (value === undefined || value === null || value === '') {continue;}
-    params.set(key, String(value));
-  }
-  if (!params.has('pageSize')) {params.set('pageSize', '24');}
-  return params.toString();
-});
-
-const { data, pending, error, refresh } = await useApiFetch<ProductSearchResult>(
-  () => `/products?${queryString.value}`,
-  { key: 'product-search', watch: [queryString] },
-);
-
-const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', { key: 'categories' });
-
+const DEFAULT_PAGE_SIZE = '24';
+const DEFAULT_SORT: ProductSort = 'recommended';
 const SORT_VALUES: ProductSort[] = [
   'recommended',
   'best-match',
@@ -39,6 +12,37 @@ const SORT_VALUES: ProductSort[] = [
   'newest',
 ];
 
+const route = useRoute();
+const router = useRouter();
+const { refresh: refreshShelf, favoriteIds, toggleFavorite } = useShelf();
+const { t } = useI18n();
+const vocab = useVocabulary();
+
+const filtersOpen = ref(false);
+
+const queryString = computed(() => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(route.query)) {
+    if (value === undefined || value === null || value === '') {
+      continue;
+    }
+    params.set(key, String(value));
+  }
+  if (!params.has('pageSize')) {
+    params.set('pageSize', DEFAULT_PAGE_SIZE);
+  }
+  return params.toString();
+});
+
+const { data, pending, error, refresh } = await useApiFetch<ProductSearchResult>(
+  () => `/products?${queryString.value}`,
+  { key: 'product-search', watch: [queryString] },
+);
+
+const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', {
+  key: 'categories',
+});
+
 const sortOptions = computed(() =>
   SORT_VALUES.map((value) => ({
     value,
@@ -47,35 +51,39 @@ const sortOptions = computed(() =>
 );
 
 const sort = computed({
-  get: () => (route.query.sort as ProductSort) ?? 'recommended',
-  set: (value: ProductSort) => router.push({ query: { ...route.query, sort: value, page: undefined } }),
+  get: () => (route.query.sort as ProductSort) ?? DEFAULT_SORT,
+  set: (value: ProductSort) =>
+    router.push({ query: { ...route.query, sort: value, page: undefined } }),
 });
 
 const page = computed(() => Number(route.query.page ?? 1));
-function goToPage(next: number) {
-  router.push({ query: { ...route.query, page: next === 1 ? undefined : next } });
-  if (import.meta.client) {window.scrollTo({ top: 0, behavior: 'smooth' });}
-}
-
-const filtersOpen = ref(false);
 const searchTerm = computed(() => (route.query.q as string) ?? '');
+
+const findCategoryBySlug = (nodes: CategoryDto[], slug: string): CategoryDto | null => {
+  for (const node of nodes) {
+    if (node.slug === slug) {
+      return node;
+    }
+    const found = node.children?.length ? findCategoryBySlug(node.children, slug) : null;
+    if (found) {
+      return found;
+    }
+  }
+  return null;
+};
 
 const activeCategory = computed(() => {
   const slug = route.query.category as string | undefined;
-  if (!slug) {return null;}
-  const find = (nodes: CategoryDto[]): CategoryDto | null => {
-    for (const node of nodes) {
-      if (node.slug === slug) {return node;}
-      const found = node.children?.length ? find(node.children) : null;
-      if (found) {return found;}
-    }
+  if (!slug) {
     return null;
-  };
-  return find(categories.value ?? []);
+  }
+  return findCategoryBySlug(categories.value ?? [], slug);
 });
 
 const heading = computed(() => {
-  if (searchTerm.value) {return t('SEARCH.RESULTS_FOR', { query: searchTerm.value });}
+  if (searchTerm.value) {
+    return t('SEARCH.RESULTS_FOR', { query: searchTerm.value });
+  }
   if (activeCategory.value) {
     return vocab.category(activeCategory.value.slug, activeCategory.value.name);
   }
@@ -88,15 +96,20 @@ const categoryDescription = computed(() =>
     : '',
 );
 
-onMounted(() => shelf.refresh());
+const goToPage = (nextPage: number) => {
+  router.push({ query: { ...route.query, page: nextPage === 1 ? undefined : nextPage } });
+  if (import.meta.client) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
+
+onMounted(refreshShelf);
 
 useSeo(() => ({
   title: heading.value,
   description: categoryDescription.value
     ? t('SEO.PRODUCTS.CATEGORY_DESCRIPTION', { description: categoryDescription.value })
     : t('SEO.PRODUCTS.DESCRIPTION'),
-  // Filtered permutations point their canonical at the clean category page, so
-  // the index is not flooded with near-duplicates.
   path: activeCategory.value ? `/products?category=${activeCategory.value.slug}` : '/products',
   noindex: Boolean(searchTerm.value || page.value > 1),
 }));
@@ -123,10 +136,14 @@ useBreadcrumbJsonLd(
       <nav aria-label="Breadcrumb" class="mb-2 flex items-center gap-1.5 text-xs text-ink-muted">
         <NuxtLinkLocale to="/" class="hover:text-ink">{{ $t('NAV.HOME') }}</NuxtLinkLocale>
         <BaseIcon name="chevron-right" :size="12" />
-        <NuxtLinkLocale to="/products" class="hover:text-ink">{{ $t('NAV.PRODUCTS') }}</NuxtLinkLocale>
+        <NuxtLinkLocale to="/products" class="hover:text-ink">
+          {{ $t('NAV.PRODUCTS') }}
+        </NuxtLinkLocale>
         <template v-if="activeCategory">
           <BaseIcon name="chevron-right" :size="12" />
-          <span class="text-ink">{{ vocab.category(activeCategory.slug, activeCategory.name) }}</span>
+          <span class="text-ink">
+            {{ vocab.category(activeCategory.slug, activeCategory.name) }}
+          </span>
         </template>
       </nav>
 
@@ -137,10 +154,13 @@ useBreadcrumbJsonLd(
     </header>
 
     <div class="lg:grid lg:grid-cols-[16rem_1fr] lg:gap-10">
-      <!-- Desktop filter rail -->
       <aside class="hidden lg:block">
         <div class="sticky top-24">
-          <ProductFilters :facets="data?.facets" :categories="categories ?? []" :loading="pending" />
+          <ProductFilters
+            :facets="data?.facets"
+            :categories="categories ?? []"
+            :loading="pending"
+          />
         </div>
       </aside>
 
@@ -182,10 +202,10 @@ useBreadcrumbJsonLd(
           <ProductGrid
             :products="data?.items"
             :loading="pending"
-            :favorite-ids="shelf.favoriteIds.value"
+            :favorite-ids="favoriteIds"
             :columns="3"
             show-compare
-            @favorite="shelf.toggleFavorite"
+            @favorite="toggleFavorite"
           />
 
           <nav
@@ -198,7 +218,9 @@ useBreadcrumbJsonLd(
               size="sm"
               :disabled="page <= 1"
               @click="goToPage(page - 1)"
-            >{{ $t('COMMON.PREVIOUS') }}</BaseButton>
+            >
+              {{ $t('COMMON.PREVIOUS') }}
+            </BaseButton>
             <span class="px-3 text-sm tabular-nums text-ink-muted">
               {{ $t('SEARCH.PAGE', { page, total: data.pageCount }) }}
             </span>
@@ -207,13 +229,14 @@ useBreadcrumbJsonLd(
               size="sm"
               :disabled="page >= data.pageCount"
               @click="goToPage(page + 1)"
-            >{{ $t('COMMON.NEXT') }}</BaseButton>
+            >
+              {{ $t('COMMON.NEXT') }}
+            </BaseButton>
           </nav>
         </template>
       </div>
     </div>
 
-    <!-- Mobile filter sheet -->
     <BaseModal v-model:open="filtersOpen" :title="$t('SEARCH.FILTERS')" size="sm">
       <ProductFilters :facets="data?.facets" :categories="categories ?? []" />
       <template #footer>

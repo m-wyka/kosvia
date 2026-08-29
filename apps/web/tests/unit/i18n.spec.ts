@@ -67,7 +67,9 @@ describe('locale files', () => {
     ]);
 
     const read = (source: unknown, key: string) =>
-      key.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], source);
+      key
+        .split('.')
+        .reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], source);
 
     const unexpected = flatten(en).filter(
       (key) => read(en, key) === read(pl, key) && !SAME_IN_BOTH.has(key),
@@ -100,9 +102,9 @@ describe('sentences the API generated', () => {
     expect(localise({ code: 'ai-available-from', text: '', params: { price: 24 } })).toBe(
       'Dostępny od 24,00 zł',
     );
-    expect(
-      localise({ code: 'ingredient-many-actives', text: '', params: { count: 5 } }),
-    ).toMatch(/^5 składników aktywnych/);
+    expect(localise({ code: 'ingredient-many-actives', text: '', params: { count: 5 } })).toMatch(
+      /^5 składników aktywnych/,
+    );
   });
 
   it('falls back to the API text for a code it does not know', () => {
@@ -167,7 +169,7 @@ describe('match reasons', () => {
 describe('formatting', () => {
   beforeEach(() => resetTestGlobals());
 
-  it('uses each locale\'s number and currency conventions', () => {
+  it("uses each locale's number and currency conventions", () => {
     expect(useFormat().price(59.99)).toBe('59.99 PLN');
     setTestLocale('pl');
     expect(useFormat().price(59.99)).toBe('59,99 zł');

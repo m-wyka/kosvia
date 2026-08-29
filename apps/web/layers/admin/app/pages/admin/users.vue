@@ -3,18 +3,21 @@ import type { TableColumn } from '../../components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
+type UserRole = 'USER' | 'ADMIN';
+
 interface UserRow {
   id: string;
   email: string;
   name: string | null;
-  role: 'USER' | 'ADMIN';
+  role: UserRole;
   subscriptionStatus: 'FREE' | 'PREMIUM' | 'CANCELLED';
   createdAt: string;
   _count: { shelfItems: number; priceAlerts: number; conversations: number };
 }
 
-const auth = useAuthStore();
-const resource = useAdminResource<UserRow>('/admin/users');
+const { user: currentUser } = storeToRefs(useAuthStore());
+const { rows, total, pageCount, page, search, pending, error, refresh, patch, remove } =
+  useAdminResource<UserRow>('/admin/users');
 const { t } = useI18n();
 const format = useFormat();
 
@@ -27,21 +30,23 @@ const columns = computed<TableColumn[]>(() => [
   { key: 'actions', label: '', align: 'right', width: 'w-20' },
 ]);
 
-async function setRole(user: UserRow, role: 'USER' | 'ADMIN') {
-  await resource.patch(
+const roleLabel = (role: UserRole): string =>
+  role === 'ADMIN' ? t('ADMIN.USERS.ROLE_ADMIN') : t('ADMIN.USERS.ROLE_USER');
+
+const setRole = async (user: UserRow, role: UserRole) => {
+  await patch(
     user.id,
     { role },
-    t('ADMIN.USERS.ROLE_CHANGED', {
-      email: user.email,
-      role: role === 'ADMIN' ? t('ADMIN.USERS.ROLE_ADMIN') : t('ADMIN.USERS.ROLE_USER'),
-    }),
+    t('ADMIN.USERS.ROLE_CHANGED', { email: user.email, role: roleLabel(role) }),
   );
-}
+};
 
-async function confirmDelete(user: UserRow) {
-  if (!confirm(t('ADMIN.USERS.CONFIRM_DELETE', { email: user.email }))) {return;}
-  await resource.remove(user.id, t('ADMIN.USERS.DELETED'));
-}
+const confirmDelete = async (user: UserRow) => {
+  if (!confirm(t('ADMIN.USERS.CONFIRM_DELETE', { email: user.email }))) {
+    return;
+  }
+  await remove(user.id, t('ADMIN.USERS.DELETED'));
+};
 
 useSeo(() => ({
   title: t('SEO.ADMIN.USERS'),
@@ -54,26 +59,26 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.USERS.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.USERS.SUBTITLE')"
     />
 
     <AdminToolbar
-      v-model:search="resource.search.value"
-      :page="resource.page.value"
-      :page-count="resource.pageCount.value"
-      :total="resource.total.value"
+      v-model:search="search"
+      :page="page"
+      :page-count="pageCount"
+      :total="total"
       :placeholder="$t('ADMIN.USERS.SEARCH_PLACEHOLDER')"
-      @update:page="resource.page.value = $event"
+      @update:page="page = $event"
     />
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.USERS.EMPTY')"
     >
       <template #cell-user="{ row }">
@@ -92,7 +97,7 @@ useSeo(() => ({
         <select
           :value="row.role"
           class="h-8 rounded-md border border-line bg-surface px-2 text-xs"
-          :disabled="row.id === auth.user?.id"
+          :disabled="row.id === currentUser?.id"
           :aria-label="$t('ADMIN.USERS.ROLE_ARIA', { email: row.email })"
           @change="setRole(row, ($event.target as HTMLSelectElement).value as 'USER' | 'ADMIN')"
         >
@@ -125,7 +130,7 @@ useSeo(() => ({
 
       <template #cell-actions="{ row }">
         <button
-          v-if="row.id !== auth.user?.id"
+          v-if="row.id !== currentUser?.id"
           type="button"
           class="rounded-md p-1.5 text-ink-faint transition-colors hover:text-critical"
           :aria-label="$t('ADMIN.USERS.DELETE_ARIA', { email: row.email })"

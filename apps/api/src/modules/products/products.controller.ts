@@ -2,7 +2,10 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { IngredientScoreBreakdownDto, ProductDto, ProductSearchResult } from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
-import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthenticatedUser,
+} from '../../common/decorators/current-user.decorator';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { ProductsService } from './products.service';
 import { ProductQueryDto } from './dto/product-query.dto';

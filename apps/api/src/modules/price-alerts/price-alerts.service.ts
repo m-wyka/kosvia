@@ -93,7 +93,11 @@ export class PriceAlertsService {
   }
 
   private async assertOwned(userId: string, id: string): Promise<void> {
-    const alert = await this.prisma.priceAlert.findUnique({ where: { id }, select: { userId: true } });
-    if (!alert || alert.userId !== userId) throw new NotFoundException('That alert does not exist.');
+    const alert = await this.prisma.priceAlert.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    if (!alert || alert.userId !== userId)
+      throw new NotFoundException('That alert does not exist.');
   }
 }

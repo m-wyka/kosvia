@@ -1,18 +1,9 @@
 <script setup lang="ts" generic="T extends { id: string }">
-/**
- * The admin table.
- *
- * One component for every resource: pass columns and rows, override any cell
- * with a scoped slot. Loading, empty and error states are handled here so no
- * admin page has to think about them.
- */
 export interface TableColumn {
   key: string;
   label: string;
-  /** Tailwind width class, e.g. `w-32`. */
   width?: string;
   align?: 'left' | 'right' | 'center';
-  /** Hidden below `sm` — use for secondary columns on narrow screens. */
   secondary?: boolean;
 }
 
@@ -25,6 +16,12 @@ defineProps<{
 }>();
 
 defineEmits<{ retry: [] }>();
+
+const EMPTY_CELL = '—';
+
+const cellValue = (row: T, key: string): unknown => {
+  return (row as Record<string, unknown>)[key] ?? EMPTY_CELL;
+};
 </script>
 
 <template>
@@ -58,10 +55,16 @@ defineEmits<{ retry: [] }>();
               class="px-4 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase"
               :class="[
                 column.width,
-                column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left',
+                column.align === 'right'
+                  ? 'text-right'
+                  : column.align === 'center'
+                    ? 'text-center'
+                    : 'text-left',
                 column.secondary && 'hidden sm:table-cell',
               ]"
-            >{{ column.label }}</th>
+            >
+              {{ column.label }}
+            </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-line">
@@ -71,12 +74,16 @@ defineEmits<{ retry: [] }>();
               :key="column.key"
               class="px-4 py-3 align-middle"
               :class="[
-                column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left',
+                column.align === 'right'
+                  ? 'text-right'
+                  : column.align === 'center'
+                    ? 'text-center'
+                    : 'text-left',
                 column.secondary && 'hidden sm:table-cell',
               ]"
             >
               <slot :name="`cell-${column.key}`" :row="row">
-                {{ (row as Record<string, unknown>)[column.key] ?? '—' }}
+                {{ cellValue(row, column.key) }}
               </slot>
             </td>
           </tr>

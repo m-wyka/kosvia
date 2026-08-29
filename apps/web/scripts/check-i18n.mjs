@@ -1,15 +1,4 @@
 #!/usr/bin/env node
-/**
- * Translation health check.
- *
- * Three failure modes this catches, none of which surface at build time:
- *   1. a key used in a component but missing from a locale file
- *   2. a key defined in one locale but not the other
- *   3. a key nobody uses any more
- *
- * Dynamic keys — `$t(\`VOCAB.TAG.${x}\`)` — are matched by prefix, so a whole
- * namespace counts as used once any template builds a key inside it.
- */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,13 +23,15 @@ const locales = Object.fromEntries(
     ]),
 );
 
-function walk(dir) {
+const walk = (dir) => {
   return readdirSync(dir).flatMap((entry) => {
     const full = join(dir, entry);
-    if (entry === 'node_modules' || entry.startsWith('.')) {return [];}
+    if (entry === 'node_modules' || entry.startsWith('.')) {
+      return [];
+    }
     return statSync(full).isDirectory() ? walk(full) : [full];
   });
-}
+};
 
 const sources = scanDirs
   .flatMap(walk)
@@ -51,12 +42,9 @@ const dynamicPrefixes = new Set();
 
 for (const file of sources) {
   const text = readFileSync(file, 'utf8');
-  // $t('A.B'), t("A.B") and bare 'A.B' passed as a label prop.
   for (const [, key] of text.matchAll(/['"`]([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)+)['"`]/g)) {
     staticKeys.add(key);
   }
-  // Template literals with an interpolation, whether the variable is a whole
-  // segment (`VOCAB.TAG.${x}`) or only part of one (`LANDING.FAQ.Q_${n}`).
   for (const [, prefix] of text.matchAll(
     /`([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)*)\.[A-Z0-9_]*\$\{/g,
   )) {
@@ -71,10 +59,14 @@ const problems = [];
 for (const other of others) {
   const otherKeys = new Set(flatten(locales[other]));
   for (const key of referenceKeys) {
-    if (!otherKeys.has(key)) {problems.push(`missing in ${other}.json: ${key}`);}
+    if (!otherKeys.has(key)) {
+      problems.push(`missing in ${other}.json: ${key}`);
+    }
   }
   for (const key of otherKeys) {
-    if (!referenceKeys.has(key)) {problems.push(`missing in ${reference}.json: ${key}`);}
+    if (!referenceKeys.has(key)) {
+      problems.push(`missing in ${reference}.json: ${key}`);
+    }
   }
 }
 
@@ -90,17 +82,25 @@ for (const key of staticKeys) {
 const unused = [...referenceKeys].filter((key) => !isCovered(key));
 
 console.log(`locales: ${Object.keys(locales).join(', ')}`);
-console.log(`keys: ${referenceKeys.size} · used statically: ${staticKeys.size} · dynamic namespaces: ${dynamicPrefixes.size}`);
+console.log(
+  `keys: ${referenceKeys.size} · used statically: ${staticKeys.size} · dynamic namespaces: ${dynamicPrefixes.size}`,
+);
 
 if (unused.length) {
   console.log(`\nunused keys (${unused.length}):`);
-  for (const key of unused.slice(0, 40)) {console.log(`  ${key}`);}
-  if (unused.length > 40) {console.log(`  … and ${unused.length - 40} more`);}
+  for (const key of unused.slice(0, 40)) {
+    console.log(`  ${key}`);
+  }
+  if (unused.length > 40) {
+    console.log(`  … and ${unused.length - 40} more`);
+  }
 }
 
 if (problems.length) {
   console.error(`\n✖ ${problems.length} problem(s):`);
-  for (const problem of problems) {console.error(`  ${problem}`);}
+  for (const problem of problems) {
+    console.error(`  ${problem}`);
+  }
   process.exit(1);
 }
 

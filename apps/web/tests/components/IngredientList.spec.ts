@@ -95,7 +95,9 @@ describe('IngredientList', () => {
 describe('IngredientBadge', () => {
   it('translates machine tags into plain language', () => {
     expect(mount(IngredientBadge, { props: { tag: 'humectant' } }).text()).toBe('Hydrating');
-    expect(mount(IngredientBadge, { props: { tag: 'barrier-support' } }).text()).toBe('Barrier support');
+    expect(mount(IngredientBadge, { props: { tag: 'barrier-support' } }).text()).toBe(
+      'Barrier support',
+    );
     expect(mount(IngredientBadge, { props: { tag: 'surfactant' } }).text()).toBe('Cleansing');
   });
 

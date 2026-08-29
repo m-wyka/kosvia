@@ -112,7 +112,11 @@ export class ProductsService {
   }
 
   scoreOne(row: ProductRow, viewer: ViewerContext): PersonalMatchDto {
-    return this.match.score({ product: toScorable(row), profile: viewer.profile, shelf: viewer.shelf });
+    return this.match.score({
+      product: toScorable(row),
+      profile: viewer.profile,
+      shelf: viewer.shelf,
+    });
   }
 
   /* ------------------------------------------------------------ querying -- */
@@ -128,7 +132,11 @@ export class ProductsService {
           { brand: { name: { contains: term, mode: 'insensitive' } } },
           { category: { name: { contains: term, mode: 'insensitive' } } },
           { ean: term },
-          { ingredients: { some: { ingredient: { inciName: { contains: term, mode: 'insensitive' } } } } },
+          {
+            ingredients: {
+              some: { ingredient: { inciName: { contains: term, mode: 'insensitive' } } },
+            },
+          },
         ],
       });
     }
@@ -220,7 +228,11 @@ export class ProductsService {
     const [byBrand, byCategory, priceAgg] = await Promise.all([
       this.prisma.product.groupBy({ by: ['brandId'], where, _count: { _all: true } }),
       this.prisma.product.groupBy({ by: ['categoryId'], where, _count: { _all: true } }),
-      this.prisma.product.aggregate({ where, _min: { lowestPrice: true }, _max: { lowestPrice: true } }),
+      this.prisma.product.aggregate({
+        where,
+        _min: { lowestPrice: true },
+        _max: { lowestPrice: true },
+      }),
     ]);
 
     const [brands, categories] = await Promise.all([

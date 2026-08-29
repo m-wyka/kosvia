@@ -8,7 +8,6 @@ withDefaults(
     skeletonCount?: number;
     favoriteIds?: string[];
     showCompare?: boolean;
-    /** Columns at the widest breakpoint. Mobile is always two-up. */
     columns?: 3 | 4;
   }>(),
   { skeletonCount: 8, columns: 4 },

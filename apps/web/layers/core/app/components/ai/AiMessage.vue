@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import type { AiMessageDto } from '@kosvia/shared';
 
-/**
- * One turn of the conversation.
- *
- * Assistant answers pair prose with structured product cards — the AI writes
- * the sentences, the backend supplies the products, and the interface keeps
- * them visibly separate.
- */
 defineProps<{ message: AiMessageDto }>();
 
 const ROLE_TONE = {
@@ -19,12 +12,6 @@ const ROLE_TONE = {
 
 const { t } = useI18n();
 const format = useFormat();
-
-/**
- * A suggestion carries a machine-readable `role` and, when retrieval has
- * something more specific to say than the role's own wording — a routine step
- * name — a translatable `label`. The label wins when it is there.
- */
 const localise = useLocalisedText();
 
 const roleLabel = (role: keyof typeof ROLE_TONE) =>
@@ -33,7 +20,9 @@ const roleLabel = (role: keyof typeof ROLE_TONE) =>
 
 <template>
   <div v-if="message.role === 'USER'" class="flex justify-end">
-    <p class="max-w-[85%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm leading-relaxed text-ink-inverse">
+    <p
+      class="max-w-[85%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm leading-relaxed text-ink-inverse"
+    >
       {{ message.content }}
     </p>
   </div>
@@ -48,15 +37,16 @@ const roleLabel = (role: keyof typeof ROLE_TONE) =>
 
     <div class="min-w-0 flex-1 space-y-3">
       <div class="rounded-2xl rounded-tl-md bg-surface px-4 py-3">
-        <p class="text-sm leading-relaxed whitespace-pre-line text-ink-soft">{{ message.content }}</p>
+        <p class="text-sm leading-relaxed whitespace-pre-line text-ink-soft">
+          {{ message.content }}
+        </p>
       </div>
 
       <ul v-if="message.suggestions.length" class="space-y-2.5">
         <li v-for="suggestion in message.suggestions" :key="suggestion.product.id">
           <NuxtLinkLocale
             :to="`/products/${suggestion.product.slug}`"
-            class="group flex items-center gap-3 rounded-xl border border-line bg-surface p-3
-                   transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
+            class="group flex items-center gap-3 rounded-xl border border-line bg-surface p-3 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
           >
             <ProductImage
               :src="suggestion.product.imageUrl"
@@ -82,7 +72,9 @@ const roleLabel = (role: keyof typeof ROLE_TONE) =>
               <span
                 v-if="suggestion.product.personalMatch"
                 class="block text-sm font-semibold tabular-nums text-sage"
-              >{{ suggestion.product.personalMatch.score }}%</span>
+              >
+                {{ suggestion.product.personalMatch.score }}%
+              </span>
               <span class="block text-sm font-semibold tabular-nums text-ink">
                 {{ format.price(suggestion.product.lowestPrice) }}
               </span>

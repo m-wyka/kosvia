@@ -15,11 +15,19 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import type { AuthResponse, UserDto } from '@kosvia/shared';
 import { Public } from '../../common/decorators/public.decorator';
-import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthenticatedUser,
+} from '../../common/decorators/current-user.decorator';
 import { AuthService, type IssuedSession } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { TokenService } from './token.service';
-import { clearAuthCookies, REFRESH_TOKEN_COOKIE, setAuthCookies, type CookieSettings } from './auth.cookies';
+import {
+  clearAuthCookies,
+  REFRESH_TOKEN_COOKIE,
+  setAuthCookies,
+  type CookieSettings,
+} from './auth.cookies';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -62,7 +70,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Rotate the refresh token and issue a new access token' })
-  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponse> {
     const raw = req.cookies?.[REFRESH_TOKEN_COOKIE] as string | undefined;
     if (!raw) throw new UnauthorizedException('No active session.');
     const session = await this.auth.refresh(raw, req.headers['user-agent']);

@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import type { DiscoveryFeedDto, ProductSummaryDto } from '@kosvia/shared';
 
-/**
- * The landing page. Server-rendered, indexable, and the only page that is
- * allowed to be long — every section answers a question a first-time visitor
- * actually has.
- */
 const { data: feed } = await useApiFetch<DiscoveryFeedDto>('/discover', {
   key: 'landing-feed',
-  // The landing page must render even if the API is asleep.
   default: () => ({ sections: [] }) as DiscoveryFeedDto,
 });
 
@@ -142,11 +136,7 @@ useHead({
       :eyebrow="$t('LANDING.AI.EYEBROW')"
       :title="$t('LANDING.AI.TITLE')"
       :description="$t('LANDING.AI.BODY')"
-      :points="[
-        $t('LANDING.AI.POINT_1'),
-        $t('LANDING.AI.POINT_2'),
-        $t('LANDING.AI.POINT_3'),
-      ]"
+      :points="[$t('LANDING.AI.POINT_1'), $t('LANDING.AI.POINT_2'), $t('LANDING.AI.POINT_3')]"
       :cta-label="$t('LANDING.AI.CTA')"
       cta-to="/ai"
       tone="surface"

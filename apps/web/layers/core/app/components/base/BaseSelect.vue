@@ -1,20 +1,12 @@
 <script setup lang="ts" generic="T">
 import Multiselect from 'vue-multiselect';
 
-/**
- * The application's only select.
- *
- * Wraps `vue-multiselect` so that library never appears anywhere else — if we
- * swap it out later, this file is the only one that changes. Everything else
- * uses <BaseSelect v-model :options label track-by />.
- */
 const model = defineModel<T | T[] | null>();
 
 withDefaults(
   defineProps<{
     options: T[];
     label?: string;
-    /** Key on each option holding its display text. */
     optionLabel?: string;
     trackBy?: string;
     placeholder?: string;
@@ -25,7 +17,6 @@ withDefaults(
     clearable?: boolean;
     disabled?: boolean;
     loading?: boolean;
-    /** Text shown when the search returns nothing. */
     emptyText?: string;
   }>(),
   {
@@ -36,7 +27,6 @@ withDefaults(
   },
 );
 
-/** Forwarded so callers can drive a remote search without touching the library. */
 const emit = defineEmits<{
   'search-change': [query: string];
   open: [];

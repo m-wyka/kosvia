@@ -2,9 +2,17 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsInt, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { AlternativeGroupDto, ComparisonResultDto, DiscoveryFeedDto, ProductSummaryDto } from '@kosvia/shared';
+import type {
+  AlternativeGroupDto,
+  ComparisonResultDto,
+  DiscoveryFeedDto,
+  ProductSummaryDto,
+} from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
-import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthenticatedUser,
+} from '../../common/decorators/current-user.decorator';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { CompareQueryDto } from '../products/dto/product-query.dto';
 import { AlternativeProductService } from './alternative-product.service';

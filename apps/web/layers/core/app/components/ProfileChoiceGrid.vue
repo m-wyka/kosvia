@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import type { TaxonomyItemDto } from '@kosvia/shared';
 
-/** `kind` selects the vocabulary the item slugs are translated against. */
-
-/** Multi-select chips for concerns and goals. Big, tappable, keyboard-friendly. */
 const model = defineModel<string[]>({ required: true });
 
 const props = defineProps<{
@@ -17,7 +14,10 @@ const vocab = useVocabulary();
 const entries = computed(() =>
   props.items.map((item) => ({
     slug: item.slug,
-    name: props.kind === 'concern' ? vocab.concern(item.slug, item.name) : vocab.goal(item.slug, item.name),
+    name:
+      props.kind === 'concern'
+        ? vocab.concern(item.slug, item.name)
+        : vocab.goal(item.slug, item.name),
     hint:
       props.kind === 'concern'
         ? vocab.concernHint(item.slug, item.description)
@@ -25,11 +25,11 @@ const entries = computed(() =>
   })),
 );
 
-function toggle(slug: string) {
+const toggle = (slug: string) => {
   model.value = model.value.includes(slug)
     ? model.value.filter((entry) => entry !== slug)
     : [...model.value, slug];
-}
+};
 </script>
 
 <template>
@@ -38,8 +38,7 @@ function toggle(slug: string) {
       v-for="item in entries"
       :key="item.slug"
       type="button"
-      class="flex items-start gap-3 rounded-lg border bg-surface p-3.5 text-left
-             transition-all duration-[--duration-fast] hover:border-ink-faint"
+      class="flex items-start gap-3 rounded-lg border bg-surface p-3.5 text-left transition-all duration-[--duration-fast] hover:border-ink-faint"
       :class="model.includes(item.slug) ? 'border-ink bg-surface-muted shadow-xs' : 'border-line'"
       :aria-pressed="model.includes(item.slug)"
       @click="toggle(item.slug)"

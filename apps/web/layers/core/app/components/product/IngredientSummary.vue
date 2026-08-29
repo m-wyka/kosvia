@@ -1,25 +1,27 @@
 <script setup lang="ts">
 import type { IngredientScoreBreakdownDto, ProductIngredientDto } from '@kosvia/shared';
 
-/** The at-a-glance read of a formula, above the full ingredient list. */
+const MAX_HIGHLIGHTS = 5;
+const MAX_TAGS_PER_HIGHLIGHT = 2;
+
 const props = defineProps<{
   ingredients: ProductIngredientDto[];
   breakdown?: IngredientScoreBreakdownDto | null;
   score: number;
 }>();
 
+const { t } = useI18n();
+const localise = useLocalisedText();
+
 const highlights = computed(() =>
   props.ingredients
     .filter((entry) => entry.ingredient.isActiveIngredient)
-    .slice(0, 5)
+    .slice(0, MAX_HIGHLIGHTS)
     .map((entry) => ({
       name: entry.ingredient.commonName ?? entry.ingredient.inciName,
-      tags: entry.ingredient.tags.slice(0, 2),
+      tags: entry.ingredient.tags.slice(0, MAX_TAGS_PER_HIGHLIGHT),
     })),
 );
-
-const { t } = useI18n();
-const localise = useLocalisedText();
 
 const stats = computed(() => [
   {
@@ -42,7 +44,10 @@ const stats = computed(() => [
         <p class="mt-1 text-sm text-ink-muted">{{ $t('PRODUCT.ANALYSIS.SUBTITLE') }}</p>
       </div>
       <div class="text-right">
-        <p class="text-3xl font-semibold tabular-nums text-ink">{{ score }}<span class="text-lg text-ink-muted">/100</span></p>
+        <p class="text-3xl font-semibold tabular-nums text-ink">
+          {{ score }}
+          <span class="text-lg text-ink-muted">/100</span>
+        </p>
         <p class="text-xs text-ink-muted">{{ $t('PRODUCT.ANALYSIS.SCORE') }}</p>
       </div>
     </div>

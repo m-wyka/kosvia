@@ -1,61 +1,64 @@
 <script setup lang="ts">
-import type { ProductSummaryDto } from "@kosvia/shared";
+import type { ProductSummaryDto } from '@kosvia/shared';
 
-/**
- * The product card, used everywhere a product appears: search results,
- * discovery rails, AI answers, alternatives, the shelf. One card, one set of
- * behaviours — nothing re-implements this markup.
- */
+type TagTone = 'sage' | 'lavender' | 'peach' | 'neutral';
+
+const POP_ANIMATION_MS = 260;
+const MAX_TAGS = 2;
+const MAX_CHIP_LABEL_LENGTH = 26;
+const CHIP_REASON_CODES = ['concerns', 'goals', 'skin-type'];
+
 const props = withDefaults(
   defineProps<{
     product: ProductSummaryDto;
-    /** `rail` is narrower, for horizontal carousels. */
-    variant?: "grid" | "rail";
+    variant?: 'grid' | 'rail';
     eager?: boolean;
     showFavorite?: boolean;
     isFavorite?: boolean;
     showCompare?: boolean;
-    /** Replaces the default tag row, e.g. with an alternative's reason. */
     note?: string;
   }>(),
-  { variant: "grid", showFavorite: true },
+  { variant: 'grid', showFavorite: true },
 );
 
 const emit = defineEmits<{ favorite: [ProductSummaryDto] }>();
 
-const compare = useCompareStore();
+const { has: isInCompareTray, toggle: toggleCompare } = useCompareStore();
 const { t } = useI18n();
 const reasonLabel = useMatchReason();
-const inComparison = computed(() => compare.has(props.product.id));
 
 const popping = ref(false);
-function onFavorite() {
-  popping.value = true;
-  setTimeout(() => (popping.value = false), 260);
-  emit("favorite", props.product);
-}
+
+const inComparison = computed(() => isInCompareTray(props.product.id));
+
+const topReasonChip = computed(() =>
+  props.product.personalMatch?.reasons
+    .filter((reason) => CHIP_REASON_CODES.includes(reason.code))
+    .map(reasonLabel)
+    .find((label) => label.length <= MAX_CHIP_LABEL_LENGTH),
+);
 
 const tags = computed(() => {
-  const list: Array<{
-    label: string;
-    tone: "sage" | "lavender" | "peach" | "neutral";
-  }> = [];
+  const list: Array<{ label: string; tone: TagTone }> = [];
   if (props.product.isFragranceFree) {
-    list.push({ label: t("SEARCH.FILTER.FRAGRANCE_FREE"), tone: "sage" });
+    list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });
   }
-  if (props.product.isVegan)
-    {list.push({ label: t("SEARCH.FILTER.VEGAN"), tone: "lavender" });}
-  // A match reason only earns a chip if it stays on one line — "Targets
-  // dehydration, redness, pores, uneven tone" is a sentence, not a tag.
-  const top = props.product.personalMatch?.reasons
-    .filter((reason) =>
-      ["concerns", "goals", "skin-type"].includes(reason.code),
-    )
-    .map(reasonLabel)
-    .find((label) => label.length <= 26);
-  if (top && list.length < 3) {list.push({ label: top, tone: "peach" });}
-  return list.slice(0, 2);
+  if (props.product.isVegan) {
+    list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });
+  }
+  if (topReasonChip.value) {
+    list.push({ label: topReasonChip.value, tone: 'peach' });
+  }
+  return list.slice(0, MAX_TAGS);
 });
+
+const handleFavoriteClick = () => {
+  popping.value = true;
+  setTimeout(() => {
+    popping.value = false;
+  }, POP_ANIMATION_MS);
+  emit('favorite', props.product);
+};
 </script>
 
 <template>
@@ -76,16 +79,12 @@ const tags = computed(() => {
         <span
           class="inline-flex items-center rounded-pill bg-surface/92 px-2.5 py-1 text-xs font-semibold tabular-nums shadow-xs backdrop-blur-sm"
           :class="{
-            'text-sage': ['perfect', 'great'].includes(
-              product.personalMatch.tier,
-            ),
+            'text-sage': ['perfect', 'great'].includes(product.personalMatch.tier),
             'text-peach': product.personalMatch.tier === 'good',
-            'text-ink-muted': ['fair', 'poor'].includes(
-              product.personalMatch.tier,
-            ),
+            'text-ink-muted': ['fair', 'poor'].includes(product.personalMatch.tier),
           }"
         >
-          {{ $t("PRODUCT.MATCH", { score: product.personalMatch.score }) }}
+          {{ $t('PRODUCT.MATCH', { score: product.personalMatch.score }) }}
         </span>
       </div>
 
@@ -100,7 +99,7 @@ const tags = computed(() => {
             : $t('PRODUCT.ADD_FAVORITE', { name: product.name })
         "
         :aria-pressed="isFavorite"
-        @click.stop.prevent="onFavorite"
+        @click.stop.prevent="handleFavoriteClick"
       >
         <BaseIcon :name="isFavorite ? 'heart-filled' : 'heart'" :size="17" />
       </button>
@@ -108,16 +107,11 @@ const tags = computed(() => {
 
     <div class="flex flex-1 flex-col gap-2.5 p-3.5">
       <div class="min-w-0">
-        <p
-          class="truncate text-2xs font-medium tracking-wide text-ink-muted uppercase"
-        >
+        <p class="truncate text-2xs font-medium tracking-wide text-ink-muted uppercase">
           {{ product.brand.name }}
         </p>
         <h3 class="mt-0.5 text-sm leading-snug font-medium text-ink">
-          <NuxtLinkLocale
-            :to="`/products/${product.slug}`"
-            class="after:absolute after:inset-0"
-          >
+          <NuxtLinkLocale :to="`/products/${product.slug}`" class="after:absolute after:inset-0">
             <span class="line-clamp-2">{{ product.name }}</span>
           </NuxtLinkLocale>
         </h3>
@@ -125,22 +119,13 @@ const tags = computed(() => {
 
       <p v-if="note" class="line-clamp-2 text-xs text-ink-muted">{{ note }}</p>
       <div v-else-if="tags.length" class="flex flex-wrap gap-1.5">
-        <BaseBadge
-          v-for="tag in tags"
-          :key="tag.label"
-          :tone="tag.tone"
-          size="xs"
-        >
+        <BaseBadge v-for="tag in tags" :key="tag.label" :tone="tag.tone" size="xs">
           {{ tag.label }}
         </BaseBadge>
       </div>
 
       <div class="mt-auto flex items-end justify-between gap-2 pt-1">
-        <PriceDisplay
-          :price="product.lowestPrice"
-          :store="product.lowestPriceStore"
-          size="sm"
-        />
+        <PriceDisplay :price="product.lowestPrice" :store="product.lowestPriceStore" size="sm" />
         <button
           v-if="showCompare"
           type="button"
@@ -156,7 +141,7 @@ const tags = computed(() => {
               : $t('PRODUCT.ADD_COMPARE', { name: product.name })
           "
           :aria-pressed="inComparison"
-          @click.stop.prevent="compare.toggle(product)"
+          @click.stop.prevent="toggleCompare(product)"
         >
           <BaseIcon name="compare" :size="16" />
         </button>

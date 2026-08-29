@@ -1,8 +1,21 @@
 <script setup lang="ts">
 import type { IngredientDto, ProductSearchResult } from '@kosvia/shared';
 
+type ToleranceTone = 'sage' | 'neutral' | 'peach' | 'blush';
+
+const RELATED_PRODUCTS_PAGE_SIZE = 8;
+
+const TOLERANCE_LEVELS: Array<{ minImpact: number; key: string; tone: ToleranceTone }> = [
+  { minImpact: 2, key: 'CALMING', tone: 'sage' },
+  { minImpact: 1, key: 'WELL_TOLERATED', tone: 'sage' },
+  { minImpact: 0, key: 'NEUTRAL', tone: 'neutral' },
+  { minImpact: -1, key: 'OCCASIONAL', tone: 'peach' },
+];
+const REACTIVE_LEVEL = { key: 'REACTIVE', tone: 'blush' as ToleranceTone };
+
 const route = useRoute();
 const { t } = useI18n();
+const vocab = useVocabulary();
 const slug = computed(() => String(route.params.slug));
 
 const { data: ingredient, error } = await useApiFetch<IngredientDto>(
@@ -15,23 +28,15 @@ if (error.value) {
 }
 
 const { data: products } = await useApiFetch<ProductSearchResult>(
-  () => `/products?ingredient=${slug.value}&pageSize=8&sort=ingredient-score`,
+  () =>
+    `/products?ingredient=${slug.value}&pageSize=${RELATED_PRODUCTS_PAGE_SIZE}&sort=ingredient-score`,
   { key: () => `ingredient-products-${slug.value}`, lazy: true },
 );
 
-const vocab = useVocabulary();
-
 const tolerance = computed(() => {
-  const value = ingredient.value?.sensitivityImpact ?? 0;
-  if (value >= 2) {return { label: t('INGREDIENTS.TOLERANCE_LEVEL.CALMING'), tone: 'sage' as const };}
-  if (value === 1) {
-    return { label: t('INGREDIENTS.TOLERANCE_LEVEL.WELL_TOLERATED'), tone: 'sage' as const };
-  }
-  if (value === 0) {return { label: t('INGREDIENTS.TOLERANCE_LEVEL.NEUTRAL'), tone: 'neutral' as const };}
-  if (value === -1) {
-    return { label: t('INGREDIENTS.TOLERANCE_LEVEL.OCCASIONAL'), tone: 'peach' as const };
-  }
-  return { label: t('INGREDIENTS.TOLERANCE_LEVEL.REACTIVE'), tone: 'blush' as const };
+  const impact = ingredient.value?.sensitivityImpact ?? 0;
+  const level = TOLERANCE_LEVELS.find((entry) => impact >= entry.minImpact) ?? REACTIVE_LEVEL;
+  return { label: t(`INGREDIENTS.TOLERANCE_LEVEL.${level.key}`), tone: level.tone };
 });
 
 useSeo(() => ({
@@ -107,7 +112,9 @@ useSeo(() => ({
                 :key="type"
                 tone="neutral"
                 size="xs"
-              >{{ vocab.skinType(type) }}</BaseBadge>
+              >
+                {{ vocab.skinType(type) }}
+              </BaseBadge>
             </div>
           </div>
         </div>

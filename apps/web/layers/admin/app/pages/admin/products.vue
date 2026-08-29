@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { SKIN_TYPES, type BrandDto, type CategoryDto, type ProductDto, type SkinType } from '@kosvia/shared';
+import {
+  SKIN_TYPES,
+  type BrandDto,
+  type CategoryDto,
+  type ProductDto,
+  type SkinType,
+} from '@kosvia/shared';
 import type { TableColumn } from '../../components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -17,27 +23,75 @@ interface ProductRow {
   _count: { offers: number; ingredients: number };
 }
 
+const CATEGORY_TRAIL_SEPARATOR = ' › ';
+
+const EMPTY_FORM = {
+  name: '',
+  slug: '',
+  brandId: '',
+  categoryId: '',
+  ean: '',
+  description: '',
+  usage: '',
+  imageUrl: '',
+  volume: '' as string | number,
+  volumeUnit: 'ml',
+  highlights: '',
+  isFragranceFree: false,
+  isVegan: false,
+  isCrueltyFree: false,
+  isActive: true,
+  targetSkinTypes: [] as SkinType[],
+};
+
 const api = useApi();
-const resource = useAdminResource<ProductRow>('/admin/products');
+const {
+  rows,
+  total,
+  pageCount,
+  page,
+  search,
+  pending,
+  error,
+  saving,
+  refresh,
+  create,
+  update,
+  remove,
+} = useAdminResource<ProductRow>('/admin/products');
 const { t } = useI18n();
 const vocab = useVocabulary();
 const format = useFormat();
 
 const { data: brands } = await useApiFetch<BrandDto[]>('/brands', { key: 'brands' });
-const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', { key: 'categories' });
+const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', {
+  key: 'categories',
+});
 
-/** Only leaf categories can hold products, so those are the only options offered. */
-const categoryOptions = computed(() => {
-  const output: Array<{ value: string; label: string }> = [];
-  const walk = (nodes: CategoryDto[], trail: string[]) => {
-    for (const node of nodes) {
-      const label = vocab.category(node.slug, node.name);
-      if (!node.children?.length) {output.push({ value: node.id, label: [...trail, label].join(' › ') });}
-      else {walk(node.children, [...trail, label]);}
+const modalOpen = ref(false);
+const editing = ref<ProductRow | null>(null);
+const loadingDetail = ref(false);
+const form = reactive({ ...EMPTY_FORM });
+
+const collectLeafCategories = (
+  nodes: CategoryDto[],
+  trail: string[],
+  output: Array<{ value: string; label: string }>,
+) => {
+  for (const node of nodes) {
+    const label = vocab.category(node.slug, node.name);
+    if (node.children?.length) {
+      collectLeafCategories(node.children, [...trail, label], output);
+      continue;
     }
-  };
-  walk(categories.value ?? [], []);
-  return [{ value: '', label: t('ADMIN.PRODUCTS.CATEGORY_PLACEHOLDER') }, ...output];
+    output.push({ value: node.id, label: [...trail, label].join(CATEGORY_TRAIL_SEPARATOR) });
+  }
+};
+
+const categoryOptions = computed(() => {
+  const leaves: Array<{ value: string; label: string }> = [];
+  collectLeafCategories(categories.value ?? [], [], leaves);
+  return [{ value: '', label: t('ADMIN.PRODUCTS.CATEGORY_PLACEHOLDER') }, ...leaves];
 });
 
 const brandOptions = computed(() => [
@@ -55,43 +109,17 @@ const columns = computed<TableColumn[]>(() => [
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
-const modalOpen = ref(false);
-const editing = ref<ProductRow | null>(null);
-const loadingDetail = ref(false);
-const form = reactive({
-  name: '',
-  slug: '',
-  brandId: '',
-  categoryId: '',
-  ean: '',
-  description: '',
-  usage: '',
-  imageUrl: '',
-  volume: '' as string | number,
-  volumeUnit: 'ml',
-  highlights: '',
-  isFragranceFree: false,
-  isVegan: false,
-  isCrueltyFree: false,
-  isActive: true,
-  targetSkinTypes: [] as SkinType[],
-});
+const resetForm = () => {
+  Object.assign(form, EMPTY_FORM, { targetSkinTypes: [] });
+};
 
-function reset() {
-  Object.assign(form, {
-    name: '', slug: '', brandId: '', categoryId: '', ean: '', description: '', usage: '',
-    imageUrl: '', volume: '', volumeUnit: 'ml', highlights: '', isFragranceFree: false,
-    isVegan: false, isCrueltyFree: false, isActive: true, targetSkinTypes: [],
-  });
-}
-
-function openCreate() {
+const openCreate = () => {
   editing.value = null;
-  reset();
+  resetForm();
   modalOpen.value = true;
-}
+};
 
-async function openEdit(row: ProductRow) {
+const openEdit = async (row: ProductRow) => {
   editing.value = row;
   modalOpen.value = true;
   loadingDetail.value = true;
@@ -118,9 +146,9 @@ async function openEdit(row: ProductRow) {
   } finally {
     loadingDetail.value = false;
   }
-}
+};
 
-async function save() {
+const save = async () => {
   const body = {
     name: form.name,
     slug: form.slug || undefined,
@@ -132,7 +160,10 @@ async function save() {
     imageUrl: form.imageUrl || undefined,
     volume: form.volume === '' ? undefined : Number(form.volume),
     volumeUnit: form.volumeUnit,
-    highlights: form.highlights.split('\n').map((line) => line.trim()).filter(Boolean),
+    highlights: form.highlights
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean),
     isFragranceFree: form.isFragranceFree,
     isVegan: form.isVegan,
     isCrueltyFree: form.isCrueltyFree,
@@ -140,16 +171,18 @@ async function save() {
     targetSkinTypes: form.targetSkinTypes,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, t('ADMIN.PRODUCTS.SAVED'))
-    : await resource.create(body, t('ADMIN.PRODUCTS.CREATED'));
-  if (result) {modalOpen.value = false;}
-}
+    ? await update(editing.value.id, body, t('ADMIN.PRODUCTS.SAVED'))
+    : await create(body, t('ADMIN.PRODUCTS.CREATED'));
+  if (result) {
+    modalOpen.value = false;
+  }
+};
 
-function toggleSkinType(type: SkinType) {
+const toggleSkinType = (type: SkinType) => {
   form.targetSkinTypes = form.targetSkinTypes.includes(type)
     ? form.targetSkinTypes.filter((entry) => entry !== type)
     : [...form.targetSkinTypes, type];
-}
+};
 
 useSeo(() => ({
   title: t('SEO.ADMIN.PRODUCTS'),
@@ -162,7 +195,7 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.PRODUCTS.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.PRODUCTS.SUBTITLE')"
     >
       <template #actions>
@@ -174,26 +207,29 @@ useSeo(() => ({
     </AdminPageHeader>
 
     <AdminToolbar
-      v-model:search="resource.search.value"
-      :page="resource.page.value"
-      :page-count="resource.pageCount.value"
-      :total="resource.total.value"
+      v-model:search="search"
+      :page="page"
+      :page-count="pageCount"
+      :total="total"
       :placeholder="$t('ADMIN.PRODUCTS.SEARCH_PLACEHOLDER')"
-      @update:page="resource.page.value = $event"
+      @update:page="page = $event"
     />
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.PRODUCTS.EMPTY')"
     >
       <template #cell-name="{ row }">
         <span class="min-w-0">
-          <NuxtLinkLocale :to="`/products/${row.slug}`" class="text-sm font-medium text-ink hover:underline">
+          <NuxtLinkLocale
+            :to="`/products/${row.slug}`"
+            class="text-sm font-medium text-ink hover:underline"
+          >
             {{ row.name }}
           </NuxtLinkLocale>
           <span class="block text-xs text-ink-muted">
@@ -239,7 +275,7 @@ useSeo(() => ({
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
             :aria-label="$t('COMMON.DELETE')"
-            @click="resource.remove(row.id, t('ADMIN.PRODUCTS.DELETED'))"
+            @click="remove(row.id, t('ADMIN.PRODUCTS.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -249,7 +285,9 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="editing ? $t('ADMIN.PRODUCTS.EDIT', { name: editing.name }) : $t('ADMIN.PRODUCTS.NEW')"
+      :title="
+        editing ? $t('ADMIN.PRODUCTS.EDIT', { name: editing.name }) : $t('ADMIN.PRODUCTS.NEW')
+      "
       size="lg"
     >
       <div v-if="loadingDetail" class="space-y-4">
@@ -282,12 +320,28 @@ useSeo(() => ({
         </div>
 
         <div class="grid gap-4 sm:grid-cols-3">
-          <BaseInput v-model="form.ean" :label="$t('ADMIN.PRODUCTS.FIELD_EAN')" placeholder="5901234567890" />
-          <BaseInput v-model="form.volume" :label="$t('ADMIN.PRODUCTS.FIELD_VOLUME')" type="number" />
-          <BaseInput v-model="form.volumeUnit" :label="$t('ADMIN.PRODUCTS.FIELD_UNIT')" placeholder="ml" />
+          <BaseInput
+            v-model="form.ean"
+            :label="$t('ADMIN.PRODUCTS.FIELD_EAN')"
+            placeholder="5901234567890"
+          />
+          <BaseInput
+            v-model="form.volume"
+            :label="$t('ADMIN.PRODUCTS.FIELD_VOLUME')"
+            type="number"
+          />
+          <BaseInput
+            v-model="form.volumeUnit"
+            :label="$t('ADMIN.PRODUCTS.FIELD_UNIT')"
+            placeholder="ml"
+          />
         </div>
 
-        <BaseTextarea v-model="form.description" :label="$t('ADMIN.PRODUCTS.FIELD_DESCRIPTION')" :rows="4" />
+        <BaseTextarea
+          v-model="form.description"
+          :label="$t('ADMIN.PRODUCTS.FIELD_DESCRIPTION')"
+          :rows="4"
+        />
         <BaseTextarea v-model="form.usage" :label="$t('ADMIN.PRODUCTS.FIELD_USAGE')" :rows="2" />
         <BaseTextarea
           v-model="form.highlights"
@@ -302,16 +356,24 @@ useSeo(() => ({
         />
 
         <div>
-          <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('ADMIN.PRODUCTS.POSITIONED_FOR') }}</p>
+          <p class="mb-2 text-sm font-medium text-ink-soft">
+            {{ $t('ADMIN.PRODUCTS.POSITIONED_FOR') }}
+          </p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="type in SKIN_TYPES.filter((entry) => entry !== 'UNKNOWN')"
               :key="type"
               type="button"
               class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
-              :class="form.targetSkinTypes.includes(type) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
+              :class="
+                form.targetSkinTypes.includes(type)
+                  ? 'border-ink bg-ink text-ink-inverse'
+                  : 'border-line text-ink-muted'
+              "
               @click="toggleSkinType(type)"
-            >{{ vocab.skinType(type) }}</button>
+            >
+              {{ vocab.skinType(type) }}
+            </button>
           </div>
         </div>
 
@@ -328,12 +390,16 @@ useSeo(() => ({
       </div>
 
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
         <BaseButton
-          :loading="resource.saving.value"
+          :loading="saving"
           :disabled="!form.name || !form.brandId || !form.categoryId"
           @click="save"
-        >{{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.PRODUCTS.CREATE') }}</BaseButton>
+        >
+          {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.PRODUCTS.CREATE') }}
+        </BaseButton>
       </template>
     </BaseModal>
   </div>

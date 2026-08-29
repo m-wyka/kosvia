@@ -21,9 +21,12 @@ import type {
  */
 const COPY: Record<AnswerLocale, Record<string, (v: Record<string, string>) => string>> = {
   en: {
-    nothing: (v) => `I looked for ${v.intent}, but nothing in the catalogue fits closely enough to recommend.`,
-    widen: () => 'Try widening the budget or relaxing one preference — I will run the search again.',
-    owned: (v) => `You already have ${v.products} on your shelf, which covers a lot of this already.`,
+    nothing: (v) =>
+      `I looked for ${v.intent}, but nothing in the catalogue fits closely enough to recommend.`,
+    widen: () =>
+      'Try widening the budget or relaxing one preference — I will run the search again.',
+    owned: (v) =>
+      `You already have ${v.products} on your shelf, which covers a lot of this already.`,
     best: (v) =>
       `The closest fit is ${v.product} at ${v.price}${v.score ? `, a ${v.score}% match` : ''}${v.reason ? ` — ${v.reason}` : ''}.`,
     warning: (v) => `One thing to weigh up: ${v.warning}.`,
@@ -45,8 +48,10 @@ const COPY: Record<AnswerLocale, Record<string, (v: Record<string, string>) => s
     against: (v) => `Working against it: ${v.warnings}.`,
   },
   pl: {
-    nothing: (v) => `Szukałam ${v.intent}, ale nic w katalogu nie pasuje na tyle dobrze, żeby to polecić.`,
-    widen: () => 'Spróbuj podnieść budżet albo poluzować jedną preferencję — przeszukam katalog jeszcze raz.',
+    nothing: (v) =>
+      `Szukałam ${v.intent}, ale nic w katalogu nie pasuje na tyle dobrze, żeby to polecić.`,
+    widen: () =>
+      'Spróbuj podnieść budżet albo poluzować jedną preferencję — przeszukam katalog jeszcze raz.',
     owned: (v) => `Masz już na półce ${v.products}, co w dużej mierze to pokrywa.`,
     best: (v) =>
       `Najbliżej jest ${v.product} za ${v.price}${v.score ? `, ${v.score}% dopasowania` : ''}${v.reason ? ` — ${v.reason}` : ''}.`,
@@ -65,7 +70,8 @@ const COPY: Record<AnswerLocale, Record<string, (v: Record<string, string>) => s
     keyIngredients: (v) => `Najwięcej pracy wykonują tu składniki: ${v.ingredients}.`,
     matchScore: (v) => `${v.product} wypada na ${v.score}%.`,
     mostlyBecause: (v) => `Głównie dlatego, że ${v.reasons}.`,
-    nothingPulling: () => 'W Twoim profilu nie ma nic, co mocno podnosiłoby lub obniżało ten wynik.',
+    nothingPulling: () =>
+      'W Twoim profilu nie ma nic, co mocno podnosiłoby lub obniżało ten wynik.',
     against: (v) => `Na minus: ${v.warnings}.`,
   },
 };
@@ -91,7 +97,9 @@ export class MockAIProvider implements AIProvider {
       entries.map((entry) => say(entry).toLowerCase()).join(', ');
 
     if (!retrieved.length) {
-      return [copy.nothing!({ intent: this.describeIntent(context) }), copy.widen!({})].join('\n\n');
+      return [copy.nothing!({ intent: this.describeIntent(context) }), copy.widen!({})].join(
+        '\n\n',
+      );
     }
 
     const owned = retrieved.filter((entry) => entry.role === 'already-owned');

@@ -20,7 +20,9 @@ describe('ComparisonService', () => {
   it('refuses fewer than two or more than four products', async () => {
     const service = new ComparisonService(prismaWith([]), match);
     await expect(service.compare(['only-one'], ANON)).rejects.toBeInstanceOf(BadRequestException);
-    await expect(service.compare(['a', 'b', 'c', 'd', 'e'], ANON)).rejects.toBeInstanceOf(BadRequestException);
+    await expect(service.compare(['a', 'b', 'c', 'd', 'e'], ANON)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
   });
 
   it('keeps the caller’s column order', async () => {
@@ -53,7 +55,10 @@ describe('ComparisonService', () => {
   });
 
   it('always reaches a verdict with reasons', async () => {
-    const rows = [row({ id: 'a', price: 50, ingredientScore: 40 }), row({ id: 'b', price: 40, ingredientScore: 90 })];
+    const rows = [
+      row({ id: 'a', price: 50, ingredientScore: 40 }),
+      row({ id: 'b', price: 40, ingredientScore: 90 }),
+    ];
     const service = new ComparisonService(prismaWith(rows), match);
     const result = await service.compare(['a', 'b'], ANON);
 
@@ -65,7 +70,9 @@ describe('ComparisonService', () => {
     expect(result.verdict!.summary.code).toBe('verdict-summary');
     expect(result.verdict!.summary.text).toMatch(/^Kosvia recommends /);
     expect(result.verdict!.summary.params?.product).toBe('Brand b Product b');
-    expect(result.verdict!.reasons.every((reason) => reason.code.startsWith('verdict-'))).toBe(true);
+    expect(result.verdict!.reasons.every((reason) => reason.code.startsWith('verdict-'))).toBe(
+      true,
+    );
   });
 
   it('records the comparison for signed-in users only', async () => {
@@ -76,7 +83,10 @@ describe('ComparisonService', () => {
     expect(anonPrisma.productComparison.create).not.toHaveBeenCalled();
 
     const userPrisma = prismaWith(rows);
-    await new ComparisonService(userPrisma, match).compare(['a', 'b'], { userId: 'u1', profile: null });
+    await new ComparisonService(userPrisma, match).compare(['a', 'b'], {
+      userId: 'u1',
+      profile: null,
+    });
     expect(userPrisma.productComparison.create).toHaveBeenCalled();
   });
 });

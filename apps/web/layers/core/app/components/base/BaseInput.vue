@@ -17,8 +17,11 @@ const props = withDefaults(
 );
 
 const id = useId();
-const describedBy = computed(() =>
-  [props.error ? `${id}-error` : null, props.hint ? `${id}-hint` : null].filter(Boolean).join(' ') || undefined,
+const describedBy = computed(
+  () =>
+    [props.error ? `${id}-error` : null, props.hint ? `${id}-hint` : null]
+      .filter(Boolean)
+      .join(' ') || undefined,
 );
 </script>
 
@@ -30,7 +33,10 @@ const describedBy = computed(() =>
     </label>
 
     <div class="relative">
-      <span v-if="$slots.prefix" class="absolute inset-y-0 left-3.5 flex items-center text-ink-faint">
+      <span
+        v-if="$slots.prefix"
+        class="absolute inset-y-0 left-3.5 flex items-center text-ink-faint"
+      >
         <slot name="prefix" />
       </span>
 
@@ -45,17 +51,18 @@ const describedBy = computed(() =>
         :inputmode="inputmode"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
-        class="h-11 w-full rounded-lg border bg-surface px-3.5 text-sm text-ink
-               placeholder:text-ink-faint transition-colors duration-[--duration-fast]
-               disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint"
+        class="h-11 w-full rounded-lg border bg-surface px-3.5 text-sm text-ink placeholder:text-ink-faint transition-colors duration-[--duration-fast] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint"
         :class="[
           error ? 'border-critical' : 'border-line-strong hover:border-ink-faint',
           $slots.prefix && 'pl-10',
           $slots.suffix && 'pr-10',
         ]"
-      >
+      />
 
-      <span v-if="$slots.suffix" class="absolute inset-y-0 right-3.5 flex items-center text-ink-faint">
+      <span
+        v-if="$slots.suffix"
+        class="absolute inset-y-0 right-3.5 flex items-center text-ink-faint"
+      >
         <slot name="suffix" />
       </span>
     </div>

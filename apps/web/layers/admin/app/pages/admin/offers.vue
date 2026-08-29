@@ -15,12 +15,33 @@ interface OfferRow {
   store: { id: string; name: string };
 }
 
+const AVAILABILITY = ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'UNKNOWN'] as const;
+const MIN_SEARCH_LENGTH = 2;
+const SEARCH_DEBOUNCE_MS = 280;
+const SEARCH_PAGE_SIZE = 6;
+
+const EMPTY_FORM = {
+  productId: '',
+  productLabel: '',
+  storeId: '',
+  price: '' as string | number,
+  url: '',
+  availability: 'IN_STOCK' as OfferRow['availability'],
+};
+
 const api = useApi();
-const resource = useAdminResource<OfferRow>('/admin/offers');
+const { rows, total, pageCount, page, search, pending, error, saving, refresh, create, remove } =
+  useAdminResource<OfferRow>('/admin/offers');
 const { data: stores } = await useApiFetch<StoreDto[]>('/stores', { key: 'stores' });
 const { t } = useI18n();
 const vocab = useVocabulary();
 const format = useFormat();
+
+const modalOpen = ref(false);
+const productSearch = ref('');
+const productResults = ref<ProductSummaryDto[]>([]);
+const searching = ref(false);
+const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
   { key: 'product', label: t('ADMIN.OFFERS.COL_PRODUCT') },
@@ -46,68 +67,53 @@ const availabilityOptions = computed(() =>
   AVAILABILITY.map((value) => ({ value, label: vocab.availability(value) })),
 );
 
-const modalOpen = ref(false);
-const productSearch = ref('');
-const productResults = ref<ProductSummaryDto[]>([]);
-const searching = ref(false);
+const productLabelOf = (product: { brand: { name: string }; name: string }): string =>
+  `${product.brand.name} ${product.name}`;
 
-const form = reactive({
-  productId: '',
-  productLabel: '',
-  storeId: '',
-  price: '' as string | number,
-  url: '',
-  availability: 'IN_STOCK' as OfferRow['availability'],
-});
+const searchProducts = async (term: string) => {
+  if (term.trim().length < MIN_SEARCH_LENGTH) {
+    productResults.value = [];
+    return;
+  }
+  searching.value = true;
+  try {
+    const response = await api<{ items: ProductSummaryDto[] }>(
+      `/products?q=${encodeURIComponent(term)}&pageSize=${SEARCH_PAGE_SIZE}`,
+    );
+    productResults.value = response.items;
+  } finally {
+    searching.value = false;
+  }
+};
 
-watchDebounced(
-  productSearch,
-  async (term) => {
-    if (term.trim().length < 2) {
-      productResults.value = [];
-      return;
-    }
-    searching.value = true;
-    try {
-      const response = await api<{ items: ProductSummaryDto[] }>(
-        `/products?q=${encodeURIComponent(term)}&pageSize=6`,
-      );
-      productResults.value = response.items;
-    } finally {
-      searching.value = false;
-    }
-  },
-  { debounce: 280 },
-);
-
-function openCreate() {
-  Object.assign(form, { productId: '', productLabel: '', storeId: '', price: '', url: '', availability: 'IN_STOCK' });
+const openCreate = () => {
+  Object.assign(form, EMPTY_FORM);
   productSearch.value = '';
   productResults.value = [];
   modalOpen.value = true;
-}
+};
 
-function openEdit(row: OfferRow) {
+const openEdit = (row: OfferRow) => {
   Object.assign(form, {
     productId: row.product.id,
-    productLabel: `${row.product.brand.name} ${row.product.name}`,
+    productLabel: productLabelOf(row.product),
     storeId: row.store.id,
     price: Number(row.price),
     url: row.url ?? '',
     availability: row.availability,
   });
   modalOpen.value = true;
-}
+};
 
-function pickProduct(product: ProductSummaryDto) {
+const pickProduct = (product: ProductSummaryDto) => {
   form.productId = product.id;
-  form.productLabel = `${product.brand.name} ${product.name}`;
+  form.productLabel = productLabelOf(product);
   productResults.value = [];
   productSearch.value = '';
-}
+};
 
-async function save() {
-  const result = await resource.create(
+const save = async () => {
+  const result = await create(
     {
       productId: form.productId,
       storeId: form.storeId,
@@ -117,10 +123,12 @@ async function save() {
     },
     t('ADMIN.OFFERS.SAVED'),
   );
-  if (result) {modalOpen.value = false;}
-}
+  if (result) {
+    modalOpen.value = false;
+  }
+};
 
-const AVAILABILITY = ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'UNKNOWN'] as const;
+watchDebounced(productSearch, searchProducts, { debounce: SEARCH_DEBOUNCE_MS });
 
 useSeo(() => ({
   title: t('SEO.ADMIN.OFFERS'),
@@ -133,7 +141,7 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.OFFERS.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.OFFERS.SUBTITLE')"
     >
       <template #actions>
@@ -145,26 +153,29 @@ useSeo(() => ({
     </AdminPageHeader>
 
     <AdminToolbar
-      v-model:search="resource.search.value"
-      :page="resource.page.value"
-      :page-count="resource.pageCount.value"
-      :total="resource.total.value"
+      v-model:search="search"
+      :page="page"
+      :page-count="pageCount"
+      :total="total"
       :placeholder="$t('ADMIN.OFFERS.SEARCH_PLACEHOLDER')"
-      @update:page="resource.page.value = $event"
+      @update:page="page = $event"
     />
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.OFFERS.EMPTY')"
     >
       <template #cell-product="{ row }">
         <span class="min-w-0">
-          <NuxtLinkLocale :to="`/products/${row.product.slug}`" class="text-sm font-medium text-ink hover:underline">
+          <NuxtLinkLocale
+            :to="`/products/${row.product.slug}`"
+            class="text-sm font-medium text-ink hover:underline"
+          >
             {{ row.product.name }}
           </NuxtLinkLocale>
           <span class="block text-xs text-ink-muted">{{ row.product.brand.name }}</span>
@@ -180,9 +191,17 @@ useSeo(() => ({
       </template>
       <template #cell-availability="{ row }">
         <BaseBadge
-          :tone="row.availability === 'IN_STOCK' ? 'sage' : row.availability === 'LOW_STOCK' ? 'caution' : 'neutral'"
+          :tone="
+            row.availability === 'IN_STOCK'
+              ? 'sage'
+              : row.availability === 'LOW_STOCK'
+                ? 'caution'
+                : 'neutral'
+          "
           size="xs"
-        >{{ vocab.availability(row.availability) }}</BaseBadge>
+        >
+          {{ vocab.availability(row.availability) }}
+        </BaseBadge>
       </template>
       <template #cell-lastCheckedAt="{ row }">
         <span class="text-xs text-ink-muted">{{ format.dateShort(row.lastCheckedAt) }}</span>
@@ -201,7 +220,7 @@ useSeo(() => ({
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
             :aria-label="$t('ADMIN.OFFERS.DELETE_ARIA')"
-            @click="resource.remove(row.id, t('ADMIN.OFFERS.DELETED'))"
+            @click="remove(row.id, t('ADMIN.OFFERS.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -212,7 +231,9 @@ useSeo(() => ({
     <BaseModal v-model:open="modalOpen" :title="$t('ADMIN.OFFERS.MODAL_TITLE')" size="sm">
       <div class="space-y-4">
         <div>
-          <p class="mb-1.5 text-sm font-medium text-ink-soft">{{ $t('ADMIN.OFFERS.PRODUCT_LABEL') }}</p>
+          <p class="mb-1.5 text-sm font-medium text-ink-soft">
+            {{ $t('ADMIN.OFFERS.PRODUCT_LABEL') }}
+          </p>
           <div
             v-if="form.productId"
             class="flex items-center justify-between gap-2 rounded-lg border border-line bg-surface-muted px-3.5 py-2.5"
@@ -222,10 +243,15 @@ useSeo(() => ({
               type="button"
               class="shrink-0 text-xs text-ink-muted hover:text-ink"
               @click="form.productId = ''"
-            >{{ $t('ADMIN.OFFERS.CHANGE') }}</button>
+            >
+              {{ $t('ADMIN.OFFERS.CHANGE') }}
+            </button>
           </div>
           <template v-else>
-            <BaseInput v-model="productSearch" :placeholder="$t('ADMIN.OFFERS.PRODUCT_PLACEHOLDER')">
+            <BaseInput
+              v-model="productSearch"
+              :placeholder="$t('ADMIN.OFFERS.PRODUCT_PLACEHOLDER')"
+            >
               <template #prefix><BaseIcon name="search" :size="16" /></template>
             </BaseInput>
             <ul v-if="productResults.length" class="mt-2 space-y-1">
@@ -252,8 +278,17 @@ useSeo(() => ({
           :label="$t('ADMIN.OFFERS.STORE_LABEL')"
         />
 
-        <BaseInput v-model="form.price" :label="$t('ADMIN.OFFERS.PRICE_LABEL')" type="number" required />
-        <BaseInput v-model="form.url" :label="$t('ADMIN.OFFERS.URL_LABEL')" placeholder="https://…" />
+        <BaseInput
+          v-model="form.price"
+          :label="$t('ADMIN.OFFERS.PRICE_LABEL')"
+          type="number"
+          required
+        />
+        <BaseInput
+          v-model="form.url"
+          :label="$t('ADMIN.OFFERS.URL_LABEL')"
+          placeholder="https://…"
+        />
 
         <BaseNativeSelect
           v-model="form.availability"
@@ -263,12 +298,16 @@ useSeo(() => ({
       </div>
 
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
+        <BaseButton variant="ghost" @click="modalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
         <BaseButton
-          :loading="resource.saving.value"
+          :loading="saving"
           :disabled="!form.productId || !form.storeId || !form.price"
           @click="save"
-        >{{ $t('ADMIN.OFFERS.SAVE') }}</BaseButton>
+        >
+          {{ $t('ADMIN.OFFERS.SAVE') }}
+        </BaseButton>
       </template>
     </BaseModal>
   </div>

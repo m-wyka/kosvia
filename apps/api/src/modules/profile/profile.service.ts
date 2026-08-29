@@ -18,7 +18,12 @@ type ProfileWithRelations = Awaited<
   goals: Array<{ id: string; slug: string; name: string; description: string | null }>;
   preferredBrands: Array<{ id: string; name: string; slug: string; logo: string | null }>;
   excludedBrands: Array<{ id: string; name: string; slug: string; logo: string | null }>;
-  excludedIngredients: Array<{ id: string; inciName: string; commonName: string | null; tags: string[] }>;
+  excludedIngredients: Array<{
+    id: string;
+    inciName: string;
+    commonName: string | null;
+    tags: string[];
+  }>;
 };
 
 @Injectable()
@@ -104,8 +109,14 @@ export class ProfileService {
     if (!slugs.length) return [];
     const rows =
       model === 'beautyConcern'
-        ? await this.prisma.beautyConcern.findMany({ where: { slug: { in: slugs } }, select: { id: true } })
-        : await this.prisma.beautyGoal.findMany({ where: { slug: { in: slugs } }, select: { id: true } });
+        ? await this.prisma.beautyConcern.findMany({
+            where: { slug: { in: slugs } },
+            select: { id: true },
+          })
+        : await this.prisma.beautyGoal.findMany({
+            where: { slug: { in: slugs } },
+            select: { id: true },
+          });
     return rows.map((row) => row.id);
   }
 
@@ -133,7 +144,12 @@ export class ProfileService {
   }
 }
 
-function toTaxonomy(item: { id: string; slug: string; name: string; description: string | null }): TaxonomyItemDto {
+function toTaxonomy(item: {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+}): TaxonomyItemDto {
   return { id: item.id, slug: item.slug, name: item.name, description: item.description };
 }
 

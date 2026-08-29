@@ -13,7 +13,9 @@
       "require": "./dist/cjs/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node ./scripts/write-cjs-marker.mjs",
     "dev": "tsc -p tsconfig.esm.json --watch --preserveWatchOutput",

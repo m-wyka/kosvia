@@ -1,14 +1,19 @@
 <script setup lang="ts">
+const FEATURE_COUNT = 4;
+const TIER_KEYS = ['FREE', 'PREMIUM'] as const;
+
 const { t } = useI18n();
 
 const tiers = computed(() =>
-  (['FREE', 'PREMIUM'] as const).map((key) => ({
+  TIER_KEYS.map((key) => ({
     key,
     name: t(`LANDING.PRICING.${key}.NAME`),
     price: t(`LANDING.PRICING.${key}.PRICE`),
     cadence: key === 'FREE' ? t('LANDING.PRICING.FOREVER') : t('LANDING.PRICING.PER_MONTH'),
     description: t(`LANDING.PRICING.${key}.DESCRIPTION`),
-    features: [1, 2, 3, 4].map((n) => t(`LANDING.PRICING.${key}.F_${n}`)),
+    features: Array.from({ length: FEATURE_COUNT }, (_, index) =>
+      t(`LANDING.PRICING.${key}.F_${index + 1}`),
+    ),
     cta: { label: t(`LANDING.PRICING.${key}.CTA`), to: '/register' },
     highlighted: key === 'PREMIUM',
   })),
@@ -44,7 +49,11 @@ const tiers = computed(() =>
         </p>
 
         <ul class="mt-5 flex-1 space-y-2.5">
-          <li v-for="feature in tier.features" :key="feature" class="flex items-start gap-2.5 text-sm text-ink-soft">
+          <li
+            v-for="feature in tier.features"
+            :key="feature"
+            class="flex items-start gap-2.5 text-sm text-ink-soft"
+          >
             <BaseIcon name="check" :size="15" class="mt-0.5 shrink-0 text-sage" />
             {{ feature }}
           </li>
@@ -55,7 +64,9 @@ const tiers = computed(() =>
           :variant="tier.highlighted ? 'primary' : 'secondary'"
           block
           class="mt-6"
-        >{{ tier.cta.label }}</BaseButton>
+        >
+          {{ tier.cta.label }}
+        </BaseButton>
       </div>
     </div>
   </section>

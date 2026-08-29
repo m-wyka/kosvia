@@ -1,52 +1,66 @@
 <script setup lang="ts">
 import type { ProductIngredientDto } from '@kosvia/shared';
 
-/**
- * The INCI list, grouped by what each ingredient is doing.
- *
- * The full ordered list still matters (position implies concentration) so it
- * stays available underneath — grouping is a reading aid, not a replacement.
- */
+interface IngredientGroup {
+  key: string;
+  tags: string[];
+}
+
 const props = defineProps<{ ingredients: ProductIngredientDto[] }>();
 
-/** Group keys map onto PRODUCT.LIST.* translations. */
-const GROUPS: Array<{ key: string; tags: string[] }> = [
+const GROUPS: IngredientGroup[] = [
   { key: 'ACTIVES', tags: ['retinoid', 'exfoliant', 'brightening', 'peptide', 'uv-filter'] },
   { key: 'HYDRATION', tags: ['humectant', 'emollient', 'occlusive', 'barrier-support'] },
   { key: 'SOOTHING', tags: ['soothing', 'antioxidant'] },
   { key: 'FRAGRANCE', tags: ['fragrance'] },
   {
     key: 'BASE',
-    tags: ['solvent', 'thickener', 'emulsifier', 'preservative', 'ph-adjuster', 'surfactant', 'colorant'],
+    tags: [
+      'solvent',
+      'thickener',
+      'emulsifier',
+      'preservative',
+      'ph-adjuster',
+      'surfactant',
+      'colorant',
+    ],
   },
 ];
-
-const grouped = computed(() => {
-  const used = new Set<string>();
-  const result = GROUPS.map((group) => {
-    const members = props.ingredients.filter((entry) => {
-      if (used.has(entry.ingredient.id)) {return false;}
-      const match =
-        (group.key === 'ACTIVES' && entry.ingredient.isActiveIngredient) ||
-        entry.ingredient.tags.some((tag) => group.tags.includes(tag));
-      if (match) {used.add(entry.ingredient.id);}
-      return match;
-    });
-    return { ...group, members };
-  }).filter((group) => group.members.length > 0);
-
-  const rest = props.ingredients.filter((entry) => !used.has(entry.ingredient.id));
-  if (rest.length) {
-    result.push({ key: 'OTHER', tags: [], members: rest });
-  }
-  return result;
-});
 
 const expanded = ref<string | null>(null);
 const showFullList = ref(false);
 
+const belongsToGroup = (entry: ProductIngredientDto, group: IngredientGroup): boolean => {
+  if (group.key === 'ACTIVES' && entry.ingredient.isActiveIngredient) {
+    return true;
+  }
+  return entry.ingredient.tags.some((tag) => group.tags.includes(tag));
+};
+
+const grouped = computed(() => {
+  const assignedIds = new Set<string>();
+  const groups = GROUPS.map((group) => {
+    const members = props.ingredients.filter((entry) => {
+      if (assignedIds.has(entry.ingredient.id) || !belongsToGroup(entry, group)) {
+        return false;
+      }
+      assignedIds.add(entry.ingredient.id);
+      return true;
+    });
+    return { ...group, members };
+  }).filter((group) => group.members.length > 0);
+
+  const unassigned = props.ingredients.filter((entry) => !assignedIds.has(entry.ingredient.id));
+  if (unassigned.length) {
+    groups.push({ key: 'OTHER', tags: [], members: unassigned });
+  }
+  return groups;
+});
+
 const fullList = computed(() =>
-  [...props.ingredients].sort((a, b) => a.position - b.position).map((entry) => entry.ingredient.inciName),
+  [...props.ingredients]
+    .sort((first, second) => first.position - second.position)
+    .map((entry) => entry.ingredient.inciName),
 );
 </script>
 
@@ -56,7 +70,9 @@ const fullList = computed(() =>
       <h3 class="text-sm font-semibold text-ink">{{ $t(`PRODUCT.LIST.${group.key}`) }}</h3>
       <p class="mt-0.5 text-xs text-ink-muted">{{ $t(`PRODUCT.LIST.${group.key}_BODY`) }}</p>
 
-      <ul class="mt-3 divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
+      <ul
+        class="mt-3 divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface"
+      >
         <li v-for="entry in group.members" :key="entry.ingredient.id">
           <button
             type="button"
@@ -71,10 +87,9 @@ const fullList = computed(() =>
               <span class="block text-sm font-medium text-ink">
                 {{ entry.ingredient.commonName ?? entry.ingredient.inciName }}
               </span>
-              <span
-                v-if="entry.ingredient.commonName"
-                class="block text-xs text-ink-muted"
-              >{{ entry.ingredient.inciName }}</span>
+              <span v-if="entry.ingredient.commonName" class="block text-xs text-ink-muted">
+                {{ entry.ingredient.inciName }}
+              </span>
               <span class="mt-1.5 flex flex-wrap gap-1">
                 <IngredientBadge
                   v-for="tag in entry.ingredient.tags.slice(0, 3)"

@@ -1,15 +1,8 @@
 import tailwindcss from '@tailwindcss/vite';
 
-/**
- * Root Nuxt configuration.
- *
- * The application is split into two layers (see `layers/`):
- *   core  — the public product: landing, discovery, product pages, shelf, AI
- *   admin — the operator back office, with its own layout and access control
- *
- * Shared base components live in `core` and are auto-imported by both, so
- * BaseButton, ProductCard and friends are never duplicated.
- */
+const DEFAULT_API_URL = 'http://localhost:3001';
+const DEFAULT_SITE_URL = 'http://localhost:3000';
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   future: { compatibilityVersion: 4 },
@@ -18,18 +11,6 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxt/eslint', '@nuxtjs/i18n'],
 
-  /**
-   * Two locales, each with its own URL space.
-   *
-   * `prefix_except_default` keeps English on the clean paths and puts Polish
-   * under /pl — so both languages are separately indexable, which matters for a
-   * catalogue this content-heavy. A single shared URL would mean Google only
-   * ever sees one of them.
-   *
-   * Browser detection redirects only from the site root: deep links must keep
-   * pointing at the language they were shared in, and redirecting everywhere
-   * makes locale switching fight the detector.
-   */
   i18n: {
     locales: [
       { code: 'en', language: 'en-GB', name: 'English', file: 'en.json' },
@@ -50,9 +31,8 @@ export default defineNuxtConfig({
 
   ssr: true,
 
-  // Nuxt 4 defaults buildDir to node_modules/.cache/nuxt/.nuxt, where the
-  // generated tsconfigs exclude their own directory — which silently breaks
-  // `nuxt typecheck`. Keeping the build output alongside the app avoids that.
+  // Nuxt 4 defaults buildDir to node_modules/.cache/nuxt/.nuxt, where the generated
+  // tsconfigs exclude their own directory and silently break `nuxt typecheck`.
   buildDir: '.nuxt',
 
   css: ['~~/layers/core/app/assets/css/main.css'],
@@ -62,11 +42,10 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Server-only: used for SSR fetches, so it can point at an internal host.
-    apiInternalUrl: process.env.API_INTERNAL_URL || process.env.API_URL || 'http://localhost:3001',
+    apiInternalUrl: process.env.API_INTERNAL_URL || process.env.API_URL || DEFAULT_API_URL,
     public: {
-      apiBase: process.env.API_URL || 'http://localhost:3001',
-      siteUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+      apiBase: process.env.API_URL || DEFAULT_API_URL,
+      siteUrl: process.env.FRONTEND_URL || DEFAULT_SITE_URL,
       siteName: 'Kosvia',
     },
   },

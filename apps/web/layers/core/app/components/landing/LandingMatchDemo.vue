@@ -1,9 +1,4 @@
 <script setup lang="ts">
-/** A working "Why?" panel, using the same components as the product page. */
-/**
- * A worked example, rendered through the same reason translations the product
- * page uses — so the demo cannot drift out of sync with the real thing.
- */
 const reasonLabel = useMatchReason();
 
 const match = {
@@ -34,14 +29,13 @@ const match = {
       <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">
         {{ $t('LANDING.MATCH.DEMO_WHY') }}
       </p>
-      <div
-        v-for="reason in match.reasons"
-        :key="reason.code"
-        class="flex items-center gap-3"
-      >
+      <div v-for="reason in match.reasons" :key="reason.code" class="flex items-center gap-3">
         <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ reasonLabel(reason) }}</span>
         <span class="h-1.5 w-16 overflow-hidden rounded-pill bg-line">
-          <span class="block h-full rounded-pill bg-sage" :style="{ width: `${reason.impact * 8}%` }" />
+          <span
+            class="block h-full rounded-pill bg-sage"
+            :style="{ width: `${reason.impact * 8}%` }"
+          />
         </span>
         <span class="w-8 text-right text-xs tabular-nums text-sage">+{{ reason.impact }}</span>
       </div>
@@ -53,7 +47,10 @@ const match = {
       >
         <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ reasonLabel(warning) }}</span>
         <span class="h-1.5 w-16 overflow-hidden rounded-pill bg-line">
-          <span class="block h-full rounded-pill bg-caution" :style="{ width: `${Math.abs(warning.impact) * 8}%` }" />
+          <span
+            class="block h-full rounded-pill bg-caution"
+            :style="{ width: `${Math.abs(warning.impact) * 8}%` }"
+          />
         </span>
         <span class="w-8 text-right text-xs tabular-nums text-caution">{{ warning.impact }}</span>
       </div>

@@ -46,7 +46,8 @@ export class AuthService {
 
     // Compare against a dummy hash when the account is missing so the response
     // time does not reveal whether an email is registered.
-    const hash = user?.passwordHash ?? '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi';
+    const hash =
+      user?.passwordHash ?? '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi';
     const valid = await bcrypt.compare(dto.password, hash);
     if (!user || !valid) {
       throw new UnauthorizedException('That email and password combination did not match.');
@@ -80,7 +81,11 @@ export class AuthService {
     return toUserDto(user, Boolean(user.beautyProfile));
   }
 
-  private async issue(user: User, userAgent: string | undefined, hasProfile: boolean): Promise<IssuedSession> {
+  private async issue(
+    user: User,
+    userAgent: string | undefined,
+    hasProfile: boolean,
+  ): Promise<IssuedSession> {
     const [accessToken, refreshToken] = await Promise.all([
       this.tokens.issueAccessToken(user),
       this.tokens.issueRefreshToken(user.id, userAgent),

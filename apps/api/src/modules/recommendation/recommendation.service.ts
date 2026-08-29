@@ -52,7 +52,12 @@ export class RecommendationService {
   /** Top products for this viewer, optionally restricted to a routine step. */
   async getPersonalizedProducts(
     viewer: ViewerContext,
-    options: { limit?: number; routineStep?: RoutineStep; maxPrice?: number; excludeOwned?: boolean } = {},
+    options: {
+      limit?: number;
+      routineStep?: RoutineStep;
+      maxPrice?: number;
+      excludeOwned?: boolean;
+    } = {},
   ): Promise<ProductSummaryDto[]> {
     const { limit = 8, routineStep, maxPrice, excludeOwned = true } = options;
 
@@ -80,7 +85,11 @@ export class RecommendationService {
     return this.rank(rows, viewer).slice(0, limit);
   }
 
-  async getSimilarProducts(productId: string, viewer: ViewerContext, limit = 6): Promise<ProductSummaryDto[]> {
+  async getSimilarProducts(
+    productId: string,
+    viewer: ViewerContext,
+    limit = 6,
+  ): Promise<ProductSummaryDto[]> {
     const subject = await this.prisma.product.findUnique({
       where: { id: productId },
       include: { category: true },
@@ -133,7 +142,9 @@ export class RecommendationService {
       const rows = await this.prisma.product.findMany({
         where: {
           isActive: true,
-          ingredients: { some: { ingredient: { targetsConcerns: { some: { slug: concernSlug } } } } },
+          ingredients: {
+            some: { ingredient: { targetsConcerns: { some: { slug: concernSlug } } } },
+          },
         },
         include: PRODUCT_INCLUDE,
         orderBy: { ingredientScore: 'desc' },
@@ -208,7 +219,12 @@ export class RecommendationService {
       SPF: 'Sun protection',
     };
     // Sunscreen and moisturiser carry the routine, so they get more of the budget.
-    const share: Record<string, number> = { CLEANSER: 0.18, SERUM: 0.27, MOISTURIZER: 0.28, SPF: 0.27 };
+    const share: Record<string, number> = {
+      CLEANSER: 0.18,
+      SERUM: 0.27,
+      MOISTURIZER: 0.28,
+      SPF: 0.27,
+    };
 
     // What the cheapest acceptable option in each step costs.
     const floors = new Map<RoutineStep, number | null>();
@@ -265,7 +281,11 @@ export class RecommendationService {
 
       const picks =
         available >= floor
-          ? await this.getPersonalizedProducts(viewer, { limit: 1, routineStep: step, maxPrice: allowance })
+          ? await this.getPersonalizedProducts(viewer, {
+              limit: 1,
+              routineStep: step,
+              maxPrice: allowance,
+            })
           : [];
 
       const product = picks[0] ?? null;
@@ -277,13 +297,13 @@ export class RecommendationService {
         label,
         product,
         reason: product
-          ? (product.personalMatch?.reasons[0]
-              ? {
-                  code: `match:${product.personalMatch.reasons[0].code}`,
-                  text: product.personalMatch.reasons[0].label,
-                  params: (product.personalMatch.reasons[0].params ?? {}) as LocalisedText['params'],
-                }
-              : { code: 'routine-step-best', text: 'Best available match for this step' })
+          ? product.personalMatch?.reasons[0]
+            ? {
+                code: `match:${product.personalMatch.reasons[0].code}`,
+                text: product.personalMatch.reasons[0].label,
+                params: (product.personalMatch.reasons[0].params ?? {}) as LocalisedText['params'],
+              }
+            : { code: 'routine-step-best', text: 'Best available match for this step' }
           : {
               code: 'routine-step-unaffordable',
               text: `Nothing here fits what is left of the budget — the cheapest is ${floor.toFixed(2)} PLN.`,

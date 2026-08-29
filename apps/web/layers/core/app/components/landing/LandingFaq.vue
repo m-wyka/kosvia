@@ -1,11 +1,12 @@
 <script setup lang="ts">
+const FAQ_COUNT = 6;
+
 const { t } = useI18n();
 
-/** Six entries, each a Q/A pair under LANDING.FAQ. */
 const faqs = computed(() =>
-  [1, 2, 3, 4, 5, 6].map((n) => ({
-    q: t(`LANDING.FAQ.Q_${n}`),
-    a: t(`LANDING.FAQ.A_${n}`),
+  Array.from({ length: FAQ_COUNT }, (_, index) => index + 1).map((number) => ({
+    q: t(`LANDING.FAQ.Q_${number}`),
+    a: t(`LANDING.FAQ.A_${number}`),
   })),
 );
 
@@ -20,7 +21,9 @@ const open = ref<number | null>(0);
       align="center"
     />
 
-    <dl class="mx-auto mt-10 max-w-2xl divide-y divide-line rounded-xl border border-line bg-surface">
+    <dl
+      class="mx-auto mt-10 max-w-2xl divide-y divide-line rounded-xl border border-line bg-surface"
+    >
       <div v-for="(faq, index) in faqs" :key="faq.q">
         <dt>
           <button
@@ -38,7 +41,10 @@ const open = ref<number | null>(0);
             />
           </button>
         </dt>
-        <dd v-if="open === index" class="animate-fade-up px-5 pb-4 text-sm leading-relaxed text-ink-muted">
+        <dd
+          v-if="open === index"
+          class="animate-fade-up px-5 pb-4 text-sm leading-relaxed text-ink-muted"
+        >
           {{ faq.a }}
         </dd>
       </div>

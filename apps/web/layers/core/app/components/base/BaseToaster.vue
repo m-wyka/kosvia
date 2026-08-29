@@ -34,7 +34,9 @@ const tones = {
               :to="toast.action.to"
               class="shrink-0 font-medium underline underline-offset-2"
               @click="dismiss(toast.id)"
-            >{{ toast.action.label }}</NuxtLinkLocale>
+            >
+              {{ toast.action.label }}
+            </NuxtLinkLocale>
             <button
               type="button"
               class="-mr-1 shrink-0 rounded p-1 opacity-70 transition-opacity hover:opacity-100"

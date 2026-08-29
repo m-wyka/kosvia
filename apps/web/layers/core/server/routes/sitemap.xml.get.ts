@@ -1,4 +1,4 @@
-import { escapeXmlText } from '../utils/placeholder';
+import { escapeXml } from '../utils/placeholder';
 
 interface SitemapEntry {
   path: string;
@@ -51,8 +51,8 @@ const fetchCatalogueEntries = async (apiBaseUrl: string): Promise<SitemapEntry[]
   }
 
   let page = 1;
-  let pageCount = 1;
-  do {
+  let hasMorePages = true;
+  while (hasMorePages && page <= MAX_PRODUCT_PAGES) {
     const result = await $fetch<{ items: Array<{ slug: string }>; pageCount: number }>(
       '/products',
       { baseURL: apiBaseUrl, query: { page, pageSize: PRODUCTS_PAGE_SIZE } },
@@ -60,9 +60,9 @@ const fetchCatalogueEntries = async (apiBaseUrl: string): Promise<SitemapEntry[]
     for (const product of result.items) {
       entries.push({ path: `/products/${product.slug}`, changefreq: 'weekly', priority: '0.8' });
     }
-    pageCount = result.pageCount;
+    hasMorePages = page < result.pageCount;
     page += 1;
-  } while (page <= pageCount && page <= MAX_PRODUCT_PAGES);
+  }
 
   return entries;
 };
@@ -70,14 +70,14 @@ const fetchCatalogueEntries = async (apiBaseUrl: string): Promise<SitemapEntry[]
 const renderUrl = (siteOrigin: string, entry: SitemapEntry, locale: string): string => {
   const alternates = LOCALES.map(
     (other) =>
-      `    <xhtml:link rel="alternate" hreflang="${other}" href="${escapeXmlText(`${siteOrigin}${localise(entry.path, other)}`)}"/>`,
+      `    <xhtml:link rel="alternate" hreflang="${other}" href="${escapeXml(`${siteOrigin}${localise(entry.path, other)}`)}"/>`,
   ).join('\n');
 
   return [
     '  <url>',
-    `    <loc>${escapeXmlText(`${siteOrigin}${localise(entry.path, locale)}`)}</loc>`,
+    `    <loc>${escapeXml(`${siteOrigin}${localise(entry.path, locale)}`)}</loc>`,
     alternates,
-    `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXmlText(`${siteOrigin}${localise(entry.path, DEFAULT_LOCALE)}`)}"/>`,
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${siteOrigin}${localise(entry.path, DEFAULT_LOCALE)}`)}"/>`,
     `    <changefreq>${entry.changefreq}</changefreq>`,
     `    <priority>${entry.priority}</priority>`,
     '  </url>',

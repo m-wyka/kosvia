@@ -18,6 +18,10 @@ export class HealthController {
     } catch {
       database = 'down';
     }
-    return { status: database === 'up' ? 'ok' : 'degraded', database, uptime: Math.round(process.uptime()) };
+    return {
+      status: database === 'up' ? 'ok' : 'degraded',
+      database,
+      uptime: Math.round(process.uptime()),
+    };
   }
 }

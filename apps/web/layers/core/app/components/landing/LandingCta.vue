@@ -1,9 +1,15 @@
 <template>
   <section class="container-page pb-20">
-    <div class="relative overflow-hidden rounded-2xl border border-line bg-surface px-6 py-14 text-center sm:px-12">
+    <div
+      class="relative overflow-hidden rounded-2xl border border-line bg-surface px-6 py-14 text-center sm:px-12"
+    >
       <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-        <div class="absolute -top-24 left-1/4 size-80 rounded-full bg-blush-soft blur-3xl opacity-70" />
-        <div class="absolute -bottom-24 right-1/4 size-80 rounded-full bg-sage-soft blur-3xl opacity-60" />
+        <div
+          class="absolute -top-24 left-1/4 size-80 rounded-full bg-blush-soft blur-3xl opacity-70"
+        />
+        <div
+          class="absolute -bottom-24 right-1/4 size-80 rounded-full bg-sage-soft blur-3xl opacity-60"
+        />
       </div>
 
       <h2 class="mx-auto max-w-2xl font-display text-3xl leading-tight text-ink sm:text-4xl">

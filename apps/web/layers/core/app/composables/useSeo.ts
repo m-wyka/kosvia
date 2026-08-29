@@ -1,3 +1,4 @@
+import type { Link } from '@unhead/vue';
 import type { ProductDto } from '@kosvia/shared';
 
 interface SeoOptions {
@@ -7,12 +8,6 @@ interface SeoOptions {
   image?: string;
   type?: 'website' | 'article' | 'product';
   noindex?: boolean;
-}
-
-interface AlternateLink {
-  rel: 'alternate';
-  hreflang: string;
-  href: string;
 }
 
 const DEFAULT_OG_IMAGE = '/og-default.svg';
@@ -35,7 +30,7 @@ export const useSeo = (options: SeoOptions | (() => SeoOptions)) => {
     return `${siteOrigin}${path}`;
   });
 
-  const alternates = computed<AlternateLink[]>(() => {
+  const alternates = computed<Link[]>(() => {
     if (resolved.value.noindex) {
       return [];
     }
@@ -43,7 +38,7 @@ export const useSeo = (options: SeoOptions | (() => SeoOptions)) => {
 
     return locales.value.flatMap((entry) => {
       const href = `${siteOrigin}${localePath(basePath, entry.code)}`;
-      const links: AlternateLink[] = [{ rel: 'alternate', hreflang: String(entry.code), href }];
+      const links: Link[] = [{ rel: 'alternate', hreflang: String(entry.code), href }];
       if (entry.code === defaultLocale) {
         links.push({ rel: 'alternate', hreflang: 'x-default', href });
       }

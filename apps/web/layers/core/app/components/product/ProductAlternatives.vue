@@ -10,14 +10,17 @@ const { data, pending, error, refresh } = await useApiFetch<AlternativeGroupDto[
 
 const localise = useLocalisedText();
 const active = ref<string | null>(null);
-watchEffect(() => {
-  if (!active.value && data.value?.length) {active.value = data.value[0]!.kind;}
-});
 
 const groups = computed(() => data.value ?? []);
 const current = computed(
   () => groups.value.find((group) => group.kind === active.value) ?? groups.value[0] ?? null,
 );
+
+watchEffect(() => {
+  if (!active.value && data.value?.length) {
+    active.value = data.value[0]!.kind;
+  }
+});
 </script>
 
 <template>
@@ -57,14 +60,11 @@ const current = computed(
         "
       />
 
-      <!-- The API's own `title`/`description` stay English; the kind is what we
-           translate on, exactly as with the tab labels above. -->
       <p v-if="current" class="mt-3 text-sm text-ink-muted">
         {{
-          $t(
-            `PRODUCT.ALTERNATIVES.DESCRIPTION.${current.kind.replace(/-/g, '_').toUpperCase()}`,
-            { product: props.name },
-          )
+          $t(`PRODUCT.ALTERNATIVES.DESCRIPTION.${current.kind.replace(/-/g, '_').toUpperCase()}`, {
+            product: props.name,
+          })
         }}
       </p>
 

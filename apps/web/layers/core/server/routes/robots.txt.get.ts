@@ -18,7 +18,9 @@ export default defineEventHandler((event) => {
   return [
     'User-agent: *',
     'Allow: /',
-    ...LOCALE_PREFIXES.flatMap((prefix) => PRIVATE_PATHS.map((path) => `Disallow: ${prefix}${path}`)),
+    ...LOCALE_PREFIXES.flatMap((prefix) =>
+      PRIVATE_PATHS.map((path) => `Disallow: ${prefix}${path}`),
+    ),
     '',
     `Sitemap: ${config.siteUrl}/sitemap.xml`,
     '',

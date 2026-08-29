@@ -26,7 +26,9 @@ export const aiProviderFactory: Provider = {
       return new AnthropicAIProvider(apiKey, model);
     }
 
-    logger.log('Using the offline deterministic AI provider (set AI_PROVIDER=anthropic to change).');
+    logger.log(
+      'Using the offline deterministic AI provider (set AI_PROVIDER=anthropic to change).',
+    );
     return new MockAIProvider();
   },
 };

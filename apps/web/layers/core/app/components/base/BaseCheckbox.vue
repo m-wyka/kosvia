@@ -16,10 +16,8 @@ const id = useId();
         v-model="model"
         type="checkbox"
         :disabled="disabled"
-        class="peer size-[18px] cursor-pointer appearance-none rounded-xs border border-line-strong
-               bg-surface transition-all duration-[--duration-fast]
-               checked:border-ink checked:bg-ink disabled:cursor-not-allowed"
-      >
+        class="peer size-[18px] cursor-pointer appearance-none rounded-xs border border-line-strong bg-surface transition-all duration-[--duration-fast] checked:border-ink checked:bg-ink disabled:cursor-not-allowed"
+      />
       <BaseIcon
         name="check"
         :size="12"

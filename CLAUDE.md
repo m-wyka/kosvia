@@ -3,7 +3,7 @@
 Monorepo: `apps/web` (Nuxt 4, SSR, warstwy), `apps/api` (NestJS + Prisma), `packages/shared` (typy DTO).
 Ten dokument opisuje przede wszystkim frontend (`apps/web`) — Vue 3 `<script setup lang="ts">`, Pinia, `@nuxtjs/i18n`, Tailwind v4.
 
-Istniejący kod nie wszędzie spełnia te reguły (jest w nim sporo komentarzy, `function` zamiast strzałek, `if` bez klamer). Reguły obowiązują dla **nowego i edytowanego** kodu — plik, który dotykam, doprowadzam do tego standardu.
+Cały frontend jest już doprowadzony do tego standardu. Część reguł pilnuje narzędzi: Prettier (`.prettierrc`, format-on-save w `.vscode/settings.json`) oraz ESLint (`curly`, `func-style: expression`, `prefer-arrow-callback`, `vue/html-self-closing`). Resztę — Pinia, komentarze, nazewnictwo — pilnujemy ręcznie.
 
 ---
 
@@ -24,8 +24,8 @@ await fetchCategories();
 
 ```ts
 const authStore = useAuthStore();
-await authStore.fetchCategories();   // nie
-const categories = authStore.categories;  // traci reaktywność
+await authStore.fetchCategories(); // nie
+const categories = authStore.categories; // traci reaktywność
 ```
 
 `storeToRefs` tylko dla `ref`/`computed` — akcje z niego nie wychodzą reaktywne i destrukturyzujemy je osobno.
@@ -93,18 +93,13 @@ Treść elementu — zwłaszcza tłumaczenie — stoi w osobnej linii. Nie zosta
   v-if="seeAllTo"
   :to="seeAllTo"
   class="text-sm font-medium text-ink-soft"
-  >{{ $t('COMMON.SEE_ALL') }}</NuxtLinkLocale
->
+>{{ $t('COMMON.SEE_ALL') }}</NuxtLinkLocale>
 ```
 
 Dobrze:
 
 ```vue
-<NuxtLinkLocale
-  v-if="seeAllTo"
-  :to="seeAllTo"
-  class="text-sm font-medium text-ink-soft"
->
+<NuxtLinkLocale v-if="seeAllTo" :to="seeAllTo" class="text-sm font-medium text-ink-soft">
   {{ $t('COMMON.SEE_ALL') }}
 </NuxtLinkLocale>
 ```
@@ -145,9 +140,10 @@ Kolejność w pliku: `<script setup lang="ts">`, potem `<template>`. Wewnątrz s
 ## Weryfikacja zmian
 
 ```bash
+npm run format                     # prettier --write . (root)
 npm run lint -w @kosvia/web        # eslint --max-warnings 0
 npm run typecheck -w @kosvia/web   # vue-tsc, strict
 npm run test -w @kosvia/web        # i18n check + vitest
 ```
 
-Zmiana we frontendzie jest skończona dopiero, gdy te trzy przechodzą.
+Zmiana we frontendzie jest skończona dopiero, gdy lint, typecheck i testy przechodzą, a `npm run format:check` nie zgłasza plików.

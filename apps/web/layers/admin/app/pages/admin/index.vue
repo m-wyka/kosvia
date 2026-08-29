@@ -10,14 +10,54 @@ const { data, pending, error, refresh } = await useApiFetch<AdminStatsDto>('/adm
 const { t } = useI18n();
 
 const cards = computed(() => [
-  { label: t('ADMIN.NAV.PRODUCTS'), value: data.value?.products, to: '/admin/products', icon: 'droplet' as const },
-  { label: t('ADMIN.NAV.BRANDS'), value: data.value?.brands, to: '/admin/brands', icon: 'tag' as const },
-  { label: t('ADMIN.NAV.CATEGORIES'), value: data.value?.categories, to: '/admin/categories', icon: 'shelf' as const },
-  { label: t('ADMIN.NAV.INGREDIENTS'), value: data.value?.ingredients, to: '/admin/ingredients', icon: 'leaf' as const },
-  { label: t('ADMIN.NAV.STORES'), value: data.value?.stores, to: '/admin/stores', icon: 'store' as const },
-  { label: t('ADMIN.NAV.OFFERS'), value: data.value?.offers, to: '/admin/offers', icon: 'compare' as const },
-  { label: t('ADMIN.NAV.USERS'), value: data.value?.users, to: '/admin/users', icon: 'user' as const },
-  { label: t('ADMIN.OVERVIEW.SHELF_ITEMS'), value: data.value?.shelfItems, to: '/admin/users', icon: 'heart' as const },
+  {
+    label: t('ADMIN.NAV.PRODUCTS'),
+    value: data.value?.products,
+    to: '/admin/products',
+    icon: 'droplet' as const,
+  },
+  {
+    label: t('ADMIN.NAV.BRANDS'),
+    value: data.value?.brands,
+    to: '/admin/brands',
+    icon: 'tag' as const,
+  },
+  {
+    label: t('ADMIN.NAV.CATEGORIES'),
+    value: data.value?.categories,
+    to: '/admin/categories',
+    icon: 'shelf' as const,
+  },
+  {
+    label: t('ADMIN.NAV.INGREDIENTS'),
+    value: data.value?.ingredients,
+    to: '/admin/ingredients',
+    icon: 'leaf' as const,
+  },
+  {
+    label: t('ADMIN.NAV.STORES'),
+    value: data.value?.stores,
+    to: '/admin/stores',
+    icon: 'store' as const,
+  },
+  {
+    label: t('ADMIN.NAV.OFFERS'),
+    value: data.value?.offers,
+    to: '/admin/offers',
+    icon: 'compare' as const,
+  },
+  {
+    label: t('ADMIN.NAV.USERS'),
+    value: data.value?.users,
+    to: '/admin/users',
+    icon: 'user' as const,
+  },
+  {
+    label: t('ADMIN.OVERVIEW.SHELF_ITEMS'),
+    value: data.value?.shelfItems,
+    to: '/admin/users',
+    icon: 'heart' as const,
+  },
 ]);
 
 useSeo(() => ({

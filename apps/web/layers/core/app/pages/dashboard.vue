@@ -3,21 +3,40 @@ import type { DashboardDto } from '@kosvia/shared';
 
 definePageMeta({ middleware: 'auth' });
 
-const auth = useAuthStore();
+const MAX_OBSERVATIONS = 3;
+
+const { displayName } = storeToRefs(useAuthStore());
+const { t } = useI18n();
+const localise = useLocalisedText();
+
 const { data, pending, error, refresh } = await useApiFetch<DashboardDto>('/dashboard', {
   key: 'dashboard',
 });
 
-const { t } = useI18n();
-const localise = useLocalisedText();
-
 const stats = computed(() => [
-  { label: t('DASHBOARD.STAT_SHELF'), value: data.value?.shelfCount ?? 0, to: '/shelf', icon: 'shelf' as const },
-  { label: t('DASHBOARD.STAT_FAVORITES'), value: data.value?.favoriteCount ?? 0, to: '/shelf?tab=favorites', icon: 'heart' as const },
-  { label: t('DASHBOARD.STAT_ALERTS'), value: data.value?.activeAlerts ?? 0, to: '/price-alerts', icon: 'bell' as const },
+  {
+    label: t('DASHBOARD.STAT_SHELF'),
+    value: data.value?.shelfCount ?? 0,
+    to: '/shelf',
+    icon: 'shelf' as const,
+  },
+  {
+    label: t('DASHBOARD.STAT_FAVORITES'),
+    value: data.value?.favoriteCount ?? 0,
+    to: '/shelf?tab=favorites',
+    icon: 'heart' as const,
+  },
+  {
+    label: t('DASHBOARD.STAT_ALERTS'),
+    value: data.value?.activeAlerts ?? 0,
+    to: '/price-alerts',
+    icon: 'bell' as const,
+  },
 ]);
 
-const observations = computed(() => data.value?.routine?.observations.slice(0, 3) ?? []);
+const observations = computed(
+  () => data.value?.routine?.observations.slice(0, MAX_OBSERVATIONS) ?? [],
+);
 
 useSeo(() => ({
   title: t('SEO.DASHBOARD.TITLE'),
@@ -31,7 +50,7 @@ useSeo(() => ({
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 class="font-display text-3xl text-ink sm:text-4xl">
-          {{ $t('DASHBOARD.GREETING', { name: auth.displayName }) }}
+          {{ $t('DASHBOARD.GREETING', { name: displayName }) }}
         </h1>
         <p class="mt-2 text-sm text-ink-muted">
           {{ data?.profile ? $t('DASHBOARD.SUBTITLE_PERSONAL') : $t('DASHBOARD.SUBTITLE_GENERIC') }}
@@ -47,7 +66,9 @@ useSeo(() => ({
 
     <template v-else>
       <div v-if="!pending && !data?.profile" class="mt-8">
-        <BaseCard class="flex flex-wrap items-center justify-between gap-4 border-blush/30 bg-blush-soft">
+        <BaseCard
+          class="flex flex-wrap items-center justify-between gap-4 border-blush/30 bg-blush-soft"
+        >
           <div class="min-w-0">
             <h2 class="font-display text-lg text-ink">{{ $t('DASHBOARD.NO_PROFILE_TITLE') }}</h2>
             <p class="mt-1 text-sm text-ink-soft">{{ $t('DASHBOARD.NO_PROFILE_BODY') }}</p>
@@ -81,9 +102,16 @@ useSeo(() => ({
           <NuxtLinkLocale
             to="/discover"
             class="shrink-0 text-sm font-medium text-ink-soft underline-offset-4 hover:text-ink hover:underline"
-          >{{ $t('COMMON.SEE_MORE') }}</NuxtLinkLocale>
+          >
+            {{ $t('COMMON.SEE_MORE') }}
+          </NuxtLinkLocale>
         </div>
-        <ProductGrid :products="data?.recommended" :loading="pending" :skeleton-count="6" :columns="3" />
+        <ProductGrid
+          :products="data?.recommended"
+          :loading="pending"
+          :skeleton-count="6"
+          :columns="3"
+        />
       </section>
 
       <section v-if="observations.length" class="mt-12">
@@ -100,7 +128,11 @@ useSeo(() => ({
           >
             <span
               class="flex size-8 shrink-0 items-center justify-center rounded-lg"
-              :class="observation.severity === 'notice' ? 'bg-caution-soft text-caution' : 'bg-surface-muted text-ink-faint'"
+              :class="
+                observation.severity === 'notice'
+                  ? 'bg-caution-soft text-caution'
+                  : 'bg-surface-muted text-ink-faint'
+              "
             >
               <BaseIcon :name="observation.severity === 'notice' ? 'alert' : 'info'" :size="16" />
             </span>

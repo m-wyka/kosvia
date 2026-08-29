@@ -2,7 +2,9 @@ import type { ScorableIngredient, ScorableProduct, ScorableProfile } from './typ
 
 /** Small builders so tests read as intent, not as object literals. */
 
-export function ingredient(overrides: Partial<ScorableIngredient> & { id: string }): ScorableIngredient {
+export function ingredient(
+  overrides: Partial<ScorableIngredient> & { id: string },
+): ScorableIngredient {
   return {
     inciName: overrides.id,
     tags: [],

@@ -68,7 +68,15 @@ export function row(options: RowOptions): ProductRow {
     isActive: true,
     createdAt: now,
     updatedAt: now,
-    brand: { id: brandId, name: brandName, slug: brandId, logo: null, description: null, isVegan, isCrueltyFree },
+    brand: {
+      id: brandId,
+      name: brandName,
+      slug: brandId,
+      logo: null,
+      description: null,
+      isVegan,
+      isCrueltyFree,
+    },
     category: {
       id: categoryId,
       name: 'Moisturizers',

@@ -1,13 +1,8 @@
 <script setup lang="ts">
-/**
- * Bottom navigation for phones.
- *
- * Scan sits in the middle and is deliberately the most prominent target — it
- * is the fastest route into the product once barcode scanning ships. Today it
- * opens the search page and says so honestly.
- */
+const AUTH_ONLY_PATHS = ['/shelf', '/profile'];
+
 const route = useRoute();
-const auth = useAuthStore();
+const { isAuthenticated } = storeToRefs(useAuthStore());
 
 const items = [
   { to: '/', label: 'NAV.HOME', icon: 'home' as const, exact: true },
@@ -17,8 +12,8 @@ const items = [
   { to: '/profile', label: 'NAV.PROFILE', icon: 'user' as const },
 ];
 
-const resolve = (to: string) =>
-  !auth.isAuthenticated && ['/shelf', '/profile'].includes(to) ? '/login' : to;
+const linkTarget = (to: string) =>
+  !isAuthenticated.value && AUTH_ONLY_PATHS.includes(to) ? '/login' : to;
 
 const isActive = (item: (typeof items)[number]) =>
   item.exact ? route.path === item.to : route.path.startsWith(item.to);
@@ -32,7 +27,7 @@ const isActive = (item: (typeof items)[number]) =>
     <ul class="mx-auto flex max-w-lg items-end justify-around px-2 pt-1.5">
       <li v-for="item in items" :key="item.to" class="flex-1">
         <NuxtLinkLocale
-          :to="resolve(item.to)"
+          :to="linkTarget(item.to)"
           class="flex flex-col items-center gap-1 rounded-lg px-1 py-1.5 transition-colors"
           :class="[
             item.primary ? '-mt-5' : '',
@@ -42,13 +37,14 @@ const isActive = (item: (typeof items)[number]) =>
         >
           <span
             v-if="item.primary"
-            class="flex size-12 items-center justify-center rounded-full bg-ink text-ink-inverse shadow-md
-                   transition-transform active:scale-95"
+            class="flex size-12 items-center justify-center rounded-full bg-ink text-ink-inverse shadow-md transition-transform active:scale-95"
           >
             <BaseIcon :name="item.icon" :size="22" />
           </span>
           <BaseIcon v-else :name="item.icon" :size="21" />
-          <span class="text-2xs font-medium" :class="item.primary && 'text-ink'">{{ $t(item.label) }}</span>
+          <span class="text-2xs font-medium" :class="item.primary && 'text-ink'">
+            {{ $t(item.label) }}
+          </span>
         </NuxtLinkLocale>
       </li>
     </ul>

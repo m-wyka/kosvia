@@ -36,14 +36,14 @@ price → I buy it
 
 ## Stack
 
-| Layer     | Choice                                                        |
-| --------- | ------------------------------------------------------------- |
-| Frontend  | Nuxt 4 (SSR), Vue 3, TypeScript, Tailwind CSS 4, Pinia, VueUse |
-| i18n      | @nuxtjs/i18n — English and Polish, browser-detected, prefixed URLs |
-| Backend   | NestJS 11, TypeScript, REST, Passport JWT, class-validator     |
-| Database  | PostgreSQL 16, Prisma ORM                                      |
-| AI        | Provider abstraction — offline mock by default, Claude opt-in  |
-| Shared    | `@kosvia/shared` — one set of types for both apps              |
+| Layer    | Choice                                                             |
+| -------- | ------------------------------------------------------------------ |
+| Frontend | Nuxt 4 (SSR), Vue 3, TypeScript, Tailwind CSS 4, Pinia, VueUse     |
+| i18n     | @nuxtjs/i18n — English and Polish, browser-detected, prefixed URLs |
+| Backend  | NestJS 11, TypeScript, REST, Passport JWT, class-validator         |
+| Database | PostgreSQL 16, Prisma ORM                                          |
+| AI       | Provider abstraction — offline mock by default, Claude opt-in      |
+| Shared   | `@kosvia/shared` — one set of types for both apps                  |
 
 ```
 Nuxt 4  ──REST──▶  NestJS  ──Prisma──▶  PostgreSQL
@@ -73,10 +73,10 @@ Then open **http://localhost:3000**.
 
 Seeded accounts:
 
-| Account            | Password       | What it has                                   |
-| ------------------ | -------------- | --------------------------------------------- |
+| Account            | Password       | What it has                                     |
+| ------------------ | -------------- | ----------------------------------------------- |
 | `demo@kosvia.app`  | `Password123!` | Full beauty profile, five-product shelf, alerts |
-| `admin@kosvia.app` | `Admin123!`    | Admin role, access to `/admin`                 |
+| `admin@kosvia.app` | `Admin123!`    | Admin role, access to `/admin`                  |
 
 The login page has a **Use the demo account** button so you never need to type these.
 
@@ -100,18 +100,18 @@ One file at the repository root: `.env` (copied from `.env.example` on install).
 `npm run env` redistributes it to `apps/api/.env` and `apps/web/.env` — the web
 app receives only the URL variables, never database credentials or JWT secrets.
 
-| Variable                                   | Purpose                                                     |
-| ------------------------------------------ | ----------------------------------------------------------- |
-| `DATABASE_URL`                             | PostgreSQL connection string                                 |
-| `JWT_SECRET`, `JWT_REFRESH_SECRET`         | Token signing. **Required in production** — no fallback      |
-| `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`        | `15m` / `30d` by default                                     |
-| `COOKIE_DOMAIN`, `COOKIE_SECURE`           | Set `COOKIE_SECURE=true` behind HTTPS                        |
-| `API_PORT`, `API_URL`                      | Where the API listens, and where the browser reaches it      |
-| `API_INTERNAL_URL`                         | Where the Nuxt server reaches the API during SSR             |
-| `FRONTEND_URL`                             | Drives CORS and canonical URLs                               |
-| `AI_PROVIDER`                              | `mock` (default, offline) or `anthropic`                     |
-| `AI_API_KEY`, `AI_MODEL`                   | Only needed when `AI_PROVIDER=anthropic`                     |
-| `SEED_USER_PASSWORD`, `SEED_ADMIN_PASSWORD`| Demo account passwords, seed only                            |
+| Variable                                    | Purpose                                                 |
+| ------------------------------------------- | ------------------------------------------------------- |
+| `DATABASE_URL`                              | PostgreSQL connection string                            |
+| `JWT_SECRET`, `JWT_REFRESH_SECRET`          | Token signing. **Required in production** — no fallback |
+| `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`         | `15m` / `30d` by default                                |
+| `COOKIE_DOMAIN`, `COOKIE_SECURE`            | Set `COOKIE_SECURE=true` behind HTTPS                   |
+| `API_PORT`, `API_URL`                       | Where the API listens, and where the browser reaches it |
+| `API_INTERNAL_URL`                          | Where the Nuxt server reaches the API during SSR        |
+| `FRONTEND_URL`                              | Drives CORS and canonical URLs                          |
+| `AI_PROVIDER`                               | `mock` (default, offline) or `anthropic`                |
+| `AI_API_KEY`, `AI_MODEL`                    | Only needed when `AI_PROVIDER=anthropic`                |
+| `SEED_USER_PASSWORD`, `SEED_ADMIN_PASSWORD` | Demo account passwords, seed only                       |
 
 No secrets are committed. `.env` is gitignored; `.env.example` holds placeholders.
 
@@ -216,11 +216,11 @@ registers a CLDR-correct rule for it — otherwise "5 produkty" instead of
 The backend answers in English, which is right for an API. The UI never renders
 those strings; it renders the **identifier** next to them:
 
-| The API sends | The UI translates on |
-| --- | --- |
-| `{ slug: "eye-care", name: "Eye care" }` | `VOCAB.CATEGORY.EYE_CARE` |
-| `{ code: "budget-over", label: "Well above your 100 PLN budget", params: { budget: 100 } }` | `MATCH.BUDGET_OVER` + params |
-| `availability: "LOW_STOCK"` | `VOCAB.AVAILABILITY.LOW_STOCK` |
+| The API sends                                                                               | The UI translates on           |
+| ------------------------------------------------------------------------------------------- | ------------------------------ |
+| `{ slug: "eye-care", name: "Eye care" }`                                                    | `VOCAB.CATEGORY.EYE_CARE`      |
+| `{ code: "budget-over", label: "Well above your 100 PLN budget", params: { budget: 100 } }` | `MATCH.BUDGET_OVER` + params   |
+| `availability: "LOW_STOCK"`                                                                 | `VOCAB.AVAILABILITY.LOW_STOCK` |
 
 `useVocabulary()` bridges slugs and enum members to keys; `useMatchReason()`
 renders a Personal Match reason from its code and raw params. Both fall back to
@@ -318,11 +318,11 @@ directory and silently break `nuxt typecheck`.
 This is the architectural spine of the project, and it is enforced by module
 boundaries rather than convention:
 
-| Kind             | Where it comes from                                   | Example                                |
-| ---------------- | ----------------------------------------------------- | -------------------------------------- |
-| **Raw data**     | PostgreSQL, via Prisma                                | ingredients, prices, stores, categories |
-| **Computed data**| Deterministic services in `modules/scoring`           | Personal Match, ingredient score        |
-| **AI output**    | `AIProvider`, given the two above as facts            | the sentence explaining the score       |
+| Kind              | Where it comes from                         | Example                                 |
+| ----------------- | ------------------------------------------- | --------------------------------------- |
+| **Raw data**      | PostgreSQL, via Prisma                      | ingredients, prices, stores, categories |
+| **Computed data** | Deterministic services in `modules/scoring` | Personal Match, ingredient score        |
+| **AI output**     | `AIProvider`, given the two above as facts  | the sentence explaining the score       |
 
 The AI never produces a number, a price, an ingredient or a product name.
 
@@ -479,15 +479,15 @@ product slug, so no third-party photography or copy is used anywhere.
 The seed is deterministic: the same slug always produces the same variant,
 palette and price band.
 
-| | |
-| --- | --- |
-| Brands | 22 |
-| Categories | 17, three levels deep |
-| Ingredients | 139, with functions, tags, tolerance and concern/goal links |
-| Products | 132, across 33 realistic formulas |
-| Product-ingredient rows | ~1,900 |
-| Stores / offers | 5 / ~400 |
-| Price history | ~2,400 points |
+|                         |                                                             |
+| ----------------------- | ----------------------------------------------------------- |
+| Brands                  | 22                                                          |
+| Categories              | 17, three levels deep                                       |
+| Ingredients             | 139, with functions, tags, tolerance and concern/goal links |
+| Products                | 132, across 33 realistic formulas                           |
+| Product-ingredient rows | ~1,900                                                      |
+| Stores / offers         | 5 / ~400                                                    |
+| Price history           | ~2,400 points                                               |
 
 ---
 

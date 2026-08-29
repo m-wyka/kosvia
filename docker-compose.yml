@@ -8,11 +8,11 @@ services:
       POSTGRES_PASSWORD: kosvia
       POSTGRES_DB: kosvia
     ports:
-      - "5433:5432"
+      - '5433:5432'
     volumes:
       - kosvia-pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kosvia -d kosvia"]
+      test: ['CMD-SHELL', 'pg_isready -U kosvia -d kosvia']
       interval: 5s
       timeout: 5s
       retries: 10

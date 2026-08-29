@@ -31,10 +31,10 @@ export const useAdminResource = <T extends { id: string }>(
     return `${path}?${params.toString()}`;
   });
 
-  const { data, pending, error, refresh } = useApiFetch<PaginatedResult<T> | T[]>(
-    () => url.value,
-    { key: `admin-${path}`, watch: [url] },
-  );
+  const { data, pending, error, refresh } = useApiFetch<PaginatedResult<T> | T[]>(() => url.value, {
+    key: `admin-${path}`,
+    watch: [url],
+  });
 
   const rows = computed<T[]>(() =>
     Array.isArray(data.value) ? data.value : (data.value?.items ?? []),
@@ -42,9 +42,7 @@ export const useAdminResource = <T extends { id: string }>(
   const total = computed(() =>
     Array.isArray(data.value) ? data.value.length : (data.value?.total ?? 0),
   );
-  const pageCount = computed(() =>
-    Array.isArray(data.value) ? 1 : (data.value?.pageCount ?? 1),
-  );
+  const pageCount = computed(() => (Array.isArray(data.value) ? 1 : (data.value?.pageCount ?? 1)));
 
   const mutate = async <R>(action: () => Promise<R>, successMessage: string): Promise<R | null> => {
     saving.value = true;

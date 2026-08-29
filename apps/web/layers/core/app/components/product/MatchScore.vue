@@ -1,15 +1,26 @@
 <script setup lang="ts">
-import type { PersonalMatchDto } from '@kosvia/shared';
+import type { MatchTier, PersonalMatchDto } from '@kosvia/shared';
 
-/**
- * The Personal Match number — the single most important figure in the product,
- * so it gets a ring, a colour, and a written tier rather than colour alone.
- */
+const COUNT_UP_DURATION_MS = 700;
+
+const DIMENSIONS = {
+  sm: { box: 40, stroke: 3.5, text: 'text-xs' },
+  md: { box: 60, stroke: 4, text: 'text-base' },
+  lg: { box: 92, stroke: 5, text: 'text-2xl' },
+} as const;
+
+const TONES: Record<MatchTier, { ring: string; text: string; bg: string }> = {
+  perfect: { ring: 'var(--color-sage)', text: 'text-sage', bg: 'bg-sage-soft' },
+  great: { ring: 'var(--color-sage)', text: 'text-sage', bg: 'bg-sage-soft' },
+  good: { ring: 'var(--color-peach)', text: 'text-peach', bg: 'bg-peach-soft' },
+  fair: { ring: 'var(--color-sand)', text: 'text-ink-soft', bg: 'bg-sand-soft' },
+  poor: { ring: 'var(--color-ink-faint)', text: 'text-ink-muted', bg: 'bg-surface-muted' },
+};
+
 const props = withDefaults(
   defineProps<{
     match?: PersonalMatchDto | null;
     size?: 'sm' | 'md' | 'lg';
-    /** Animates the ring in. Off in dense lists where it would be noise. */
     animate?: boolean;
     showLabel?: boolean;
   }>(),
@@ -19,73 +30,85 @@ const props = withDefaults(
 const { t } = useI18n();
 const vocab = useVocabulary();
 
-const dimensions = {
-  sm: { box: 40, stroke: 3.5, text: 'text-xs' },
-  md: { box: 60, stroke: 4, text: 'text-base' },
-  lg: { box: 92, stroke: 5, text: 'text-2xl' },
-} as const;
-
-const d = computed(() => dimensions[props.size]!);
-const radius = computed(() => (d.value.box - d.value.stroke) / 2);
-const circumference = computed(() => 2 * Math.PI * radius.value);
-
 const score = computed(() => props.match?.score ?? 0);
 const displayed = ref(props.animate ? 0 : score.value);
 
-onMounted(() => {
-  if (!props.animate) {return;}
-  // Respect the user's motion preference — no count-up if they asked for less.
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    displayed.value = score.value;
-    return;
-  }
-  const start = performance.now();
-  const duration = 700;
-  const tick = (now: number) => {
-    const t = Math.min(1, (now - start) / duration);
-    displayed.value = Math.round(score.value * (1 - Math.pow(1 - t, 3)));
-    if (t < 1) {requestAnimationFrame(tick);}
-  };
-  requestAnimationFrame(tick);
-});
-watch(score, (next) => { if (!props.animate) {displayed.value = next;} });
-
-const tone = computed(() => {
-  const tier = props.match?.tier ?? 'poor';
-  return {
-    perfect: { ring: 'var(--color-sage)', text: 'text-sage', bg: 'bg-sage-soft' },
-    great: { ring: 'var(--color-sage)', text: 'text-sage', bg: 'bg-sage-soft' },
-    good: { ring: 'var(--color-peach)', text: 'text-peach', bg: 'bg-peach-soft' },
-    fair: { ring: 'var(--color-sand)', text: 'text-ink-soft', bg: 'bg-sand-soft' },
-    poor: { ring: 'var(--color-ink-faint)', text: 'text-ink-muted', bg: 'bg-surface-muted' },
-  }[tier]!;
-});
+const dimension = computed(() => DIMENSIONS[props.size]);
+const radius = computed(() => (dimension.value.box - dimension.value.stroke) / 2);
+const circumference = computed(() => 2 * Math.PI * radius.value);
+const tone = computed(() => TONES[props.match?.tier ?? 'poor']);
 
 const label = computed(() =>
   props.match?.personalised === false
     ? t('PRODUCT.FORMULA_SCORE')
     : vocab.matchTier(props.match?.tier ?? 'poor'),
 );
+
+const easeOutCubic = (progress: number): number => 1 - Math.pow(1 - progress, 3);
+
+const prefersReducedMotion = (): boolean =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const animateCountUp = () => {
+  const startedAt = performance.now();
+  const tick = (now: number) => {
+    const progress = Math.min(1, (now - startedAt) / COUNT_UP_DURATION_MS);
+    displayed.value = Math.round(score.value * easeOutCubic(progress));
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    }
+  };
+  requestAnimationFrame(tick);
+};
+
+onMounted(() => {
+  if (!props.animate) {
+    return;
+  }
+  if (prefersReducedMotion()) {
+    displayed.value = score.value;
+    return;
+  }
+  animateCountUp();
+});
+
+watch(score, (nextScore) => {
+  if (!props.animate) {
+    displayed.value = nextScore;
+  }
+});
 </script>
 
 <template>
   <div v-if="match" class="flex items-center gap-3">
-    <div class="relative shrink-0" :style="{ width: `${d.box}px`, height: `${d.box}px` }">
+    <div
+      class="relative shrink-0"
+      :style="{ width: `${dimension.box}px`, height: `${dimension.box}px` }"
+    >
       <svg
-        :width="d.box"
-        :height="d.box"
-        :viewBox="`0 0 ${d.box} ${d.box}`"
+        :width="dimension.box"
+        :height="dimension.box"
+        :viewBox="`0 0 ${dimension.box} ${dimension.box}`"
         class="-rotate-90"
         role="img"
         :aria-label="$t('PRODUCT.MATCH_ARIA', { score, tier: label })"
       >
         <circle
-          :cx="d.box / 2" :cy="d.box / 2" :r="radius"
-          fill="none" stroke="var(--color-line)" :stroke-width="d.stroke"
+          :cx="dimension.box / 2"
+          :cy="dimension.box / 2"
+          :r="radius"
+          fill="none"
+          stroke="var(--color-line)"
+          :stroke-width="dimension.stroke"
         />
         <circle
-          :cx="d.box / 2" :cy="d.box / 2" :r="radius"
-          fill="none" :stroke="tone.ring" :stroke-width="d.stroke" stroke-linecap="round"
+          :cx="dimension.box / 2"
+          :cy="dimension.box / 2"
+          :r="radius"
+          fill="none"
+          :stroke="tone.ring"
+          :stroke-width="dimension.stroke"
+          stroke-linecap="round"
           :stroke-dasharray="circumference"
           :stroke-dashoffset="circumference * (1 - displayed / 100)"
           class="transition-[stroke-dashoffset] duration-[--duration-slow] ease-[--ease-out-soft]"
@@ -93,8 +116,11 @@ const label = computed(() =>
       </svg>
       <span
         class="absolute inset-0 flex items-center justify-center font-semibold tabular-nums"
-        :class="[d.text, tone.text]"
-      >{{ displayed }}<span class="text-[0.6em] font-medium">%</span></span>
+        :class="[dimension.text, tone.text]"
+      >
+        {{ displayed }}
+        <span class="text-[0.6em] font-medium">%</span>
+      </span>
     </div>
 
     <div v-if="showLabel" class="min-w-0">

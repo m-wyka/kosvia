@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import type { IngredientScoreBreakdownDto, ProductDto } from '@kosvia/shared';
 
-/**
- * The product page — the most important SEO surface in the product, and the
- * screen where the whole proposition has to land in one scroll on a phone.
- */
+type BadgeTone = 'sage' | 'lavender' | 'peach';
+
+const ALERT_DISCOUNT_RATIO = 0.85;
+
 const route = useRoute();
 const { t } = useI18n();
 const vocab = useVocabulary();
 const format = useFormat();
 const slug = computed(() => String(route.params.slug));
 
-const { data: product, error, refresh } = await useApiFetch<ProductDto>(
-  () => `/products/${slug.value}`,
-  { key: () => `product-${slug.value}` },
-);
+const {
+  data: product,
+  error,
+  refresh,
+} = await useApiFetch<ProductDto>(() => `/products/${slug.value}`, {
+  key: () => `product-${slug.value}`,
+});
 
 if (error.value) {
   throw createError({
@@ -24,35 +27,75 @@ if (error.value) {
   });
 }
 
-// Secondary data: never blocks the first paint of the page itself.
 const { data: breakdown } = await useApiFetch<IngredientScoreBreakdownDto>(
   () => `/products/${slug.value}/ingredient-score`,
   { key: () => `score-${slug.value}`, lazy: true },
 );
 
-const shelf = useShelf();
-const compare = useCompareStore();
+const { refresh: refreshShelf, has: isOnShelfById, busy: shelfBusy, add: addToShelf } = useShelf();
+const { has: isInCompareTray, toggle: toggleCompare } = useCompareStore();
 const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
-
-onMounted(() => shelf.refresh());
-
-const onShelf = computed(() => (product.value ? shelf.has(product.value.id) : false));
-const inComparison = computed(() => (product.value ? compare.has(product.value.id) : false));
 
 const alertOpen = ref(false);
 const alertPrice = ref<number | null>(null);
 const alertSaving = ref(false);
 
-watchEffect(() => {
-  if (product.value?.lowestPrice && alertPrice.value === null) {
-    alertPrice.value = Math.round(product.value.lowestPrice * 0.85 * 100) / 100;
+const onShelf = computed(() => (product.value ? isOnShelfById(product.value.id) : false));
+const inComparison = computed(() => (product.value ? isInCompareTray(product.value.id) : false));
+
+const fullName = computed(() =>
+  product.value ? `${product.value.brand.name} ${product.value.name}` : '',
+);
+
+const facts = computed(() => {
+  const value = product.value;
+  if (!value) {
+    return [];
   }
+  return [
+    { label: t('PRODUCT.SIZE'), value: formatVolume(value.volume, value.volumeUnit) },
+    {
+      label: t('PRODUCT.PRICE_PER_100'),
+      value: value.pricePerHundredMl ? format.price(value.pricePerHundredMl) : null,
+    },
+    {
+      label: t('PRODUCT.INGREDIENT_COUNT'),
+      value: t('PRODUCT.INGREDIENT_COUNT_VALUE', { count: value.ingredients.length }),
+    },
+    {
+      label: t('PRODUCT.CATEGORY'),
+      value: vocab.category(value.category.slug, value.category.name),
+    },
+  ].filter((fact) => fact.value);
 });
 
-async function createAlert() {
-  if (!product.value || !alertPrice.value) {return;}
+const badges = computed(() => {
+  const value = product.value;
+  if (!value) {
+    return [];
+  }
+  const list: Array<{ label: string; tone: BadgeTone }> = [];
+  if (value.isFragranceFree) {
+    list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });
+  }
+  if (value.isVegan) {
+    list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });
+  }
+  if (value.isCrueltyFree) {
+    list.push({ label: t('SEARCH.FILTER.CRUELTY_FREE'), tone: 'peach' });
+  }
+  return list;
+});
+
+const suggestedAlertPrice = (lowestPrice: number): number =>
+  Math.round(lowestPrice * ALERT_DISCOUNT_RATIO * 100) / 100;
+
+const createAlert = async () => {
+  if (!product.value || !alertPrice.value) {
+    return;
+  }
   alertSaving.value = true;
   try {
     await api('/price-alerts', {
@@ -69,44 +112,26 @@ async function createAlert() {
   } finally {
     alertSaving.value = false;
   }
-}
+};
 
-const facts = computed(() => {
-  const value = product.value;
-  if (!value) {return [];}
-  return [
-    { label: t('PRODUCT.SIZE'), value: formatVolume(value.volume, value.volumeUnit) },
-    {
-      label: t('PRODUCT.PRICE_PER_100'),
-      value: value.pricePerHundredMl ? format.price(value.pricePerHundredMl) : null,
-    },
-    {
-      label: t('PRODUCT.INGREDIENT_COUNT'),
-      value: t('PRODUCT.INGREDIENT_COUNT_VALUE', { count: value.ingredients.length }),
-    },
-    { label: t('PRODUCT.CATEGORY'), value: vocab.category(value.category.slug, value.category.name) },
-  ].filter((fact) => fact.value);
-});
+const handleShelfClick = () => {
+  if (onShelf.value || !product.value) {
+    return;
+  }
+  addToShelf(product.value);
+};
 
-const badges = computed(() => {
-  const value = product.value;
-  if (!value) {return [];}
-  const list: Array<{ label: string; tone: 'sage' | 'lavender' | 'peach' }> = [];
-  if (value.isFragranceFree) {list.push({ label: t('SEARCH.FILTER.FRAGRANCE_FREE'), tone: 'sage' });}
-  if (value.isVegan) {list.push({ label: t('SEARCH.FILTER.VEGAN'), tone: 'lavender' });}
-  if (value.isCrueltyFree) {list.push({ label: t('SEARCH.FILTER.CRUELTY_FREE'), tone: 'peach' });}
-  return list;
+onMounted(refreshShelf);
+
+watchEffect(() => {
+  if (product.value?.lowestPrice && alertPrice.value === null) {
+    alertPrice.value = suggestedAlertPrice(product.value.lowestPrice);
+  }
 });
 
 useSeo(() => ({
-  title: product.value
-    ? `${product.value.brand.name} ${product.value.name}`
-    : t('SEO.PRODUCT.FALLBACK_TITLE'),
-  description: product.value
-    ? t('SEO.PRODUCT.DESCRIPTION', {
-        name: `${product.value.brand.name} ${product.value.name}`,
-      })
-    : '',
+  title: fullName.value || t('SEO.PRODUCT.FALLBACK_TITLE'),
+  description: fullName.value ? t('SEO.PRODUCT.DESCRIPTION', { name: fullName.value }) : '',
   path: `/products/${slug.value}`,
   image: product.value?.imageUrl ?? undefined,
   type: 'product',
@@ -132,17 +157,21 @@ useBreadcrumbJsonLd(
 
 <template>
   <div v-if="product" class="container-page py-6 sm:py-10">
-    <nav aria-label="Breadcrumb" class="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
+    <nav
+      aria-label="Breadcrumb"
+      class="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-ink-muted"
+    >
       <NuxtLinkLocale to="/" class="hover:text-ink">{{ $t('NAV.HOME') }}</NuxtLinkLocale>
       <BaseIcon name="chevron-right" :size="12" />
-      <NuxtLinkLocale to="/products" class="hover:text-ink">{{ $t('NAV.PRODUCTS') }}</NuxtLinkLocale>
+      <NuxtLinkLocale to="/products" class="hover:text-ink">
+        {{ $t('NAV.PRODUCTS') }}
+      </NuxtLinkLocale>
       <BaseIcon name="chevron-right" :size="12" />
       <NuxtLinkLocale :to="`/products?category=${product.category.slug}`" class="hover:text-ink">
         {{ vocab.category(product.category.slug, product.category.name) }}
       </NuxtLinkLocale>
     </nav>
 
-    <!-- Hero -->
     <div class="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:gap-12">
       <div>
         <ProductImage
@@ -159,7 +188,9 @@ useBreadcrumbJsonLd(
         <NuxtLinkLocale
           :to="`/products?brand=${product.brand.slug}`"
           class="text-sm font-medium tracking-wide text-ink-muted uppercase underline-offset-4 hover:text-ink hover:underline"
-        >{{ product.brand.name }}</NuxtLinkLocale>
+        >
+          {{ product.brand.name }}
+        </NuxtLinkLocale>
 
         <h1 class="mt-1.5 font-display text-3xl leading-tight text-ink sm:text-4xl">
           {{ product.name }}
@@ -186,8 +217,8 @@ useBreadcrumbJsonLd(
           <BaseButton
             size="lg"
             :variant="onShelf ? 'secondary' : 'primary'"
-            :loading="shelf.busy.value"
-            @click="onShelf ? undefined : shelf.add(product)"
+            :loading="shelfBusy"
+            @click="handleShelfClick"
           >
             <template #icon>
               <BaseIcon :name="onShelf ? 'check' : 'plus'" :size="17" />
@@ -195,11 +226,7 @@ useBreadcrumbJsonLd(
             {{ onShelf ? $t('PRODUCT.ON_SHELF') : $t('PRODUCT.ADD_TO_SHELF') }}
           </BaseButton>
 
-          <BaseButton
-            size="lg"
-            variant="secondary"
-            @click="compare.toggle(product)"
-          >
+          <BaseButton size="lg" variant="secondary" @click="toggleCompare(product)">
             <template #icon><BaseIcon name="compare" :size="17" /></template>
             {{ inComparison ? $t('PRODUCT.IN_COMPARISON') : $t('PRODUCT.COMPARE') }}
           </BaseButton>
@@ -216,7 +243,9 @@ useBreadcrumbJsonLd(
             :key="highlight"
             class="flex items-start gap-2.5 text-sm text-ink-soft"
           >
-            <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sage-soft text-sage">
+            <span
+              class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sage-soft text-sage"
+            >
               <BaseIcon name="check" :size="12" :stroke-width="2.2" />
             </span>
             {{ highlight }}
@@ -232,7 +261,6 @@ useBreadcrumbJsonLd(
       </div>
     </div>
 
-    <!-- Body -->
     <div class="mt-12 grid gap-8 lg:grid-cols-[1fr_22rem] lg:gap-10">
       <div class="min-w-0 space-y-10">
         <section v-if="product.description">
@@ -288,13 +316,17 @@ useBreadcrumbJsonLd(
             : undefined
         "
       >
-        <template #suffix><span class="text-sm">{{ format.currencyUnit.value }}</span></template>
+        <template #suffix>
+          <span class="text-sm">{{ format.currencyUnit.value }}</span>
+        </template>
       </BaseInput>
       <p class="mt-4 text-xs leading-relaxed text-ink-muted">
         {{ $t('PRODUCT.ALERT_MODAL.NOTE') }}
       </p>
       <template #footer>
-        <BaseButton variant="ghost" @click="alertOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
+        <BaseButton variant="ghost" @click="alertOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
         <BaseButton :loading="alertSaving" @click="createAlert">
           {{ $t('PRODUCT.ALERT_MODAL.CREATE') }}
         </BaseButton>

@@ -126,7 +126,11 @@ export class PersonalMatchService {
           { skinTypes: product.targetSkinTypes },
         );
       }
-      add('skin-type-ingredients', 'Ingredients suit your skin type', WEIGHTS.skinType * 0.4 * ingredientFit);
+      add(
+        'skin-type-ingredients',
+        'Ingredients suit your skin type',
+        WEIGHTS.skinType * 0.4 * ingredientFit,
+      );
     }
 
     /* ----------------------------------------------------------- concerns -- */
@@ -146,11 +150,20 @@ export class PersonalMatchService {
       const depth = clamp(weightedHits / 2, 0, 1);
       const impact = WEIGHTS.concerns * (coverage * 0.7 + depth * 0.3);
       if (matched.size) {
-        add('concerns', `Targets ${[...matched].map((s) => this.readableSlug(s)).join(', ')}`, impact, {
-          concerns: [...matched],
-        });
+        add(
+          'concerns',
+          `Targets ${[...matched].map((s) => this.readableSlug(s)).join(', ')}`,
+          impact,
+          {
+            concerns: [...matched],
+          },
+        );
       } else {
-        add('concerns-none', 'Nothing here specifically addresses your concerns', -WEIGHTS.concerns * 0.3);
+        add(
+          'concerns-none',
+          'Nothing here specifically addresses your concerns',
+          -WEIGHTS.concerns * 0.3,
+        );
       }
     }
 
@@ -273,7 +286,9 @@ export class PersonalMatchService {
 
     add(
       product.ingredientScore >= 50 ? 'ingredient-quality-good' : 'ingredient-quality-poor',
-      product.ingredientScore >= 50 ? 'Well-built formula' : 'Formula is light on active ingredients',
+      product.ingredientScore >= 50
+        ? 'Well-built formula'
+        : 'Formula is light on active ingredients',
       ((product.ingredientScore - 50) / 50) * WEIGHTS.ingredientQuality,
     );
 

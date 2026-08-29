@@ -24,54 +24,84 @@ import { JwtStrategy } from './strategies/jwt.strategy';
  */
 describe('Auth API', () => {
   let app: INestApplication;
-  let users: Array<{ id: string; email: string; passwordHash: string; name: string | null; role: 'USER' | 'ADMIN'; subscriptionStatus: 'FREE'; createdAt: Date; updatedAt: Date; beautyProfile: null }>;
-  let refreshTokens: Array<{ id: string; userId: string; tokenHash: string; expiresAt: Date; revokedAt: Date | null }>;
+  let users: Array<{
+    id: string;
+    email: string;
+    passwordHash: string;
+    name: string | null;
+    role: 'USER' | 'ADMIN';
+    subscriptionStatus: 'FREE';
+    createdAt: Date;
+    updatedAt: Date;
+    beautyProfile: null;
+  }>;
+  let refreshTokens: Array<{
+    id: string;
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    revokedAt: Date | null;
+  }>;
 
   const prismaDouble = {
     user: {
-      findUnique: jest.fn(async ({ where }: { where: { email?: string; id?: string } }) =>
-        users.find((u) => (where.email ? u.email === where.email : u.id === where.id)) ?? null,
+      findUnique: jest.fn(
+        async ({ where }: { where: { email?: string; id?: string } }) =>
+          users.find((u) => (where.email ? u.email === where.email : u.id === where.id)) ?? null,
       ),
       findUniqueOrThrow: jest.fn(async ({ where }: { where: { id: string } }) => {
         const found = users.find((u) => u.id === where.id);
         if (!found) throw new Error('not found');
         return found;
       }),
-      create: jest.fn(async ({ data }: { data: { email: string; passwordHash: string; name: string | null } }) => {
-        const created = {
-          id: `user-${users.length + 1}`,
-          email: data.email,
-          passwordHash: data.passwordHash,
-          name: data.name,
-          role: 'USER' as const,
-          subscriptionStatus: 'FREE' as const,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          beautyProfile: null,
-        };
-        users.push(created);
-        return created;
-      }),
+      create: jest.fn(
+        async ({
+          data,
+        }: {
+          data: { email: string; passwordHash: string; name: string | null };
+        }) => {
+          const created = {
+            id: `user-${users.length + 1}`,
+            email: data.email,
+            passwordHash: data.passwordHash,
+            name: data.name,
+            role: 'USER' as const,
+            subscriptionStatus: 'FREE' as const,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            beautyProfile: null,
+          };
+          users.push(created);
+          return created;
+        },
+      ),
     },
     refreshToken: {
-      create: jest.fn(async ({ data }: { data: { userId: string; tokenHash: string; expiresAt: Date } }) => {
-        const created = { id: `rt-${refreshTokens.length + 1}`, revokedAt: null, ...data };
-        refreshTokens.push(created);
-        return created;
-      }),
-      findUnique: jest.fn(async ({ where }: { where: { tokenHash: string } }) =>
-        refreshTokens.find((t) => t.tokenHash === where.tokenHash) ?? null,
+      create: jest.fn(
+        async ({ data }: { data: { userId: string; tokenHash: string; expiresAt: Date } }) => {
+          const created = { id: `rt-${refreshTokens.length + 1}`, revokedAt: null, ...data };
+          refreshTokens.push(created);
+          return created;
+        },
       ),
-      update: jest.fn(async ({ where, data }: { where: { id: string }; data: { revokedAt: Date } }) => {
-        const found = refreshTokens.find((t) => t.id === where.id)!;
-        found.revokedAt = data.revokedAt;
-        return found;
-      }),
-      updateMany: jest.fn(async ({ where, data }: { where: { tokenHash: string }; data: { revokedAt: Date } }) => {
-        const found = refreshTokens.find((t) => t.tokenHash === where.tokenHash);
-        if (found) found.revokedAt = data.revokedAt;
-        return { count: found ? 1 : 0 };
-      }),
+      findUnique: jest.fn(
+        async ({ where }: { where: { tokenHash: string } }) =>
+          refreshTokens.find((t) => t.tokenHash === where.tokenHash) ?? null,
+      ),
+      update: jest.fn(
+        async ({ where, data }: { where: { id: string }; data: { revokedAt: Date } }) => {
+          const found = refreshTokens.find((t) => t.id === where.id)!;
+          found.revokedAt = data.revokedAt;
+          return found;
+        },
+      ),
+      updateMany: jest.fn(
+        async ({ where, data }: { where: { tokenHash: string }; data: { revokedAt: Date } }) => {
+          const found = refreshTokens.find((t) => t.tokenHash === where.tokenHash);
+          if (found) found.revokedAt = data.revokedAt;
+          return { count: found ? 1 : 0 };
+        },
+      ),
     },
   };
 
@@ -98,7 +128,9 @@ describe('Auth API', () => {
 
     app = moduleRef.createNestApplication();
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+    );
     await app.init();
   });
 
@@ -256,14 +288,20 @@ describe('Auth API', () => {
         .send({ email: 'demo@kosvia.app', password: 'Password123!' });
       const firstCookies = cookiesFrom(login);
 
-      await request(app.getHttpServer()).post('/auth/refresh').set('Cookie', firstCookies).expect(200);
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', firstCookies)
+        .expect(200);
 
       expect(refreshTokens).toHaveLength(2);
       expect(refreshTokens[0].revokedAt).not.toBeNull();
       expect(refreshTokens[1].revokedAt).toBeNull();
 
       // A replayed refresh token must not work a second time.
-      await request(app.getHttpServer()).post('/auth/refresh').set('Cookie', firstCookies).expect(401);
+      await request(app.getHttpServer())
+        .post('/auth/refresh')
+        .set('Cookie', firstCookies)
+        .expect(401);
     });
 
     it('fails cleanly when there is no refresh cookie', async () => {

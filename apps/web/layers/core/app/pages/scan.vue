@@ -1,9 +1,4 @@
 <script setup lang="ts">
-/**
- * Scan is prominent in the mobile navigation because it is where the product is
- * headed. Until the camera pipeline exists, this page is honest about that and
- * routes people to the search that does work today.
- */
 import type { ProductSummaryDto } from '@kosvia/shared';
 
 const api = useApi();
@@ -15,25 +10,27 @@ const ean = ref('');
 const looking = ref(false);
 const notFound = ref(false);
 
-async function lookup() {
+const lookup = async () => {
   const code = ean.value.trim();
-  if (!code) {return;}
+  if (!code) {
+    return;
+  }
   looking.value = true;
   notFound.value = false;
   try {
     const response = await api<{ items: ProductSummaryDto[] }>(
       `/products?q=${encodeURIComponent(code)}&pageSize=1`,
     );
-    const first = response.items[0];
-    if (first) {
-      await router.push(localePath(`/products/${first.slug}`));
-    } else {
-      notFound.value = true;
+    const firstMatch = response.items[0];
+    if (firstMatch) {
+      await router.push(localePath(`/products/${firstMatch.slug}`));
+      return;
     }
+    notFound.value = true;
   } finally {
     looking.value = false;
   }
-}
+};
 
 useSeo(() => ({
   title: t('SCAN.TITLE'),
@@ -45,7 +42,9 @@ useSeo(() => ({
 <template>
   <div class="container-page max-w-lg py-10 sm:py-16">
     <div class="text-center">
-      <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-ink text-ink-inverse">
+      <span
+        class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-ink text-ink-inverse"
+      >
         <BaseIcon name="scan" :size="26" />
       </span>
       <h1 class="mt-5 font-display text-3xl text-ink">{{ $t('SCAN.TITLE') }}</h1>

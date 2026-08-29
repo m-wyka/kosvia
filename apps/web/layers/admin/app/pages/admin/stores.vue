@@ -6,8 +6,15 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 type StoreRow = StoreDto & { affiliateUrlTemplate: string | null; _count: { offers: number } };
 
-const resource = useAdminResource<StoreRow>('/admin/stores', { paginated: false });
+const EMPTY_FORM = { name: '', slug: '', websiteUrl: '', affiliateUrlTemplate: '' };
+
+const { rows, total, pending, error, saving, refresh, create, update, remove } =
+  useAdminResource<StoreRow>('/admin/stores', { paginated: false });
 const { t } = useI18n();
+
+const modalOpen = ref(false);
+const editing = ref<StoreRow | null>(null);
+const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
   { key: 'name', label: t('ADMIN.STORES.COL_STORE') },
@@ -17,17 +24,13 @@ const columns = computed<TableColumn[]>(() => [
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
-const modalOpen = ref(false);
-const editing = ref<StoreRow | null>(null);
-const form = reactive({ name: '', slug: '', websiteUrl: '', affiliateUrlTemplate: '' });
-
-function openCreate() {
+const openCreate = () => {
   editing.value = null;
-  Object.assign(form, { name: '', slug: '', websiteUrl: '', affiliateUrlTemplate: '' });
+  Object.assign(form, EMPTY_FORM);
   modalOpen.value = true;
-}
+};
 
-function openEdit(store: StoreRow) {
+const openEdit = (store: StoreRow) => {
   editing.value = store;
   Object.assign(form, {
     name: store.name,
@@ -36,9 +39,9 @@ function openEdit(store: StoreRow) {
     affiliateUrlTemplate: store.affiliateUrlTemplate ?? '',
   });
   modalOpen.value = true;
-}
+};
 
-async function save() {
+const save = async () => {
   const body = {
     name: form.name,
     slug: form.slug || undefined,
@@ -46,10 +49,12 @@ async function save() {
     affiliateUrlTemplate: form.affiliateUrlTemplate || undefined,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, t('ADMIN.STORES.SAVED'))
-    : await resource.create(body, t('ADMIN.STORES.CREATED'));
-  if (result) {modalOpen.value = false;}
-}
+    ? await update(editing.value.id, body, t('ADMIN.STORES.SAVED'))
+    : await create(body, t('ADMIN.STORES.CREATED'));
+  if (result) {
+    modalOpen.value = false;
+  }
+};
 
 useSeo(() => ({
   title: t('SEO.ADMIN.STORES'),
@@ -62,7 +67,7 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.STORES.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.STORES.SUBTITLE')"
     >
       <template #actions>
@@ -73,13 +78,13 @@ useSeo(() => ({
       </template>
     </AdminPageHeader>
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.STORES.EMPTY')"
     >
       <template #cell-name="{ row }">
@@ -111,7 +116,7 @@ useSeo(() => ({
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
             :aria-label="$t('COMMON.DELETE')"
-            @click="resource.remove(row.id, t('ADMIN.STORES.DELETED'))"
+            @click="remove(row.id, t('ADMIN.STORES.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -144,8 +149,10 @@ useSeo(() => ({
         />
       </div>
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
-        <BaseButton :loading="resource.saving.value" :disabled="!form.name" @click="save">
+        <BaseButton variant="ghost" @click="modalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
+        <BaseButton :loading="saving" :disabled="!form.name" @click="save">
           {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.STORES.CREATE') }}
         </BaseButton>
       </template>

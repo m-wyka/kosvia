@@ -47,7 +47,12 @@ export class AIService {
       data: { conversationId: conversation.id, role: 'USER', content: message },
     });
 
-    const { context, retrieved } = await this.advisor.buildContext(message, viewer, history, locale);
+    const { context, retrieved } = await this.advisor.buildContext(
+      message,
+      viewer,
+      history,
+      locale,
+    );
     const answer = await this.provider.generateResponse(context);
     const suggestions = this.advisor.toSuggestions(retrieved);
 
@@ -108,13 +113,19 @@ export class AIService {
   }
 
   async deleteConversation(userId: string, id: string): Promise<void> {
-    const row = await this.prisma.aIConversation.findFirst({ where: { id, userId }, select: { id: true } });
+    const row = await this.prisma.aIConversation.findFirst({
+      where: { id, userId },
+      select: { id: true },
+    });
     if (!row) throw new NotFoundException('That conversation does not exist.');
     await this.prisma.aIConversation.delete({ where: { id } });
   }
 
   /** Natural-language read of a formula, for the product page. */
-  async explainProduct(slug: string, locale: AnswerLocale = 'en'): Promise<{ explanation: string }> {
+  async explainProduct(
+    slug: string,
+    locale: AnswerLocale = 'en',
+  ): Promise<{ explanation: string }> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
     if (!row) throw new NotFoundException('We could not find that product.');
 
@@ -170,7 +181,11 @@ export class AIService {
     return { explanation };
   }
 
-  private async resolveConversation(userId: string, conversationId: string | undefined, firstMessage: string) {
+  private async resolveConversation(
+    userId: string,
+    conversationId: string | undefined,
+    firstMessage: string,
+  ) {
     if (conversationId) {
       const existing = await this.prisma.aIConversation.findFirst({
         where: { id: conversationId, userId },

@@ -1,5 +1,15 @@
 <script setup lang="ts">
-type Tone = 'neutral' | 'blush' | 'sage' | 'lavender' | 'peach' | 'sand' | 'positive' | 'caution' | 'critical' | 'info';
+type Tone =
+  | 'neutral'
+  | 'blush'
+  | 'sage'
+  | 'lavender'
+  | 'peach'
+  | 'sand'
+  | 'positive'
+  | 'caution'
+  | 'critical'
+  | 'info';
 
 withDefaults(defineProps<{ tone?: Tone; size?: 'xs' | 'sm' }>(), { tone: 'neutral', size: 'sm' });
 

@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import type { CategoryDto, ProductFacetsDto } from '@kosvia/shared';
 
-/**
- * Search filters.
- *
- * Every control writes to the URL rather than to local state — that keeps
- * filtered pages linkable, shareable and indexable, and means the back button
- * behaves the way people expect.
- */
+type QueryPatch = Record<string, string | number | boolean | undefined>;
+
+const DEFAULT_PRICE_CEILING = 250;
+const PRICE_CEILING_STEP = 10;
+const FILTER_KEYS = [
+  'category',
+  'brand',
+  'maxPrice',
+  'minPrice',
+  'skinType',
+  'fragranceFree',
+  'vegan',
+  'crueltyFree',
+];
+
 const props = defineProps<{
   facets?: ProductFacetsDto | null;
   categories: CategoryDto[];
@@ -18,59 +26,78 @@ const route = useRoute();
 const router = useRouter();
 const vocab = useVocabulary();
 
+const maxPrice = ref(Number(route.query.maxPrice ?? 0) || 0);
+
 const query = computed(() => route.query);
 
-function update(patch: Record<string, string | number | boolean | undefined>) {
-  const next: Record<string, string> = {};
-  for (const [key, value] of Object.entries({ ...route.query, ...patch })) {
-    if (value === undefined || value === '' || value === false || value === null) {continue;}
-    next[key] = String(value);
-  }
-  delete next.page;
-  router.push({ path: route.path, query: next });
-}
+const activeBrands = computed(() =>
+  String(route.query.brand ?? '')
+    .split(',')
+    .filter(Boolean),
+);
 
-function toggleBrand(slug: string) {
-  const current = String(route.query.brand ?? '').split(',').filter(Boolean);
-  const next = current.includes(slug)
-    ? current.filter((entry) => entry !== slug)
-    : [...current, slug];
-  update({ brand: next.join(',') || undefined });
-}
-
-const activeBrands = computed(() => String(route.query.brand ?? '').split(',').filter(Boolean));
-
-/** Flattened leaf categories — the tree is for navigation, this is for filtering. */
 const flatCategories = computed(() => {
   const output: Array<{ slug: string; name: string; depth: number }> = [];
-  const walk = (nodes: CategoryDto[], depth: number) => {
+  const collect = (nodes: CategoryDto[], depth: number) => {
     for (const node of nodes) {
       output.push({ slug: node.slug, name: vocab.category(node.slug, node.name), depth });
-      if (node.children?.length) {walk(node.children, depth + 1);}
+      if (node.children?.length) {
+        collect(node.children, depth + 1);
+      }
     }
   };
-  walk(props.categories, 0);
+  collect(props.categories, 0);
   return output;
 });
 
-const maxPrice = ref(Number(route.query.maxPrice ?? 0) || 0);
-watch(() => route.query.maxPrice, (value) => { maxPrice.value = Number(value ?? 0) || 0; });
-
-const priceCeiling = computed(() => Math.ceil((props.facets?.priceRange.max ?? 250) / 10) * 10);
-
-const activeCount = computed(
+const priceCeiling = computed(
   () =>
-    ['category', 'brand', 'maxPrice', 'minPrice', 'skinType', 'fragranceFree', 'vegan', 'crueltyFree'].filter(
-      (key) => route.query[key],
-    ).length,
+    Math.ceil((props.facets?.priceRange.max ?? DEFAULT_PRICE_CEILING) / PRICE_CEILING_STEP) *
+    PRICE_CEILING_STEP,
 );
 
-function clearAll() {
+const activeCount = computed(() => FILTER_KEYS.filter((key) => route.query[key]).length);
+
+const isEmptyValue = (value: unknown): boolean =>
+  value === undefined || value === '' || value === false || value === null;
+
+const update = (patch: QueryPatch) => {
+  const nextQuery: Record<string, string> = {};
+  for (const [key, value] of Object.entries({ ...route.query, ...patch })) {
+    if (isEmptyValue(value)) {
+      continue;
+    }
+    nextQuery[key] = String(value);
+  }
+  delete nextQuery.page;
+  router.push({ path: route.path, query: nextQuery });
+};
+
+const toggleBrand = (slug: string) => {
+  const current = activeBrands.value;
+  const nextBrands = current.includes(slug)
+    ? current.filter((entry) => entry !== slug)
+    : [...current, slug];
+  update({ brand: nextBrands.join(',') || undefined });
+};
+
+const clearAll = () => {
   const preserved: Record<string, string> = {};
-  if (route.query.q) {preserved.q = String(route.query.q);}
-  if (route.query.sort) {preserved.sort = String(route.query.sort);}
+  if (route.query.q) {
+    preserved.q = String(route.query.q);
+  }
+  if (route.query.sort) {
+    preserved.sort = String(route.query.sort);
+  }
   router.push({ path: route.path, query: preserved });
-}
+};
+
+watch(
+  () => route.query.maxPrice,
+  (value) => {
+    maxPrice.value = Number(value ?? 0) || 0;
+  },
+);
 </script>
 
 <template>
@@ -81,7 +108,9 @@ function clearAll() {
         type="button"
         class="text-sm font-medium text-ink underline-offset-4 hover:underline"
         @click="clearAll"
-      >{{ $t('COMMON.CLEAR_ALL') }}</button>
+      >
+        {{ $t('COMMON.CLEAR_ALL') }}
+      </button>
     </div>
 
     <section>
@@ -91,9 +120,15 @@ function clearAll() {
           <button
             type="button"
             class="w-full rounded-md px-2 py-1.5 text-left text-sm transition-colors"
-            :class="!query.category ? 'bg-surface-muted font-medium text-ink' : 'text-ink-muted hover:text-ink'"
+            :class="
+              !query.category
+                ? 'bg-surface-muted font-medium text-ink'
+                : 'text-ink-muted hover:text-ink'
+            "
             @click="update({ category: undefined })"
-          >{{ $t('SEARCH.FILTER.ALL_PRODUCTS') }}</button>
+          >
+            {{ $t('SEARCH.FILTER.ALL_PRODUCTS') }}
+          </button>
         </li>
         <li v-for="category in flatCategories" :key="category.slug">
           <button
@@ -107,7 +142,9 @@ function clearAll() {
               category.depth >= 2 && 'pl-8',
             ]"
             @click="update({ category: category.slug })"
-          >{{ category.name }}</button>
+          >
+            {{ category.name }}
+          </button>
         </li>
       </ul>
     </section>
@@ -121,7 +158,9 @@ function clearAll() {
         :step="5"
         :format="
           (value) =>
-            value === 0 ? $t('SEARCH.FILTER.ANY_PRICE') : $t('SEARCH.FILTER.UP_TO', { price: value })
+            value === 0
+              ? $t('SEARCH.FILTER.ANY_PRICE')
+              : $t('SEARCH.FILTER.UP_TO', { price: value })
         "
         @change="update({ maxPrice: maxPrice || undefined })"
       />
@@ -162,7 +201,9 @@ function clearAll() {
               : 'border-line text-ink-muted hover:border-line-strong hover:text-ink'
           "
           @click="update({ skinType: query.skinType === type ? undefined : type })"
-        >{{ vocab.skinType(type) }}</button>
+        >
+          {{ vocab.skinType(type) }}
+        </button>
       </div>
     </section>
 

@@ -58,7 +58,10 @@ export class AlternativeProductService {
         kind,
         title,
         description,
-        products: picks.map(({ entry, reason }) => ({ ...entry.summary, alternativeReason: reason })),
+        products: picks.map(({ entry, reason }) => ({
+          ...entry.summary,
+          alternativeReason: reason,
+        })),
       });
     };
 
@@ -95,7 +98,12 @@ export class AlternativeProductService {
           params: { score: entry.match, delta: entry.match - self.match },
         },
       }));
-    push('better-match', 'Better match', 'Closer to your profile than the product you are viewing.', betterMatch);
+    push(
+      'better-match',
+      'Better match',
+      'Closer to your profile than the product you are viewing.',
+      betterMatch,
+    );
 
     /* --------------------------------------------------------- better value */
     const value = others
@@ -112,7 +120,12 @@ export class AlternativeProductService {
           params: { score: entry.match, price: entry.price! },
         },
       }));
-    push('better-value', 'Better value', 'The strongest match per złoty in this routine step.', value);
+    push(
+      'better-value',
+      'Better value',
+      'The strongest match per złoty in this routine step.',
+      value,
+    );
 
     /* -------------------------------------------------- similar ingredients */
     const subjectIngredients = new Set(

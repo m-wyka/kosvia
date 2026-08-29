@@ -44,7 +44,8 @@ const pluralIndex = (locale: string, count: number, formCount: number): number =
   }
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
-  const isFewForm = lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14);
+  const isFewForm =
+    lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14);
   return isFewForm ? 1 : 2;
 };
 
@@ -162,7 +163,10 @@ Object.assign(globalThis, {
 const NuxtLinkStub = defineComponent({
   name: 'NuxtLinkLocale',
   props: { to: { type: [String, Object], default: '' } },
-  setup: (props, { slots }) => () => h('a', { href: String(props.to) }, slots.default?.()),
+  setup:
+    (props, { slots }) =>
+    () =>
+      h('a', { href: String(props.to) }, slots.default?.()),
 });
 
 config.global.components = {

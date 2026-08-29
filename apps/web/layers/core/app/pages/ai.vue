@@ -3,15 +3,16 @@ import type { AiChatResponse, AiConversationDto, AiMessageDto } from '@kosvia/sh
 
 definePageMeta({ middleware: 'auth' });
 
+const STARTER_COUNT = 5;
+
 const api = useApi();
-const auth = useAuthStore();
+const { displayName } = storeToRefs(useAuthStore());
 const message = useApiMessage();
 const { t, locale } = useI18n();
 
-const { data: conversations, refresh: refreshConversations } = await useApiFetch<AiConversationDto[]>(
-  '/ai/conversations',
-  { key: 'ai-conversations', default: () => [] },
-);
+const { data: conversations, refresh: refreshConversations } = await useApiFetch<
+  AiConversationDto[]
+>('/ai/conversations', { key: 'ai-conversations', default: () => [] });
 
 const conversationId = ref<string | null>(null);
 const messages = ref<AiMessageDto[]>([]);
@@ -20,30 +21,29 @@ const thinking = ref(false);
 const error = ref('');
 const thread = ref<HTMLElement | null>(null);
 
-const STARTERS = computed(() =>
-  [1, 2, 3, 4, 5].map((n) => t(`AI.STARTER.ITEM_${n}`)),
+const starters = computed(() =>
+  Array.from({ length: STARTER_COUNT }, (_, index) => t(`AI.STARTER.ITEM_${index + 1}`)),
 );
 
-async function openConversation(id: string) {
+const scrollToEnd = async () => {
+  await nextTick();
+  thread.value?.scrollTo({ top: thread.value.scrollHeight, behavior: 'smooth' });
+};
+
+const openConversation = async (id: string) => {
   const conversation = await api<AiConversationDto>(`/ai/conversations/${id}`);
   conversationId.value = conversation.id;
   messages.value = conversation.messages;
   await scrollToEnd();
-}
+};
 
-function startNew() {
+const startNew = () => {
   conversationId.value = null;
   messages.value = [];
   error.value = '';
-}
+};
 
-async function send(text?: string) {
-  const content = (text ?? draft.value).trim();
-  if (!content || thinking.value) {return;}
-
-  error.value = '';
-  draft.value = '';
-  // Show the question immediately; the id is replaced when the server answers.
+const appendLocalUserMessage = (content: string) => {
   messages.value = [
     ...messages.value,
     {
@@ -54,6 +54,17 @@ async function send(text?: string) {
       createdAt: new Date().toISOString(),
     },
   ];
+};
+
+const send = async (text?: string) => {
+  const content = (text ?? draft.value).trim();
+  if (!content || thinking.value) {
+    return;
+  }
+
+  error.value = '';
+  draft.value = '';
+  appendLocalUserMessage(content);
   thinking.value = true;
   await scrollToEnd();
 
@@ -75,20 +86,14 @@ async function send(text?: string) {
     thinking.value = false;
     await scrollToEnd();
   }
-}
+};
 
-async function scrollToEnd() {
-  await nextTick();
-  thread.value?.scrollTo({ top: thread.value.scrollHeight, behavior: 'smooth' });
-}
-
-/** Enter sends; Shift+Enter is a newline, as in every chat people already use. */
-function onKeydown(event: KeyboardEvent) {
+const handleComposerKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     void send();
   }
-}
+};
 
 useSeo(() => ({
   title: t('SEO.AI.TITLE'),
@@ -111,25 +116,27 @@ useSeo(() => ({
           </BaseButton>
         </header>
 
-        <!-- Empty state doubles as the prompt library -->
         <div v-if="!messages.length" class="flex flex-1 flex-col justify-center py-8">
           <div class="mx-auto max-w-2xl text-center">
-            <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-blush-soft text-blush-deep">
+            <span
+              class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-blush-soft text-blush-deep"
+            >
               <BaseIcon name="sparkles" :size="26" />
             </span>
             <h2 class="mt-5 font-display text-2xl text-ink">
-              {{ $t('AI.EMPTY_TITLE', { name: auth.displayName }) }}
+              {{ $t('AI.EMPTY_TITLE', { name: displayName }) }}
             </h2>
             <p class="mt-2 text-sm text-ink-muted">{{ $t('AI.EMPTY_BODY') }}</p>
 
             <ul class="mt-7 flex flex-wrap justify-center gap-2">
-              <li v-for="starter in STARTERS" :key="starter">
+              <li v-for="starter in starters" :key="starter">
                 <button
                   type="button"
-                  class="rounded-pill border border-line bg-surface px-3.5 py-2 text-sm text-ink-soft
-                         transition-colors hover:border-line-strong hover:text-ink"
+                  class="rounded-pill border border-line bg-surface px-3.5 py-2 text-sm text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
                   @click="send(starter)"
-                >{{ starter }}</button>
+                >
+                  {{ starter }}
+                </button>
               </li>
             </ul>
           </div>
@@ -157,9 +164,8 @@ useSeo(() => ({
               v-model="draft"
               rows="1"
               :placeholder="$t('AI.PLACEHOLDER')"
-              class="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2.5 py-2.5 text-sm
-                     text-ink placeholder:text-ink-faint focus:outline-none"
-              @keydown="onKeydown"
+              class="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2.5 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none"
+              @keydown="handleComposerKeydown"
             />
             <BaseButton
               type="submit"

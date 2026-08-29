@@ -1,7 +1,20 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { PriceAlertDto } from '@kosvia/shared';
-import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthenticatedUser,
+} from '../../common/decorators/current-user.decorator';
 import { PriceAlertsService } from './price-alerts.service';
 import { CreatePriceAlertDto, UpdatePriceAlertDto } from './dto/price-alert.dto';
 
@@ -18,7 +31,10 @@ export class PriceAlertsController {
 
   @Post()
   @ApiOperation({ summary: 'Watch a product for a target price' })
-  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreatePriceAlertDto): Promise<PriceAlertDto> {
+  create(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreatePriceAlertDto,
+  ): Promise<PriceAlertDto> {
     return this.alerts.create(user.id, dto);
   }
 

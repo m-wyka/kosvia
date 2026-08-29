@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { INGREDIENT_TAGS, type IngredientDto } from '@kosvia/shared';
 
+const SEARCH_DEBOUNCE_MS = 300;
+const LIBRARY_PAGE_SIZE = '120';
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -9,26 +12,33 @@ const vocab = useVocabulary();
 const search = ref(String(route.query.q ?? ''));
 const tag = computed(() => (route.query.tag as string) ?? '');
 
+const libraryUrl = (): string => {
+  const params = new URLSearchParams();
+  if (route.query.q) {
+    params.set('q', String(route.query.q));
+  }
+  if (route.query.tag) {
+    params.set('tag', String(route.query.tag));
+  }
+  params.set('take', LIBRARY_PAGE_SIZE);
+  return `/ingredients?${params.toString()}`;
+};
+
+const { data, pending, error, refresh } = await useApiFetch<IngredientDto[]>(libraryUrl, {
+  key: 'ingredient-library',
+  watch: [() => route.query],
+  default: () => [],
+});
+
+const setTag = (nextTag: string) => {
+  router.replace({ query: { ...route.query, tag: tag.value === nextTag ? undefined : nextTag } });
+};
+
 watchDebounced(
   search,
   (value) => router.replace({ query: { ...route.query, q: value || undefined } }),
-  { debounce: 300 },
+  { debounce: SEARCH_DEBOUNCE_MS },
 );
-
-const { data, pending, error, refresh } = await useApiFetch<IngredientDto[]>(
-  () => {
-    const params = new URLSearchParams();
-    if (route.query.q) {params.set('q', String(route.query.q));}
-    if (route.query.tag) {params.set('tag', String(route.query.tag));}
-    params.set('take', '120');
-    return `/ingredients?${params.toString()}`;
-  },
-  { key: 'ingredient-library', watch: [() => route.query], default: () => [] },
-);
-
-function setTag(next: string) {
-  router.replace({ query: { ...route.query, tag: tag.value === next ? undefined : next } });
-}
 
 useSeo(() => ({
   title: t('SEO.INGREDIENTS.TITLE'),
@@ -53,7 +63,9 @@ useSeo(() => ({
         <template #prefix><BaseIcon name="search" :size="16" /></template>
       </BaseInput>
 
-      <div class="hide-scrollbar -mx-5 flex gap-1.5 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
+      <div
+        class="hide-scrollbar -mx-5 flex gap-1.5 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0"
+      >
         <button
           v-for="option in INGREDIENT_TAGS"
           :key="option"
@@ -65,7 +77,9 @@ useSeo(() => ({
               : 'border-line text-ink-muted hover:border-line-strong hover:text-ink'
           "
           @click="setTag(option)"
-        >{{ vocab.tag(option) }}</button>
+        >
+          {{ vocab.tag(option) }}
+        </button>
       </div>
     </div>
 
@@ -86,18 +100,23 @@ useSeo(() => ({
       <li v-for="ingredient in data" :key="ingredient.id">
         <NuxtLinkLocale
           :to="`/ingredients/${ingredient.slug}`"
-          class="flex h-full flex-col rounded-xl border border-line bg-surface p-4
-                 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
+          class="flex h-full flex-col rounded-xl border border-line bg-surface p-4 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
         >
           <p class="text-sm font-semibold text-ink">
             {{ ingredient.commonName ?? ingredient.inciName }}
           </p>
-          <p v-if="ingredient.commonName" class="text-xs text-ink-muted">{{ ingredient.inciName }}</p>
+          <p v-if="ingredient.commonName" class="text-xs text-ink-muted">
+            {{ ingredient.inciName }}
+          </p>
           <p class="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-ink-muted">
             {{ ingredient.description }}
           </p>
           <span class="mt-3 flex flex-wrap gap-1">
-            <IngredientBadge v-for="entry in ingredient.tags.slice(0, 3)" :key="entry" :tag="entry" />
+            <IngredientBadge
+              v-for="entry in ingredient.tags.slice(0, 3)"
+              :key="entry"
+              :tag="entry"
+            />
           </span>
         </NuxtLinkLocale>
       </li>

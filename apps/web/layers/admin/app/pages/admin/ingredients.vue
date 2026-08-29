@@ -21,10 +21,51 @@ interface IngredientRow {
   _count: { products: number };
 }
 
-const resource = useAdminResource<IngredientRow>('/admin/ingredients');
+const TOLERANCE_VALUES = [-2, -1, 0, 1, 2];
+const TOLERANCE_KEYS: Record<number, string> = {
+  '-2': 'MINUS_2',
+  '-1': 'MINUS_1',
+  0: 'ZERO',
+  1: 'PLUS_1',
+  2: 'PLUS_2',
+};
+
+const EMPTY_FORM = {
+  inciName: '',
+  commonName: '',
+  description: '',
+  concerns: '',
+  functions: '',
+  tags: [] as string[],
+  comedogenicRating: '' as string | number,
+  sensitivityImpact: 0,
+  goodForSkinTypes: [] as SkinType[],
+  isActiveIngredient: false,
+  targetsConcernSlugs: [] as string[],
+  supportsGoalSlugs: [] as string[],
+};
+
+const {
+  rows,
+  total,
+  pageCount,
+  page,
+  search,
+  pending,
+  error,
+  saving,
+  refresh,
+  create,
+  update,
+  remove,
+} = useAdminResource<IngredientRow>('/admin/ingredients');
 const { concerns, goals } = useProfileOptions();
 const { t } = useI18n();
 const vocab = useVocabulary();
+
+const modalOpen = ref(false);
+const editing = ref<IngredientRow | null>(null);
+const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
   { key: 'inciName', label: t('ADMIN.INGREDIENTS.COL_INCI') },
@@ -40,50 +81,31 @@ const columns = computed<TableColumn[]>(() => [
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
-/** -2…2 maps onto MINUS_2 … PLUS_2, since a key cannot start with a digit. */
-const TOLERANCE_KEYS: Record<number, string> = {
-  '-2': 'MINUS_2',
-  '-1': 'MINUS_1',
-  0: 'ZERO',
-  1: 'PLUS_1',
-  2: 'PLUS_2',
-};
-
 const toleranceLabel = (value: number) =>
   t(`ADMIN.INGREDIENTS.TOLERANCE.${TOLERANCE_KEYS[value] ?? 'ZERO'}`);
 
 const toleranceOptions = computed(() =>
-  [-2, -1, 0, 1, 2].map((value) => ({ value, label: `${value} — ${toleranceLabel(value)}` })),
+  TOLERANCE_VALUES.map((value) => ({ value, label: `${value} — ${toleranceLabel(value)}` })),
 );
 
-const modalOpen = ref(false);
-const editing = ref<IngredientRow | null>(null);
-const form = reactive({
-  inciName: '',
-  commonName: '',
-  description: '',
-  concerns: '',
-  functions: '',
-  tags: [] as string[],
-  comedogenicRating: '' as string | number,
-  sensitivityImpact: 0,
-  goodForSkinTypes: [] as SkinType[],
-  isActiveIngredient: false,
-  targetsConcernSlugs: [] as string[],
-  supportsGoalSlugs: [] as string[],
-});
+const splitList = (value: string): string[] =>
+  value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 
-function openCreate() {
+const openCreate = () => {
   editing.value = null;
-  Object.assign(form, {
-    inciName: '', commonName: '', description: '', concerns: '', functions: '',
-    tags: [], comedogenicRating: '', sensitivityImpact: 0, goodForSkinTypes: [],
-    isActiveIngredient: false, targetsConcernSlugs: [], supportsGoalSlugs: [],
+  Object.assign(form, EMPTY_FORM, {
+    tags: [],
+    goodForSkinTypes: [],
+    targetsConcernSlugs: [],
+    supportsGoalSlugs: [],
   });
   modalOpen.value = true;
-}
+};
 
-function openEdit(row: IngredientRow) {
+const openEdit = (row: IngredientRow) => {
   editing.value = row;
   Object.assign(form, {
     inciName: row.inciName,
@@ -100,15 +122,15 @@ function openEdit(row: IngredientRow) {
     supportsGoalSlugs: row.supportsGoals.map((entry) => entry.slug),
   });
   modalOpen.value = true;
-}
+};
 
-async function save() {
+const save = async () => {
   const body = {
     inciName: form.inciName,
     commonName: form.commonName || undefined,
     description: form.description || undefined,
     concerns: form.concerns || undefined,
-    functions: form.functions.split(',').map((entry) => entry.trim()).filter(Boolean),
+    functions: splitList(form.functions),
     tags: form.tags,
     comedogenicRating: form.comedogenicRating === '' ? undefined : Number(form.comedogenicRating),
     sensitivityImpact: Number(form.sensitivityImpact),
@@ -118,14 +140,16 @@ async function save() {
     supportsGoalSlugs: form.supportsGoalSlugs,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, t('ADMIN.INGREDIENTS.SAVED'))
-    : await resource.create(body, t('ADMIN.INGREDIENTS.CREATED'));
-  if (result) {modalOpen.value = false;}
-}
+    ? await update(editing.value.id, body, t('ADMIN.INGREDIENTS.SAVED'))
+    : await create(body, t('ADMIN.INGREDIENTS.CREATED'));
+  if (result) {
+    modalOpen.value = false;
+  }
+};
 
-function toggle(list: string[], value: string): string[] {
+const toggleInList = (list: string[], value: string): string[] => {
   return list.includes(value) ? list.filter((entry) => entry !== value) : [...list, value];
-}
+};
 
 useSeo(() => ({
   title: t('SEO.ADMIN.INGREDIENTS'),
@@ -138,7 +162,7 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.INGREDIENTS.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.INGREDIENTS.SUBTITLE')"
     >
       <template #actions>
@@ -150,21 +174,21 @@ useSeo(() => ({
     </AdminPageHeader>
 
     <AdminToolbar
-      v-model:search="resource.search.value"
-      :page="resource.page.value"
-      :page-count="resource.pageCount.value"
-      :total="resource.total.value"
+      v-model:search="search"
+      :page="page"
+      :page-count="pageCount"
+      :total="total"
       :placeholder="$t('ADMIN.INGREDIENTS.SEARCH_PLACEHOLDER')"
-      @update:page="resource.page.value = $event"
+      @update:page="page = $event"
     />
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.INGREDIENTS.EMPTY')"
     >
       <template #cell-inciName="{ row }">
@@ -175,13 +199,17 @@ useSeo(() => ({
               {{ $t('ADMIN.INGREDIENTS.ACTIVE') }}
             </BaseBadge>
           </span>
-          <span v-if="row.commonName" class="block text-xs text-ink-muted">{{ row.commonName }}</span>
+          <span v-if="row.commonName" class="block text-xs text-ink-muted">
+            {{ row.commonName }}
+          </span>
         </span>
       </template>
       <template #cell-tags="{ row }">
         <span class="flex flex-wrap gap-1">
           <IngredientBadge v-for="tag in row.tags.slice(0, 3)" :key="tag" :tag="tag" />
-          <span v-if="row.tags.length > 3" class="text-2xs text-ink-faint">+{{ row.tags.length - 3 }}</span>
+          <span v-if="row.tags.length > 3" class="text-2xs text-ink-faint">
+            +{{ row.tags.length - 3 }}
+          </span>
         </span>
       </template>
       <template #cell-sensitivityImpact="{ row }">
@@ -204,7 +232,7 @@ useSeo(() => ({
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
             :aria-label="$t('COMMON.DELETE')"
-            @click="resource.remove(row.id, t('ADMIN.INGREDIENTS.DELETED'))"
+            @click="remove(row.id, t('ADMIN.INGREDIENTS.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -250,16 +278,24 @@ useSeo(() => ({
         />
 
         <div>
-          <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('ADMIN.INGREDIENTS.TAGS_LABEL') }}</p>
+          <p class="mb-2 text-sm font-medium text-ink-soft">
+            {{ $t('ADMIN.INGREDIENTS.TAGS_LABEL') }}
+          </p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="tag in INGREDIENT_TAGS"
               :key="tag"
               type="button"
               class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
-              :class="form.tags.includes(tag) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted hover:border-line-strong'"
-              @click="form.tags = toggle(form.tags, tag)"
-            >{{ vocab.tag(tag) }}</button>
+              :class="
+                form.tags.includes(tag)
+                  ? 'border-ink bg-ink text-ink-inverse'
+                  : 'border-line text-ink-muted hover:border-line-strong'
+              "
+              @click="form.tags = toggleInList(form.tags, tag)"
+            >
+              {{ vocab.tag(tag) }}
+            </button>
           </div>
         </div>
 
@@ -278,16 +314,26 @@ useSeo(() => ({
         </div>
 
         <div>
-          <p class="mb-2 text-sm font-medium text-ink-soft">{{ $t('ADMIN.INGREDIENTS.SUITS_LABEL') }}</p>
+          <p class="mb-2 text-sm font-medium text-ink-soft">
+            {{ $t('ADMIN.INGREDIENTS.SUITS_LABEL') }}
+          </p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="type in SKIN_TYPES.filter((entry) => entry !== 'UNKNOWN')"
               :key="type"
               type="button"
               class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
-              :class="form.goodForSkinTypes.includes(type) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
-              @click="form.goodForSkinTypes = toggle(form.goodForSkinTypes, type) as SkinType[]"
-            >{{ vocab.skinType(type) }}</button>
+              :class="
+                form.goodForSkinTypes.includes(type)
+                  ? 'border-ink bg-ink text-ink-inverse'
+                  : 'border-line text-ink-muted'
+              "
+              @click="
+                form.goodForSkinTypes = toggleInList(form.goodForSkinTypes, type) as SkinType[]
+              "
+            >
+              {{ vocab.skinType(type) }}
+            </button>
           </div>
         </div>
 
@@ -302,9 +348,17 @@ useSeo(() => ({
                 :key="concern.slug"
                 type="button"
                 class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
-                :class="form.targetsConcernSlugs.includes(concern.slug) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
-                @click="form.targetsConcernSlugs = toggle(form.targetsConcernSlugs, concern.slug)"
-              >{{ vocab.concern(concern.slug, concern.name) }}</button>
+                :class="
+                  form.targetsConcernSlugs.includes(concern.slug)
+                    ? 'border-ink bg-ink text-ink-inverse'
+                    : 'border-line text-ink-muted'
+                "
+                @click="
+                  form.targetsConcernSlugs = toggleInList(form.targetsConcernSlugs, concern.slug)
+                "
+              >
+                {{ vocab.concern(concern.slug, concern.name) }}
+              </button>
             </div>
           </div>
           <div>
@@ -317,9 +371,15 @@ useSeo(() => ({
                 :key="goal.slug"
                 type="button"
                 class="rounded-pill border px-2.5 py-1 text-xs transition-colors"
-                :class="form.supportsGoalSlugs.includes(goal.slug) ? 'border-ink bg-ink text-ink-inverse' : 'border-line text-ink-muted'"
-                @click="form.supportsGoalSlugs = toggle(form.supportsGoalSlugs, goal.slug)"
-              >{{ vocab.goal(goal.slug, goal.name) }}</button>
+                :class="
+                  form.supportsGoalSlugs.includes(goal.slug)
+                    ? 'border-ink bg-ink text-ink-inverse'
+                    : 'border-line text-ink-muted'
+                "
+                @click="form.supportsGoalSlugs = toggleInList(form.supportsGoalSlugs, goal.slug)"
+              >
+                {{ vocab.goal(goal.slug, goal.name) }}
+              </button>
             </div>
           </div>
         </div>
@@ -334,8 +394,10 @@ useSeo(() => ({
       </div>
 
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
-        <BaseButton :loading="resource.saving.value" :disabled="!form.inciName" @click="save">
+        <BaseButton variant="ghost" @click="modalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
+        <BaseButton :loading="saving" :disabled="!form.inciName" @click="save">
           {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.INGREDIENTS.CREATE') }}
         </BaseButton>
       </template>

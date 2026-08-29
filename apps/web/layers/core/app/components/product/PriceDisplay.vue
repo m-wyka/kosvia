@@ -25,7 +25,7 @@ const format = useFormat();
     </p>
     <p v-if="store || perHundred" class="mt-0.5 truncate text-xs text-ink-muted">
       <span v-if="store">{{ $t('PRODUCT.AT', { store: store.name }) }}</span>
-      <span v-if="store && perHundred"> · </span>
+      <span v-if="store && perHundred">·</span>
       <span v-if="perHundred">{{ format.pricePer100(perHundred, unit) }}</span>
     </p>
   </div>

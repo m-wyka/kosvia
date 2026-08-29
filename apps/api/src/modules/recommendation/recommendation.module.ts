@@ -17,6 +17,11 @@ import { RoutineAnalysisService } from './routine-analysis.service';
     ComparisonService,
     RoutineAnalysisService,
   ],
-  exports: [RecommendationService, AlternativeProductService, ComparisonService, RoutineAnalysisService],
+  exports: [
+    RecommendationService,
+    AlternativeProductService,
+    ComparisonService,
+    RoutineAnalysisService,
+  ],
 })
 export class RecommendationModule {}

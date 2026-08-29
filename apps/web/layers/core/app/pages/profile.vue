@@ -8,7 +8,8 @@ import type {
 
 definePageMeta({ middleware: 'auth' });
 
-const auth = useAuthStore();
+const { user, displayName } = storeToRefs(useAuthStore());
+const { markProfileComplete, logout } = useAuthStore();
 const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
@@ -18,17 +19,20 @@ const { concerns, goals, brands } = useProfileOptions();
 const { t } = useI18n();
 const vocab = useVocabulary();
 
-const { data: profile, pending, error, refresh } = await useApiFetch<BeautyProfileDto | null>(
-  '/profile',
-  { key: 'profile' },
-);
+const {
+  data: profile,
+  pending,
+  error,
+  refresh,
+} = await useApiFetch<BeautyProfileDto | null>('/profile', { key: 'profile' });
 
-/** Ingredient search is remote — the library is far too big to ship to the client. */
 const ingredientQuery = ref('');
 const { data: ingredientResults, status: ingredientStatus } = await useApiFetch<IngredientDto[]>(
   () => `/ingredients?q=${encodeURIComponent(ingredientQuery.value)}`,
   { key: 'excluded-ingredient-search', watch: [ingredientQuery], default: () => [] },
 );
+
+const saving = ref(false);
 
 const form = reactive({
   skinType: 'UNKNOWN' as BeautyProfileDto['skinType'],
@@ -44,11 +48,7 @@ const form = reactive({
   excludedIngredients: [] as IngredientDto[],
 });
 
-watchEffect(() => {
-  const value = profile.value;
-  // `""` for "no profile yet" would pass a plain truthiness check on some
-  // transports; require the shape we actually read from.
-  if (!value || typeof value !== 'object') {return;}
+const fillFormFrom = (value: BeautyProfileDto) => {
   form.skinType = value.skinType;
   form.sensitivity = value.sensitivity;
   form.budget = value.budget;
@@ -60,28 +60,27 @@ watchEffect(() => {
   form.preferredBrands = value.preferredBrands as BrandDto[];
   form.excludedBrands = value.excludedBrands as BrandDto[];
   form.excludedIngredients = value.excludedIngredients as IngredientDto[];
+};
+
+const toPayload = (): UpdateBeautyProfilePayload => ({
+  skinType: form.skinType,
+  sensitivity: form.sensitivity,
+  budget: form.budget,
+  fragrancePreference: form.fragrancePreference,
+  veganPreference: form.veganPreference,
+  crueltyFreePreference: form.crueltyFreePreference,
+  concernSlugs: form.concernSlugs,
+  goalSlugs: form.goalSlugs,
+  preferredBrandIds: form.preferredBrands.map((brand) => brand.id),
+  excludedBrandIds: form.excludedBrands.map((brand) => brand.id),
+  excludedIngredientIds: form.excludedIngredients.map((item) => item.id),
 });
 
-const saving = ref(false);
-
-async function save() {
+const save = async () => {
   saving.value = true;
   try {
-    const payload: UpdateBeautyProfilePayload = {
-      skinType: form.skinType,
-      sensitivity: form.sensitivity,
-      budget: form.budget,
-      fragrancePreference: form.fragrancePreference,
-      veganPreference: form.veganPreference,
-      crueltyFreePreference: form.crueltyFreePreference,
-      concernSlugs: form.concernSlugs,
-      goalSlugs: form.goalSlugs,
-      preferredBrandIds: form.preferredBrands.map((brand) => brand.id),
-      excludedBrandIds: form.excludedBrands.map((brand) => brand.id),
-      excludedIngredientIds: form.excludedIngredients.map((item) => item.id),
-    };
-    const updated = await api<BeautyProfileDto>('/profile', { method: 'PATCH', body: payload });
-    auth.markProfileComplete(updated);
+    const updated = await api<BeautyProfileDto>('/profile', { method: 'PATCH', body: toPayload() });
+    markProfileComplete(updated);
     await refresh();
     toast.success(t('PROFILE.SAVED'));
   } catch (caught) {
@@ -89,12 +88,20 @@ async function save() {
   } finally {
     saving.value = false;
   }
-}
+};
 
-async function signOut() {
-  await auth.logout();
+const signOut = async () => {
+  await logout();
   await router.push(localePath('/'));
-}
+};
+
+watchEffect(() => {
+  const value = profile.value;
+  if (!value || typeof value !== 'object') {
+    return;
+  }
+  fillFormFrom(value);
+});
 
 useSeo(() => ({
   title: t('SEO.PROFILE.TITLE'),
@@ -107,17 +114,19 @@ useSeo(() => ({
   <div class="container-page max-w-3xl py-8 sm:py-12">
     <header class="flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-4">
-        <BaseAvatar :name="auth.user?.name ?? auth.user?.email" :size="52" />
+        <BaseAvatar :name="user?.name ?? user?.email" :size="52" />
         <div class="min-w-0">
-          <h1 class="font-display text-2xl text-ink">{{ auth.displayName }}</h1>
-          <p class="truncate text-sm text-ink-muted">{{ auth.user?.email }}</p>
+          <h1 class="font-display text-2xl text-ink">{{ displayName }}</h1>
+          <p class="truncate text-sm text-ink-muted">{{ user?.email }}</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <BaseBadge v-if="auth.user?.subscriptionStatus === 'PREMIUM'" tone="blush">
+        <BaseBadge v-if="user?.subscriptionStatus === 'PREMIUM'" tone="blush">
           {{ $t('PROFILE.PREMIUM') }}
         </BaseBadge>
-        <BaseButton variant="ghost" size="sm" @click="signOut">{{ $t('COMMON.SIGN_OUT') }}</BaseButton>
+        <BaseButton variant="ghost" size="sm" @click="signOut">
+          {{ $t('COMMON.SIGN_OUT') }}
+        </BaseButton>
       </div>
     </header>
 
@@ -149,7 +158,12 @@ useSeo(() => ({
       <BaseCard>
         <h2 class="font-display text-xl text-ink">{{ $t('PROFILE.CONCERNS_TITLE') }}</h2>
         <p class="mt-1 text-sm text-ink-muted">{{ $t('PROFILE.CONCERNS_SUBTITLE') }}</p>
-        <ProfileChoiceGrid v-model="form.concernSlugs" :items="concerns" kind="concern" class="mt-4" />
+        <ProfileChoiceGrid
+          v-model="form.concernSlugs"
+          :items="concerns"
+          kind="concern"
+          class="mt-4"
+        />
       </BaseCard>
 
       <BaseCard>

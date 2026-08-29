@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const steps = [
-  { key: "STEP_1", icon: "user" as const },
-  { key: "STEP_2", icon: "droplet" as const },
-  { key: "STEP_3", icon: "sparkles" as const },
-  { key: "STEP_4", icon: "tag" as const },
+  { key: 'STEP_1', icon: 'user' as const },
+  { key: 'STEP_2', icon: 'droplet' as const },
+  { key: 'STEP_3', icon: 'sparkles' as const },
+  { key: 'STEP_4', icon: 'tag' as const },
 ];
 </script>
 
@@ -22,15 +22,11 @@ const steps = [
         :key="step.key"
         class="relative rounded-xl border border-line bg-surface p-6"
       >
-        <span
-          class="flex size-10 items-center justify-center rounded-lg bg-surface-muted text-ink"
-        >
+        <span class="flex size-10 items-center justify-center rounded-lg bg-surface-muted text-ink">
           <BaseIcon :name="step.icon" :size="19" />
         </span>
-        <p
-          class="mt-4 text-2xs font-semibold tracking-widest text-ink-faint uppercase"
-        >
-          {{ $t("LANDING.STEPS.N", { n: index + 1 }) }}
+        <p class="mt-4 text-2xs font-semibold tracking-widest text-ink-faint uppercase">
+          {{ $t('LANDING.STEPS.N', { n: index + 1 }) }}
         </p>
         <h3 class="mt-1 text-base font-semibold text-ink">
           {{ $t(`LANDING.STEPS.${step.key}.TITLE`) }}

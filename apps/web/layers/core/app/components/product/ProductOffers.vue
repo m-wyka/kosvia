@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { pricePerHundred, type ProductDto } from '@kosvia/shared';
+import { pricePerHundred, type ProductDto, type ProductOfferDto } from '@kosvia/shared';
 
 const props = defineProps<{ product: ProductDto }>();
 
-const offers = computed(() =>
-  [...props.product.offers].sort((a, b) => {
-    // Out of stock always sinks, whatever the price says.
-    const stockA = a.availability === 'OUT_OF_STOCK' ? 1 : 0;
-    const stockB = b.availability === 'OUT_OF_STOCK' ? 1 : 0;
-    return stockA - stockB || a.price - b.price;
-  }),
-);
-
-const bestPrice = computed(
-  () => offers.value.find((offer) => offer.availability !== 'OUT_OF_STOCK')?.price ?? null,
-);
-
 const vocab = useVocabulary();
 const format = useFormat();
+
+const isOutOfStock = (offer: ProductOfferDto): boolean => offer.availability === 'OUT_OF_STOCK';
+
+const stockRank = (offer: ProductOfferDto): number => (isOutOfStock(offer) ? 1 : 0);
+
+const offers = computed(() =>
+  [...props.product.offers].sort(
+    (first, second) => stockRank(first) - stockRank(second) || first.price - second.price,
+  ),
+);
+
+const bestPrice = computed(() => offers.value.find((offer) => !isOutOfStock(offer))?.price ?? null);
 </script>
 
 <template>
@@ -33,8 +32,6 @@ const format = useFormat();
     </header>
 
     <ul v-if="offers.length" class="divide-y divide-line">
-      <!-- Two rows once the column narrows: a store name is never worth
-           truncating to a single letter to keep a price on the same line. -->
       <li
         v-for="offer in offers"
         :key="offer.id"
@@ -55,7 +52,9 @@ const format = useFormat();
                   'text-caution': offer.availability === 'LOW_STOCK',
                   'text-ink-muted': ['OUT_OF_STOCK', 'UNKNOWN'].includes(offer.availability),
                 }"
-              >{{ vocab.availability(offer.availability) }}</span>
+              >
+                {{ vocab.availability(offer.availability) }}
+              </span>
             </span>
           </span>
 
@@ -78,7 +77,9 @@ const format = useFormat();
         </div>
 
         <div class="mt-2.5 flex items-center justify-between gap-3">
-          <BaseBadge v-if="offer.price === bestPrice" tone="sage" size="xs">{{ $t('PRODUCT.OFFERS.BEST_PRICE') }}</BaseBadge>
+          <BaseBadge v-if="offer.price === bestPrice" tone="sage" size="xs">
+            {{ $t('PRODUCT.OFFERS.BEST_PRICE') }}
+          </BaseBadge>
           <span v-else aria-hidden="true" />
           <BaseButton
             v-if="offer.url && offer.availability !== 'OUT_OF_STOCK'"
@@ -87,7 +88,9 @@ const format = useFormat();
             variant="secondary"
             target="_blank"
             rel="noopener nofollow"
-          >{{ $t('PRODUCT.OFFERS.VISIT') }}</BaseButton>
+          >
+            {{ $t('PRODUCT.OFFERS.VISIT') }}
+          </BaseButton>
         </div>
       </li>
     </ul>

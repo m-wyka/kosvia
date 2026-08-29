@@ -84,8 +84,12 @@ export class ShelfService {
       data: {
         ...(dto.notes !== undefined && { notes: dto.notes }),
         ...(dto.isFavorite !== undefined && { isFavorite: dto.isFavorite }),
-        ...(dto.openedAt !== undefined && { openedAt: dto.openedAt ? new Date(dto.openedAt) : null }),
-        ...(dto.finishedAt !== undefined && { finishedAt: dto.finishedAt ? new Date(dto.finishedAt) : null }),
+        ...(dto.openedAt !== undefined && {
+          openedAt: dto.openedAt ? new Date(dto.openedAt) : null,
+        }),
+        ...(dto.finishedAt !== undefined && {
+          finishedAt: dto.finishedAt ? new Date(dto.finishedAt) : null,
+        }),
       },
     });
     const items = await this.list(userId);
@@ -102,7 +106,10 @@ export class ShelfService {
   }
 
   private async assertOwned(userId: string, id: string): Promise<void> {
-    const item = await this.prisma.userShelfItem.findUnique({ where: { id }, select: { userId: true } });
+    const item = await this.prisma.userShelfItem.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
     if (!item || item.userId !== userId) {
       throw new NotFoundException('That shelf item does not exist.');
     }

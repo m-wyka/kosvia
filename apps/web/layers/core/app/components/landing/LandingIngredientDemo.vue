@@ -3,8 +3,16 @@ const { t } = useI18n();
 
 const rows = computed(() => [
   { name: 'Sodium Hyaluronate', inci: t('LANDING.INGREDIENTS.DEMO_ROW_1'), tags: ['humectant'] },
-  { name: 'Niacinamide', inci: t('LANDING.INGREDIENTS.DEMO_ROW_2'), tags: ['brightening', 'barrier-support'] },
-  { name: 'Ceramide NP', inci: t('LANDING.INGREDIENTS.DEMO_ROW_3'), tags: ['barrier-support', 'emollient'] },
+  {
+    name: 'Niacinamide',
+    inci: t('LANDING.INGREDIENTS.DEMO_ROW_2'),
+    tags: ['brightening', 'barrier-support'],
+  },
+  {
+    name: 'Ceramide NP',
+    inci: t('LANDING.INGREDIENTS.DEMO_ROW_3'),
+    tags: ['barrier-support', 'emollient'],
+  },
   { name: 'Parfum', inci: t('LANDING.INGREDIENTS.DEMO_ROW_4'), tags: ['fragrance'] },
 ]);
 </script>
@@ -17,7 +25,9 @@ const rows = computed(() => [
     </div>
     <ul class="divide-y divide-line">
       <li v-for="(row, index) in rows" :key="row.name" class="flex items-start gap-3 px-5 py-3.5">
-        <span class="mt-0.5 w-5 shrink-0 text-2xs tabular-nums text-ink-faint">{{ index + 1 }}</span>
+        <span class="mt-0.5 w-5 shrink-0 text-2xs tabular-nums text-ink-faint">
+          {{ index + 1 }}
+        </span>
         <span class="min-w-0 flex-1">
           <span class="block text-sm font-medium text-ink">{{ row.name }}</span>
           <span class="block text-xs text-ink-muted">{{ row.inci }}</span>

@@ -42,13 +42,17 @@ const groups = [
               <NuxtLinkLocale
                 :to="link.to"
                 class="text-sm text-ink-muted underline-offset-4 transition-colors hover:text-ink hover:underline"
-              >{{ $t(link.label) }}</NuxtLinkLocale>
+              >
+                {{ $t(link.label) }}
+              </NuxtLinkLocale>
             </li>
           </ul>
         </nav>
       </div>
 
-      <div class="mt-10 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="mt-10 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between"
+      >
         <p>{{ $t('FOOTER.RIGHTS', { year }) }}</p>
         <p class="max-w-xl">{{ $t('COMMON.MEDICAL_NOTE') }}</p>
       </div>

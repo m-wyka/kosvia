@@ -40,7 +40,7 @@ const shapeFor = (slug: string): Shape => {
   return match?.shape ?? 'flask';
 };
 
-const escapeXml = (value: string): string => {
+export const escapeXml = (value: string): string => {
   return value.replace(
     /[<>&'"]/g,
     (char) =>
@@ -127,5 +127,3 @@ export const monogramSvg = (name: string, slug: string): string => {
         font-family="Georgia, 'Times New Roman', serif" font-size="42" fill="${palette.cap}">${escapeXml(initials)}</text>
 </svg>`;
 };
-
-export const escapeXmlText = escapeXml;

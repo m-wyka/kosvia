@@ -12,7 +12,11 @@ export class CreatePriceAlertDto {
 }
 
 export class UpdatePriceAlertDto {
-  @IsOptional() @Type(() => Number) @IsNumber({ maxDecimalPlaces: 2 }) @Min(1) @Max(100000)
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(1)
+  @Max(100000)
   targetPrice?: number;
 
   @IsOptional() @IsBoolean() active?: boolean;

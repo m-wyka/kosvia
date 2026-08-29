@@ -34,14 +34,27 @@ function baseOptions(settings: CookieSettings, maxAge: number): CookieOptions {
 export function setAuthCookies(
   res: Response,
   settings: CookieSettings,
-  tokens: { accessToken: string; accessMaxAge: number; refreshToken: string; refreshMaxAge: number },
+  tokens: {
+    accessToken: string;
+    accessMaxAge: number;
+    refreshToken: string;
+    refreshMaxAge: number;
+  },
 ): void {
   res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, baseOptions(settings, tokens.accessMaxAge));
-  res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, baseOptions(settings, tokens.refreshMaxAge));
+  res.cookie(
+    REFRESH_TOKEN_COOKIE,
+    tokens.refreshToken,
+    baseOptions(settings, tokens.refreshMaxAge),
+  );
 }
 
 export function clearAuthCookies(res: Response, settings: CookieSettings): void {
-  const common = { httpOnly: true, secure: settings.secure, sameSite: settings.secure ? 'none' : 'lax' } as const;
+  const common = {
+    httpOnly: true,
+    secure: settings.secure,
+    sameSite: settings.secure ? 'none' : 'lax',
+  } as const;
   res.clearCookie(ACCESS_TOKEN_COOKIE, { ...common, path: '/' });
   res.clearCookie(REFRESH_TOKEN_COOKIE, { ...common, path: '/' });
 }

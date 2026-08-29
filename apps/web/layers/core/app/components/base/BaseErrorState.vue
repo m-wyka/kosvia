@@ -1,8 +1,4 @@
 <script setup lang="ts">
-/**
- * Shown whenever a request fails. Never surfaces a status code — the user gets
- * plain language and a way to try again.
- */
 defineProps<{ title?: string; message?: string; compact?: boolean }>();
 defineEmits<{ retry: [] }>();
 </script>
@@ -13,7 +9,9 @@ defineEmits<{ retry: [] }>();
     :class="compact ? 'px-6 py-8' : 'px-6 py-12'"
     role="alert"
   >
-    <span class="mb-4 flex size-11 items-center justify-center rounded-full bg-surface text-critical shadow-xs">
+    <span
+      class="mb-4 flex size-11 items-center justify-center rounded-full bg-surface text-critical shadow-xs"
+    >
       <BaseIcon name="alert" :size="20" />
     </span>
     <h3 class="font-display text-lg text-ink">{{ title ?? $t('ERRORS.GENERIC_TITLE') }}</h3>

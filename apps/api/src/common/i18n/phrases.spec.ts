@@ -36,7 +36,11 @@ describe('renderLocalised', () => {
   });
 
   it('formats money params in the locale currency style', () => {
-    const entry = { code: 'ai-available-from', text: 'Available from 24 PLN', params: { price: 24 } };
+    const entry = {
+      code: 'ai-available-from',
+      text: 'Available from 24 PLN',
+      params: { price: 24 },
+    };
     expect(renderLocalised(entry, 'pl')).toBe('Dostępny od 24,00 zł');
   });
 

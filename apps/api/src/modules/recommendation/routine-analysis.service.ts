@@ -81,8 +81,12 @@ export class RoutineAnalysisService {
       for (let j = i + 1; j < items.length; j += 1) {
         const a = items[i].product;
         const b = items[j].product;
-        const setA = new Set(a.ingredients.filter((x) => x.position <= 10).map((x) => x.ingredientId));
-        const setB = new Set(b.ingredients.filter((x) => x.position <= 10).map((x) => x.ingredientId));
+        const setA = new Set(
+          a.ingredients.filter((x) => x.position <= 10).map((x) => x.ingredientId),
+        );
+        const setB = new Set(
+          b.ingredients.filter((x) => x.position <= 10).map((x) => x.ingredientId),
+        );
         if (!setA.size || !setB.size) continue;
         let shared = 0;
         for (const id of setB) if (setA.has(id)) shared += 1;
@@ -115,7 +119,8 @@ export class RoutineAnalysisService {
       item.product.ingredients.some(
         (entry) =>
           entry.position <= 8 &&
-          (entry.ingredient.tags.includes('exfoliant') || entry.ingredient.tags.includes('retinoid')),
+          (entry.ingredient.tags.includes('exfoliant') ||
+            entry.ingredient.tags.includes('retinoid')),
       ),
     );
     if (exfoliantOrRetinoid.length >= 3) {
@@ -145,11 +150,13 @@ export class RoutineAnalysisService {
 
     /* ------------------------------------------------------------- gaps ----- */
     const coveredSteps = new Set(byStep.keys());
-    const missing = ESSENTIAL_STEPS.filter((entry) => !coveredSteps.has(entry.step)).map((entry) => ({
-      slug: entry.slug,
-      name: entry.name,
-      why: entry.why,
-    }));
+    const missing = ESSENTIAL_STEPS.filter((entry) => !coveredSteps.has(entry.step)).map(
+      (entry) => ({
+        slug: entry.slug,
+        name: entry.name,
+        why: entry.why,
+      }),
+    );
     for (const gap of missing) {
       observations.push({
         kind: 'gap',

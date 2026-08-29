@@ -30,11 +30,20 @@ describe('PersonalMatchService', () => {
   it('keeps the reported breakdown consistent with the score shown', () => {
     const result = service.score({
       product: hydratingCream,
-      profile: profile({ concernSlugs: ['dehydration'], goalSlugs: ['hydration'], budget: 'UNDER_50' }),
+      profile: profile({
+        concernSlugs: ['dehydration'],
+        goalSlugs: ['hydration'],
+        budget: 'UNDER_50',
+      }),
     });
-    const sum = [...result.reasons, ...result.warnings].reduce((total, entry) => total + entry.impact, 0);
+    const sum = [...result.reasons, ...result.warnings].reduce(
+      (total, entry) => total + entry.impact,
+      0,
+    );
     // Impacts are rounded individually, so allow for accumulated rounding.
-    expect(Math.abs(50 + sum - result.score)).toBeLessThanOrEqual(result.reasons.length + result.warnings.length);
+    expect(Math.abs(50 + sum - result.score)).toBeLessThanOrEqual(
+      result.reasons.length + result.warnings.length,
+    );
   });
 
   it('scores a product that targets the user’s concerns above one that does not', () => {
@@ -89,7 +98,10 @@ describe('PersonalMatchService', () => {
 
   describe('budget', () => {
     it('credits a product inside the budget', () => {
-      const result = service.score({ product: hydratingCream, profile: profile({ budget: 'UNDER_50' }) });
+      const result = service.score({
+        product: hydratingCream,
+        profile: profile({ budget: 'UNDER_50' }),
+      });
       expect(result.reasons.some((r) => r.code === 'budget-fit')).toBe(true);
     });
 
@@ -108,8 +120,14 @@ describe('PersonalMatchService', () => {
     });
 
     it('ignores price entirely when the budget is unlimited', () => {
-      const cheap = service.score({ product: product({ ...hydratingCream, lowestPrice: 20 }), profile: profile() });
-      const dear = service.score({ product: product({ ...hydratingCream, lowestPrice: 300 }), profile: profile() });
+      const cheap = service.score({
+        product: product({ ...hydratingCream, lowestPrice: 20 }),
+        profile: profile(),
+      });
+      const dear = service.score({
+        product: product({ ...hydratingCream, lowestPrice: 300 }),
+        profile: profile(),
+      });
       expect(cheap.score).toBe(dear.score);
     });
   });
@@ -139,7 +157,11 @@ describe('PersonalMatchService', () => {
   describe('sensitivity', () => {
     const harsh = product({
       isFragranceFree: false,
-      ingredients: list(AQUA, PARFUM, ingredient({ id: 'alcohol', inciName: 'Alcohol Denat.', sensitivityImpact: -2 })),
+      ingredients: list(
+        AQUA,
+        PARFUM,
+        ingredient({ id: 'alcohol', inciName: 'Alcohol Denat.', sensitivityImpact: -2 }),
+      ),
       ingredientScore: 45,
     });
 
@@ -154,8 +176,18 @@ describe('PersonalMatchService', () => {
         ingredients: list(
           AQUA,
           GLYCERIN,
-          ingredient({ id: 'panthenol', inciName: 'Panthenol', tags: ['soothing'], sensitivityImpact: 2 }),
-          ingredient({ id: 'bisabolol', inciName: 'Bisabolol', tags: ['soothing'], sensitivityImpact: 2 }),
+          ingredient({
+            id: 'panthenol',
+            inciName: 'Panthenol',
+            tags: ['soothing'],
+            sensitivityImpact: 2,
+          }),
+          ingredient({
+            id: 'bisabolol',
+            inciName: 'Bisabolol',
+            tags: ['soothing'],
+            sensitivityImpact: 2,
+          }),
         ),
         ingredientScore: 70,
       });
@@ -256,10 +288,7 @@ describe('PersonalMatchService', () => {
   });
 
   it('scoreMany returns one entry per product', () => {
-    const scores = service.scoreMany(
-      [hydratingCream, product({ id: 'product-2' })],
-      profile(),
-    );
+    const scores = service.scoreMany([hydratingCream, product({ id: 'product-2' })], profile());
     expect([...scores.keys()].sort()).toEqual(['product-1', 'product-2']);
   });
 });

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/** A feature row: copy on one side, a real UI fragment on the other. */
 withDefaults(
   defineProps<{
     eyebrow: string;
@@ -8,7 +7,6 @@ withDefaults(
     points?: string[];
     ctaLabel?: string;
     ctaTo?: string;
-    /** `reverse` puts the visual on the left. */
     reverse?: boolean;
     tone?: 'surface' | 'canvas';
   }>(),
@@ -23,8 +21,14 @@ withDefaults(
         <SectionHeading :eyebrow="eyebrow" :title="title" :description="description" />
 
         <ul v-if="points?.length" class="mt-6 space-y-3">
-          <li v-for="point in points" :key="point" class="flex items-start gap-2.5 text-sm text-ink-soft">
-            <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sage-soft text-sage">
+          <li
+            v-for="point in points"
+            :key="point"
+            class="flex items-start gap-2.5 text-sm text-ink-soft"
+          >
+            <span
+              class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sage-soft text-sage"
+            >
               <BaseIcon name="check" :size="12" :stroke-width="2.2" />
             </span>
             {{ point }}

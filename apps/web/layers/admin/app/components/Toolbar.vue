@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/** Search + pagination bar shared by every admin list. */
 const search = defineModel<string>('search', { default: '' });
 
 defineProps<{ page: number; pageCount: number; total?: number; placeholder?: string }>();
@@ -18,9 +17,8 @@ defineEmits<{ 'update:page': [value: number] }>();
         v-model="search"
         type="search"
         :placeholder="placeholder ?? $t('ADMIN.SEARCH_PLACEHOLDER')"
-        class="h-10 w-full rounded-lg border border-line bg-surface pr-3 pl-9 text-sm
-               placeholder:text-ink-faint transition-colors hover:border-line-strong"
-      >
+        class="h-10 w-full rounded-lg border border-line bg-surface pr-3 pl-9 text-sm placeholder:text-ink-faint transition-colors hover:border-line-strong"
+      />
     </div>
 
     <div v-if="pageCount > 1" class="flex items-center gap-2">
@@ -28,10 +26,20 @@ defineEmits<{ 'update:page': [value: number] }>();
         {{ $t('ADMIN.PAGE_OF', { page, total: pageCount }) }}
         <template v-if="total">{{ $t('ADMIN.TOTAL_SUFFIX', { total }) }}</template>
       </span>
-      <BaseButton variant="secondary" size="sm" :disabled="page <= 1" @click="$emit('update:page', page - 1)">
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        :disabled="page <= 1"
+        @click="$emit('update:page', page - 1)"
+      >
         <BaseIcon name="chevron-left" :size="15" />
       </BaseButton>
-      <BaseButton variant="secondary" size="sm" :disabled="page >= pageCount" @click="$emit('update:page', page + 1)">
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        :disabled="page >= pageCount"
+        @click="$emit('update:page', page + 1)"
+      >
         <BaseIcon name="chevron-right" :size="15" />
       </BaseButton>
     </div>

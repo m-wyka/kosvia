@@ -5,3 +5,4 @@ dist
 package-lock.json
 *.tsbuildinfo
 apps/api/prisma/migrations
+.claude

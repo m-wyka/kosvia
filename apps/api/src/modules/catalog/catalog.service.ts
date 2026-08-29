@@ -100,7 +100,10 @@ export class CatalogService {
         }),
         ...(tag && { tags: { has: tag } }),
       },
-      include: { targetsConcerns: { select: { slug: true } }, supportsGoals: { select: { slug: true } } },
+      include: {
+        targetsConcerns: { select: { slug: true } },
+        supportsGoals: { select: { slug: true } },
+      },
       orderBy: { inciName: 'asc' },
       take: Math.min(take, 200),
     });
@@ -110,7 +113,10 @@ export class CatalogService {
   async ingredient(slug: string): Promise<IngredientDto> {
     const row = await this.prisma.ingredient.findUnique({
       where: { slug },
-      include: { targetsConcerns: { select: { slug: true } }, supportsGoals: { select: { slug: true } } },
+      include: {
+        targetsConcerns: { select: { slug: true } },
+        supportsGoals: { select: { slug: true } },
+      },
     });
     if (!row) throw new NotFoundException('We could not find that ingredient.');
     return toIngredientDto(row);

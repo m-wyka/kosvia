@@ -60,7 +60,12 @@ export class ComparisonService {
     }
 
     const rowsOut: ComparisonRowDto[] = [
-      this.row('brand', 'Brand', products.map((p) => p.brand.name), 'none'),
+      this.row(
+        'brand',
+        'Brand',
+        products.map((p) => p.brand.name),
+        'none',
+      ),
       this.row('price', 'Best price', prices, 'lower'),
       this.row(
         'volume',
@@ -70,22 +75,43 @@ export class ComparisonService {
       ),
       this.row('price-per-100', 'Price per 100 ml', perHundred, 'lower'),
       this.row('match', 'Personal Match', matches, 'higher'),
-      this.row('ingredient-score', 'Ingredient score', products.map((p) => p.ingredientScore), 'higher'),
+      this.row(
+        'ingredient-score',
+        'Ingredient score',
+        products.map((p) => p.ingredientScore),
+        'higher',
+      ),
       this.row(
         'actives',
         'Key active ingredients',
-        ordered.map((row) =>
-          row.ingredients
-            .filter((entry) => entry.ingredient.isActiveIngredient)
-            .slice(0, 3)
-            .map((entry) => entry.ingredient.commonName ?? entry.ingredient.inciName)
-            .join(', ') || 'None highlighted',
+        ordered.map(
+          (row) =>
+            row.ingredients
+              .filter((entry) => entry.ingredient.isActiveIngredient)
+              .slice(0, 3)
+              .map((entry) => entry.ingredient.commonName ?? entry.ingredient.inciName)
+              .join(', ') || 'None highlighted',
         ),
         'none',
       ),
-      this.row('fragrance', 'Fragrance', products.map((p) => (p.isFragranceFree ? 'Fragrance-free' : 'Contains fragrance')), 'none'),
-      this.row('vegan', 'Vegan', products.map((p) => (p.isVegan ? 'Yes' : 'Not stated')), 'none'),
-      this.row('cruelty-free', 'Cruelty-free', products.map((p) => (p.isCrueltyFree ? 'Yes' : 'Not stated')), 'none'),
+      this.row(
+        'fragrance',
+        'Fragrance',
+        products.map((p) => (p.isFragranceFree ? 'Fragrance-free' : 'Contains fragrance')),
+        'none',
+      ),
+      this.row(
+        'vegan',
+        'Vegan',
+        products.map((p) => (p.isVegan ? 'Yes' : 'Not stated')),
+        'none',
+      ),
+      this.row(
+        'cruelty-free',
+        'Cruelty-free',
+        products.map((p) => (p.isCrueltyFree ? 'Yes' : 'Not stated')),
+        'none',
+      ),
       this.row(
         'stores',
         'Available at',
@@ -139,7 +165,9 @@ export class ComparisonService {
     const ranked = products
       .map((product, index) => {
         const valueScore =
-          bestValue !== null && perHundred[index] !== null ? (bestValue / perHundred[index]!) * 100 : 60;
+          bestValue !== null && perHundred[index] !== null
+            ? (bestValue / perHundred[index]!) * 100
+            : 60;
         return {
           index,
           product,

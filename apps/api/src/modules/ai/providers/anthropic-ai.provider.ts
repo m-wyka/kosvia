@@ -100,7 +100,8 @@ export class AnthropicAIProvider implements AIProvider {
       `INGREDIENT SCORE: ${context.ingredientScore}/100`,
       'KEY INGREDIENTS:',
       ...context.ingredientHighlights.map(
-        (entry) => `- ${entry.name} [${entry.tags.join(', ')}]${entry.note ? ` — ${entry.note}` : ''}`,
+        (entry) =>
+          `- ${entry.name} [${entry.tags.join(', ')}]${entry.note ? ` — ${entry.note}` : ''}`,
       ),
       context.notes.length ? `NOTES: ${sentences(context.notes)}` : '',
     ]

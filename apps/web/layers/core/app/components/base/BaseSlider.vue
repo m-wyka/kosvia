@@ -2,11 +2,16 @@
 const model = defineModel<number>({ required: true });
 
 const props = withDefaults(
-  defineProps<{ label?: string; min?: number; max?: number; step?: number; format?: (value: number) => string }>(),
+  defineProps<{
+    label?: string;
+    min?: number;
+    max?: number;
+    step?: number;
+    format?: (value: number) => string;
+  }>(),
   { min: 0, max: 100, step: 1 },
 );
 
-/** Emitted on release, so URL updates do not fire on every pixel of a drag. */
 const emit = defineEmits<{ change: [value: number] }>();
 
 const id = useId();
@@ -30,7 +35,7 @@ const display = computed(() => (props.format ? props.format(model.value) : Strin
       class="kosvia-range h-6 w-full cursor-pointer appearance-none bg-transparent"
       :style="{ '--fill': `${percent}%` }"
       @change="emit('change', model)"
-    >
+    />
   </div>
 </template>
 
@@ -64,7 +69,9 @@ const display = computed(() => (props.format ? props.format(model.value) : Strin
   box-shadow: var(--shadow-sm);
   transition: transform var(--duration-fast) var(--ease-out-soft);
 }
-.kosvia-range::-webkit-slider-thumb:active { transform: scale(1.12); }
+.kosvia-range::-webkit-slider-thumb:active {
+  transform: scale(1.12);
+}
 .kosvia-range::-moz-range-thumb {
   width: 18px;
   height: 18px;

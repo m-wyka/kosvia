@@ -15,12 +15,9 @@ defineProps<{ tabs: Array<{ value: string; label: string; count?: number }> }>()
       type="button"
       role="tab"
       :aria-selected="model === tab.value"
-      class="flex shrink-0 items-center gap-1.5 rounded-pill px-4 py-2 text-sm font-medium
-             transition-all duration-[--duration-fast]"
+      class="flex shrink-0 items-center gap-1.5 rounded-pill px-4 py-2 text-sm font-medium transition-all duration-[--duration-fast]"
       :class="
-        model === tab.value
-          ? 'bg-surface text-ink shadow-xs'
-          : 'text-ink-muted hover:text-ink-soft'
+        model === tab.value ? 'bg-surface text-ink shadow-xs' : 'text-ink-muted hover:text-ink-soft'
       "
       @click="model = tab.value"
     >

@@ -39,16 +39,24 @@ const toBoolean = ({ value }: { value: unknown }): boolean | undefined => {
 };
 
 export class ProductQueryDto {
-  @IsOptional() @IsString() @MaxLength(120)
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   q?: string;
 
   @IsOptional() @IsString() category?: string;
 
-  @IsOptional() @IsArray() @IsString({ each: true }) @Transform(toArray)
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(toArray)
   brand?: string[];
 
-  @IsOptional() @IsArray() @IsString({ each: true }) @Transform(toArray)
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(toArray)
   ingredient?: string[];
 
   @IsOptional() @IsEnum(SkinType) skinType?: SkinType;
@@ -68,6 +76,8 @@ export class ProductQueryDto {
 
 export class CompareQueryDto {
   /** 2-4 product ids or slugs. */
-  @IsArray() @IsString({ each: true }) @Transform(toArray)
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(toArray)
   products!: string[];
 }

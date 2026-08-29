@@ -78,7 +78,12 @@ const FRAGRANCE_FREE_BRANDS = new Set([
   'hydrapure-lab',
 ]);
 
-const NON_VEGAN_INGREDIENTS = new Set(['Beeswax', 'Lanolin', 'Honey Extract', 'Hydrolyzed Wheat Protein']);
+const NON_VEGAN_INGREDIENTS = new Set([
+  'Beeswax',
+  'Lanolin',
+  'Honey Extract',
+  'Hydrolyzed Wheat Protein',
+]);
 
 const TIER_MULTIPLIER = { value: 0.7, mid: 1, premium: 1.65 } as const;
 
@@ -124,7 +129,11 @@ async function main(): Promise<void> {
   // Two passes so parents always exist before their children.
   for (const pass of [0, 1, 2]) {
     for (const category of CATEGORIES) {
-      const depth = category.parent ? (CATEGORIES.find((c) => c.slug === category.parent)?.parent ? 2 : 1) : 0;
+      const depth = category.parent
+        ? CATEGORIES.find((c) => c.slug === category.parent)?.parent
+          ? 2
+          : 1
+        : 0;
       if (depth !== pass || categoryBySlug.has(category.slug)) continue;
       const created = await prisma.category.create({
         data: {
@@ -214,7 +223,8 @@ async function main(): Promise<void> {
   console.log('› Products, ingredient lists and offers');
   const brandList = BRANDS;
   let productIndex = 0;
-  const createdProducts: Array<{ id: string; slug: string; categoryId: string; price: number }> = [];
+  const createdProducts: Array<{ id: string; slug: string; categoryId: string; price: number }> =
+    [];
 
   for (const [formulaIndex, formula] of FORMULAS.entries()) {
     const category = categoryBySlug.get(formula.category);
@@ -235,17 +245,24 @@ async function main(): Promise<void> {
       const volume = roundVolume(formula.volume * volumeFactor);
 
       const price = shelfPrice(
-        formula.basePrice * TIER_MULTIPLIER[brandSeed.tier] * volumeFactor * (0.88 + random() * 0.3),
+        formula.basePrice *
+          TIER_MULTIPLIER[brandSeed.tier] *
+          volumeFactor *
+          (0.88 + random() * 0.3),
       );
 
-      const slug = `${brandSeed.slug}-${formula.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`;
+      const slug = `${brandSeed.slug}-${formula.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')}`;
       const isVegan = brandSeed.isVegan && !inciNames.some((n) => NON_VEGAN_INGREDIENTS.has(n));
 
       const productIngredients: Prisma.ProductIngredientCreateWithoutProductInput[] = [];
       const scorable: ScorableProductIngredient[] = [];
       inciNames.forEach((inci, idx) => {
         const ingredient = ingredientByInci.get(inci);
-        if (!ingredient) throw new Error(`Formula ${formula.key} references unknown INCI "${inci}"`);
+        if (!ingredient)
+          throw new Error(`Formula ${formula.key} references unknown INCI "${inci}"`);
         productIngredients.push({
           position: idx + 1,
           ingredient: { connect: { id: ingredient.id } },
@@ -310,7 +327,11 @@ async function main(): Promise<void> {
             storeId: store.id,
             price: new Prisma.Decimal(storePrice),
             url: `${store.websiteUrl}/p/${slug}`,
-            availability: !inStock ? 'OUT_OF_STOCK' : availabilityRoll > 0.82 ? 'LOW_STOCK' : 'IN_STOCK',
+            availability: !inStock
+              ? 'OUT_OF_STOCK'
+              : availabilityRoll > 0.82
+                ? 'LOW_STOCK'
+                : 'IN_STOCK',
             lastCheckedAt: new Date(Date.now() - Math.floor(random() * 36) * 3600 * 1000),
           },
         });
@@ -379,9 +400,11 @@ async function main(): Promise<void> {
             })),
           },
           goals: {
-            connect: ['hydration', 'barrier-support', 'brightening', 'sun-protection'].map((slug) => ({
-              id: goalBySlug.get(slug)!.id,
-            })),
+            connect: ['hydration', 'barrier-support', 'brightening', 'sun-protection'].map(
+              (slug) => ({
+                id: goalBySlug.get(slug)!.id,
+              }),
+            ),
           },
         },
       },
@@ -400,10 +423,18 @@ async function main(): Promise<void> {
     });
 
   const shelfPicks = [
-    { product: await pickByStep('CLEANSER'), favorite: true, notes: 'Works well, no tightness afterwards.' },
+    {
+      product: await pickByStep('CLEANSER'),
+      favorite: true,
+      notes: 'Works well, no tightness afterwards.',
+    },
     { product: await pickByStep('TONER'), favorite: false, notes: null },
     { product: await pickByStep('SERUM'), favorite: true, notes: null },
-    { product: await pickByStep('SERUM', 1), favorite: false, notes: 'Alternating this with the other serum.' },
+    {
+      product: await pickByStep('SERUM', 1),
+      favorite: false,
+      notes: 'Alternating this with the other serum.',
+    },
     { product: await pickByStep('MOISTURIZER'), favorite: false, notes: null },
   ];
 

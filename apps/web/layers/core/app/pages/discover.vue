@@ -1,66 +1,87 @@
 <script setup lang="ts">
 import type { CategoryDto, DiscoveryFeedDto } from '@kosvia/shared';
 
-const auth = useAuthStore();
+interface FeedSection {
+  key: string;
+  title: string;
+  subtitle: string | null;
+}
+
+const MAX_BROWSE_TILES = 8;
+const CONCERN_SECTION_PREFIX = 'concern-';
+const DEFAULT_BEST_VALUE_CEILING = '50';
+
+const STATIC_SECTION_TITLES: Record<string, string> = {
+  'fragrance-free': 'DISCOVER.SECTION.FRAGRANCE_FREE',
+  'daily-spf': 'DISCOVER.SECTION.DAILY_SPF',
+  'best-value': 'DISCOVER.SECTION.BEST_VALUE',
+};
+
+const STATIC_SECTION_SUBTITLES: Record<string, string> = {
+  'fragrance-free': 'DISCOVER.SECTION.FRAGRANCE_FREE_SUBTITLE',
+  'daily-spf': 'DISCOVER.SECTION.DAILY_SPF_SUBTITLE',
+  'best-value': 'DISCOVER.SECTION.BEST_VALUE_SUBTITLE',
+};
+
+const { isAuthenticated } = storeToRefs(useAuthStore());
 const { t } = useI18n();
 const vocab = useVocabulary();
 
 const { data, pending, error, refresh } = await useApiFetch<DiscoveryFeedDto>('/discover', {
   key: 'discover-feed',
 });
-const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', { key: 'categories' });
+const { data: categories } = await useApiFetch<CategoryDto[]>('/categories', {
+  key: 'categories',
+});
 
-/** Second-level categories make the best browse tiles — "Face", not "Skincare". */
 const browseTiles = computed(() =>
   (categories.value ?? [])
     .flatMap((root) => root.children ?? [])
     .flatMap((branch) => branch.children ?? [])
     .filter((leaf) => (leaf.productCount ?? 0) > 0)
-    .slice(0, 8),
+    .slice(0, MAX_BROWSE_TILES),
 );
+
+const concernSlugOf = (section: Pick<FeedSection, 'key'>): string =>
+  section.key.slice(CONCERN_SECTION_PREFIX.length);
+
+const sectionTitle = (section: Pick<FeedSection, 'key' | 'title'>): string => {
+  if (section.key === 'recommended') {
+    return isAuthenticated.value
+      ? t('DISCOVER.SECTION.RECOMMENDED_PERSONAL')
+      : t('DISCOVER.SECTION.RECOMMENDED_GENERIC');
+  }
+  if (section.key.startsWith(CONCERN_SECTION_PREFIX)) {
+    return t('DISCOVER.SECTION.CONCERN', {
+      concern: vocab.concern(concernSlugOf(section)).toLowerCase(),
+    });
+  }
+  if (section.key === 'best-value') {
+    const ceiling = /(\d+)/.exec(section.title)?.[1] ?? DEFAULT_BEST_VALUE_CEILING;
+    return t(STATIC_SECTION_TITLES['best-value']!, { price: ceiling });
+  }
+  const staticKey = STATIC_SECTION_TITLES[section.key];
+  return staticKey ? t(staticKey) : section.title;
+};
+
+const sectionSubtitle = (section: Pick<FeedSection, 'key' | 'subtitle'>): string | null => {
+  if (section.key === 'recommended') {
+    return isAuthenticated.value
+      ? t('DISCOVER.SECTION.RECOMMENDED_SUBTITLE_PERSONAL')
+      : t('DISCOVER.SECTION.RECOMMENDED_SUBTITLE_GENERIC');
+  }
+  if (section.key.startsWith(CONCERN_SECTION_PREFIX)) {
+    return t('DISCOVER.SECTION.CONCERN_SUBTITLE');
+  }
+  const staticKey = STATIC_SECTION_SUBTITLES[section.key];
+  return staticKey ? t(staticKey) : section.subtitle;
+};
 
 useSeo(() => ({
   title: t('SEO.DISCOVER.TITLE'),
   description: t('SEO.DISCOVER.DESCRIPTION'),
   path: '/discover',
 }));
-
-/**
- * The API labels each section in English; we translate on the section key and
- * fall back to the API's own title for anything the frontend does not know.
- */
-function sectionTitle(section: { key: string; title: string }): string {
-  if (section.key === 'recommended') {
-    return auth.isAuthenticated
-      ? t('DISCOVER.SECTION.RECOMMENDED_PERSONAL')
-      : t('DISCOVER.SECTION.RECOMMENDED_GENERIC');
-  }
-  if (section.key.startsWith('concern-')) {
-    return t('DISCOVER.SECTION.CONCERN', {
-      concern: vocab.concern(section.key.replace('concern-', '')).toLowerCase(),
-    });
-  }
-  if (section.key === 'best-value') {
-    const ceiling = /(\d+)/.exec(section.title)?.[1] ?? '50';
-    return t('DISCOVER.SECTION.BEST_VALUE', { price: ceiling });
-  }
-  if (section.key === 'fragrance-free') {return t('DISCOVER.SECTION.FRAGRANCE_FREE');}
-  if (section.key === 'daily-spf') {return t('DISCOVER.SECTION.DAILY_SPF');}
-  return section.title;
-}
-
-function sectionSubtitle(section: { key: string; subtitle: string | null }): string | null {
-  if (section.key === 'recommended') {
-    return auth.isAuthenticated
-      ? t('DISCOVER.SECTION.RECOMMENDED_SUBTITLE_PERSONAL')
-      : t('DISCOVER.SECTION.RECOMMENDED_SUBTITLE_GENERIC');
-  }
-  if (section.key.startsWith('concern-')) {return t('DISCOVER.SECTION.CONCERN_SUBTITLE');}
-  if (section.key === 'best-value') {return t('DISCOVER.SECTION.BEST_VALUE_SUBTITLE');}
-  if (section.key === 'fragrance-free') {return t('DISCOVER.SECTION.FRAGRANCE_FREE_SUBTITLE');}
-  if (section.key === 'daily-spf') {return t('DISCOVER.SECTION.DAILY_SPF_SUBTITLE');}
-  return section.subtitle;
-}
 </script>
 
 <template>
@@ -68,7 +89,7 @@ function sectionSubtitle(section: { key: string; subtitle: string | null }): str
     <header class="mb-10 max-w-2xl">
       <h1 class="font-display text-3xl text-ink sm:text-4xl">{{ $t('DISCOVER.TITLE') }}</h1>
       <p class="mt-2 text-base text-ink-muted">
-        {{ auth.isAuthenticated ? $t('DISCOVER.SUBTITLE_PERSONAL') : $t('DISCOVER.SUBTITLE_GENERIC') }}
+        {{ isAuthenticated ? $t('DISCOVER.SUBTITLE_PERSONAL') : $t('DISCOVER.SUBTITLE_GENERIC') }}
       </p>
     </header>
 
@@ -93,11 +114,13 @@ function sectionSubtitle(section: { key: string; subtitle: string | null }): str
           :title="sectionTitle(section)"
           :subtitle="sectionSubtitle(section)"
           :products="section.products"
-          :see-all-to="section.key === 'daily-spf'
-            ? '/products?category=sun-care'
-            : section.key === 'fragrance-free'
-              ? '/products?fragranceFree=true'
-              : '/products?sort=best-match'"
+          :see-all-to="
+            section.key === 'daily-spf'
+              ? '/products?category=sun-care'
+              : section.key === 'fragrance-free'
+                ? '/products?fragranceFree=true'
+                : '/products?sort=best-match'
+          "
         />
       </div>
 
@@ -108,8 +131,7 @@ function sectionSubtitle(section: { key: string; subtitle: string | null }): str
             v-for="category in browseTiles"
             :key="category.id"
             :to="`/products?category=${category.slug}`"
-            class="group rounded-xl border border-line bg-surface p-5 transition-all
-                   hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
+            class="group rounded-xl border border-line bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
           >
             <p class="font-display text-lg text-ink">
               {{ vocab.category(category.slug, category.name) }}

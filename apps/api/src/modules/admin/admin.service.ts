@@ -31,19 +31,38 @@ export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
   async stats(): Promise<AdminStatsDto> {
-    const [users, products, brands, categories, ingredients, stores, offers, shelfItems, conversations] =
-      await Promise.all([
-        this.prisma.user.count(),
-        this.prisma.product.count(),
-        this.prisma.brand.count(),
-        this.prisma.category.count(),
-        this.prisma.ingredient.count(),
-        this.prisma.store.count(),
-        this.prisma.productOffer.count(),
-        this.prisma.userShelfItem.count(),
-        this.prisma.aIConversation.count(),
-      ]);
-    return { users, products, brands, categories, ingredients, stores, offers, shelfItems, conversations };
+    const [
+      users,
+      products,
+      brands,
+      categories,
+      ingredients,
+      stores,
+      offers,
+      shelfItems,
+      conversations,
+    ] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.product.count(),
+      this.prisma.brand.count(),
+      this.prisma.category.count(),
+      this.prisma.ingredient.count(),
+      this.prisma.store.count(),
+      this.prisma.productOffer.count(),
+      this.prisma.userShelfItem.count(),
+      this.prisma.aIConversation.count(),
+    ]);
+    return {
+      users,
+      products,
+      brands,
+      categories,
+      ingredients,
+      stores,
+      offers,
+      shelfItems,
+      conversations,
+    };
   }
 
   /* -------------------------------------------------------------- brands -- */
@@ -77,7 +96,10 @@ export class AdminService {
 
   async deleteBrand(id: string) {
     const count = await this.prisma.product.count({ where: { brandId: id } });
-    if (count) throw new BadRequestException(`This brand still has ${count} products. Move or delete them first.`);
+    if (count)
+      throw new BadRequestException(
+        `This brand still has ${count} products. Move or delete them first.`,
+      );
     await this.prisma.brand.delete({ where: { id } });
   }
 
@@ -86,7 +108,10 @@ export class AdminService {
   listCategories() {
     return this.prisma.category.findMany({
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      include: { _count: { select: { products: true } }, parent: { select: { id: true, name: true } } },
+      include: {
+        _count: { select: { products: true } },
+        parent: { select: { id: true, name: true } },
+      },
     });
   }
 
@@ -190,7 +215,10 @@ export class AdminService {
 
   async deleteIngredient(id: string) {
     const productIds = (
-      await this.prisma.productIngredient.findMany({ where: { ingredientId: id }, select: { productId: true } })
+      await this.prisma.productIngredient.findMany({
+        where: { ingredientId: id },
+        select: { productId: true },
+      })
     ).map((row) => row.productId);
     await this.prisma.ingredient.delete({ where: { id } });
     await this.recomputeScores(productIds);
@@ -319,7 +347,9 @@ export class AdminService {
           take,
           orderBy: { updatedAt: 'desc' },
           include: {
-            product: { select: { id: true, name: true, slug: true, brand: { select: { name: true } } } },
+            product: {
+              select: { id: true, name: true, slug: true, brand: { select: { name: true } } },
+            },
             store: { select: { id: true, name: true } },
           },
         }),
@@ -411,7 +441,8 @@ export class AdminService {
   }
 
   async deleteUser(id: string, actingUserId: string) {
-    if (id === actingUserId) throw new BadRequestException('You cannot delete your own account here.');
+    if (id === actingUserId)
+      throw new BadRequestException('You cannot delete your own account here.');
     await this.prisma.user.delete({ where: { id } });
   }
 
@@ -475,7 +506,10 @@ export class AdminService {
     for (const row of rows) {
       const { score } = computeIngredientScore(toScorable(row).ingredients);
       if (score !== row.ingredientScore) {
-        await this.prisma.product.update({ where: { id: row.id }, data: { ingredientScore: score } });
+        await this.prisma.product.update({
+          where: { id: row.id },
+          data: { ingredientScore: score },
+        });
       }
     }
   }

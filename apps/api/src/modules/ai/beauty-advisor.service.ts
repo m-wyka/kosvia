@@ -8,7 +8,11 @@ import { RecommendationService, type RoutinePlan } from '../recommendation/recom
 import { ProductsService } from '../products/products.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import type { ViewerContext } from '../profile/viewer-context.service';
-import type { AdvisorContext, AnswerLocale, RetrievedProduct } from './providers/ai-provider.interface';
+import type {
+  AdvisorContext,
+  AnswerLocale,
+  RetrievedProduct,
+} from './providers/ai-provider.interface';
 
 /**
  * BeautyAdvisorService — the retrieval half of the AI Beauty Shopper.
@@ -22,12 +26,21 @@ import type { AdvisorContext, AnswerLocale, RetrievedProduct } from './providers
  */
 
 const STEP_KEYWORDS: Array<{ step: RoutineStep; words: string[] }> = [
-  { step: 'CLEANSER', words: ['cleanser', 'cleansing', 'wash', 'face wash', 'micellar', 'żel do mycia', 'oczyszcz'] },
+  {
+    step: 'CLEANSER',
+    words: ['cleanser', 'cleansing', 'wash', 'face wash', 'micellar', 'żel do mycia', 'oczyszcz'],
+  },
   { step: 'TONER', words: ['toner', 'essence', 'tonik'] },
-  { step: 'EXFOLIANT', words: ['exfoliant', 'exfoliate', 'peel', 'acid', 'aha', 'bha', 'kwas', 'złuszcz'] },
+  {
+    step: 'EXFOLIANT',
+    words: ['exfoliant', 'exfoliate', 'peel', 'acid', 'aha', 'bha', 'kwas', 'złuszcz'],
+  },
   { step: 'SERUM', words: ['serum', 'ampoule', 'retinol', 'vitamin c', 'niacinamide', 'peptide'] },
   { step: 'EYE', words: ['eye cream', 'eye care', 'pod oczy', 'oczy'] },
-  { step: 'MOISTURIZER', words: ['moisturiser', 'moisturizer', 'cream', 'gel cream', 'krem', 'nawilż'] },
+  {
+    step: 'MOISTURIZER',
+    words: ['moisturiser', 'moisturizer', 'cream', 'gel cream', 'krem', 'nawilż'],
+  },
   { step: 'SPF', words: ['spf', 'sunscreen', 'sun cream', 'filtr', 'uv', 'sun protection'] },
   { step: 'MASK', words: ['mask', 'maska'] },
   { step: 'BODY', words: ['body', 'hand cream', 'balsam', 'dłoni'] },
@@ -74,17 +87,22 @@ export class BeautyAdvisorService {
   parseIntent(question: string, viewer: ViewerContext): ParsedIntent {
     const text = question.toLowerCase();
 
-    const step = STEP_KEYWORDS.find((entry) => entry.words.some((word) => text.includes(word)))?.step ?? null;
+    const step =
+      STEP_KEYWORDS.find((entry) => entry.words.some((word) => text.includes(word)))?.step ?? null;
 
     let maxPrice: number | null = null;
     const currency = /(\d+(?:[.,]\d+)?)\s*(?:zł|zl|pln)/i.exec(text);
-    const bounded = /(?:under|below|less than|up to|max|do|poniżej|za max)\s*(\d+(?:[.,]\d+)?)/i.exec(text);
+    const bounded =
+      /(?:under|below|less than|up to|max|do|poniżej|za max)\s*(\d+(?:[.,]\d+)?)/i.exec(text);
     const raw = currency?.[1] ?? bounded?.[1];
     if (raw) maxPrice = Number(raw.replace(',', '.'));
     if (maxPrice === null && viewer.profile) maxPrice = BUDGET_CEILING[viewer.profile.budget];
 
-    const wantsCheaper = /(cheap|cheaper|budget|affordable|tan|tańsz|zamiennik|alternativ)/i.test(text);
-    const wantsShelfCheck = /(already have|do i (own|have)|mam ju|on my shelf|na półce|półce|duplicate)/i.test(text);
+    const wantsCheaper = /(cheap|cheaper|budget|affordable|tan|tańsz|zamiennik|alternativ)/i.test(
+      text,
+    );
+    const wantsShelfCheck =
+      /(already have|do i (own|have)|mam ju|on my shelf|na półce|półce|duplicate)/i.test(text);
     const wantsRoutine = /(routine|rutyn|full set|whole set|starter|zestaw|basic set)/i.test(text);
 
     const parts: string[] = [];
@@ -209,7 +227,10 @@ export class BeautyAdvisorService {
             include: { product: { include: { brand: true, category: true } } },
             take: 12,
           })
-        ).map((item) => `${item.product.brand.name} ${item.product.name} (${item.product.category.name})`)
+        ).map(
+          (item) =>
+            `${item.product.brand.name} ${item.product.name} (${item.product.category.name})`,
+        )
       : [];
 
     return {

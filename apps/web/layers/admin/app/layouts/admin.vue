@@ -1,9 +1,5 @@
 <script setup lang="ts">
-/**
- * Admin shell — a compact sidebar, denser type, same design tokens.
- * Functional rather than expressive, but recognisably the same product.
- */
-const auth = useAuthStore();
+const { logout } = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 const localePath = useLocalePath();
@@ -39,21 +35,23 @@ const sections = [
 const isActive = (link: { to: string; exact?: boolean }) =>
   link.exact ? route.path === link.to : route.path.startsWith(link.to);
 
-watch(() => route.fullPath, () => { open.value = false; });
-
-async function signOut() {
-  await auth.logout();
+const signOut = async () => {
+  await logout();
   await router.push(localePath('/'));
-}
+};
+
+watch(
+  () => route.fullPath,
+  () => {
+    open.value = false;
+  },
+);
 </script>
 
 <template>
   <div class="min-h-dvh bg-canvas lg:grid lg:grid-cols-[15rem_1fr]">
-    <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 left-0 z-50 w-60 -translate-x-full border-r border-line bg-surface
-             transition-transform duration-[--duration-base] ease-[--ease-out-soft]
-             lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-50 w-60 -translate-x-full border-r border-line bg-surface transition-transform duration-[--duration-base] ease-[--ease-out-soft] lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
       :class="open && 'translate-x-0 shadow-lg'"
     >
       <div class="flex h-14 items-center justify-between border-b border-line px-4">
@@ -73,7 +71,11 @@ async function signOut() {
               <NuxtLinkLocale
                 :to="link.to"
                 class="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors"
-                :class="isActive(link) ? 'bg-surface-muted font-medium text-ink' : 'text-ink-muted hover:bg-surface-muted hover:text-ink'"
+                :class="
+                  isActive(link)
+                    ? 'bg-surface-muted font-medium text-ink'
+                    : 'text-ink-muted hover:bg-surface-muted hover:text-ink'
+                "
               >
                 <BaseIcon :name="link.icon" :size="16" />
                 {{ $t(link.label) }}
@@ -105,7 +107,9 @@ async function signOut() {
     <div v-if="open" class="fixed inset-0 z-40 bg-overlay lg:hidden" @click="open = false" />
 
     <div class="min-w-0">
-      <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-canvas/90 px-4 backdrop-blur-md lg:hidden">
+      <header
+        class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-canvas/90 px-4 backdrop-blur-md lg:hidden"
+      >
         <button
           type="button"
           class="rounded-md p-2 text-ink-soft hover:bg-surface-muted"

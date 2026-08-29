@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import type { ProductSummaryDto, RoutineAnalysisDto, ShelfItemDto } from '@kosvia/shared';
 
+interface ShelfCategoryGroup {
+  name: string;
+  slug: string;
+  items: ShelfItemDto[];
+}
+
 definePageMeta({ middleware: 'auth' });
+
+const MIN_SEARCH_LENGTH = 2;
+const SEARCH_DEBOUNCE_MS = 280;
+const SEARCH_PAGE_SIZE = 8;
 
 const api = useApi();
 const toast = useToast();
@@ -11,7 +21,12 @@ const { t } = useI18n();
 const vocab = useVocabulary();
 const localise = useLocalisedText();
 
-const { data: items, pending, error, refresh } = await useApiFetch<ShelfItemDto[]>('/shelf', {
+const {
+  data: items,
+  pending,
+  error,
+  refresh,
+} = await useApiFetch<ShelfItemDto[]>('/shelf', {
   key: 'shelf',
   default: () => [],
 });
@@ -21,51 +36,57 @@ const { data: analysis, refresh: refreshAnalysis } = await useApiFetch<RoutineAn
 );
 
 const tab = ref(String(route.query.tab ?? 'all'));
+const addOpen = ref(false);
+const search = ref('');
+const searching = ref(false);
+const results = ref<ProductSummaryDto[]>([]);
+
 const tabs = computed(() => [
   { value: 'all', label: t('SHELF.TAB_ALL'), count: items.value?.length ?? 0 },
   {
     value: 'favorites',
     label: t('SHELF.TAB_FAVORITES'),
-    count: items.value?.filter((i) => i.isFavorite).length ?? 0,
+    count: items.value?.filter((item) => item.isFavorite).length ?? 0,
   },
   { value: 'routine', label: t('SHELF.TAB_ROUTINE') },
 ]);
 
 const visible = computed(() =>
-  tab.value === 'favorites' ? (items.value ?? []).filter((item) => item.isFavorite) : (items.value ?? []),
+  tab.value === 'favorites'
+    ? (items.value ?? []).filter((item) => item.isFavorite)
+    : (items.value ?? []),
 );
 
-/** Grouped by category so the shelf reads like a routine, not a list. */
 const grouped = computed(() => {
-  const map = new Map<string, { name: string; slug: string; items: ShelfItemDto[] }>();
+  const byCategory = new Map<string, ShelfCategoryGroup>();
   for (const item of visible.value) {
     const key = item.product.category.id;
-    if (!map.has(key)) {
-      map.set(key, {
+    if (!byCategory.has(key)) {
+      byCategory.set(key, {
         name: item.product.category.name,
         slug: item.product.category.slug,
         items: [],
       });
     }
-    map.get(key)!.items.push(item);
+    byCategory.get(key)!.items.push(item);
   }
-  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...byCategory.values()].sort((first, second) => first.name.localeCompare(second.name));
 });
 
-async function reloadAll() {
+const reloadAll = async () => {
   await Promise.all([refresh(), refreshAnalysis()]);
-}
+};
 
-async function toggleFavorite(item: ShelfItemDto) {
+const toggleFavorite = async (item: ShelfItemDto) => {
   try {
     await api(`/shelf/${item.id}`, { method: 'PATCH', body: { isFavorite: !item.isFavorite } });
     await refresh();
   } catch (caught) {
     toast.error(message(caught));
   }
-}
+};
 
-async function removeItem(item: ShelfItemDto) {
+const removeItem = async (item: ShelfItemDto) => {
   try {
     await api(`/shelf/${item.id}`, { method: 'DELETE' });
     await reloadAll();
@@ -73,36 +94,25 @@ async function removeItem(item: ShelfItemDto) {
   } catch (caught) {
     toast.error(message(caught));
   }
-}
+};
 
-/* ------------------------------------------------------------ add product -- */
+const searchProducts = async (term: string) => {
+  if (term.trim().length < MIN_SEARCH_LENGTH) {
+    results.value = [];
+    return;
+  }
+  searching.value = true;
+  try {
+    const response = await api<{ items: ProductSummaryDto[] }>(
+      `/products?q=${encodeURIComponent(term)}&pageSize=${SEARCH_PAGE_SIZE}`,
+    );
+    results.value = response.items;
+  } finally {
+    searching.value = false;
+  }
+};
 
-const addOpen = ref(false);
-const search = ref('');
-const searching = ref(false);
-const results = ref<ProductSummaryDto[]>([]);
-
-watchDebounced(
-  search,
-  async (term) => {
-    if (term.trim().length < 2) {
-      results.value = [];
-      return;
-    }
-    searching.value = true;
-    try {
-      const response = await api<{ items: ProductSummaryDto[] }>(
-        `/products?q=${encodeURIComponent(term)}&pageSize=8`,
-      );
-      results.value = response.items;
-    } finally {
-      searching.value = false;
-    }
-  },
-  { debounce: 280 },
-);
-
-async function addProduct(product: ProductSummaryDto) {
+const addProduct = async (product: ProductSummaryDto) => {
   try {
     await api('/shelf', { method: 'POST', body: { productId: product.id } });
     await reloadAll();
@@ -112,7 +122,9 @@ async function addProduct(product: ProductSummaryDto) {
   } catch (caught) {
     toast.error(message(caught));
   }
-}
+};
+
+watchDebounced(search, searchProducts, { debounce: SEARCH_DEBOUNCE_MS });
 
 useSeo(() => ({
   title: t('SEO.SHELF.TITLE'),
@@ -142,7 +154,6 @@ useSeo(() => ({
       <ProductCardSkeleton v-for="index in 4" :key="index" />
     </div>
 
-    <!-- Routine analysis -->
     <div v-else-if="tab === 'routine'">
       <BaseEmptyState
         v-if="!analysis || analysis.itemCount === 0"
@@ -163,7 +174,11 @@ useSeo(() => ({
           >
             <span
               class="flex size-9 shrink-0 items-center justify-center rounded-lg"
-              :class="observation.severity === 'notice' ? 'bg-caution-soft text-caution' : 'bg-surface-muted text-ink-faint'"
+              :class="
+                observation.severity === 'notice'
+                  ? 'bg-caution-soft text-caution'
+                  : 'bg-surface-muted text-ink-faint'
+              "
             >
               <BaseIcon :name="observation.severity === 'notice' ? 'alert' : 'info'" :size="17" />
             </span>
@@ -200,7 +215,11 @@ useSeo(() => ({
                     </span>
                     <span class="block text-xs text-ink-muted">{{ localise(gap.why) }}</span>
                   </span>
-                  <BaseIcon name="chevron-right" :size="15" class="mt-0.5 shrink-0 text-ink-faint" />
+                  <BaseIcon
+                    name="chevron-right"
+                    :size="15"
+                    class="mt-0.5 shrink-0 text-ink-faint"
+                  />
                 </NuxtLinkLocale>
               </li>
             </ul>
@@ -213,14 +232,11 @@ useSeo(() => ({
       </div>
     </div>
 
-    <!-- Product lists -->
     <BaseEmptyState
       v-else-if="!visible.length"
       icon="shelf"
       :title="tab === 'favorites' ? $t('SHELF.EMPTY_FAVORITES_TITLE') : $t('SHELF.EMPTY_TITLE')"
-      :description="
-        tab === 'favorites' ? $t('SHELF.EMPTY_FAVORITES_BODY') : $t('SHELF.EMPTY_BODY')
-      "
+      :description="tab === 'favorites' ? $t('SHELF.EMPTY_FAVORITES_BODY') : $t('SHELF.EMPTY_BODY')"
     >
       <BaseButton @click="addOpen = true">{{ $t('SHELF.EMPTY_CTA') }}</BaseButton>
       <BaseButton variant="secondary" to="/discover">{{ $t('SHELF.BROWSE_CTA') }}</BaseButton>
@@ -253,21 +269,29 @@ useSeo(() => ({
               <NuxtLinkLocale
                 :to="`/products/${item.product.slug}`"
                 class="text-sm leading-snug font-medium text-ink hover:underline"
-              >{{ item.product.name }}</NuxtLinkLocale>
+              >
+                {{ item.product.name }}
+              </NuxtLinkLocale>
 
-              <p v-if="item.notes" class="mt-1 line-clamp-2 text-xs text-ink-muted">{{ item.notes }}</p>
+              <p v-if="item.notes" class="mt-1 line-clamp-2 text-xs text-ink-muted">
+                {{ item.notes }}
+              </p>
 
               <div class="mt-auto flex items-center justify-between gap-2 pt-2">
                 <span
                   v-if="item.product.personalMatch"
                   class="text-xs font-medium tabular-nums text-ink-muted"
-                >{{ $t('PRODUCT.MATCH', { score: item.product.personalMatch.score }) }}</span>
+                >
+                  {{ $t('PRODUCT.MATCH', { score: item.product.personalMatch.score }) }}
+                </span>
                 <span class="flex items-center gap-0.5">
                   <button
                     type="button"
                     class="rounded-md p-1.5 transition-colors"
                     :class="item.isFavorite ? 'text-blush-deep' : 'text-ink-faint hover:text-ink'"
-                    :aria-label="item.isFavorite ? $t('SHELF.REMOVE_FAVORITE') : $t('SHELF.ADD_FAVORITE')"
+                    :aria-label="
+                      item.isFavorite ? $t('SHELF.REMOVE_FAVORITE') : $t('SHELF.ADD_FAVORITE')
+                    "
                     :aria-pressed="item.isFavorite"
                     @click="toggleFavorite(item)"
                   >
@@ -308,7 +332,10 @@ useSeo(() => ({
           <BaseSkeleton v-for="index in 3" :key="index" height="4rem" rounded="var(--radius-lg)" />
         </div>
 
-        <p v-else-if="search.trim().length >= 2 && !results.length" class="py-6 text-center text-sm text-ink-muted">
+        <p
+          v-else-if="search.trim().length >= 2 && !results.length"
+          class="py-6 text-center text-sm text-ink-muted"
+        >
           {{ $t('SHELF.ADD_MODAL.NO_RESULTS', { query: search }) }}
         </p>
 
@@ -317,11 +344,15 @@ useSeo(() => ({
           v-else
           :key="product.id"
           type="button"
-          class="flex w-full items-center gap-3 rounded-lg border border-line p-2.5 text-left
-                 transition-colors hover:border-line-strong hover:bg-surface-muted"
+          class="flex w-full items-center gap-3 rounded-lg border border-line p-2.5 text-left transition-colors hover:border-line-strong hover:bg-surface-muted"
           @click="addProduct(product)"
         >
-          <ProductImage :src="product.imageUrl" :alt="product.name" ratio="square" class="w-12 rounded-md" />
+          <ProductImage
+            :src="product.imageUrl"
+            :alt="product.name"
+            ratio="square"
+            class="w-12 rounded-md"
+          />
           <span class="min-w-0 flex-1">
             <span class="block truncate text-2xs tracking-wide text-ink-muted uppercase">
               {{ product.brand.name }}

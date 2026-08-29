@@ -16,9 +16,21 @@ const product = (overrides: Partial<ProductSummaryDto> = {}): ProductSummaryDto 
   isVegan: true,
   isCrueltyFree: true,
   brand: { id: 'b1', name: 'Kalmé', slug: 'kalme', logo: null },
-  category: { id: 'c1', name: 'Moisturizers', slug: 'moisturizers', parentId: null, description: null },
+  category: {
+    id: 'c1',
+    name: 'Moisturizers',
+    slug: 'moisturizers',
+    parentId: null,
+    description: null,
+  },
   lowestPrice: 59.99,
-  lowestPriceStore: { id: 's1', name: 'Demo Drogeria', slug: 'demo-drogeria', logo: null, websiteUrl: null },
+  lowestPriceStore: {
+    id: 's1',
+    name: 'Demo Drogeria',
+    slug: 'demo-drogeria',
+    logo: null,
+    websiteUrl: null,
+  },
   ingredientScore: 82,
   personalMatch: {
     score: 92,

@@ -73,7 +73,9 @@ describe('BeautyAdvisorService.parseIntent', () => {
   });
 
   it('detects a shelf check', () => {
-    expect(service.parseIntent('do I already have something similar?', ANON).wantsShelfCheck).toBe(true);
+    expect(service.parseIntent('do I already have something similar?', ANON).wantsShelfCheck).toBe(
+      true,
+    );
   });
 
   it('detects a full-routine request', () => {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{ width?: string; height?: string; rounded?: string; lines?: number }>(),
-  { height: '1rem', rounded: 'var(--radius-sm)' },
-);
+withDefaults(defineProps<{ width?: string; height?: string; rounded?: string; lines?: number }>(), {
+  height: '1rem',
+  rounded: 'var(--radius-sm)',
+});
 </script>
 
 <template>

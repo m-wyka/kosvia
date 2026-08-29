@@ -1,22 +1,11 @@
 <script setup lang="ts">
-/**
- * Language switcher.
- *
- * `switchLocalePath` returns the current route in the other locale, so
- * switching from /pl/products/xyz lands on /products/xyz rather than the home
- * page. Rendered as real links: each locale has its own URL, and a link is
- * what lets a reader open the other language in a new tab.
- */
-withDefaults(defineProps<{ variant?: 'inline' | 'stacked' }>(), { variant: 'inline' });
-
 type LocaleCode = 'en' | 'pl';
 
-const { locale, locales } = useI18n();
+withDefaults(defineProps<{ variant?: 'inline' | 'stacked' }>(), { variant: 'inline' });
+
+const { locale, locales, t } = useI18n();
 const switchLocalePath = useSwitchLocalePath();
 
-const { t } = useI18n();
-
-/** Names come from the locale files so each language names itself. */
 const available = computed(() =>
   locales.value.map((entry) => ({
     code: entry.code as LocaleCode,
@@ -43,6 +32,9 @@ const available = computed(() =>
       "
       :aria-current="locale === entry.code ? 'true' : undefined"
       :hreflang="entry.code"
-    >{{ entry.code.toUpperCase() }}<span class="sr-only"> — {{ entry.label }}</span></NuxtLink>
+    >
+      {{ entry.code.toUpperCase() }}
+      <span class="sr-only">— {{ entry.label }}</span>
+    </NuxtLink>
   </nav>
 </template>

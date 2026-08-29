@@ -35,7 +35,12 @@ describe('computeIngredientScore', () => {
   });
 
   it('flags a high comedogenic rating only when it appears high in the list', () => {
-    const heavy = ingredient({ id: 'coconut', inciName: 'Coconut Oil', tags: ['occlusive'], comedogenicRating: 4 });
+    const heavy = ingredient({
+      id: 'coconut',
+      inciName: 'Coconut Oil',
+      tags: ['occlusive'],
+      comedogenicRating: 4,
+    });
     const early = computeIngredientScore(list(AQUA, heavy, GLYCERIN));
     const buried = computeIngredientScore(
       list(AQUA, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, GLYCERIN, heavy),
@@ -46,7 +51,9 @@ describe('computeIngredientScore', () => {
 
   it('never leaves the 0-100 range', () => {
     const allFragrance = computeIngredientScore(list(PARFUM, PARFUM, PARFUM, PARFUM, PARFUM));
-    const allActives = computeIngredientScore(list(NIACINAMIDE, NIACINAMIDE, NIACINAMIDE, NIACINAMIDE));
+    const allActives = computeIngredientScore(
+      list(NIACINAMIDE, NIACINAMIDE, NIACINAMIDE, NIACINAMIDE),
+    );
     for (const result of [allFragrance, allActives]) {
       expect(result.score).toBeGreaterThanOrEqual(0);
       expect(result.score).toBeLessThanOrEqual(100);

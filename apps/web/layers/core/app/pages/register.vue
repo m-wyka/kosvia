@@ -1,10 +1,13 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'focused', middleware: 'guest' });
 
-const auth = useAuthStore();
+const MIN_PASSWORD_LENGTH = 10;
+
+const { register } = useAuthStore();
 const router = useRouter();
 const localePath = useLocalePath();
 const message = useApiMessage();
+const { t } = useI18n();
 
 const name = ref('');
 const email = ref('');
@@ -12,29 +15,26 @@ const password = ref('');
 const error = ref('');
 const pending = ref(false);
 
-const { t } = useI18n();
-
-/** Mirrors the API's password policy so the rules are visible before submitting. */
 const rules = computed(() => [
-  { label: t('AUTH.RULE.LENGTH'), met: password.value.length >= 10 },
+  { label: t('AUTH.RULE.LENGTH'), met: password.value.length >= MIN_PASSWORD_LENGTH },
   { label: t('AUTH.RULE.LOWER'), met: /[a-z]/.test(password.value) },
   { label: t('AUTH.RULE.UPPER'), met: /[A-Z]/.test(password.value) },
   { label: t('AUTH.RULE.DIGIT'), met: /[0-9]/.test(password.value) },
 ]);
 const passwordValid = computed(() => rules.value.every((rule) => rule.met));
 
-async function submit() {
+const submit = async () => {
   error.value = '';
   pending.value = true;
   try {
-    await auth.register(email.value, password.value, name.value);
+    await register(email.value, password.value, name.value);
     await router.push(localePath('/onboarding'));
   } catch (caught) {
     error.value = message(caught);
   } finally {
     pending.value = false;
   }
-}
+};
 
 useSeo(() => ({
   title: t('SEO.REGISTER.TITLE'),
@@ -98,7 +98,9 @@ useSeo(() => ({
         size="lg"
         :loading="pending"
         :disabled="!passwordValid || !email"
-      >{{ $t('AUTH.REGISTER') }}</BaseButton>
+      >
+        {{ $t('AUTH.REGISTER') }}
+      </BaseButton>
     </form>
 
     <p class="mt-6 text-center text-xs leading-relaxed text-ink-muted">

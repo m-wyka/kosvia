@@ -43,7 +43,9 @@ const contents = build();
 if (process.argv.includes('--check')) {
   const current = readFileSync(target, 'utf8');
   if (current !== contents) {
-    console.error('phrases.generated.ts is out of date — run `npm run sync:phrases -w @kosvia/api`.');
+    console.error(
+      'phrases.generated.ts is out of date — run `npm run sync:phrases -w @kosvia/api`.',
+    );
     process.exit(1);
   }
   console.log('phrases.generated.ts is up to date.');

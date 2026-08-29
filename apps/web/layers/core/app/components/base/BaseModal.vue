@@ -6,22 +6,22 @@ withDefaults(defineProps<{ title?: string; description?: string; size?: 'sm' | '
 });
 
 const titleId = useId();
+const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };
 
-// Escape to close, and the page behind must not scroll while the modal is up.
-onKeyStroke('Escape', () => {
-  if (open.value) {open.value = false;}
-});
-
-watchEffect(() => {
+const lockPageScroll = (locked: boolean) => {
   if (import.meta.client) {
-    document.documentElement.style.overflow = open.value ? 'hidden' : '';
+    document.documentElement.style.overflow = locked ? 'hidden' : '';
+  }
+};
+
+onKeyStroke('Escape', () => {
+  if (open.value) {
+    open.value = false;
   }
 });
-onUnmounted(() => {
-  if (import.meta.client) {document.documentElement.style.overflow = '';}
-});
 
-const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };
+watchEffect(() => lockPageScroll(open.value));
+onUnmounted(() => lockPageScroll(false));
 </script>
 
 <template>
@@ -43,11 +43,13 @@ const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };
           <div class="fixed inset-0 bg-overlay backdrop-blur-[2px]" @click="open = false" />
 
           <div
-            class="animate-fade-up relative w-full rounded-t-2xl border border-line bg-surface
-                   shadow-lg sm:rounded-2xl"
+            class="animate-fade-up relative w-full rounded-t-2xl border border-line bg-surface shadow-lg sm:rounded-2xl"
             :class="widths[size]"
           >
-            <header v-if="title" class="flex items-start justify-between gap-4 border-b border-line p-5 sm:p-6">
+            <header
+              v-if="title"
+              class="flex items-start justify-between gap-4 border-b border-line p-5 sm:p-6"
+            >
               <div class="min-w-0">
                 <h2 :id="titleId" class="font-display text-xl text-ink">{{ title }}</h2>
                 <p v-if="description" class="mt-1 text-sm text-ink-muted">{{ description }}</p>
@@ -64,7 +66,10 @@ const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };
 
             <div class="p-5 sm:p-6"><slot /></div>
 
-            <footer v-if="$slots.footer" class="flex flex-wrap justify-end gap-2 border-t border-line p-5 sm:p-6">
+            <footer
+              v-if="$slots.footer"
+              class="flex flex-wrap justify-end gap-2 border-t border-line p-5 sm:p-6"
+            >
               <slot name="footer" />
             </footer>
           </div>

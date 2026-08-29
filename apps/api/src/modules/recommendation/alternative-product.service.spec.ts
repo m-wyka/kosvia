@@ -74,7 +74,11 @@ describe('AlternativeProductService', () => {
     const subject = row({ id: 'subject', ingredientIds: ['a', 'b', 'c', 'd'] });
     const service = new AlternativeProductService(
       prismaWith(subject, [
-        row({ id: 'same-formula', name: 'Completely Different Name', ingredientIds: ['a', 'b', 'c', 'd'] }),
+        row({
+          id: 'same-formula',
+          name: 'Completely Different Name',
+          ingredientIds: ['a', 'b', 'c', 'd'],
+        }),
         row({ id: 'shared-name', name: 'Product subject', ingredientIds: ['w', 'x', 'y', 'z'] }),
       ]),
       match,

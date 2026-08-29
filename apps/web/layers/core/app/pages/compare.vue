@@ -1,38 +1,31 @@
 <script setup lang="ts">
 import type { ComparisonResultDto } from '@kosvia/shared';
 
+const MIN_PRODUCTS_TO_COMPARE = 2;
+const MONEY_ROW_KEYS = ['price', 'price-per-100'];
+
 const route = useRoute();
 const router = useRouter();
-const compare = useCompareStore();
+const { items: trayItems, count: trayCount } = storeToRefs(useCompareStore());
+const { hydrate, remove: removeFromTray } = useCompareStore();
 const { t } = useI18n();
 const format = useFormat();
 const localise = useLocalisedText();
 
-onMounted(() => {
-  compare.hydrate();
-  // Land here from a shared link with nothing in the tray? Seed it from the URL.
-  if (!route.query.products && compare.items.length >= 2) {
-    router.replace({ query: { products: compare.items.map((item) => item.slug).join(',') } });
-  }
-});
-
-const slugs = computed(() => String(route.query.products ?? '').split(',').filter(Boolean));
+const slugs = computed(() =>
+  String(route.query.products ?? '')
+    .split(',')
+    .filter(Boolean),
+);
 
 const { data, pending, error, refresh } = await useApiFetch<ComparisonResultDto>(
   () => `/compare?products=${slugs.value.join(',')}`,
   {
     key: 'comparison',
     watch: [slugs],
-    immediate: slugs.value.length >= 2,
+    immediate: slugs.value.length >= MIN_PRODUCTS_TO_COMPARE,
   },
 );
-
-function removeProduct(slug: string) {
-  const next = slugs.value.filter((entry) => entry !== slug);
-  const removed = compare.items.find((item) => item.slug === slug);
-  if (removed) {compare.remove(removed.id);}
-  router.replace({ query: next.length ? { products: next.join(',') } : {} });
-}
 
 const winnerIndex = computed(() =>
   data.value?.verdict
@@ -40,18 +33,46 @@ const winnerIndex = computed(() =>
     : -1,
 );
 
-function formatCell(key: string, value: string | number | null): string {
-  if (value === null) {return t('COMMON.NOT_AVAILABLE');}
-  if (typeof value !== 'number') {return value;}
-  if (key === 'price' || key === 'price-per-100') {return format.price(value);}
-  if (key === 'match') {return `${value}%`;}
-  return String(value);
-}
+const removeProduct = (slug: string) => {
+  const remainingSlugs = slugs.value.filter((entry) => entry !== slug);
+  const removed = trayItems.value.find((item) => item.slug === slug);
+  if (removed) {
+    removeFromTray(removed.id);
+  }
+  router.replace({ query: remainingSlugs.length ? { products: remainingSlugs.join(',') } : {} });
+};
 
-/** Row labels come from the locale file, keyed on the API's row key. */
-function rowLabel(key: string): string {
+const formatCell = (key: string, value: string | number | null): string => {
+  if (value === null) {
+    return t('COMMON.NOT_AVAILABLE');
+  }
+  if (typeof value !== 'number') {
+    return value;
+  }
+  if (MONEY_ROW_KEYS.includes(key)) {
+    return format.price(value);
+  }
+  if (key === 'match') {
+    return `${value}%`;
+  }
+  return String(value);
+};
+
+const rowLabel = (key: string): string => {
   return t(`COMPARE.ROW.${key.replace(/-/g, '_').toUpperCase()}`);
-}
+};
+
+const seedQueryFromTray = () => {
+  if (route.query.products || trayItems.value.length < MIN_PRODUCTS_TO_COMPARE) {
+    return;
+  }
+  router.replace({ query: { products: trayItems.value.map((item) => item.slug).join(',') } });
+};
+
+onMounted(() => {
+  hydrate();
+  seedQueryFromTray();
+});
 
 useSeo(() => ({
   title: t('SEO.COMPARE.TITLE'),
@@ -74,7 +95,7 @@ useSeo(() => ({
       :description="$t('COMPARE.EMPTY_BODY')"
     >
       <BaseButton to="/products">{{ $t('COMPARE.BROWSE') }}</BaseButton>
-      <BaseButton v-if="compare.count === 1" variant="secondary" to="/discover">
+      <BaseButton v-if="trayCount === 1" variant="secondary" to="/discover">
         {{ $t('COMPARE.FIND_ONE_MORE') }}
       </BaseButton>
     </BaseEmptyState>
@@ -87,10 +108,11 @@ useSeo(() => ({
     </div>
 
     <template v-else-if="data">
-      <!-- Verdict first: it is the answer people came for. -->
       <BaseCard v-if="data.verdict" class="mb-8 border-ink/15 bg-surface">
         <div class="flex flex-wrap items-start gap-5">
-          <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-ink text-ink-inverse">
+          <span
+            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-ink text-ink-inverse"
+          >
             <BaseIcon name="sparkles" :size="20" />
           </span>
           <div class="min-w-0 flex-1">
@@ -112,11 +134,12 @@ useSeo(() => ({
             v-if="winnerIndex >= 0"
             :to="`/products/${data.products[winnerIndex]!.slug}`"
             class="shrink-0"
-          >{{ $t('COMPARE.VIEW_PRODUCT') }}</BaseButton>
+          >
+            {{ $t('COMPARE.VIEW_PRODUCT') }}
+          </BaseButton>
         </div>
       </BaseCard>
 
-      <!-- Table on desktop; stacked cards on mobile, where a table cannot work. -->
       <div class="hide-scrollbar -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
         <table class="w-full min-w-[42rem] border-separate border-spacing-0">
           <caption class="sr-only">{{ $t('COMPARE.CAPTION') }}</caption>
@@ -171,11 +194,7 @@ useSeo(() => ({
                 v-for="(value, index) in row.values"
                 :key="index"
                 class="px-3 py-3 text-center text-sm"
-                :class="
-                  row.bestIndex === index
-                    ? 'font-semibold text-ink'
-                    : 'text-ink-soft'
-                "
+                :class="row.bestIndex === index ? 'font-semibold text-ink' : 'text-ink-soft'"
               >
                 <span class="inline-flex items-center gap-1.5">
                   <BaseIcon

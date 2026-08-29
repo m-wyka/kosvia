@@ -8,14 +8,21 @@ const format = useFormat();
 
 <template>
   <section class="relative overflow-hidden">
-    <!-- Soft, low-contrast field rather than a loud gradient. -->
     <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute -top-32 -left-24 size-[34rem] rounded-full bg-blush-soft blur-3xl opacity-70" />
-      <div class="absolute -top-16 right-0 size-[28rem] rounded-full bg-lavender-soft blur-3xl opacity-60" />
-      <div class="absolute top-64 left-1/3 size-[24rem] rounded-full bg-sage-soft blur-3xl opacity-50" />
+      <div
+        class="absolute -top-32 -left-24 size-[34rem] rounded-full bg-blush-soft blur-3xl opacity-70"
+      />
+      <div
+        class="absolute -top-16 right-0 size-[28rem] rounded-full bg-lavender-soft blur-3xl opacity-60"
+      />
+      <div
+        class="absolute top-64 left-1/3 size-[24rem] rounded-full bg-sage-soft blur-3xl opacity-50"
+      />
     </div>
 
-    <div class="container-page grid items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24">
+    <div
+      class="container-page grid items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24"
+    >
       <div class="animate-fade-up max-w-xl">
         <BaseBadge tone="blush">
           <template #icon><BaseIcon name="sparkles" :size="12" /></template>
@@ -54,9 +61,10 @@ const format = useFormat();
         </dl>
       </div>
 
-      <!-- A real product card, scored, rather than an illustration of one. -->
       <div class="relative mx-auto w-full max-w-sm lg:max-w-none">
-        <div class="animate-fade-up relative rounded-2xl border border-line bg-surface p-5 shadow-lg">
+        <div
+          class="animate-fade-up relative rounded-2xl border border-line bg-surface p-5 shadow-lg"
+        >
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
               <p class="text-2xs font-medium tracking-wide text-ink-muted uppercase">
@@ -67,7 +75,15 @@ const format = useFormat();
               </p>
             </div>
             <MatchScore
-              :match="featured?.personalMatch ?? { score: 92, tier: 'perfect', reasons: [], warnings: [], personalised: true }"
+              :match="
+                featured?.personalMatch ?? {
+                  score: 92,
+                  tier: 'perfect',
+                  reasons: [],
+                  warnings: [],
+                  personalised: true,
+                }
+              "
               size="md"
               animate
               :show-label="false"
@@ -76,7 +92,9 @@ const format = useFormat();
 
           <ProductImage
             :src="featured?.imageUrl ?? '/img/product/kalme-ceramide-barrier-cream.svg'"
-            :alt="featured ? `${featured.brand.name} ${featured.name}` : $t('LANDING.HERO_CARD_ALT')"
+            :alt="
+              featured ? `${featured.brand.name} ${featured.name}` : $t('LANDING.HERO_CARD_ALT')
+            "
             ratio="square"
             eager
             class="mt-4"
@@ -108,8 +126,6 @@ const format = useFormat();
           </div>
         </div>
 
-        <!-- Anchored to the image band. Pinned to the card's bottom edge it sat
-             on top of the price, which is the one number that must stay legible. -->
         <div
           class="absolute top-[38%] -left-6 hidden rounded-xl border border-line bg-surface px-4 py-3 shadow-lg sm:block"
         >

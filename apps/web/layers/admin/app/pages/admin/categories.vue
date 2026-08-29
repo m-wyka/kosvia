@@ -15,13 +15,38 @@ interface CategoryRow {
 }
 
 const ROUTINE_STEPS = [
-  'CLEANSER', 'TONER', 'EXFOLIANT', 'SERUM', 'EYE', 'MOISTURIZER',
-  'SPF', 'MASK', 'TREATMENT', 'BODY', 'HAIR', 'MAKEUP', 'OTHER',
+  'CLEANSER',
+  'TONER',
+  'EXFOLIANT',
+  'SERUM',
+  'EYE',
+  'MOISTURIZER',
+  'SPF',
+  'MASK',
+  'TREATMENT',
+  'BODY',
+  'HAIR',
+  'MAKEUP',
+  'OTHER',
 ];
 
-const resource = useAdminResource<CategoryRow>('/admin/categories', { paginated: false });
+const EMPTY_FORM = {
+  name: '',
+  slug: '',
+  description: '',
+  parentId: '',
+  routineStep: 'OTHER',
+  sortOrder: 0,
+};
+
+const { rows, total, pending, error, saving, refresh, create, update, remove } =
+  useAdminResource<CategoryRow>('/admin/categories', { paginated: false });
 const { t } = useI18n();
 const vocab = useVocabulary();
+
+const modalOpen = ref(false);
+const editing = ref<CategoryRow | null>(null);
+const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
   { key: 'name', label: t('ADMIN.CATEGORIES.COL_NAME') },
@@ -35,35 +60,24 @@ const routineStepOptions = computed(() =>
   ROUTINE_STEPS.map((value) => ({ value, label: vocab.routineStep(value) })),
 );
 
+const parentOptions = computed(() =>
+  rows.value
+    .filter((row) => row.id !== editing.value?.id)
+    .map((row) => ({ value: row.id, label: row.name })),
+);
+
 const parentSelectOptions = computed(() => [
   { value: '', label: t('ADMIN.CATEGORIES.PARENT_NONE') },
   ...parentOptions.value,
 ]);
 
-const modalOpen = ref(false);
-const editing = ref<CategoryRow | null>(null);
-const form = reactive({
-  name: '',
-  slug: '',
-  description: '',
-  parentId: '',
-  routineStep: 'OTHER',
-  sortOrder: 0,
-});
-
-const parentOptions = computed(() =>
-  resource.rows.value
-    .filter((row) => row.id !== editing.value?.id)
-    .map((row) => ({ value: row.id, label: row.name })),
-);
-
-function openCreate() {
+const openCreate = () => {
   editing.value = null;
-  Object.assign(form, { name: '', slug: '', description: '', parentId: '', routineStep: 'OTHER', sortOrder: 0 });
+  Object.assign(form, EMPTY_FORM);
   modalOpen.value = true;
-}
+};
 
-function openEdit(category: CategoryRow) {
+const openEdit = (category: CategoryRow) => {
   editing.value = category;
   Object.assign(form, {
     name: category.name,
@@ -74,9 +88,9 @@ function openEdit(category: CategoryRow) {
     sortOrder: category.sortOrder,
   });
   modalOpen.value = true;
-}
+};
 
-async function save() {
+const save = async () => {
   const body = {
     name: form.name,
     slug: form.slug || undefined,
@@ -86,10 +100,12 @@ async function save() {
     sortOrder: Number(form.sortOrder) || 0,
   };
   const result = editing.value
-    ? await resource.update(editing.value.id, body, t('ADMIN.CATEGORIES.SAVED'))
-    : await resource.create(body, t('ADMIN.CATEGORIES.CREATED'));
-  if (result) {modalOpen.value = false;}
-}
+    ? await update(editing.value.id, body, t('ADMIN.CATEGORIES.SAVED'))
+    : await create(body, t('ADMIN.CATEGORIES.CREATED'));
+  if (result) {
+    modalOpen.value = false;
+  }
+};
 
 useSeo(() => ({
   title: t('SEO.ADMIN.CATEGORIES'),
@@ -102,7 +118,7 @@ useSeo(() => ({
   <div>
     <AdminPageHeader
       :title="$t('ADMIN.CATEGORIES.TITLE')"
-      :count="resource.total.value"
+      :count="total"
       :description="$t('ADMIN.CATEGORIES.SUBTITLE')"
     >
       <template #actions>
@@ -113,13 +129,13 @@ useSeo(() => ({
       </template>
     </AdminPageHeader>
 
-    <BaseErrorState v-if="resource.error.value" @retry="resource.refresh()" />
+    <BaseErrorState v-if="error" @retry="refresh()" />
 
     <AdminTable
       v-else
       :columns="columns"
-      :rows="resource.rows.value"
-      :loading="resource.pending.value"
+      :rows="rows"
+      :loading="pending"
       :empty-title="$t('ADMIN.CATEGORIES.EMPTY')"
     >
       <template #cell-name="{ row }">
@@ -131,7 +147,9 @@ useSeo(() => ({
       </template>
       <template #cell-parent="{ row }">
         <span class="text-sm text-ink-muted">
-          {{ row.parent ? vocab.category(row.parent.id, row.parent.name) : $t('COMMON.NOT_AVAILABLE') }}
+          {{
+            row.parent ? vocab.category(row.parent.id, row.parent.name) : $t('COMMON.NOT_AVAILABLE')
+          }}
         </span>
       </template>
       <template #cell-routineStep="{ row }">
@@ -154,7 +172,7 @@ useSeo(() => ({
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-critical"
             :aria-label="$t('COMMON.DELETE')"
-            @click="resource.remove(row.id, t('ADMIN.CATEGORIES.DELETED'))"
+            @click="remove(row.id, t('ADMIN.CATEGORIES.DELETED'))"
           >
             <BaseIcon name="trash" :size="15" />
           </button>
@@ -190,11 +208,17 @@ useSeo(() => ({
           :hint="$t('ADMIN.CATEGORIES.STEP_HINT')"
         />
 
-        <BaseInput v-model="form.sortOrder" :label="$t('ADMIN.CATEGORIES.SORT_ORDER')" type="number" />
+        <BaseInput
+          v-model="form.sortOrder"
+          :label="$t('ADMIN.CATEGORIES.SORT_ORDER')"
+          type="number"
+        />
       </div>
       <template #footer>
-        <BaseButton variant="ghost" @click="modalOpen = false">{{ $t('COMMON.CANCEL') }}</BaseButton>
-        <BaseButton :loading="resource.saving.value" :disabled="!form.name" @click="save">
+        <BaseButton variant="ghost" @click="modalOpen = false">
+          {{ $t('COMMON.CANCEL') }}
+        </BaseButton>
+        <BaseButton :loading="saving" :disabled="!form.name" @click="save">
           {{ editing ? $t('ADMIN.BRANDS.SAVE_CHANGES') : $t('ADMIN.CATEGORIES.CREATE') }}
         </BaseButton>
       </template>
