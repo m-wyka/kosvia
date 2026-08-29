@@ -148,7 +148,8 @@ npm run test -w @kosvia/web        # i18n check + vitest
 
 ## Specyfikacja
 
-Kontekst projektu: `docs/spec/`. `AUDIT.md` zawiera stan faktyczny i korekty
-do plików 00–07 (sekcja 5) — czytaj go przed plikami numerowanymi.
+Kontekst projektu: `docs/spec/`. Kolejność czytania: **`STATUS.md`** (co jest zrobione,
+decyzje, co otwarte) → `AUDIT.md` (stan faktyczny i korekty do 00–07, sekcja 5) → pliki
+numerowane. Sekcje 3 i 6 audytu są wykonane — nie planuj ich ponownie.
 
 Zmiana we frontendzie jest skończona dopiero, gdy lint, typecheck i testy przechodzą, a `npm run format:check` nie zgłasza plików.
