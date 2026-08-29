@@ -6,3 +6,5 @@ package-lock.json
 *.tsbuildinfo
 apps/api/prisma/migrations
 .claude
+apps/api/src/common/i18n/phrases.generated.ts
+docs/spec

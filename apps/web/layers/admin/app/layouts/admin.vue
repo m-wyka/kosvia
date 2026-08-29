@@ -30,7 +30,10 @@ const sections = [
   },
   {
     title: 'ADMIN.NAV.PEOPLE',
-    links: [{ to: '/admin/users', label: 'ADMIN.NAV.USERS', icon: 'user' as const }],
+    links: [
+      { to: '/admin/users', label: 'ADMIN.NAV.USERS', icon: 'user' as const },
+      { to: '/admin/audit', label: 'ADMIN.NAV.AUDIT', icon: 'shield' as const },
+    ],
   },
 ];
 

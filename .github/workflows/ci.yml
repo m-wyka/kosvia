@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Format, lint, typecheck, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+
+  database:
+    name: Migrations and seed against Postgres
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: kosvia
+          POSTGRES_PASSWORD: kosvia
+          POSTGRES_DB: kosvia
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kosvia -d kosvia"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://kosvia:kosvia@localhost:5432/kosvia?schema=public
+      JWT_SECRET: ci-access-secret
+      JWT_REFRESH_SECRET: ci-refresh-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Apply every migration from scratch
+        run: npm run db:deploy -w @kosvia/api
+      - name: Migration history is consistent
+        run: npx prisma migrate status
+        working-directory: apps/api
+      - name: Seed demo data (exercises traits, aliases, consents)
+        run: npm run db:seed -w @kosvia/api
+      - name: Purge sweep runs cleanly
+        run: npm run account:purge -w @kosvia/api

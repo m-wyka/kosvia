@@ -580,6 +580,18 @@ export interface ImportRunDto {
   finishedAt: string | null;
 }
 
+export interface AuditLogDto {
+  id: string;
+  actorId: string | null;
+  actorEmail: string | null;
+  /** `entity.action`, e.g. `products.update`, `inci.map`. */
+  action: string;
+  entity: string;
+  entityId: string | null;
+  diff: Record<string, unknown> | null;
+  createdAt: string;
+}
+
 export interface TokenResolutionDto {
   token: UnmatchedTokenDto;
   rematchedRows: number;

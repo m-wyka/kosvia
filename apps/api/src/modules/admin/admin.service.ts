@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { slugify } from '@kosvia/shared';
-import type { AdminStatsDto, PaginatedResult } from '@kosvia/shared';
+import type { AdminStatsDto, AuditLogDto, PaginatedResult } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
@@ -67,6 +67,45 @@ export class AdminService {
       offers,
       shelfItems,
       conversations,
+    };
+  }
+
+  /* ---------------------------------------------------------------- audit -- */
+
+  async listAudit(query: AdminListQueryDto): Promise<PaginatedResult<AuditLogDto>> {
+    const where: Prisma.AuditLogWhereInput = query.q
+      ? {
+          OR: [
+            { action: { contains: query.q, mode: 'insensitive' } },
+            { entityId: { contains: query.q } },
+            { actorId: { contains: query.q } },
+          ],
+        }
+      : {};
+    const page = await this.paginate(
+      query,
+      () => this.prisma.auditLog.count({ where }),
+      (skip, take) =>
+        this.prisma.auditLog.findMany({ where, skip, take, orderBy: { createdAt: 'desc' } }),
+    );
+    const actorIds = [...new Set(page.items.flatMap((row) => (row.actorId ? [row.actorId] : [])))];
+    const actors = await this.prisma.user.findMany({
+      where: { id: { in: actorIds } },
+      select: { id: true, email: true },
+    });
+    const emailById = new Map(actors.map((actor) => [actor.id, actor.email]));
+    return {
+      ...page,
+      items: page.items.map((row) => ({
+        id: row.id,
+        actorId: row.actorId,
+        actorEmail: row.actorId ? (emailById.get(row.actorId) ?? null) : null,
+        action: row.action,
+        entity: row.entity,
+        entityId: row.entityId,
+        diff: (row.diff as Record<string, unknown> | null) ?? null,
+        createdAt: row.createdAt.toISOString(),
+      })),
     };
   }
 

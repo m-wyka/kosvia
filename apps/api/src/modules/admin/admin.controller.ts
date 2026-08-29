@@ -11,9 +11,10 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AdminStatsDto, ImportRunDto } from '@kosvia/shared';
+import type { AdminStatsDto, AuditLogDto, ImportRunDto, PaginatedResult } from '@kosvia/shared';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import {
@@ -21,6 +22,7 @@ import {
   type AuthenticatedUser,
 } from '../../common/decorators/current-user.decorator';
 import { AdminService } from './admin.service';
+import { AdminAuditInterceptor } from './admin-audit.interceptor';
 import { InciImportService } from '../inci/inci-import.service';
 import { UnmatchedTokenService } from '../inci/unmatched-token.service';
 import { ImportRunService } from '../import/import-run.service';
@@ -43,6 +45,7 @@ import {
 @Controller('admin')
 @UseGuards(RolesGuard)
 @Roles('ADMIN')
+@UseInterceptors(AdminAuditInterceptor)
 export class AdminController {
   constructor(
     private readonly admin: AdminService,
@@ -50,6 +53,13 @@ export class AdminController {
     private readonly unmatchedTokens: UnmatchedTokenService,
     private readonly importRuns: ImportRunService,
   ) {}
+
+  /* ---------------------------------------------------------------- audit -- */
+  @Get('audit')
+  @ApiOperation({ summary: 'Who changed what in the admin panel, newest first' })
+  listAudit(@Query() query: AdminListQueryDto): Promise<PaginatedResult<AuditLogDto>> {
+    return this.admin.listAudit(query);
+  }
 
   /* -------------------------------------------------------------- imports -- */
   @Get('import/runs')

@@ -952,6 +952,8 @@
       "INCI_QUEUE_DESCRIPTION": "Rozstrzygaj niedopasowane tokeny z etykiet.",
       "IMPORTS": "Importy · Admin",
       "IMPORTS_DESCRIPTION": "Historia importów wsadowych.",
+      "AUDIT": "Dziennik zmian · Admin",
+      "AUDIT_DESCRIPTION": "Historia zmian w panelu.",
       "STORES": "Sklepy · Admin",
       "STORES_DESCRIPTION": "Zarządzaj sklepami demonstracyjnymi.",
       "OFFERS": "Oferty · Admin",
@@ -974,6 +976,7 @@
       "INGREDIENTS": "Składniki",
       "INCI_QUEUE": "Kolejka INCI",
       "IMPORTS": "Importy",
+      "AUDIT": "Dziennik zmian",
       "STORES": "Sklepy",
       "OFFERS": "Oferty",
       "USERS": "Użytkownicy",
@@ -1132,6 +1135,18 @@
       "STATUS_FAILED": "Nieudany",
       "STATUS_INTERRUPTED": "Przerwany",
       "ERRORS": "{count} błędów — ostatni: {last}"
+    },
+    "AUDIT": {
+      "TITLE": "Dziennik zmian",
+      "SUBTITLE": "Każda zmiana z panelu administratora — kto, co, kiedy i jakie żądanie ją wykonało.",
+      "EMPTY": "Brak zapisanych zmian",
+      "SEARCH_PLACEHOLDER": "Szukaj po akcji, id autora lub id obiektu…",
+      "COL_WHEN": "Kiedy",
+      "COL_WHO": "Kto",
+      "COL_ACTION": "Akcja",
+      "COL_TARGET": "Obiekt",
+      "COL_DIFF": "Żądanie",
+      "SYSTEM": "system"
     },
     "PRODUCTS": {
       "TITLE": "Produkty",

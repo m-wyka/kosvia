@@ -53,6 +53,7 @@ describe('locale files', () => {
       'ADMIN.IMPORTS.COL_STATUS',
       'ABOUT_DATA.OBF_TITLE',
       'SEARCH.FILTER.WITH_COUNT',
+      'ADMIN.AUDIT.SYSTEM',
       'COMPARE.ROW.CRUELTY_FREE',
       'PROFILE.PREMIUM',
       'SCAN.PLACEHOLDER',

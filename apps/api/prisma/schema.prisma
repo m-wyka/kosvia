@@ -593,6 +593,23 @@ enum ImportRunStatus {
   INTERRUPTED
 }
 
+/// Who changed what in the admin panel. Written by AdminAuditInterceptor
+/// for every mutating admin request; the diff is the validated request body.
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  diff      Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
 /// One row per search, no viewer identity: tells us which queries return
 /// nothing and which brands people look for that we do not stock yet.
 model SearchLog {

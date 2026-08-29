@@ -881,6 +881,7 @@
       "INGREDIENTS": "Ingredients",
       "INCI_QUEUE": "INCI queue",
       "IMPORTS": "Imports",
+      "AUDIT": "Audit log",
       "STORES": "Stores",
       "OFFERS": "Offers",
       "USERS": "Users",
@@ -1039,6 +1040,18 @@
       "STATUS_FAILED": "Failed",
       "STATUS_INTERRUPTED": "Interrupted",
       "ERRORS": "{count} errors — last: {last}"
+    },
+    "AUDIT": {
+      "TITLE": "Audit log",
+      "SUBTITLE": "Every change made through the admin panel — who, what, when, and the request that did it.",
+      "EMPTY": "No changes recorded yet",
+      "SEARCH_PLACEHOLDER": "Search by action, actor id or target id…",
+      "COL_WHEN": "When",
+      "COL_WHO": "Who",
+      "COL_ACTION": "Action",
+      "COL_TARGET": "Target",
+      "COL_DIFF": "Request",
+      "SYSTEM": "system"
     },
     "PRODUCTS": {
       "TITLE": "Products",
@@ -1245,6 +1258,8 @@
       "INCI_QUEUE_DESCRIPTION": "Resolve unmatched label tokens.",
       "IMPORTS": "Imports · Admin",
       "IMPORTS_DESCRIPTION": "Batch import history.",
+      "AUDIT": "Audit log · Admin",
+      "AUDIT_DESCRIPTION": "Admin change history.",
       "STORES": "Stores · Admin",
       "STORES_DESCRIPTION": "Manage demo retailers.",
       "OFFERS": "Offers · Admin",
