@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     { path: './components/product', pathPrefix: false },
     { path: './components/layout', pathPrefix: false },
     { path: './components/ai', pathPrefix: false },
+    { path: './components/account', prefix: 'Account' },
     { path: './components', pathPrefix: false },
   ],
 });

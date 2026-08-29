@@ -21,7 +21,7 @@ useSeo(() => ({
 
 <template>
   <div class="container-page py-12">
-    <article class="mx-auto max-w-2xl">
+    <article>
       <h1 class="font-display text-3xl text-ink sm:text-4xl">
         {{ $t('PRIVACY.TITLE') }}
       </h1>
