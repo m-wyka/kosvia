@@ -554,6 +554,7 @@
     "MATCH": "{score}% dopasowania",
     "MATCH_ARIA": "Dopasowanie osobiste {score} procent — {tier}",
     "FORMULA_SCORE": "Ocena składu",
+    "MATCH_BELOW_THRESHOLD": "<50",
     "COMPLETE_PROFILE": "Uzupełnij profil, aby zobaczyć wynik osobisty",
     "PRICE_UNAVAILABLE": "Cena niedostępna",
     "AT": "w {store}",
@@ -954,6 +955,8 @@
       "IMPORTS_DESCRIPTION": "Historia importów wsadowych.",
       "AUDIT": "Dziennik zmian · Admin",
       "AUDIT_DESCRIPTION": "Historia zmian w panelu.",
+      "MATCH_WEIGHTS": "Wagi dopasowania · Admin",
+      "MATCH_WEIGHTS_DESCRIPTION": "Stroj Personal Match bez wdrożenia.",
       "STORES": "Sklepy · Admin",
       "STORES_DESCRIPTION": "Zarządzaj sklepami demonstracyjnymi.",
       "OFFERS": "Oferty · Admin",
@@ -977,6 +980,7 @@
       "INCI_QUEUE": "Kolejka INCI",
       "IMPORTS": "Importy",
       "AUDIT": "Dziennik zmian",
+      "MATCH_WEIGHTS": "Wagi dopasowania",
       "STORES": "Sklepy",
       "OFFERS": "Oferty",
       "USERS": "Użytkownicy",
@@ -1147,6 +1151,20 @@
       "COL_TARGET": "Obiekt",
       "COL_DIFF": "Żądanie",
       "SYSTEM": "system"
+    },
+    "MATCH_WEIGHTS": {
+      "TITLE": "Wagi Personal Match",
+      "SUBTITLE": "Ile punktów każda grupa sygnałów może dodać lub odjąć. Zapis nowej wersji niczego nie przelicza — wyniki liczone są przy odczycie, więc zmiana działa od razu.",
+      "ACTIVE": "Aktywne",
+      "VERSION": "v{version}",
+      "NOTE": "Notatka",
+      "NOTE_PLACEHOLDER": "Dlaczego ta zmiana, np. „budżet miał za dużą wagę dla użytkowników premium”",
+      "SAVE_ACTIVATE": "Zapisz i aktywuj",
+      "SAVE_DRAFT": "Zapisz jako szkic",
+      "ACTIVATE": "Aktywuj",
+      "SAVED": "Zestaw wag zapisany",
+      "ACTIVATED": "Zestaw wag v{version} jest teraz aktywny",
+      "DEFAULTS": "Wbudowane domyślne"
     },
     "PRODUCTS": {
       "TITLE": "Produkty",
@@ -1365,5 +1383,17 @@
     "MEDICAL_TITLE": "To nie jest usługa medyczna",
     "MEDICAL_BODY": "Kosvia dostarcza informacji o produktach kosmetycznych i ich składnikach. Nie jest wyrobem ani usługą medyczną, nie diagnozuje ani nie leczy chorób skóry i nie zastępuje konsultacji z dermatologiem. Odpowiedzi AI są sprawdzane pod kątem stwierdzeń medycznych, zanim je zobaczysz.",
     "VERSION": "Wersja z {date}."
+  },
+  "MATCH_GROUP": {
+    "SKIN_TYPE": "Typ cery",
+    "CONCERNS": "Problemy",
+    "GOALS": "Cele",
+    "INGREDIENT_QUALITY": "Jakość formuły",
+    "FRAGRANCE": "Zapach",
+    "SENSITIVITY": "Wrażliwość",
+    "BUDGET": "Budżet",
+    "ETHICS": "Wegańskie / cruelty-free",
+    "BRAND_PREFERENCE": "Lubiane marki",
+    "SHELF_CONTEXT": "Twoja półka"
   }
 }

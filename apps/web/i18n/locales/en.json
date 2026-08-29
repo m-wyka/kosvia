@@ -554,6 +554,7 @@
     "MATCH": "{score}% match",
     "MATCH_ARIA": "Personal match {score} percent — {tier}",
     "FORMULA_SCORE": "Formula score",
+    "MATCH_BELOW_THRESHOLD": "<50",
     "COMPLETE_PROFILE": "Complete your profile for a personal score",
     "PRICE_UNAVAILABLE": "Price unavailable",
     "AT": "at {store}",
@@ -882,6 +883,7 @@
       "INCI_QUEUE": "INCI queue",
       "IMPORTS": "Imports",
       "AUDIT": "Audit log",
+      "MATCH_WEIGHTS": "Match weights",
       "STORES": "Stores",
       "OFFERS": "Offers",
       "USERS": "Users",
@@ -1052,6 +1054,20 @@
       "COL_TARGET": "Target",
       "COL_DIFF": "Request",
       "SYSTEM": "system"
+    },
+    "MATCH_WEIGHTS": {
+      "TITLE": "Personal Match weights",
+      "SUBTITLE": "How many points each signal group may add or take away. Saving a new version recomputes nothing — scores are computed on read, so the change is live immediately.",
+      "ACTIVE": "Active",
+      "VERSION": "v{version}",
+      "NOTE": "Note",
+      "NOTE_PLACEHOLDER": "Why this change, e.g. “budget was overweighted for premium users”",
+      "SAVE_ACTIVATE": "Save and activate",
+      "SAVE_DRAFT": "Save as draft",
+      "ACTIVATE": "Activate",
+      "SAVED": "Weight set saved",
+      "ACTIVATED": "Weight set v{version} is now active",
+      "DEFAULTS": "Built-in defaults"
     },
     "PRODUCTS": {
       "TITLE": "Products",
@@ -1260,6 +1276,8 @@
       "IMPORTS_DESCRIPTION": "Batch import history.",
       "AUDIT": "Audit log · Admin",
       "AUDIT_DESCRIPTION": "Admin change history.",
+      "MATCH_WEIGHTS": "Match weights · Admin",
+      "MATCH_WEIGHTS_DESCRIPTION": "Tune Personal Match without a deploy.",
       "STORES": "Stores · Admin",
       "STORES_DESCRIPTION": "Manage demo retailers.",
       "OFFERS": "Offers · Admin",
@@ -1365,5 +1383,17 @@
     "MEDICAL_TITLE": "Not a medical service",
     "MEDICAL_BODY": "Kosvia provides information about cosmetic products and their ingredients. It is not a medical device or service, does not diagnose or treat skin conditions, and does not replace a consultation with a dermatologist. AI answers are checked for medical claims before they are shown.",
     "VERSION": "Version of {date}."
+  },
+  "MATCH_GROUP": {
+    "SKIN_TYPE": "Skin type",
+    "CONCERNS": "Concerns",
+    "GOALS": "Goals",
+    "INGREDIENT_QUALITY": "Formula quality",
+    "FRAGRANCE": "Fragrance",
+    "SENSITIVITY": "Sensitivity",
+    "BUDGET": "Budget",
+    "ETHICS": "Vegan / cruelty-free",
+    "BRAND_PREFERENCE": "Preferred brands",
+    "SHELF_CONTEXT": "Your shelf"
   }
 }

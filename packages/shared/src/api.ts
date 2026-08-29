@@ -7,6 +7,7 @@ import type {
   SensitivityLevel,
   SkinType,
   ConsentType,
+  MatchWeights,
   SubscriptionStatus,
   TokenStatus,
   UserRole,
@@ -578,6 +579,14 @@ export interface ImportRunDto {
   errors: string[];
   startedAt: string;
   finishedAt: string | null;
+}
+
+export interface MatchWeightSetDto {
+  version: number;
+  isActive: boolean;
+  weights: MatchWeights;
+  note: string | null;
+  createdAt: string;
 }
 
 export interface AuditLogDto {

@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import {
   BUDGET_CEILING,
+  DEFAULT_MATCH_WEIGHTS,
+  type MatchWeights,
   matchTier,
   type MatchReason,
   type MatchReasonParams,
@@ -13,6 +15,7 @@ import {
   type ScorableProfile,
   type ShelfSnapshot,
 } from './types';
+import { MatchWeightService } from './match-weight.service';
 
 /**
  * PersonalMatchService — the "how well does this fit ME?" number.
@@ -34,20 +37,6 @@ const BASELINE = 50;
  */
 const SCALE = 45;
 
-/** Maximum points each signal group may contribute, positive or negative. */
-const WEIGHTS = {
-  skinType: 14,
-  concerns: 18,
-  goals: 16,
-  ingredientQuality: 10,
-  fragrance: 12,
-  sensitivity: 18,
-  budget: 10,
-  ethics: 8,
-  brandPreference: 6,
-  shelfContext: 6,
-} as const;
-
 const SENSITIVITY_MULTIPLIER: Record<ScorableProfile['sensitivity'], number> = {
   HIGH: 1,
   MEDIUM: 0.55,
@@ -63,6 +52,13 @@ export interface MatchInput {
 
 @Injectable()
 export class PersonalMatchService {
+  constructor(@Optional() private readonly weightSets?: MatchWeightService) {}
+
+  /** The active weight set, or the built-in defaults when none is configured. */
+  get weights(): MatchWeights {
+    return this.weightSets?.current() ?? DEFAULT_MATCH_WEIGHTS;
+  }
+
   /**
    * Scores a single product. When there is no profile the result is still
    * useful — it falls back to formula quality — but `personalised` is false so
@@ -86,6 +82,7 @@ export class PersonalMatchService {
     // Raw contributions are collected first and compressed at the end, so the
     // reported breakdown always adds up to the score the user sees.
     const raw: MatchReason[] = [];
+    const WEIGHTS = this.weights;
 
     // `label` stays the canonical English sentence; `params` carries the raw
     // values so a client can render the same reason in its own language.

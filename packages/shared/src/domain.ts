@@ -151,6 +151,50 @@ export const BUDGET_OPTIONS: LabelledOption<BudgetTier>[] = [
   { value: 'NO_LIMIT', label: 'No limit' },
 ];
 
+/**
+ * How many points each signal group of Personal Match may contribute
+ * (04_PERSONAL_MATCH.md §3). Tuned outside the code: the active
+ * MatchWeightSet row overrides these defaults at runtime.
+ */
+export interface MatchWeights {
+  skinType: number;
+  concerns: number;
+  goals: number;
+  ingredientQuality: number;
+  fragrance: number;
+  sensitivity: number;
+  budget: number;
+  ethics: number;
+  brandPreference: number;
+  shelfContext: number;
+}
+
+export const MATCH_WEIGHT_KEYS = [
+  'skinType',
+  'concerns',
+  'goals',
+  'ingredientQuality',
+  'fragrance',
+  'sensitivity',
+  'budget',
+  'ethics',
+  'brandPreference',
+  'shelfContext',
+] as const satisfies ReadonlyArray<keyof MatchWeights>;
+
+export const DEFAULT_MATCH_WEIGHTS: MatchWeights = {
+  skinType: 14,
+  concerns: 18,
+  goals: 16,
+  ingredientQuality: 10,
+  fragrance: 12,
+  sensitivity: 18,
+  budget: 10,
+  ethics: 8,
+  brandPreference: 6,
+  shelfContext: 6,
+};
+
 /** Upper bound in PLN for a budget tier, or null when unbounded. */
 export const BUDGET_CEILING: Record<BudgetTier, number | null> = {
   UNDER_30: 30,

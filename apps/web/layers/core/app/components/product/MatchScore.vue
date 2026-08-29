@@ -30,7 +30,12 @@ const props = withDefaults(
 const { t } = useI18n();
 const vocab = useVocabulary();
 
+const LOWEST_SHOWN_SCORE = 50;
+
 const score = computed(() => props.match?.score ?? 0);
+const showsNumber = computed(
+  () => props.match?.personalised === false || score.value >= LOWEST_SHOWN_SCORE,
+);
 const displayed = ref(props.animate ? 0 : score.value);
 
 const dimension = computed(() => DIMENSIONS[props.size]);
@@ -118,8 +123,13 @@ watch(score, (nextScore) => {
         class="absolute inset-0 flex items-center justify-center font-semibold tabular-nums"
         :class="[dimension.text, tone.text]"
       >
-        {{ displayed }}
-        <span class="text-[0.6em] font-medium">%</span>
+        <template v-if="showsNumber">
+          {{ displayed }}
+          <span class="text-[0.6em] font-medium">%</span>
+        </template>
+        <span v-else class="text-[0.7em] font-medium">
+          {{ $t('PRODUCT.MATCH_BELOW_THRESHOLD') }}
+        </span>
       </span>
     </div>
 

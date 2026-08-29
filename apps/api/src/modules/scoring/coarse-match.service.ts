@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { BUDGET_CEILING } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { COARSE_WEIGHTS, SENSITIVITY_MULTIPLIER } from './coarse-match';
+import { coarseWeights, SENSITIVITY_MULTIPLIER, type CoarseWeights } from './coarse-match';
+import { MatchWeightService } from './match-weight.service';
 import type { ScorableProfile, ShelfSnapshot } from './types';
 
 /** How many candidates pass A hands to the exact scorer (04_PERSONAL_MATCH.md §2). */
@@ -29,7 +30,10 @@ export interface CoarseCandidate {
  */
 @Injectable()
 export class CoarseMatchService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly weightSets: MatchWeightService,
+  ) {}
 
   async topCandidates(
     productIds: string[],
@@ -70,6 +74,7 @@ export class CoarseMatchService {
   }
 
   private coarseExpression(profile: ScorableProfile, shelf?: ShelfSnapshot): Prisma.Sql {
+    const COARSE_WEIGHTS: CoarseWeights = coarseWeights(this.weightSets.current());
     const terms: Prisma.Sql[] = [];
 
     if (profile.skinType !== 'UNKNOWN') {

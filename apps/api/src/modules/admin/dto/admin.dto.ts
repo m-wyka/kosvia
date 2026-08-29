@@ -6,6 +6,7 @@ import {
   IsEnum,
   IsInt,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   Max,
@@ -93,6 +94,12 @@ export class UpsertProductDto {
   @ValidateNested({ each: true })
   @Type(() => ProductIngredientInputDto)
   ingredients?: ProductIngredientInputDto[];
+}
+
+export class CreateMatchWeightSetDto {
+  @IsObject() weights!: Record<string, number>;
+  @IsOptional() @IsString() @MaxLength(300) note?: string;
+  @IsOptional() @IsBoolean() activate?: boolean;
 }
 
 export class ImportLabelDto {

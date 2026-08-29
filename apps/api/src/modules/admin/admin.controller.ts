@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Put,
@@ -14,7 +15,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { AdminStatsDto, AuditLogDto, ImportRunDto, PaginatedResult } from '@kosvia/shared';
+import type {
+  AdminStatsDto,
+  AuditLogDto,
+  ImportRunDto,
+  MatchWeights,
+  PaginatedResult,
+} from '@kosvia/shared';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import {
@@ -26,8 +33,10 @@ import { AdminAuditInterceptor } from './admin-audit.interceptor';
 import { InciImportService } from '../inci/inci-import.service';
 import { UnmatchedTokenService } from '../inci/unmatched-token.service';
 import { ImportRunService } from '../import/import-run.service';
+import { MatchWeightService } from '../scoring/match-weight.service';
 import {
   AdminListQueryDto,
+  CreateMatchWeightSetDto,
   ImportLabelDto,
   MapTokenDto,
   UnmatchedTokenQueryDto,
@@ -52,7 +61,29 @@ export class AdminController {
     private readonly inciImport: InciImportService,
     private readonly unmatchedTokens: UnmatchedTokenService,
     private readonly importRuns: ImportRunService,
+    private readonly matchWeights: MatchWeightService,
   ) {}
+
+  /* -------------------------------------------------------- match weights -- */
+  @Get('match-weights')
+  @ApiOperation({ summary: 'Personal Match weight sets, newest first' })
+  listMatchWeights() {
+    return this.matchWeights.list();
+  }
+  @Post('match-weights')
+  @ApiOperation({ summary: 'Save a new weight set version, optionally activating it' })
+  createMatchWeights(@Body() dto: CreateMatchWeightSetDto) {
+    return this.matchWeights.create(
+      dto.weights as unknown as MatchWeights,
+      dto.note ?? null,
+      dto.activate ?? false,
+    );
+  }
+  @Post('match-weights/:version/activate')
+  @ApiOperation({ summary: 'Make a saved weight set the active one' })
+  activateMatchWeights(@Param('version', ParseIntPipe) version: number) {
+    return this.matchWeights.activate(version);
+  }
 
   /* ---------------------------------------------------------------- audit -- */
   @Get('audit')

@@ -593,6 +593,20 @@ enum ImportRunStatus {
   INTERRUPTED
 }
 
+/// Versioned Personal Match weights. Exactly one row is active; the scorer
+/// reads it at boot and after every admin change, so tuning needs no deploy.
+model MatchWeightSet {
+  id        String   @id @default(cuid())
+  version   Int      @unique
+  isActive  Boolean  @default(false)
+  weights   Json
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([isActive])
+  @@map("match_weight_sets")
+}
+
 /// Who changed what in the admin panel. Written by AdminAuditInterceptor
 /// for every mutating admin request; the diff is the validated request body.
 model AuditLog {

@@ -1,4 +1,4 @@
-import { BUDGET_CEILING } from '@kosvia/shared';
+import { BUDGET_CEILING, DEFAULT_MATCH_WEIGHTS, type MatchWeights } from '@kosvia/shared';
 import type { ScorableProfile, ShelfSnapshot } from './types';
 import type { ComputedTraits } from './product-traits';
 
@@ -16,29 +16,32 @@ import type { ComputedTraits } from './product-traits';
  * step (the E2E check compares them on the seeded catalogue).
  */
 
-/** Mirrors WEIGHTS in personal-match.service.ts. */
-export const COARSE_WEIGHTS = {
-  skinTypePositioned: 14 * 0.6,
-  skinTypeIngredients: 14 * 0.4,
-  concerns: 18,
-  concernsCoverageShare: 0.7,
-  concernsDepthShare: 0.3,
-  goals: 16,
-  goalsCoverageShare: 0.65,
-  goalsDepthShare: 0.35,
-  fragranceFreeRequired: 12 * 0.7,
-  fragranceFreePreferred: 12 * 0.55,
-  fragranceFreeBonus: 3,
-  sensitivityFriendlyMax: 18 * 0.6,
-  sensitivityFriendlyPerNet: 4,
-  sensitivityFriendlyThreshold: 0.8,
-  budgetFit: 10 * 0.7,
-  vegan: 8 * 0.5,
-  crueltyFree: 8 * 0.5,
-  brandPreferred: 6,
-  ingredientQualityPerPoint: 10 / 50,
-  shelfGap: 6 * 0.6,
-} as const;
+/** Mirrors the fractions PersonalMatchService applies to each group weight. */
+export const coarseWeights = (weights: MatchWeights) =>
+  ({
+    skinTypePositioned: weights.skinType * 0.6,
+    skinTypeIngredients: weights.skinType * 0.4,
+    concerns: weights.concerns,
+    concernsCoverageShare: 0.7,
+    concernsDepthShare: 0.3,
+    goals: weights.goals,
+    goalsCoverageShare: 0.65,
+    goalsDepthShare: 0.35,
+    fragranceFreeRequired: weights.fragrance * 0.7,
+    fragranceFreePreferred: weights.fragrance * 0.55,
+    fragranceFreeBonus: 3,
+    sensitivityFriendlyMax: weights.sensitivity * 0.6,
+    sensitivityFriendlyPerNet: 4,
+    sensitivityFriendlyThreshold: 0.8,
+    budgetFit: weights.budget * 0.7,
+    vegan: weights.ethics * 0.5,
+    crueltyFree: weights.ethics * 0.5,
+    brandPreferred: weights.brandPreference,
+    ingredientQualityPerPoint: weights.ingredientQuality / 50,
+    shelfGap: weights.shelfContext * 0.6,
+  }) as const;
+
+export type CoarseWeights = ReturnType<typeof coarseWeights>;
 
 export const SENSITIVITY_MULTIPLIER: Record<ScorableProfile['sensitivity'], number> = {
   HIGH: 1,
@@ -94,7 +97,9 @@ export const coarseDelta = (
   product: CoarseProduct,
   profile: ScorableProfile,
   shelf?: ShelfSnapshot,
+  weights: MatchWeights = DEFAULT_MATCH_WEIGHTS,
 ): number => {
+  const COARSE_WEIGHTS = coarseWeights(weights);
   const { traits } = product;
   let delta = 0;
 
