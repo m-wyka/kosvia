@@ -54,7 +54,10 @@ export interface ScorableProfile {
   goalSlugs: string[];
   preferredBrandIds: string[];
   excludedBrandIds: string[];
+  /** Avoided by preference — a penalty. */
   excludedIngredientIds: string[];
+  /** Declared allergies — a hard block; pass A never returns such products. */
+  allergenIngredientIds: string[];
 }
 
 /** What the user already owns, so we can flag redundancy. */

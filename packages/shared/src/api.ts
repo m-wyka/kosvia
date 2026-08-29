@@ -7,6 +7,7 @@ import type {
   SensitivityLevel,
   SkinType,
   ConsentType,
+  ExclusionReason,
   MatchWeights,
   SubscriptionStatus,
   TokenStatus,
@@ -129,8 +130,18 @@ export interface BeautyProfileDto {
   goals: TaxonomyItemDto[];
   preferredBrands: BrandSummaryDto[];
   excludedBrands: BrandSummaryDto[];
-  excludedIngredients: IngredientSummaryDto[];
+  excludedIngredients: ExcludedIngredientDto[];
   updatedAt: string;
+}
+
+/** ALLERGY hides the product outright; PREFERENCE only lowers its score. */
+export interface ExcludedIngredientDto extends IngredientSummaryDto {
+  reason: ExclusionReason;
+}
+
+export interface ExcludedIngredientInput {
+  ingredientId: string;
+  reason: ExclusionReason;
 }
 
 export interface UpdateBeautyProfilePayload {
@@ -144,7 +155,9 @@ export interface UpdateBeautyProfilePayload {
   goalSlugs?: string[];
   preferredBrandIds?: string[];
   excludedBrandIds?: string[];
+  /** Legacy shorthand — every id is stored as a PREFERENCE. */
   excludedIngredientIds?: string[];
+  excludedIngredients?: ExcludedIngredientInput[];
 }
 
 /* -------------------------------------------------------------------------- */

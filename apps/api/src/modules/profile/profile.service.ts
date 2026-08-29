@@ -1,14 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { BeautyProfileDto, TaxonomyItemDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import type { ExclusionReason } from '@prisma/client';
 import type { UpdateBeautyProfileDto } from './dto/update-profile.dto';
+
+/** Both request shapes end up as rows; the legacy id list means "preference". */
+const exclusionsFrom = (
+  dto: UpdateBeautyProfileDto,
+): Array<{ ingredientId: string; reason: ExclusionReason }> | undefined => {
+  if (dto.excludedIngredients) {
+    return dto.excludedIngredients.map(({ ingredientId, reason }) => ({ ingredientId, reason }));
+  }
+  if (dto.excludedIngredientIds) {
+    return dto.excludedIngredientIds.map((ingredientId) => ({
+      ingredientId,
+      reason: 'PREFERENCE' as const,
+    }));
+  }
+  return undefined;
+};
 
 const PROFILE_INCLUDE = {
   concerns: true,
   goals: true,
   preferredBrands: true,
   excludedBrands: true,
-  excludedIngredients: true,
+  excludedIngredients: { include: { ingredient: true } },
 } as const;
 
 type ProfileWithRelations = Awaited<
@@ -19,10 +36,8 @@ type ProfileWithRelations = Awaited<
   preferredBrands: Array<{ id: string; name: string; slug: string; logo: string | null }>;
   excludedBrands: Array<{ id: string; name: string; slug: string; logo: string | null }>;
   excludedIngredients: Array<{
-    id: string;
-    inciName: string;
-    commonName: string | null;
-    tags: string[];
+    reason: ExclusionReason;
+    ingredient: { id: string; inciName: string; commonName: string | null; tags: string[] };
   }>;
 };
 
@@ -65,7 +80,6 @@ export class ProfileService {
       goals: goalIds,
       preferredBrands: dto.preferredBrandIds,
       excludedBrands: dto.excludedBrandIds,
-      excludedIngredients: dto.excludedIngredientIds,
     };
     const relations = (mode: 'set' | 'connect') =>
       Object.fromEntries(
@@ -74,10 +88,22 @@ export class ProfileService {
           .map(([key, ids]) => [key, { [mode]: ids!.map((id) => ({ id })) }]),
       );
 
+    const exclusions = exclusionsFrom(dto);
     const profile = await this.prisma.beautyProfile.upsert({
       where: { userId },
-      create: { userId, ...stripUndefined(scalars), ...relations('connect') },
-      update: { ...stripUndefined(scalars), ...relations('set') },
+      create: {
+        userId,
+        ...stripUndefined(scalars),
+        ...relations('connect'),
+        ...(exclusions && { excludedIngredients: { create: exclusions } }),
+      },
+      update: {
+        ...stripUndefined(scalars),
+        ...relations('set'),
+        ...(exclusions && {
+          excludedIngredients: { deleteMany: {}, create: exclusions },
+        }),
+      },
       include: PROFILE_INCLUDE,
     });
 
@@ -133,11 +159,12 @@ export class ProfileService {
       goals: profile.goals.map(toTaxonomy),
       preferredBrands: profile.preferredBrands.map(toBrandSummary),
       excludedBrands: profile.excludedBrands.map(toBrandSummary),
-      excludedIngredients: profile.excludedIngredients.map((i) => ({
-        id: i.id,
-        inciName: i.inciName,
-        commonName: i.commonName,
-        tags: i.tags as never,
+      excludedIngredients: profile.excludedIngredients.map(({ ingredient, reason }) => ({
+        id: ingredient.id,
+        inciName: ingredient.inciName,
+        commonName: ingredient.commonName,
+        reason,
+        tags: ingredient.tags as never,
       })),
       updatedAt: profile.updatedAt.toISOString(),
     };

@@ -83,6 +83,7 @@ const randomProfile = (random: () => number): ScorableProfile => ({
   preferredBrandIds: sample(random, BRANDS, 1),
   excludedBrandIds: [],
   excludedIngredientIds: [],
+  allergenIngredientIds: [],
 });
 
 const randomShelf = (random: () => number): ShelfSnapshot | undefined =>

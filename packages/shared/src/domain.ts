@@ -61,6 +61,9 @@ export const CONSENT_VERSIONS: Record<ConsentType, string> = {
 /** Minimum age to use the service without parental consent (Poland). */
 export const MINIMUM_AGE = 16;
 
+export const EXCLUSION_REASONS = ['ALLERGY', 'PREFERENCE'] as const;
+export type ExclusionReason = (typeof EXCLUSION_REASONS)[number];
+
 export const TOKEN_STATUSES = ['PENDING', 'MAPPED', 'NEW_INGREDIENT', 'IGNORED'] as const;
 export type TokenStatus = (typeof TOKEN_STATUSES)[number];
 

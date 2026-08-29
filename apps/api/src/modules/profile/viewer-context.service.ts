@@ -32,7 +32,7 @@ export class ViewerContextService {
           goals: { select: { slug: true } },
           preferredBrands: { select: { id: true } },
           excludedBrands: { select: { id: true } },
-          excludedIngredients: { select: { id: true } },
+          excludedIngredients: { select: { ingredientId: true, reason: true } },
         },
       }),
       this.prisma.userShelfItem.findMany({
@@ -62,7 +62,12 @@ export class ViewerContextService {
         goalSlugs: profile.goals.map((g) => g.slug),
         preferredBrandIds: profile.preferredBrands.map((b) => b.id),
         excludedBrandIds: profile.excludedBrands.map((b) => b.id),
-        excludedIngredientIds: profile.excludedIngredients.map((i) => i.id),
+        excludedIngredientIds: profile.excludedIngredients
+          .filter((entry) => entry.reason === 'PREFERENCE')
+          .map((entry) => entry.ingredientId),
+        allergenIngredientIds: profile.excludedIngredients
+          .filter((entry) => entry.reason === 'ALLERGY')
+          .map((entry) => entry.ingredientId),
       },
     };
   }

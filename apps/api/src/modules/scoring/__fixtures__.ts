@@ -49,6 +49,7 @@ export function profile(overrides: Partial<ScorableProfile> = {}): ScorableProfi
     preferredBrandIds: [],
     excludedBrandIds: [],
     excludedIngredientIds: [],
+    allergenIngredientIds: [],
     ...overrides,
   };
 }

@@ -114,6 +114,7 @@ describe('AlternativeProductService', () => {
         preferredBrandIds: [],
         excludedBrandIds: [],
         excludedIngredientIds: [],
+        allergenIngredientIds: [],
       },
     };
 

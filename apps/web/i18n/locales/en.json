@@ -222,6 +222,7 @@
   "MATCH": {
     "BRAND_EXCLUDED": "You asked us to skip this brand",
     "INGREDIENT_EXCLUDED": "Contains {ingredients}, which you avoid",
+    "INGREDIENT_ALLERGEN": "Contains {ingredients}, which you are allergic to",
     "SKIN_TYPE": "Formulated for {skinType} skin",
     "SKIN_TYPE_MISMATCH": "Positioned for {skinTypes} skin",
     "SKIN_TYPE_INGREDIENTS": "Ingredients suit your skin type",
@@ -819,6 +820,8 @@
     "PREFERRED_BRANDS": "Brands you like",
     "EXCLUDED_INGREDIENTS": "Ingredients to avoid",
     "EXCLUDED_INGREDIENTS_HINT": "Products containing these will be marked and pushed down your results.",
+    "ALLERGEN_INGREDIENTS": "Ingredients you are allergic to",
+    "ALLERGEN_INGREDIENTS_HINT": "Products containing these are never shown to you. Your own words, not a diagnosis — see a dermatologist for that.",
     "INGREDIENT_PLACEHOLDER": "Search by INCI name…",
     "SAVE": "Save profile",
     "SAVED": "Profile updated — your matches have been recalculated",

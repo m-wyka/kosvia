@@ -7,6 +7,7 @@ export const PHRASES = {
     "MATCH": {
       "BRAND_EXCLUDED": "You asked us to skip this brand",
       "INGREDIENT_EXCLUDED": "Contains {ingredients}, which you avoid",
+      "INGREDIENT_ALLERGEN": "Contains {ingredients}, which you are allergic to",
       "SKIN_TYPE": "Formulated for {skinType} skin",
       "SKIN_TYPE_MISMATCH": "Positioned for {skinTypes} skin",
       "SKIN_TYPE_INGREDIENTS": "Ingredients suit your skin type",
@@ -246,6 +247,7 @@ export const PHRASES = {
     "MATCH": {
       "BRAND_EXCLUDED": "Poprosiłaś nas o pomijanie tej marki",
       "INGREDIENT_EXCLUDED": "Zawiera {ingredients}, których unikasz",
+      "INGREDIENT_ALLERGEN": "Zawiera {ingredients} — masz na to alergię",
       "SKIN_TYPE": "Stworzony dla typu skóry: {skinType}",
       "SKIN_TYPE_MISMATCH": "Kierowany do typu skóry: {skinTypes}",
       "SKIN_TYPE_INGREDIENTS": "Składniki pasują do Twojego typu skóry",

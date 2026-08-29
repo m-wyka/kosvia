@@ -48,7 +48,7 @@ export class ProductsService {
     const candidates = query.q
       ? await this.searchProvider.rankedCandidates(query.q, MAX_SEARCH_CANDIDATES)
       : null;
-    const where = await this.buildWhere(query, candidates);
+    const where = await this.buildWhere(query, candidates, viewer);
     const sortsByPersonalMatch = query.sort === 'best-match' || query.sort === 'recommended';
     const result =
       candidates && this.sortsByRelevance(query.sort)
@@ -240,8 +240,16 @@ export class ProductsService {
   private async buildWhere(
     query: ProductQueryDto,
     candidates: RankedCandidate[] | null,
+    viewer: ViewerContext,
   ): Promise<Prisma.ProductWhereInput> {
     const and: Prisma.ProductWhereInput[] = [{ isActive: true }];
+
+    // A declared allergy is a hard filter, not a ranking signal: such products
+    // must not be listed at all, and the totals must not count them.
+    const allergens = viewer.profile?.allergenIngredientIds ?? [];
+    if (allergens.length) {
+      and.push({ ingredients: { none: { ingredientId: { in: allergens } } } });
+    }
 
     if (candidates) {
       and.push({ id: { in: candidates.map((candidate) => candidate.id) } });

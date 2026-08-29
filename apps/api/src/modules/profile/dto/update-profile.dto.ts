@@ -1,5 +1,25 @@
-import { ArrayMaxSize, IsArray, IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
-import { BudgetTier, FragrancePreference, SensitivityLevel, SkinType } from '@prisma/client';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import {
+  BudgetTier,
+  ExclusionReason,
+  FragrancePreference,
+  SensitivityLevel,
+  SkinType,
+} from '@prisma/client';
+
+export class ExcludedIngredientInputDto {
+  @IsString() ingredientId!: string;
+  @IsEnum(ExclusionReason) reason!: ExclusionReason;
+}
 
 export class UpdateBeautyProfileDto {
   @IsOptional() @IsEnum(SkinType) skinType?: SkinType;
@@ -18,4 +38,11 @@ export class UpdateBeautyProfileDto {
   @ArrayMaxSize(50)
   @IsString({ each: true })
   excludedIngredientIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => ExcludedIngredientInputDto)
+  excludedIngredients?: ExcludedIngredientInputDto[];
 }

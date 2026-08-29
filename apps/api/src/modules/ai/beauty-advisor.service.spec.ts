@@ -20,6 +20,7 @@ const withBudget = (budget: 'UNDER_50' | 'NO_LIMIT'): ViewerContext => ({
     preferredBrandIds: [],
     excludedBrandIds: [],
     excludedIngredientIds: [],
+    allergenIngredientIds: [],
   },
 });
 

@@ -224,9 +224,30 @@ model BeautyProfile {
   goals               BeautyGoal[]    @relation("ProfileGoals")
   preferredBrands     Brand[]         @relation("ProfilePreferredBrands")
   excludedBrands      Brand[]         @relation("ProfileExcludedBrands")
-  excludedIngredients Ingredient[]    @relation("ProfileExcludedIngredients")
+  excludedIngredients ProfileExcludedIngredient[]
 
   @@map("beauty_profiles")
+}
+
+enum ExclusionReason {
+  ALLERGY
+  PREFERENCE
+}
+
+/// An allergy is a hard block — the product never appears; a preference only
+/// pushes it down. Both are the user's own words, never a diagnosis.
+model ProfileExcludedIngredient {
+  profileId    String
+  ingredientId String
+  reason       ExclusionReason @default(PREFERENCE)
+  createdAt    DateTime        @default(now())
+
+  profile    BeautyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  ingredient Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, ingredientId])
+  @@index([ingredientId])
+  @@map("profile_excluded_ingredients")
 }
 
 model BeautyConcern {
@@ -378,7 +399,7 @@ model Ingredient {
   source          DataSource?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   targetsConcerns BeautyConcern[]     @relation("IngredientTargetsConcerns")
   supportsGoals   BeautyGoal[]        @relation("IngredientSupportsGoals")
-  excludedByProfiles BeautyProfile[]  @relation("ProfileExcludedIngredients")
+  excludedByProfiles ProfileExcludedIngredient[]
 
   @@index([inciName])
   @@index([normalizedName])

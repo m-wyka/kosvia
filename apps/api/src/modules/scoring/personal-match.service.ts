@@ -97,6 +97,16 @@ export class PersonalMatchService {
       add('brand-excluded', 'You asked us to skip this brand', -45);
     }
 
+    const allergenHits = product.ingredients.filter((entry) =>
+      profile.allergenIngredientIds.includes(entry.ingredient.id),
+    );
+    if (allergenHits.length) {
+      const names = allergenHits.map((entry) => entry.ingredient.inciName).slice(0, 3);
+      add('ingredient-allergen', `Contains ${names.join(', ')}, which you are allergic to`, -60, {
+        ingredients: names,
+      });
+    }
+
     const excludedHits = product.ingredients.filter((entry) =>
       profile.excludedIngredientIds.includes(entry.ingredient.id),
     );

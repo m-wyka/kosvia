@@ -64,10 +64,10 @@ export class CoarseMatchService {
     if (profile.excludedBrandIds.length) {
       parts.push(Prisma.sql`AND p."brandId" <> ALL(${profile.excludedBrandIds}::text[])`);
     }
-    if (profile.excludedIngredientIds.length) {
+    if (profile.allergenIngredientIds.length) {
       parts.push(Prisma.sql`AND NOT EXISTS (
         SELECT 1 FROM "product_ingredients" pi
-        WHERE pi."productId" = p."id" AND pi."ingredientId" = ANY(${profile.excludedIngredientIds}::text[])
+        WHERE pi."productId" = p."id" AND pi."ingredientId" = ANY(${profile.allergenIngredientIds}::text[])
       )`);
     }
     return parts.length ? Prisma.join(parts, ' ', '', '') : Prisma.empty;

@@ -5,6 +5,7 @@ import type {
   BeautyProfileDto,
   BrandDto,
   IngredientDto,
+  IngredientSummaryDto,
   UpdateBeautyProfilePayload,
 } from '@kosvia/shared';
 
@@ -49,7 +50,8 @@ const form = reactive({
   goalSlugs: [] as string[],
   preferredBrands: [] as BrandDto[],
   excludedBrands: [] as BrandDto[],
-  excludedIngredients: [] as IngredientDto[],
+  excludedIngredients: [] as IngredientSummaryDto[],
+  allergenIngredients: [] as IngredientSummaryDto[],
 });
 
 const fillFormFrom = (value: BeautyProfileDto) => {
@@ -63,7 +65,12 @@ const fillFormFrom = (value: BeautyProfileDto) => {
   form.goalSlugs = value.goals.map((item) => item.slug);
   form.preferredBrands = value.preferredBrands as BrandDto[];
   form.excludedBrands = value.excludedBrands as BrandDto[];
-  form.excludedIngredients = value.excludedIngredients as IngredientDto[];
+  form.excludedIngredients = value.excludedIngredients.filter(
+    (entry) => entry.reason === 'PREFERENCE',
+  );
+  form.allergenIngredients = value.excludedIngredients.filter(
+    (entry) => entry.reason === 'ALLERGY',
+  );
 };
 
 const toPayload = (): UpdateBeautyProfilePayload => ({
@@ -77,7 +84,16 @@ const toPayload = (): UpdateBeautyProfilePayload => ({
   goalSlugs: form.goalSlugs,
   preferredBrandIds: form.preferredBrands.map((brand) => brand.id),
   excludedBrandIds: form.excludedBrands.map((brand) => brand.id),
-  excludedIngredientIds: form.excludedIngredients.map((item) => item.id),
+  excludedIngredients: [
+    ...form.allergenIngredients.map((item) => ({
+      ingredientId: item.id,
+      reason: 'ALLERGY' as const,
+    })),
+    ...form.excludedIngredients.map((item) => ({
+      ingredientId: item.id,
+      reason: 'PREFERENCE' as const,
+    })),
+  ],
 });
 
 const save = async () => {
@@ -320,6 +336,18 @@ useSeo(() => ({
             :label="$t('ONBOARDING.EXCLUDED_BRANDS')"
             :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
             multiple
+          />
+          <BaseSelect
+            v-model="form.allergenIngredients"
+            :options="ingredientResults ?? []"
+            option-label="inciName"
+            track-by="id"
+            :label="$t('PROFILE.ALLERGEN_INGREDIENTS')"
+            :placeholder="$t('PROFILE.INGREDIENT_PLACEHOLDER')"
+            :hint="$t('PROFILE.ALLERGEN_INGREDIENTS_HINT')"
+            :loading="ingredientStatus === 'pending'"
+            multiple
+            @search-change="ingredientQuery = $event"
           />
           <BaseSelect
             v-model="form.excludedIngredients"
