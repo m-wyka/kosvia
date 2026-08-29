@@ -1054,6 +1054,8 @@
       "STATUS_NEW_INGREDIENT": "Nowy składnik",
       "STATUS_IGNORED": "Zignorowane",
       "ACTION_MAP": "To alias…",
+      "ACTION_ACCEPT": "Przyjmij propozycję",
+      "SUGGESTION_SCORE": "{score}% podobieństwa",
       "ACTION_NEW": "Nowy składnik",
       "ACTION_IGNORE": "Ignoruj",
       "ACTION_REOPEN": "Przywróć",

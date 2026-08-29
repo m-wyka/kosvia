@@ -1,6 +1,11 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { IngredientScoreBreakdownDto, ProductDto, ProductSearchResult } from '@kosvia/shared';
+import type {
+  IngredientScoreBreakdownDto,
+  ProductDto,
+  ProductSearchResult,
+  ProductSuggestionDto,
+} from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
 import {
   CurrentUser,
@@ -8,7 +13,7 @@ import {
 } from '../../common/decorators/current-user.decorator';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { ProductsService } from './products.service';
-import { ProductQueryDto } from './dto/product-query.dto';
+import { ProductQueryDto, SuggestQueryDto } from './dto/product-query.dto';
 
 @ApiTags('products')
 @OptionalAuth()
@@ -27,6 +32,12 @@ export class ProductsController {
   ): Promise<ProductSearchResult> {
     const viewer = await this.viewers.load(user?.id);
     return this.products.search(query, viewer);
+  }
+
+  @Get('suggest')
+  @ApiOperation({ summary: 'Autocomplete hits for the search box' })
+  suggest(@Query() query: SuggestQueryDto): Promise<ProductSuggestionDto[]> {
+    return this.products.suggest(query.q);
   }
 
   @Get(':slug')

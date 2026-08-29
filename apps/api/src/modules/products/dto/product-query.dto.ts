@@ -10,6 +10,7 @@ import {
   Max,
   MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
 import { SkinType } from '@prisma/client';
 import type { ProductSort } from '@kosvia/shared';
@@ -72,6 +73,14 @@ export class ProductQueryDto {
 
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) page?: number;
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(60) pageSize?: number;
+}
+
+export class SuggestQueryDto {
+  @IsString()
+  @MinLength(2)
+  @MaxLength(60)
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  q!: string;
 }
 
 export class CompareQueryDto {

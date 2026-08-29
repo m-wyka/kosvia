@@ -231,6 +231,15 @@ export interface ProductFacetsDto {
   priceRange: { min: number; max: number };
 }
 
+/** A lightweight autocomplete hit — see GET /products/suggest. */
+export interface ProductSuggestionDto {
+  id: string;
+  name: string;
+  slug: string;
+  brandName: string;
+  imageUrl: string | null;
+}
+
 export interface ProductSearchResult extends PaginatedResult<ProductSummaryDto> {
   facets: ProductFacetsDto;
 }

@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import type { BrandDto, CategoryDto, IngredientDto, IngredientTag, StoreDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { normalizeToken } from '../inci/inci-parser';
+
+const MAX_INGREDIENT_RESULTS = 200;
 
 /** Read-only reference data: brands, the category tree, ingredients and stores. */
 @Injectable()
@@ -90,14 +94,11 @@ export class CatalogService {
   }
 
   async ingredients(search?: string, tag?: string, take = 60): Promise<IngredientDto[]> {
+    const limit = Math.min(take, MAX_INGREDIENT_RESULTS);
+    const searchedIds = search ? await this.ingredientIdsMatching(search, limit) : null;
     const rows = await this.prisma.ingredient.findMany({
       where: {
-        ...(search && {
-          OR: [
-            { inciName: { contains: search, mode: 'insensitive' } },
-            { commonName: { contains: search, mode: 'insensitive' } },
-          ],
-        }),
+        ...(searchedIds && { id: { in: searchedIds } }),
         ...(tag && { tags: { has: tag } }),
       },
       include: {
@@ -105,9 +106,37 @@ export class CatalogService {
         supportsGoals: { select: { slug: true } },
       },
       orderBy: { inciName: 'asc' },
-      take: Math.min(take, 200),
+      take: limit,
     });
-    return rows.map(toIngredientDto);
+    if (!searchedIds) {
+      return rows.map(toIngredientDto);
+    }
+    const rowById = new Map(rows.map((row) => [row.id, row]));
+    return searchedIds.flatMap((id) => rowById.get(id) ?? []).map(toIngredientDto);
+  }
+
+  /** Prefix hits first (short queries), then trigram similarity for typos and mid-word matches. */
+  private async ingredientIdsMatching(search: string, limit: number): Promise<string[]> {
+    const term = normalizeToken(search);
+    if (!term) {
+      return [];
+    }
+    const rows = await this.prisma.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT "id"
+      FROM "ingredients"
+      WHERE "normalizedName" LIKE ${`${term}%`}
+         OR "normalizedName" % ${term}
+         OR f_unaccent(lower(coalesce("commonName", ''))) % ${term}
+      ORDER BY
+        ("normalizedName" LIKE ${`${term}%`}) DESC,
+        GREATEST(
+          similarity("normalizedName", ${term}),
+          similarity(f_unaccent(lower(coalesce("commonName", ''))), ${term})
+        ) DESC,
+        "inciName" ASC
+      LIMIT ${limit}
+    `);
+    return rows.map((row) => row.id);
   }
 
   async ingredient(slug: string): Promise<IngredientDto> {

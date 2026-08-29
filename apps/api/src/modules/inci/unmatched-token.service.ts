@@ -6,7 +6,7 @@ import { computeIngredientScore } from '../scoring/ingredient-score';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { toScorable } from '../products/product.mapper';
 import { normalizeToken } from './inci-parser';
-import { MATCH_CONFIDENCE } from './inci-matcher.service';
+import { MATCH_CONFIDENCE, type IngredientSuggestion } from './inci-matcher.service';
 
 const MAX_RAW_SAMPLES = 5;
 const DEFAULT_PAGE_SIZE = 25;
@@ -42,23 +42,35 @@ type TokenRow = Prisma.UnmatchedTokenGetPayload<{ select: typeof TOKEN_SELECT }>
 export class UnmatchedTokenService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async record(normalized: string, rawSample: string): Promise<void> {
+  async record(
+    normalized: string,
+    rawSample: string,
+    suggestion: IngredientSuggestion | null = null,
+  ): Promise<void> {
+    const suggested = suggestion
+      ? { suggestedIngredientId: suggestion.ingredientId, suggestedScore: suggestion.score }
+      : {};
     const existing = await this.prisma.unmatchedToken.findUnique({
       where: { normalized },
-      select: { id: true, rawSamples: true, status: true },
+      select: { id: true, rawSamples: true, status: true, suggestedScore: true },
     });
     if (!existing) {
-      await this.prisma.unmatchedToken.create({ data: { normalized, rawSamples: [rawSample] } });
+      await this.prisma.unmatchedToken.create({
+        data: { normalized, rawSamples: [rawSample], ...suggested },
+      });
       return;
     }
     const rawSamples = existing.rawSamples.includes(rawSample)
       ? existing.rawSamples
       : [...existing.rawSamples, rawSample].slice(0, MAX_RAW_SAMPLES);
+    const isBetterSuggestion =
+      suggestion !== null && suggestion.score > (existing.suggestedScore ?? 0);
     await this.prisma.unmatchedToken.update({
       where: { id: existing.id },
       data: {
         rawSamples,
         occurrenceCount: { increment: 1 },
+        ...(isBetterSuggestion ? suggested : {}),
         ...(existing.status === 'IGNORED' ? {} : { status: 'PENDING', resolvedAt: null }),
       },
     });

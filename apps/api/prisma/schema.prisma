@@ -251,6 +251,9 @@ model Product {
   /// Denormalised cheapest active offer price, for sorting/filtering at scale.
   lowestPrice     Decimal?   @db.Decimal(10, 2)
   isActive        Boolean    @default(true)
+  /// Generated in SQL from name, highlights and description — see the
+  /// add_search_extensions_and_indexes migration. Prisma never writes it.
+  searchVector    Unsupported("tsvector")?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -404,6 +407,19 @@ enum SubmissionStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+/// One row per search, no viewer identity: tells us which queries return
+/// nothing and which brands people look for that we do not stock yet.
+model SearchLog {
+  id          String   @id @default(cuid())
+  query       String
+  resultCount Int
+  durationMs  Int
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("search_logs")
 }
 
 /* -------------------------------------------------------------------------- */

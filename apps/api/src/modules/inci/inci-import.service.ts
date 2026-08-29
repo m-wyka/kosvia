@@ -53,9 +53,10 @@ export class InciImportService {
 
     await Promise.all(
       resolved.flatMap((entry) =>
-        entry.unmatchedNormalized.map((normalized) =>
-          this.unmatchedTokens.record(normalized, entry.token.rawText),
-        ),
+        entry.unmatchedNormalized.map(async (normalized) => {
+          const suggestion = await this.matcher.suggest(normalized);
+          await this.unmatchedTokens.record(normalized, entry.token.rawText, suggestion);
+        }),
       ),
     );
     await this.recomputeScore(productId);

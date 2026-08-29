@@ -21,6 +21,7 @@ interface IngredientOption {
 const PAGE_SIZE = 25;
 const SEARCH_DEBOUNCE_MS = 300;
 const MAX_SEARCH_RESULTS = 8;
+const PERCENT_SCALE = 100;
 
 const api = useApi();
 const toast = useToast();
@@ -105,6 +106,23 @@ const resolvedMessage = (result: TokenResolutionDto) =>
     rows: result.rematchedRows,
     products: result.affectedProducts,
   });
+
+const toPercent = (score: number): number => Math.round(score * PERCENT_SCALE);
+
+const acceptSuggestion = (token: UnmatchedTokenDto) => {
+  const suggested = token.suggestedIngredient;
+  if (!suggested) {
+    return;
+  }
+  return runMutation(
+    () =>
+      api<TokenResolutionDto>(`/admin/inci/queue/${token.id}/map`, {
+        method: 'POST',
+        body: { ingredientId: suggested.id, kind: 'TYPO' },
+      }),
+    resolvedMessage,
+  );
+};
 
 const openMap = (token: UnmatchedTokenDto) => {
   selectedToken.value = token;
@@ -262,13 +280,25 @@ useSeo(() => ({
         </span>
       </template>
       <template #cell-suggestion="{ row }">
-        <span v-if="row.suggestedIngredient" class="text-xs text-ink-muted">
-          {{ row.suggestedIngredient.inciName }}
+        <span v-if="row.suggestedIngredient" class="block text-xs">
+          <span class="text-ink">{{ row.suggestedIngredient.inciName }}</span>
+          <span v-if="row.suggestedScore !== null" class="block text-ink-faint">
+            {{ $t('ADMIN.INCI_QUEUE.SUGGESTION_SCORE', { score: toPercent(row.suggestedScore) }) }}
+          </span>
         </span>
       </template>
       <template #cell-actions="{ row }">
         <span class="flex justify-end gap-1.5">
           <template v-if="isPending">
+            <BaseButton
+              v-if="row.suggestedIngredient"
+              variant="secondary"
+              size="sm"
+              :disabled="saving"
+              @click="acceptSuggestion(row)"
+            >
+              {{ $t('ADMIN.INCI_QUEUE.ACTION_ACCEPT') }}
+            </BaseButton>
             <BaseButton variant="ghost" size="sm" :disabled="saving" @click="openMap(row)">
               {{ $t('ADMIN.INCI_QUEUE.ACTION_MAP') }}
             </BaseButton>

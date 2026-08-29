@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import type {
   IngredientScoreBreakdownDto,
@@ -6,6 +6,7 @@ import type {
   ProductDto,
   ProductFacetsDto,
   ProductSearchResult,
+  ProductSuggestionDto,
   ProductSummaryDto,
 } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -15,21 +16,95 @@ import type { ViewerContext } from '../profile/viewer-context.service';
 import { PRODUCT_INCLUDE, type ProductRow } from './product.select';
 import { decimalToNumber, toProductDto, toProductSummary, toScorable } from './product.mapper';
 import type { ProductQueryDto } from './dto/product-query.dto';
+import {
+  SEARCH_PROVIDER,
+  type RankedCandidate,
+  type SearchProvider,
+} from './search/search-provider';
 
 const DEFAULT_PAGE_SIZE = 24;
+/** Upper bound on ranked hits a text query can page through. */
+const MAX_SEARCH_CANDIDATES = 500;
+const SUGGESTION_LIMIT = 8;
 
 @Injectable()
 export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly match: PersonalMatchService,
     private readonly ingredientScore: IngredientScoreService,
+    @Inject(SEARCH_PROVIDER) private readonly searchProvider: SearchProvider,
   ) {}
 
   /* ------------------------------------------------------------- reading -- */
 
   async search(query: ProductQueryDto, viewer: ViewerContext): Promise<ProductSearchResult> {
-    const where = await this.buildWhere(query);
+    const startedAt = Date.now();
+    const candidates = query.q
+      ? await this.searchProvider.rankedCandidates(query.q, MAX_SEARCH_CANDIDATES)
+      : null;
+    const where = await this.buildWhere(query, candidates);
+    const result =
+      candidates && this.sortsByRelevance(query.sort)
+        ? await this.pageByRelevance(where, candidates, query, viewer)
+        : await this.pageByColumn(where, query, viewer);
+
+    if (query.q) {
+      this.logSearch(query.q, result.total, Date.now() - startedAt);
+    }
+    return result;
+  }
+
+  suggest(query: string): Promise<ProductSuggestionDto[]> {
+    return this.searchProvider.suggest(query, SUGGESTION_LIMIT);
+  }
+
+  /** With a text query and no explicit sort, the engine's ranking wins. */
+  private sortsByRelevance(sort: ProductQueryDto['sort']): boolean {
+    return sort === undefined;
+  }
+
+  private async pageByRelevance(
+    where: Prisma.ProductWhereInput,
+    candidates: RankedCandidate[],
+    query: ProductQueryDto,
+    viewer: ViewerContext,
+  ): Promise<ProductSearchResult> {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
+
+    const [matching, facets] = await Promise.all([
+      this.prisma.product.findMany({ where, select: { id: true } }),
+      this.facets(where),
+    ]);
+    const matchingIds = new Set(matching.map((row) => row.id));
+    const ordered = candidates.filter((candidate) => matchingIds.has(candidate.id));
+    const pageIds = ordered.slice((page - 1) * pageSize, page * pageSize).map((c) => c.id);
+
+    const rows = await this.prisma.product.findMany({
+      where: { id: { in: pageIds } },
+      include: PRODUCT_INCLUDE,
+    });
+    const rowById = new Map(rows.map((row) => [row.id, row]));
+    const pageRows = pageIds.flatMap((id) => rowById.get(id) ?? []);
+
+    return {
+      items: this.decorate(pageRows, viewer),
+      total: ordered.length,
+      page,
+      pageSize,
+      pageCount: Math.max(1, Math.ceil(ordered.length / pageSize)),
+      facets,
+    };
+  }
+
+  private async pageByColumn(
+    where: Prisma.ProductWhereInput,
+    query: ProductQueryDto,
+    viewer: ViewerContext,
+  ): Promise<ProductSearchResult> {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
 
@@ -121,24 +196,20 @@ export class ProductsService {
 
   /* ------------------------------------------------------------ querying -- */
 
-  private async buildWhere(query: ProductQueryDto): Promise<Prisma.ProductWhereInput> {
+  private logSearch(query: string, resultCount: number, durationMs: number): void {
+    this.prisma.searchLog
+      .create({ data: { query, resultCount, durationMs } })
+      .catch((error: unknown) => this.logger.warn(`Search log write failed: ${String(error)}`));
+  }
+
+  private async buildWhere(
+    query: ProductQueryDto,
+    candidates: RankedCandidate[] | null,
+  ): Promise<Prisma.ProductWhereInput> {
     const and: Prisma.ProductWhereInput[] = [{ isActive: true }];
 
-    if (query.q) {
-      const term = query.q;
-      and.push({
-        OR: [
-          { name: { contains: term, mode: 'insensitive' } },
-          { brand: { name: { contains: term, mode: 'insensitive' } } },
-          { category: { name: { contains: term, mode: 'insensitive' } } },
-          { ean: term },
-          {
-            ingredients: {
-              some: { ingredient: { inciName: { contains: term, mode: 'insensitive' } } },
-            },
-          },
-        ],
-      });
+    if (candidates) {
+      and.push({ id: { in: candidates.map((candidate) => candidate.id) } });
     }
 
     if (query.category) {
@@ -204,24 +275,15 @@ export class ProductsService {
   }
 
   async categoryWithDescendants(slugOrId: string): Promise<string[]> {
-    const root = await this.prisma.category.findFirst({
-      where: { OR: [{ slug: slugOrId }, { id: slugOrId }] },
-      select: { id: true },
-    });
-    if (!root) return [];
-
-    const ids = [root.id];
-    let frontier = [root.id];
-    // Category trees are three levels deep by design; this loop is bounded.
-    while (frontier.length) {
-      const children = await this.prisma.category.findMany({
-        where: { parentId: { in: frontier } },
-        select: { id: true },
-      });
-      frontier = children.map((child) => child.id);
-      ids.push(...frontier);
-    }
-    return ids;
+    const rows = await this.prisma.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      WITH RECURSIVE tree AS (
+        SELECT "id" FROM "categories" WHERE "slug" = ${slugOrId} OR "id" = ${slugOrId}
+        UNION ALL
+        SELECT c."id" FROM "categories" c JOIN tree ON c."parentId" = tree."id"
+      )
+      SELECT "id" FROM tree
+    `);
+    return rows.map((row) => row.id);
   }
 
   private async facets(where: Prisma.ProductWhereInput): Promise<ProductFacetsDto> {

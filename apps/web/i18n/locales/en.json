@@ -971,6 +971,8 @@
       "STATUS_NEW_INGREDIENT": "New ingredient",
       "STATUS_IGNORED": "Ignored",
       "ACTION_MAP": "Alias of…",
+      "ACTION_ACCEPT": "Accept suggestion",
+      "SUGGESTION_SCORE": "{score}% similar",
       "ACTION_NEW": "New ingredient",
       "ACTION_IGNORE": "Ignore",
       "ACTION_REOPEN": "Reopen",

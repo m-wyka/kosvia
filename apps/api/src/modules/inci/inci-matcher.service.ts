@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { isCiNumber } from './inci-parser';
 
@@ -10,16 +11,23 @@ export interface IngredientMatch {
   level: MatchLevel;
 }
 
+export interface IngredientSuggestion {
+  ingredientId: string;
+  score: number;
+}
+
 export const MATCH_CONFIDENCE: Record<MatchLevel, number> = {
   INCI_NAME: 1,
   ALIAS: 0.95,
   CI_NUMBER: 0.95,
 };
 
+/** Spec 07 §2: below this trigram score a token is simply unknown. */
+export const SUGGESTION_MIN_SIMILARITY = 0.6;
+
 /**
- * Resolves normalised label tokens to dictionary entries. Trigram similarity
- * (the fourth level from the spec) needs pg_trgm and arrives with the search
- * work; until then a token either matches exactly or goes to the queue.
+ * Resolves normalised label tokens to dictionary entries. Levels 1–3 are
+ * exact lookups and write a match; level 4 (trigrams) only ever proposes.
  */
 @Injectable()
 export class InciMatcherService {
@@ -68,5 +76,27 @@ export class InciMatcherService {
   async matchOne(normalized: string): Promise<IngredientMatch | null> {
     const matches = await this.matchMany([normalized]);
     return matches.get(normalized) ?? null;
+  }
+
+  /**
+   * Level 4: trigram similarity. A suggestion for the admin queue, never an
+   * automatic match — typos like "Nicotinamide" get proposed, not written.
+   */
+  async suggest(normalized: string): Promise<IngredientSuggestion | null> {
+    if (!normalized) {
+      return null;
+    }
+    const rows = await this.prisma.$queryRaw<Array<{ id: string; score: number }>>(Prisma.sql`
+      SELECT "id", similarity("normalizedName", ${normalized})::float8 AS score
+      FROM "ingredients"
+      WHERE "normalizedName" % ${normalized}
+      ORDER BY score DESC
+      LIMIT 1
+    `);
+    const best = rows[0];
+    if (!best || best.score < SUGGESTION_MIN_SIMILARITY) {
+      return null;
+    }
+    return { ingredientId: best.id, score: Number(best.score.toFixed(3)) };
   }
 }
