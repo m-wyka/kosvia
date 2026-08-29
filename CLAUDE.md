@@ -146,4 +146,9 @@ npm run typecheck -w @kosvia/web   # vue-tsc, strict
 npm run test -w @kosvia/web        # i18n check + vitest
 ```
 
+## Specyfikacja
+
+Kontekst projektu: `docs/spec/`. `AUDIT.md` zawiera stan faktyczny i korekty
+do plików 00–07 (sekcja 5) — czytaj go przed plikami numerowanymi.
+
 Zmiana we frontendzie jest skończona dopiero, gdy lint, typecheck i testy przechodzą, a `npm run format:check` nie zgłasza plików.
