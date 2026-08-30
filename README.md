@@ -446,6 +446,37 @@ npm run db:reset       # drop, migrate, seed
 npm run db:studio      # Prisma Studio
 ```
 
+### Data imports (`-w @kosvia/api`)
+
+Run in this order on a fresh database. Each importer records an `ImportRun`
+(visible under `/admin/imports`) and is safe to re-run — it updates, never
+duplicates.
+
+```bash
+# 1. Ingredient dictionary — CosIng (European Commission, CC BY 4.0).
+#    ~33 600 INCI names, CAS/EC numbers, functions and Annexes II–VI.
+#    Takes a few minutes; afterwards pending label tokens are re-matched
+#    and hidden imported products are re-evaluated.
+npm run import:cosing -w @kosvia/api
+npm run import:cosing -w @kosvia/api -- --dry-run --max-pages=2   # smoke test
+npm run import:cosing -w @kosvia/api -- --resume                  # after an interrupted run
+npm run import:cosing -w @kosvia/api -- --skip-annexes --skip-rematch
+
+# 2. Product catalogue — Open Beauty Facts (ODbL).
+npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]
+
+# 3. Ingredient descriptions — English and Polish, written by the model from
+#    CosIng facts only. Needs AI_PROVIDER=anthropic and AI_API_KEY in .env;
+#    with the offline provider every entry is declined and nothing is invented.
+npm run ingredients:describe -w @kosvia/api -- --all --limit=139   # first: translate the seed entries
+npm run ingredients:describe -w @kosvia/api                        # then: ingredients used on product labels, most common first
+npm run ingredients:describe -w @kosvia/api -- --limit=500 --dry-run   # see what would be selected
+
+# Maintenance
+npm run traits:recompute -w @kosvia/api -- [--stale]   # ingredientScore + product_traits
+npm run account:purge -w @kosvia/api                   # execute deletion requests past their grace period
+```
+
 ---
 
 ## Testing
@@ -481,15 +512,15 @@ product slug, so no third-party photography or copy is used anywhere.
 The seed is deterministic: the same slug always produces the same variant,
 palette and price band.
 
-|                         |                                                             |
-| ----------------------- | ----------------------------------------------------------- |
-| Brands                  | 22                                                          |
-| Categories              | 17, three levels deep                                       |
-| Ingredients             | 139, with functions, tags, tolerance and concern/goal links |
-| Products                | 132, across 33 realistic formulas                           |
-| Product-ingredient rows | ~1,900                                                      |
-| Stores / offers         | 5 / ~400                                                    |
-| Price history           | ~2,400 points                                               |
+|                         |                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| Brands                  | 22                                                                                                     |
+| Categories              | 17, three levels deep                                                                                  |
+| Ingredients             | 139 curated, with functions, tags, tolerance and concern/goal links; `import:cosing` adds ~32 700 more |
+| Products                | 132, across 33 realistic formulas                                                                      |
+| Product-ingredient rows | ~1,900                                                                                                 |
+| Stores / offers         | 5 / ~400                                                                                               |
+| Price history           | ~2,400 points                                                                                          |
 
 ---
 
