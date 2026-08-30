@@ -91,7 +91,7 @@ export function toIngredientDto(ingredient: IngredientRow, locale: AnswerLocale)
 export function toOfferDto(offer: ProductOfferRow): ProductOfferDto {
   return {
     id: offer.id,
-    variantId: offer.variantId ?? offer.productId,
+    variantId: offer.variantId,
     price: decimalToNumber(offer.price)!,
     currency: offer.currency,
     url: offer.url,

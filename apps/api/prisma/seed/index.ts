@@ -396,7 +396,6 @@ async function main(): Promise<void> {
         if (inStock) lowest = Math.min(lowest, storePrice);
         await prisma.productOffer.create({
           data: {
-            productId: product.id,
             variantId: defaultVariant.id,
             storeId: store.id,
             price: new Prisma.Decimal(storePrice),
@@ -415,7 +414,6 @@ async function main(): Promise<void> {
         const history: Prisma.PriceHistoryCreateManyInput[] = [];
         for (let month = 6; month >= 1; month -= 1) {
           history.push({
-            productId: product.id,
             variantId: defaultVariant.id,
             storeId: store.id,
             price: new Prisma.Decimal(shelfPrice(storePrice * (0.92 + random() * 0.2))),

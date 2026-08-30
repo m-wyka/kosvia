@@ -48,16 +48,12 @@ export function row(options: RowOptions): ProductRow {
 
   return {
     id,
-    ean: null,
     name,
     slug: id,
     brandId,
     categoryId,
     description: null,
     usage: null,
-    imageUrl: null,
-    volume,
-    volumeUnit: 'ml',
     highlights: [],
     isFragranceFree,
     isVegan,
@@ -154,7 +150,6 @@ export function row(options: RowOptions): ProductRow {
         offers: [
           {
             id: `${id}-offer`,
-            productId: id,
             variantId: `${id}-variant`,
             storeId: 'store-1',
             price: new Prisma.Decimal(price),

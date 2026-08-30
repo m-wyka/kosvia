@@ -285,7 +285,7 @@ export class AdminService {
           ],
         }
       : {};
-    return this.paginate(
+    const page = await this.paginate(
       query,
       () => this.prisma.product.count({ where }),
       (skip, take) =>
@@ -297,10 +297,21 @@ export class AdminService {
           include: {
             brand: { select: { id: true, name: true } },
             category: { select: { id: true, name: true } },
-            _count: { select: { offers: true, ingredients: true } },
+            variants: { select: { _count: { select: { offers: true } } } },
+            _count: { select: { ingredients: true } },
           },
         }),
     );
+    return {
+      ...page,
+      items: page.items.map(({ variants, ...product }) => ({
+        ...product,
+        _count: {
+          ingredients: product._count.ingredients,
+          offers: variants.reduce((sum, variant) => sum + variant._count.offers, 0),
+        },
+      })),
+    };
   }
 
   /** The public DTO (default pack flattened, packs listed) plus the flags only admins edit. */
@@ -393,7 +404,7 @@ export class AdminService {
 
   async listOffers(query: AdminListQueryDto) {
     const where: Prisma.ProductOfferWhereInput = query.q
-      ? { product: { name: { contains: query.q, mode: 'insensitive' } } }
+      ? { variant: { product: { name: { contains: query.q, mode: 'insensitive' } } } }
       : {};
     const page = await this.paginate(
       query,
@@ -405,22 +416,31 @@ export class AdminService {
           take,
           orderBy: { updatedAt: 'desc' },
           include: {
-            product: {
-              select: { id: true, name: true, slug: true, brand: { select: { name: true } } },
+            variant: {
+              select: {
+                id: true,
+                ean: true,
+                volume: true,
+                volumeUnit: true,
+                product: {
+                  select: { id: true, name: true, slug: true, brand: { select: { name: true } } },
+                },
+              },
             },
-            variant: { select: { id: true, ean: true, volume: true, volumeUnit: true } },
             store: { select: { id: true, name: true } },
           },
         }),
     );
     return {
       ...page,
-      items: page.items.map((offer) => ({
+      items: page.items.map(({ variant, ...offer }) => ({
         ...offer,
-        variant: offer.variant && {
-          ...offer.variant,
-          volume: decimalToNumber(offer.variant.volume),
-          volumeUnit: toVolumeUnitDto(offer.variant.volumeUnit),
+        product: variant.product,
+        variant: {
+          id: variant.id,
+          ean: variant.ean,
+          volume: decimalToNumber(variant.volume),
+          volumeUnit: toVolumeUnitDto(variant.volumeUnit),
         },
       })),
     };
@@ -431,7 +451,6 @@ export class AdminService {
     const offer = await this.prisma.productOffer.upsert({
       where: { variantId_storeId: { variantId: variant.id, storeId: dto.storeId } },
       create: {
-        productId: dto.productId,
         variantId: variant.id,
         storeId: dto.storeId,
         price: new Prisma.Decimal(dto.price),
@@ -450,7 +469,6 @@ export class AdminService {
     // Append to the price log, then refresh the denormalised lowest price.
     await this.prisma.priceHistory.create({
       data: {
-        productId: dto.productId,
         variantId: variant.id,
         storeId: dto.storeId,
         price: new Prisma.Decimal(dto.price),
@@ -462,10 +480,13 @@ export class AdminService {
   }
 
   async deleteOffer(id: string) {
-    const offer = await this.prisma.productOffer.findUnique({ where: { id } });
+    const offer = await this.prisma.productOffer.findUnique({
+      where: { id },
+      select: { variant: { select: { productId: true } } },
+    });
     if (!offer) throw new NotFoundException('That offer does not exist.');
     await this.prisma.productOffer.delete({ where: { id } });
-    await this.refreshLowestPrice(offer.productId);
+    await this.refreshLowestPrice(offer.variant.productId);
   }
 
   /* --------------------------------------------------------------- users -- */
