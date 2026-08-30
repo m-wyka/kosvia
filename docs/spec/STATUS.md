@@ -37,7 +37,11 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 
 ## Otwarte (osobne zadania, w tej kolejności)
 
-1. Opisy AI dla składników: `AI_PROVIDER=anthropic` + `npm run ingredients:describe -w @kosvia/api` (domyślnie 200 najczęściej występujących); do rozważenia kolumna z locale dla opisów PL.
+1. **Pierwsze prawdziwe produkty (przerwane 2026-08-30 — awaria Open Beauty Facts, cała ich infrastruktura nie odpowiadała; kod importu jest sprawny).** Gdy `world.openbeautyfacts.org` wróci:
+   1. `npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 --resume` (nieudany przebieg czeka jako `FAILED` w `/admin/imports`).
+   2. Sprawdzić, ile produktów przeszło próg rozpoznania 0.8 (`products.isActive`) i co zostało w `/admin/inci-queue`.
+   3. Opisy EN+PL dla składników, które faktycznie wystąpiły na etykietach: lista z `SELECT … FROM ingredients WHERE description IS NULL AND id IN (SELECT "ingredientId" FROM product_ingredients)`, teksty pisane w sesji Claude Code (bez klucza API), wgranie przez `npm run ingredients:describe -w @kosvia/api -- --from=plik.json`. Format pliku: `IngredientProseFile` w `ingredient-describer.service.ts`; wzorzec: `prisma/seed/data/ingredients.pl.json`.
+   Klucz API (`AI_PROVIDER=anthropic`) nie jest do tego potrzebny — decyzja z 2026-08-30: opisy powstają w sesji, płatne AI dopiero gdy będzie potrzebne do czatu.
 2. **`ProductVariant`** (`03` §4) — 3-krokowa migracja `ean`/`volume`/`imageUrl`; zrobić **przed** feedami afiliacyjnymi.
 3. Feedy afiliacyjne (`01` etap 4) — po publicznym uruchomieniu.
 4. Keyset (`05` §5), autocomplete w nagłówku (`05` §6) — gdy będzie nieskończony scroll.
