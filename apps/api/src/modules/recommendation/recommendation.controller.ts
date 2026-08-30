@@ -16,6 +16,8 @@ import {
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { CompareQueryDto } from '../products/dto/product-query.dto';
 import { AlternativeProductService } from './alternative-product.service';
+import { RequestLocale } from '../../common/decorators/request-locale.decorator';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import { ComparisonService } from './comparison.service';
 import { RecommendationService, type RoutinePlan } from './recommendation.service';
 
@@ -58,8 +60,9 @@ export class RecommendationController {
   async compare(
     @Query() query: CompareQueryDto,
     @CurrentUser() user: AuthenticatedUser | null,
+    @RequestLocale() locale: AnswerLocale,
   ): Promise<ComparisonResultDto> {
-    return this.comparison.compare(query.products, await this.viewers.load(user?.id));
+    return this.comparison.compare(query.products, await this.viewers.load(user?.id), locale);
   }
 
   @Get('discover')

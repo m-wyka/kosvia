@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const OPEN_BEAUTY_FACTS_URL = 'https://world.openbeautyfacts.org';
+const COSING_URL = 'https://ec.europa.eu/growth/tools-databases/cosing/';
 
 const { t } = useI18n();
 
@@ -11,7 +12,7 @@ useSeo(() => ({
 
 <template>
   <div class="container-page py-12">
-    <article class="mx-auto max-w-2xl">
+    <article class="mx-auto">
       <h1 class="font-display text-3xl text-ink sm:text-4xl">
         {{ $t('ABOUT_DATA.TITLE') }}
       </h1>
@@ -33,6 +34,23 @@ useSeo(() => ({
           target="_blank"
         >
           {{ $t('ABOUT_DATA.OBF_LINK') }}
+        </a>
+      </section>
+
+      <section class="mt-10">
+        <h2 class="font-display text-2xl text-ink">
+          {{ $t('ABOUT_DATA.COSING_TITLE') }}
+        </h2>
+        <p class="mt-3 text-base leading-relaxed text-ink-soft">
+          {{ $t('ABOUT_DATA.COSING_BODY') }}
+        </p>
+        <a
+          :href="COSING_URL"
+          class="mt-3 inline-block text-sm font-medium text-ink underline-offset-4 hover:underline"
+          rel="noopener"
+          target="_blank"
+        >
+          {{ $t('ABOUT_DATA.COSING_LINK') }}
         </a>
       </section>
 

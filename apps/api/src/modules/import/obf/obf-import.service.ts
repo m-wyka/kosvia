@@ -137,6 +137,34 @@ export class OpenBeautyFactsImportService {
     }
   }
 
+  /**
+   * Imported products hidden for a poor recognition share get a second look
+   * once the dictionary has grown. Returns how many were made visible.
+   */
+  async republishHidden(): Promise<number> {
+    const hidden = await this.prisma.product.findMany({
+      where: { isActive: false, isManuallyEdited: false, sourceId: { not: null } },
+      select: {
+        id: true,
+        ingredients: {
+          select: { position: true, isAfterMayContain: true, matchConfidence: true },
+        },
+      },
+    });
+    const publishable = hidden.filter(
+      (product) =>
+        this.inciImport.recognizedRatio(product.ingredients) >= MIN_RECOGNIZED_RATIO_FOR_PUBLISHING,
+    );
+    if (!publishable.length) {
+      return 0;
+    }
+    await this.prisma.product.updateMany({
+      where: { id: { in: publishable.map((product) => product.id) } },
+      data: { isActive: true },
+    });
+    return publishable.length;
+  }
+
   private cursorFrom(resumable: ImportRun | null, options: ObfImportOptions): ObfCursor {
     const cursor = resumable?.cursor as Partial<ObfCursor> | null | undefined;
     if (

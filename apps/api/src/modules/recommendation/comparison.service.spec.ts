@@ -19,8 +19,10 @@ describe('ComparisonService', () => {
 
   it('refuses fewer than two or more than four products', async () => {
     const service = new ComparisonService(prismaWith([]), match);
-    await expect(service.compare(['only-one'], ANON)).rejects.toBeInstanceOf(BadRequestException);
-    await expect(service.compare(['a', 'b', 'c', 'd', 'e'], ANON)).rejects.toBeInstanceOf(
+    await expect(service.compare(['only-one'], ANON, 'pl')).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    await expect(service.compare(['a', 'b', 'c', 'd', 'e'], ANON, 'pl')).rejects.toBeInstanceOf(
       BadRequestException,
     );
   });
@@ -28,7 +30,7 @@ describe('ComparisonService', () => {
   it('keeps the caller’s column order', async () => {
     const rows = [row({ id: 'b' }), row({ id: 'a' })];
     const service = new ComparisonService(prismaWith(rows), match);
-    const result = await service.compare(['a', 'b'], ANON);
+    const result = await service.compare(['a', 'b'], ANON, 'pl');
     expect(result.products.map((p) => p.id)).toEqual(['a', 'b']);
   });
 
@@ -38,7 +40,7 @@ describe('ComparisonService', () => {
       row({ id: 'small', price: 40, volume: 50 }), // 80 PLN / 100 ml
     ];
     const service = new ComparisonService(prismaWith(rows), match);
-    const result = await service.compare(['big', 'small'], ANON);
+    const result = await service.compare(['big', 'small'], ANON, 'pl');
 
     const price = result.rows.find((r) => r.key === 'price')!;
     const perHundred = result.rows.find((r) => r.key === 'price-per-100')!;
@@ -50,7 +52,7 @@ describe('ComparisonService', () => {
   it('declares no winner on a row where the values are identical', async () => {
     const rows = [row({ id: 'a', price: 50 }), row({ id: 'b', price: 50 })];
     const service = new ComparisonService(prismaWith(rows), match);
-    const result = await service.compare(['a', 'b'], ANON);
+    const result = await service.compare(['a', 'b'], ANON, 'pl');
     expect(result.rows.find((r) => r.key === 'price')!.bestIndex).toBeNull();
   });
 
@@ -60,7 +62,7 @@ describe('ComparisonService', () => {
       row({ id: 'b', price: 40, ingredientScore: 90 }),
     ];
     const service = new ComparisonService(prismaWith(rows), match);
-    const result = await service.compare(['a', 'b'], ANON);
+    const result = await service.compare(['a', 'b'], ANON, 'pl');
 
     expect(result.verdict).not.toBeNull();
     expect(result.verdict!.productId).toBe('b');
@@ -79,14 +81,18 @@ describe('ComparisonService', () => {
     const rows = [row({ id: 'a' }), row({ id: 'b' })];
 
     const anonPrisma = prismaWith(rows);
-    await new ComparisonService(anonPrisma, match).compare(['a', 'b'], ANON);
+    await new ComparisonService(anonPrisma, match).compare(['a', 'b'], ANON, 'pl');
     expect(anonPrisma.productComparison.create).not.toHaveBeenCalled();
 
     const userPrisma = prismaWith(rows);
-    await new ComparisonService(userPrisma, match).compare(['a', 'b'], {
-      userId: 'u1',
-      profile: null,
-    });
+    await new ComparisonService(userPrisma, match).compare(
+      ['a', 'b'],
+      {
+        userId: 'u1',
+        profile: null,
+      },
+      'pl',
+    );
     expect(userPrisma.productComparison.create).toHaveBeenCalled();
   });
 });

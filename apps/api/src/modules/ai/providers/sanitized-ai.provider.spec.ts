@@ -1,5 +1,6 @@
 import type {
   AdvisorContext,
+  IngredientDescriptionContext,
   ProductAnalysisContext,
   RecommendationExplanationContext,
 } from './ai-provider.interface';
@@ -11,6 +12,11 @@ const EMAIL = 'anna.kowalska@example.com';
 class RecordingProvider extends SanitizedAIProvider {
   readonly name = 'recording';
   received: unknown[] = [];
+
+  protected async describe(context: IngredientDescriptionContext): Promise<null> {
+    this.received.push(context);
+    return null;
+  }
 
   protected async generate(context: AdvisorContext): Promise<string> {
     this.received.push(context);

@@ -4,7 +4,6 @@ import { formatMoney, renderLocalised, vocabTerm } from '../../../common/i18n/ph
 import { SanitizedAIProvider } from './sanitized-ai.provider';
 import type {
   AdvisorContext,
-  AIProvider,
   AnswerLocale,
   ProductAnalysisContext,
   RecommendationExplanationContext,
@@ -88,6 +87,11 @@ const COPY: Record<AnswerLocale, Record<string, (v: Record<string, string>) => s
 @Injectable()
 export class MockAIProvider extends SanitizedAIProvider {
   readonly name = 'mock';
+
+  /** Offline, there is nothing to write from — the entry stays undescribed rather than invented. */
+  protected async describe(): Promise<null> {
+    return null;
+  }
 
   protected async generate(context: AdvisorContext): Promise<string> {
     const { retrieved, profileSummary } = context;

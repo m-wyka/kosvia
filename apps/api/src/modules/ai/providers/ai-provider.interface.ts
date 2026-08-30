@@ -72,8 +72,42 @@ export interface RecommendationExplanationContext {
   profileSummary: string | null;
 }
 
+/**
+ * Facts the describer hands over for one dictionary entry. All of them come
+ * from CosIng; the model only turns them into two plain sentences.
+ */
+export interface IngredientDescriptionContext {
+  inciName: string;
+  chemicalDescription: string | null;
+  /** CosIng function names, verbatim. */
+  cosIngFunctions: string[];
+  isFragranceAllergen: boolean;
+  isRestricted: boolean;
+  /** Hand-written English entry, when one exists — the Polish text must follow it. */
+  existing: IngredientProse | null;
+}
+
+/** One language's worth of prose for a dictionary entry. */
+export interface IngredientProse {
+  /** Two or three plain sentences on what the ingredient does in a formula. */
+  description: string;
+  /** Up to three short plain-language function phrases ("Binds water in the skin"). */
+  functions: string[];
+  /** Everyday name if one is in common use, e.g. "Vitamin C" for Ascorbic Acid. */
+  commonName: string | null;
+  /** Neutral "worth knowing" note, or null. */
+  concerns: string | null;
+}
+
+export interface IngredientDescription {
+  en: IngredientProse;
+  pl: IngredientProse;
+}
+
 export interface AIProvider {
   readonly name: string;
+  /** Writes an informational entry for a dictionary ingredient; null when the provider cannot. */
+  describeIngredient(context: IngredientDescriptionContext): Promise<IngredientDescription | null>;
   /** Conversational answer for the AI Beauty Shopper. */
   generateResponse(context: AdvisorContext): Promise<string>;
   /** Plain-language read of a single formula. */

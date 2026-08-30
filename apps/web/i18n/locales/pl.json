@@ -609,7 +609,9 @@
       "OTHER": "Pozostałe składniki",
       "OTHER_BODY": "Wszystko inne z etykiety.",
       "MORE_ABOUT": "Więcej o tym składniku",
-      "FULL_LIST": "Pełny skład INCI, w kolejności z etykiety"
+      "FULL_LIST": "Pełny skład INCI, w kolejności z etykiety",
+      "FRAGRANCE_ALLERGEN": "Alergen zapachowy",
+      "RESTRICTED": "Aneks III"
     },
     "MATCH_PANEL": {
       "PERSONAL_TITLE": "Twoje dopasowanie",
@@ -686,6 +688,19 @@
       "NEUTRAL": "Neutralny",
       "OCCASIONAL": "Bywa reaktywny",
       "REACTIVE": "Często zgłaszany jako reaktywny"
+    },
+    "CAS": "Numer CAS: {number}",
+    "COSING_FUNCTIONS": "Funkcje według CosIng",
+    "REGULATORY": {
+      "TITLE": "Status regulacyjny",
+      "FRAGRANCE_ALLERGEN": "Alergen zapachowy — musi być wymieniony na etykiecie powyżej 0,001 % w produktach pozostających na skórze i 0,01 % w spłukiwanych (rozporządzenie (UE) 2023/1545).",
+      "RESTRICTED": "Wymieniony w Aneksie III rozporządzenia kosmetycznego UE — dopuszczony z warunkami stosowania.",
+      "PROHIBITED": "Wymieniony w Aneksie II rozporządzenia kosmetycznego UE — niedopuszczony w kosmetykach sprzedawanych w UE.",
+      "ANNEX": "Wymieniony w Aneksie {annex} CosIng.",
+      "NOTE_TITLE": "Warunki stosowania, cytat z aneksu",
+      "NONE": "Nie figuruje w Aneksach II–VI. Każdy składnik produktu sprzedawanego w UE podlega temu samemu rozporządzeniu.",
+      "DISCLAIMER": "To fakt regulacyjny, nie ocena składnika. Produkty na rynku UE spełniają te limity.",
+      "SOURCE": "Źródło: CosIng, Komisja Europejska (CC BY 4.0)."
     }
   },
   "COMPARE": {
@@ -1342,7 +1357,10 @@
     "OWN_BODY": "Oceny składu, Personal Match, wyjaśnienia i porównania są wynikiem własnych algorytmów Kosvii liczonych na podstawie faktów. Nie są częścią żadnej bazy zewnętrznej.",
     "DEMO_TITLE": "Dane demonstracyjne",
     "DEMO_BODY": "Produkty bez podanego źródła to dane demonstracyjne stworzone na potrzeby rozwoju: wymyślone marki, wygenerowane ceny i ilustracyjne opakowania.",
-    "CONTACT": "Widzisz błąd w danych? Poprawki rekordów Open Beauty Facts najlepiej wnosić bezpośrednio na ich stronie; w pozostałych sprawach — napisz do nas."
+    "CONTACT": "Widzisz błąd w danych? Poprawki rekordów Open Beauty Facts najlepiej wnosić bezpośrednio na ich stronie; w pozostałych sprawach — napisz do nas.",
+    "COSING_TITLE": "CosIng — Komisja Europejska",
+    "COSING_BODY": "Nazwy składników (INCI), numery CAS/EC, funkcje oraz wpisy w Aneksach II–VI pochodzą z CosIng — bazy substancji i składników kosmetycznych Komisji Europejskiej prowadzonej na podstawie rozporządzenia (WE) nr 1223/2009. Dane są wykorzystywane na licencji Creative Commons Uznanie autorstwa 4.0. Przedstawiamy je jako fakty regulacyjne i nie przekładamy ich na oceny składników.",
+    "COSING_LINK": "Odwiedź CosIng"
   },
   "CONSENT": {
     "TERMS_LABEL": "Akceptuję regulamin",

@@ -13,6 +13,13 @@ const TOLERANCE_LEVELS: Array<{ minImpact: number; key: string; tone: ToleranceT
 ];
 const REACTIVE_LEVEL = { key: 'REACTIVE', tone: 'blush' as ToleranceTone };
 
+interface RegulatoryFact {
+  key: string;
+  label: string;
+  icon: 'info' | 'check';
+  iconClass: string;
+}
+
 const route = useRoute();
 const { t } = useI18n();
 const vocab = useVocabulary();
@@ -38,6 +45,60 @@ const tolerance = computed(() => {
   const level = TOLERANCE_LEVELS.find((entry) => impact >= entry.minImpact) ?? REACTIVE_LEVEL;
   return { label: t(`INGREDIENTS.TOLERANCE_LEVEL.${level.key}`), tone: level.tone };
 });
+
+const regulatoryFacts = computed(() => {
+  const regulatory = ingredient.value?.regulatory;
+  if (!regulatory) {
+    return [];
+  }
+  const facts: RegulatoryFact[] = [];
+  if (regulatory.isProhibited) {
+    facts.push({
+      key: 'prohibited',
+      label: t('INGREDIENTS.REGULATORY.PROHIBITED'),
+      icon: 'info',
+      iconClass: 'text-critical',
+    });
+  }
+  if (regulatory.isFragranceAllergen) {
+    facts.push({
+      key: 'allergen',
+      label: t('INGREDIENTS.REGULATORY.FRAGRANCE_ALLERGEN'),
+      icon: 'info',
+      iconClass: 'text-caution',
+    });
+  }
+  if (regulatory.isRestricted) {
+    facts.push({
+      key: 'restricted',
+      label: t('INGREDIENTS.REGULATORY.RESTRICTED'),
+      icon: 'info',
+      iconClass: 'text-ink-muted',
+    });
+  }
+  const isOtherAnnex = regulatory.annex && !regulatory.isProhibited && !regulatory.isRestricted;
+  if (isOtherAnnex) {
+    facts.push({
+      key: 'annex',
+      label: t('INGREDIENTS.REGULATORY.ANNEX', { annex: regulatory.annex }),
+      icon: 'check',
+      iconClass: 'text-sage',
+    });
+  }
+  if (!facts.length) {
+    facts.push({
+      key: 'none',
+      label: t('INGREDIENTS.REGULATORY.NONE'),
+      icon: 'check',
+      iconClass: 'text-sage',
+    });
+  }
+  return facts;
+});
+
+const cosIngFunctionList = computed(() =>
+  (ingredient.value?.cosIngFunctions ?? []).map((name) => name.toLowerCase()).join(', '),
+);
 
 useSeo(() => ({
   title: ingredient.value
@@ -120,6 +181,34 @@ useSeo(() => ({
         </div>
       </BaseCard>
     </div>
+
+    <BaseCard class="mt-4">
+      <h2 class="text-sm font-semibold text-ink">{{ $t('INGREDIENTS.REGULATORY.TITLE') }}</h2>
+      <ul class="mt-3 space-y-2">
+        <li
+          v-for="fact in regulatoryFacts"
+          :key="fact.key"
+          class="flex items-start gap-2 text-sm text-ink-soft"
+        >
+          <BaseIcon :name="fact.icon" :size="15" class="mt-0.5 shrink-0" :class="fact.iconClass" />
+          {{ fact.label }}
+        </li>
+      </ul>
+      <div v-if="ingredient.regulatory.note" class="mt-3 rounded-md bg-surface-muted px-3 py-2">
+        <p class="text-xs font-medium text-ink">{{ $t('INGREDIENTS.REGULATORY.NOTE_TITLE') }}</p>
+        <p class="mt-1 text-xs leading-relaxed text-ink-soft">{{ ingredient.regulatory.note }}</p>
+      </div>
+      <p class="mt-3 text-xs text-ink-muted">
+        {{ $t('INGREDIENTS.REGULATORY.DISCLAIMER') }}
+        {{ $t('INGREDIENTS.REGULATORY.SOURCE') }}
+      </p>
+      <p v-if="ingredient.cosIngFunctions.length" class="mt-3 text-xs text-ink-muted">
+        {{ $t('INGREDIENTS.COSING_FUNCTIONS') }}: {{ cosIngFunctionList }}
+      </p>
+      <p v-if="ingredient.casNumber" class="mt-1 text-xs text-ink-muted">
+        {{ $t('INGREDIENTS.CAS', { number: ingredient.casNumber }) }}
+      </p>
+    </BaseCard>
 
     <div
       v-if="ingredient.concerns"

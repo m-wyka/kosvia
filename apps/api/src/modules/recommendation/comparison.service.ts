@@ -6,6 +6,7 @@ import type {
   ComparisonVerdictDto,
   LocalisedText,
 } from '@kosvia/shared';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../products/product.select';
@@ -25,7 +26,11 @@ export class ComparisonService {
     private readonly match: PersonalMatchService,
   ) {}
 
-  async compare(identifiers: string[], viewer: ViewerContext): Promise<ComparisonResultDto> {
+  async compare(
+    identifiers: string[],
+    viewer: ViewerContext,
+    locale: AnswerLocale,
+  ): Promise<ComparisonResultDto> {
     const unique = [...new Set(identifiers.filter(Boolean))];
     if (unique.length < 2 || unique.length > 4) {
       throw new BadRequestException('Choose between two and four products to compare.');
@@ -45,7 +50,7 @@ export class ComparisonService {
       .filter((row): row is ProductRow => Boolean(row));
 
     const scores = this.match.scoreMany(ordered.map(toScorable), viewer.profile, viewer.shelf);
-    const products = ordered.map((row) => toProductDto(row, scores.get(row.id) ?? null));
+    const products = ordered.map((row) => toProductDto(row, scores.get(row.id) ?? null, locale));
 
     const prices = products.map((p) => p.lowestPrice);
     const perHundred = ordered.map((row, index) =>

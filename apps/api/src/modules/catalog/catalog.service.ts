@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import type { BrandDto, CategoryDto, IngredientDto, IngredientTag, StoreDto } from '@kosvia/shared';
+import type { BrandDto, CategoryDto, IngredientDto, StoreDto } from '@kosvia/shared';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { normalizeToken } from '../inci/inci-parser';
+import { toIngredientDto } from '../products/product.mapper';
+import { INGREDIENT_INCLUDE } from '../products/product.select';
 
 const MAX_INGREDIENT_RESULTS = 200;
 
@@ -93,26 +96,32 @@ export class CatalogService {
     };
   }
 
-  async ingredients(search?: string, tag?: string, take = 60): Promise<IngredientDto[]> {
+  async ingredients(
+    locale: AnswerLocale,
+    search?: string,
+    tag?: string,
+    take = 60,
+  ): Promise<IngredientDto[]> {
     const limit = Math.min(take, MAX_INGREDIENT_RESULTS);
     const searchedIds = search ? await this.ingredientIdsMatching(search, limit) : null;
+    const isBrowsing = !searchedIds;
     const rows = await this.prisma.ingredient.findMany({
       where: {
         ...(searchedIds && { id: { in: searchedIds } }),
         ...(tag && { tags: { has: tag } }),
+        ...(isBrowsing && { description: { not: null } }),
       },
-      include: {
-        targetsConcerns: { select: { slug: true } },
-        supportsGoals: { select: { slug: true } },
-      },
+      include: INGREDIENT_INCLUDE,
       orderBy: { inciName: 'asc' },
       take: limit,
     });
     if (!searchedIds) {
-      return rows.map(toIngredientDto);
+      return rows.map((row) => toIngredientDto(row, locale));
     }
     const rowById = new Map(rows.map((row) => [row.id, row]));
-    return searchedIds.flatMap((id) => rowById.get(id) ?? []).map(toIngredientDto);
+    return searchedIds
+      .flatMap((id) => rowById.get(id) ?? [])
+      .map((row) => toIngredientDto(row, locale));
   }
 
   /** Prefix hits first (short queries), then trigram similarity for typos and mid-word matches. */
@@ -139,16 +148,13 @@ export class CatalogService {
     return rows.map((row) => row.id);
   }
 
-  async ingredient(slug: string): Promise<IngredientDto> {
+  async ingredient(slug: string, locale: AnswerLocale): Promise<IngredientDto> {
     const row = await this.prisma.ingredient.findUnique({
       where: { slug },
-      include: {
-        targetsConcerns: { select: { slug: true } },
-        supportsGoals: { select: { slug: true } },
-      },
+      include: INGREDIENT_INCLUDE,
     });
     if (!row) throw new NotFoundException('We could not find that ingredient.');
-    return toIngredientDto(row);
+    return toIngredientDto(row, locale);
   }
 
   async stores(): Promise<StoreDto[]> {
@@ -161,40 +167,4 @@ export class CatalogService {
       websiteUrl: row.websiteUrl,
     }));
   }
-}
-
-type IngredientRow = {
-  id: string;
-  inciName: string;
-  slug: string;
-  commonName: string | null;
-  description: string | null;
-  functions: string[];
-  tags: string[];
-  concerns: string | null;
-  comedogenicRating: number | null;
-  sensitivityImpact: number;
-  goodForSkinTypes: IngredientDto['goodForSkinTypes'];
-  isActiveIngredient: boolean;
-  targetsConcerns: Array<{ slug: string }>;
-  supportsGoals: Array<{ slug: string }>;
-};
-
-function toIngredientDto(row: IngredientRow): IngredientDto {
-  return {
-    id: row.id,
-    inciName: row.inciName,
-    slug: row.slug,
-    commonName: row.commonName,
-    description: row.description,
-    functions: row.functions,
-    tags: row.tags as IngredientTag[],
-    concerns: row.concerns,
-    comedogenicRating: row.comedogenicRating,
-    sensitivityImpact: row.sensitivityImpact,
-    goodForSkinTypes: row.goodForSkinTypes,
-    targetsConcerns: row.targetsConcerns.map((c) => c.slug),
-    supportsGoals: row.supportsGoals.map((g) => g.slug),
-    isActiveIngredient: row.isActiveIngredient,
-  };
 }

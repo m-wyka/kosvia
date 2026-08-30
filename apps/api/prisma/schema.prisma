@@ -392,8 +392,36 @@ model Ingredient {
   goodForSkinTypes  SkinType[] @default([])
   isActiveIngredient Boolean   @default(false)
 
+  /// CosIng substance id — the stable key the dictionary import upserts on.
+  cosIngRef           String?   @unique
+  casNumber           String?
+  ecNumber            String?
+  innName             String?
+  /// Chemical description as published by CosIng (English, technical).
+  chemicalDescription String?
+  /// Annex III entry carrying a labelling obligation — Regulation (EU) 2023/1545.
+  isFragranceAllergen Boolean   @default(false)
+  /// Listed in Annex III (restricted) — a regulatory fact, never a verdict.
+  isRestricted        Boolean   @default(false)
+  /// Listed in Annex II (prohibited in cosmetic products).
+  isProhibited        Boolean   @default(false)
+  /// "II" | "III" | "IV" | "V" | "VI" — the annex the ingredient is listed in.
+  cosIngAnnex         String?
+  /// Maximum concentration and conditions of use, quoted from the annex.
+  restrictionNote     String?
+  /// Curated by hand — imports only refresh regulatory facts on such rows.
+  isManuallyEdited    Boolean   @default(false)
+  /// When the description was written by the AI describer (null = human or none).
+  descriptionGeneratedAt DateTime?
+  /// Polish prose, served when the request asks for Polish; English columns are the fallback.
+  commonNamePl  String?
+  descriptionPl String?
+  functionsPl   String[]  @default([])
+  concernsPl    String?
+
   products        ProductIngredient[]
   aliases         IngredientAlias[]
+  cosIngFunctions IngredientFunctionOnIngredient[]
   suggestedFor    UnmatchedToken[]
   sourceId        String?
   source          DataSource?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
@@ -403,7 +431,35 @@ model Ingredient {
 
   @@index([inciName])
   @@index([normalizedName])
+  @@index([isFragranceAllergen])
   @@map("ingredients")
+}
+
+/// One CosIng function ("HUMECTANT", "SKIN CONDITIONING") — the regulator's vocabulary, kept verbatim.
+model IngredientFunction {
+  id          String  @id @default(cuid())
+  /// UPPER_SNAKE code derived from the CosIng name, e.g. SKIN_CONDITIONING.
+  code        String  @unique
+  name        String
+  description String?
+  /// CosIng function id, so renames upstream do not create duplicates.
+  cosIngRef   String? @unique
+
+  ingredients IngredientFunctionOnIngredient[]
+
+  @@map("ingredient_functions")
+}
+
+model IngredientFunctionOnIngredient {
+  ingredientId String
+  functionId   String
+
+  ingredient Ingredient         @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  function   IngredientFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+
+  @@id([ingredientId, functionId])
+  @@index([functionId])
+  @@map("ingredient_functions_on_ingredients")
 }
 
 /// The join carries data: INCI position is meaningful (earlier = more of it).

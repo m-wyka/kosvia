@@ -10,12 +10,9 @@ import type {
   ProductSummaryDto,
   StoreDto,
 } from '@kosvia/shared';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import type { ScorableProduct } from '../scoring/types';
-import {
-  hasMatchedIngredient,
-  type MatchedProductIngredientRow,
-  type ProductRow,
-} from './product.select';
+import { hasMatchedIngredient, type IngredientRow, type ProductRow } from './product.select';
 
 export function decimalToNumber(value: Prisma.Decimal | number | null | undefined): number | null {
   if (value === null || value === undefined) return null;
@@ -42,24 +39,44 @@ export function toCategoryDto(category: ProductRow['category']): CategoryDto {
   };
 }
 
-export function toIngredientDto(
-  ingredient: MatchedProductIngredientRow['ingredient'],
-): IngredientDto {
+/** Polish prose when asked for and present; the English columns are the fallback. */
+const localisedProse = (ingredient: IngredientRow, locale: AnswerLocale) => {
+  const isPolish = locale === 'pl';
+  return {
+    commonName: (isPolish && ingredient.commonNamePl) || ingredient.commonName,
+    description: (isPolish && ingredient.descriptionPl) || ingredient.description,
+    functions:
+      isPolish && ingredient.functionsPl.length ? ingredient.functionsPl : ingredient.functions,
+    concerns: (isPolish && ingredient.concernsPl) || ingredient.concerns,
+  };
+};
+
+export function toIngredientDto(ingredient: IngredientRow, locale: AnswerLocale): IngredientDto {
+  const prose = localisedProse(ingredient, locale);
   return {
     id: ingredient.id,
     inciName: ingredient.inciName,
     slug: ingredient.slug,
-    commonName: ingredient.commonName,
-    description: ingredient.description,
-    functions: ingredient.functions,
+    commonName: prose.commonName,
+    description: prose.description,
+    functions: prose.functions,
     tags: ingredient.tags as IngredientTag[],
-    concerns: ingredient.concerns,
+    concerns: prose.concerns,
     comedogenicRating: ingredient.comedogenicRating,
     sensitivityImpact: ingredient.sensitivityImpact,
     goodForSkinTypes: ingredient.goodForSkinTypes,
     targetsConcerns: ingredient.targetsConcerns.map((c) => c.slug),
     supportsGoals: ingredient.supportsGoals.map((g) => g.slug),
     isActiveIngredient: ingredient.isActiveIngredient,
+    casNumber: ingredient.casNumber,
+    cosIngFunctions: ingredient.cosIngFunctions.map((link) => link.function.name),
+    regulatory: {
+      isFragranceAllergen: ingredient.isFragranceAllergen,
+      isRestricted: ingredient.isRestricted,
+      isProhibited: ingredient.isProhibited,
+      annex: ingredient.cosIngAnnex,
+      note: ingredient.restrictionNote,
+    },
   };
 }
 
@@ -105,7 +122,11 @@ export function toProductSummary(
   };
 }
 
-export function toProductDto(row: ProductRow, personalMatch?: PersonalMatchDto | null): ProductDto {
+export function toProductDto(
+  row: ProductRow,
+  personalMatch: PersonalMatchDto | null | undefined,
+  locale: AnswerLocale,
+): ProductDto {
   const summary = toProductSummary(row, personalMatch);
   return {
     ...summary,
@@ -115,7 +136,7 @@ export function toProductDto(row: ProductRow, personalMatch?: PersonalMatchDto |
     ingredients: row.ingredients.filter(hasMatchedIngredient).map((entry) => ({
       position: entry.position,
       concentrationRange: entry.concentrationRange,
-      ingredient: toIngredientDto(entry.ingredient),
+      ingredient: toIngredientDto(entry.ingredient, locale),
     })),
     offers: row.offers.map(toOfferDto),
     pricePerHundredMl: pricePerHundred(summary.lowestPrice, row.volume, row.volumeUnit),

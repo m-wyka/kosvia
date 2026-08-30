@@ -1,4 +1,4 @@
-# STATUS — co jest zrobione z AUDIT.md (stan na 2026-08-29)
+# STATUS — co jest zrobione z AUDIT.md (stan na 2026-08-30)
 
 Ten plik jest nowszy niż `AUDIT.md`. Sekcje 3 i 6 audytu są **wykonane w całości**;
 czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–07) nadal aktualna.
@@ -18,6 +18,7 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 | 9 | `735a715` | GitHub Actions (`checks` + `database` na `pgvector/pgvector:pg16`), `/health` + `/health/ready`, `AuditLog` + `/admin/audit` |
 | 9 | `00149ff` | `MatchWeightSet` (`/admin/match-weights`), wagi wstrzykiwane do obu przebiegów; procent < 50 ukryty (pasma) |
 | 9 | `6fc6bf1` | `ProfileExcludedIngredient` z `reason: ALLERGY \| PREFERENCE` — alergia = twardy filtr, preferencja = kara |
+| 01 et. 1 | _(bieżący)_ | **CosIng**: `npm run import:cosing` (glosariusz 33 654 wpisów przez EU Search API + Aneksy II–VI z CSV; idempotentny, `--dry-run`, `--resume`, `--max-pages`); po pierwszym przebiegu słownik ma **32 860** składników (65 alergenów zapachowych, 281 z Aneksu III, 236 z Aneksu II, 83 funkcje CosIng); `Ingredient.{cosIngRef,casNumber,ecNumber,innName,chemicalDescription,isFragranceAllergen,isRestricted,isProhibited,cosIngAnnex,restrictionNote,isManuallyEdited}`; tabele `IngredientFunction` + `IngredientFunctionOnIngredient`; po imporcie automatyczny rematch kolejki (`UnmatchedTokenService.rematchPending`) i odkrycie ukrytych produktów (`republishHidden`); `npm run ingredients:describe` — opisy AI (`AIProvider.describeIngredient`, structured output) tylko dla składników występujących w produktach; status regulacyjny na stronie składnika i badge na liście produktu; atrybucja CC BY 4.0 na `/about-data` |
 
 ## Decyzje podjęte po drodze (odstępstwa od 00–07)
 
@@ -27,11 +28,16 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 - **02 §4** — konto w karencji **nie jest** zablokowane: logowanie działa, profil pokazuje baner z anulowaniem (brak mailera na link „zmieniłam zdanie").
 - **02 §5** — eksport synchroniczny (JSON w odpowiedzi), nie link 24 h.
 - **07** — rematch po zmianie aliasu filtruje w pamięci wiersze `ingredientId IS NULL`; przy milionach wierszy dodać `normalizedText` na `ProductIngredient`.
+- **01 et. 1** — funkcje CosIng są tabelą (`IngredientFunction`), ale `Ingredient.tags` zostaje tablicą stringów: tagi to wejście scoringu i mapują się z funkcji CosIng deterministycznie (`FUNCTION_TAGS` w `cosing-mapper.ts`); szerokie funkcje (SKIN CONDITIONING) nie dają tagu. Import nie dotyka `tags`, `sensitivityImpact`, `isActiveIngredient` na wpisach ręcznych (`isManuallyEdited`) ani na wpisach, które już mają tagi.
+- **01 et. 1** — nazwy CosIng, które po `normalizeToken` zlewają się w jeden token (nawiasy są usuwane — ok. 3%, egzotyczne polimery/peptydy), są pomijane jako `duplicate-name`; `normalizedName` musi być jednoznaczne dla matchera.
+- **01 et. 1** — opisy składników mają wersję EN (`description`, `functions`, `commonName`, `concerns`) i PL (kolumny `…Pl`); API wybiera po `Accept-Language` (`@RequestLocale()`, front wysyła aktywne locale w `01.api.ts`), fallback EN. Describer generuje obie naraz wyłącznie z faktów CosIng i tłumaczy 139 wpisów z seeda; provider offline zwraca `null`.
+- **01 et. 1** — EU Search API ucina paginację na 10 000 trafień (`max_result_window`), więc glosariusz jest czytany w zakresach `substanceId` po pierwszej cyfrze (`planIngredientRanges`); zakres od `"0"` API odpowiada całym zbiorem, dlatego pierwsza cyfra zaczyna się od 1.
+- **01 et. 1** — klucz do EU Search API pochodzi z publicznego configu aplikacji CosIng (`assets/env-json-config.json`); jeśli KE go zmieni, trzeba podmienić `SEARCH_API_KEY` w `cosing-client.ts`.
 - Nierozpoznane składniki nie są widoczne w publicznym `ProductDto` (filtr `hasMatchedIngredient`) — decyzja UX odłożona.
 
 ## Otwarte (osobne zadania, w tej kolejności)
 
-1. **CosIng** (`01` etap 1) — słownik ma 139 składników; wszystkie produkty z OBF są ukryte (rozpoznanie 0.4–0.6). Największa dźwignia jakości.
+1. Opisy AI dla składników: `AI_PROVIDER=anthropic` + `npm run ingredients:describe -w @kosvia/api` (domyślnie 200 najczęściej występujących); do rozważenia kolumna z locale dla opisów PL.
 2. **`ProductVariant`** (`03` §4) — 3-krokowa migracja `ean`/`volume`/`imageUrl`; zrobić **przed** feedami afiliacyjnymi.
 3. Feedy afiliacyjne (`01` etap 4) — po publicznym uruchomieniu.
 4. Keyset (`05` §5), autocomplete w nagłówku (`05` §6) — gdy będzie nieskończony scroll.
@@ -41,8 +47,8 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 ## Środowisko
 
 - Baza dev: kontener `kosvia-postgres` (`pgvector/pgvector:pg16`, port **5433**); `.env` i `apps/api/.env` wskazują 5433. Homebrew Postgres na 5432 nie jest już używany.
-- 15 migracji; `prisma migrate diff` pokazuje fałszywy drift (GIN, kolumna generowana, `vector`) — źródłem prawdy jest `migrate status` + `migrate deploy`.
+- 16 migracji; `prisma migrate diff` pokazuje fałszywy drift (GIN, kolumna generowana, `vector`) — źródłem prawdy jest `migrate status` + `migrate deploy`.
 - `@kosvia/shared` jest czytane przez API z `dist` — po zmianie wartości runtime: `npm run build -w @kosvia/shared`.
 - Prettier tylko z roota (`.prettierignore` obejmuje `phrases.generated.ts`, `docs/spec`, migracje); po edycji locale: `npm run sync:phrases -w @kosvia/api`.
-- Skrypty: `import:obf`, `traits:recompute`, `account:purge` (`-w @kosvia/api`).
+- Skrypty: `import:obf`, `import:cosing`, `ingredients:describe`, `traits:recompute`, `account:purge` (`-w @kosvia/api`).
 - Konta demo: `demo@kosvia.app / Password123!` (wszystkie zgody), `admin@kosvia.app / Admin123!`.

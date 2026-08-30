@@ -208,6 +208,24 @@ export interface IngredientDto extends IngredientSummaryDto {
   supportsGoals: string[];
   /** True for headline actives — retinoids, acids, vitamin C and the like. */
   isActiveIngredient: boolean;
+  casNumber: string | null;
+  /** CosIng function names, verbatim ("HUMECTANT", "SKIN CONDITIONING"). */
+  cosIngFunctions: string[];
+  /** Regulatory facts from CosIng Annexes II–VI — stated, never interpreted. */
+  regulatory: IngredientRegulatoryDto;
+}
+
+export interface IngredientRegulatoryDto {
+  /** Annex III entry with a labelling obligation — Regulation (EU) 2023/1545. */
+  isFragranceAllergen: boolean;
+  /** Listed in Annex III (restricted use). */
+  isRestricted: boolean;
+  /** Listed in Annex II (prohibited in cosmetic products). */
+  isProhibited: boolean;
+  /** "II" | "III" | "IV" | "V" | "VI" */
+  annex: string | null;
+  /** Maximum concentration and conditions of use, quoted from the annex. */
+  note: string | null;
 }
 
 export interface ProductIngredientDto {

@@ -2,6 +2,8 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { BrandDto, CategoryDto, IngredientDto, StoreDto } from '@kosvia/shared';
 import { Public } from '../../common/decorators/public.decorator';
+import { RequestLocale } from '../../common/decorators/request-locale.decorator';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import { CatalogService } from './catalog.service';
 
 @ApiTags('catalog')
@@ -30,14 +32,21 @@ export class CatalogController {
 
   @Get('ingredients')
   @ApiOperation({ summary: 'Search the ingredient reference' })
-  ingredients(@Query('q') q?: string, @Query('tag') tag?: string): Promise<IngredientDto[]> {
-    return this.catalog.ingredients(q, tag);
+  ingredients(
+    @RequestLocale() locale: AnswerLocale,
+    @Query('q') q?: string,
+    @Query('tag') tag?: string,
+  ): Promise<IngredientDto[]> {
+    return this.catalog.ingredients(locale, q, tag);
   }
 
   @Get('ingredients/:slug')
   @ApiOperation({ summary: 'A single ingredient' })
-  ingredient(@Param('slug') slug: string): Promise<IngredientDto> {
-    return this.catalog.ingredient(slug);
+  ingredient(
+    @Param('slug') slug: string,
+    @RequestLocale() locale: AnswerLocale,
+  ): Promise<IngredientDto> {
+    return this.catalog.ingredient(slug, locale);
   }
 
   @Get('stores')

@@ -13,6 +13,13 @@ const RECOGNIZED_THRESHOLD = 0.9;
 
 type ProductIngredientRowInput = Omit<Prisma.ProductIngredientCreateManyInput, 'productId'>;
 
+/** The three fields the position-weighted recognition share is computed from. */
+export interface RecognizableRow {
+  position: number;
+  isAfterMayContain?: boolean;
+  matchConfidence?: number;
+}
+
 /** Who is writing this label — stamped on every row for attribution and import safety. */
 export interface LabelProvenance {
   sourceId?: string;
@@ -141,7 +148,7 @@ export class InciImportService {
     return rows.map((row, index) => ({ ...row, position: index + 1 }));
   }
 
-  private recognizedRatio(rows: ProductIngredientRowInput[]): number {
+  recognizedRatio(rows: RecognizableRow[]): number {
     let weighted = 0;
     let total = 0;
     for (const row of rows) {

@@ -10,6 +10,7 @@ import type {
   ProductSuggestionDto,
   ProductSummaryDto,
 } from '@kosvia/shared';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { IngredientScoreService } from '../scoring/ingredient-score.service';
@@ -183,19 +184,23 @@ export class ProductsService {
     };
   }
 
-  async findBySlug(slug: string, viewer: ViewerContext): Promise<ProductDto> {
+  async findBySlug(slug: string, viewer: ViewerContext, locale: AnswerLocale): Promise<ProductDto> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
     if (!row || !row.isActive) throw new NotFoundException('We could not find that product.');
-    return toProductDto(row, this.scoreOne(row, viewer));
+    return toProductDto(row, this.scoreOne(row, viewer), locale);
   }
 
-  async findByIdOrSlug(idOrSlug: string, viewer: ViewerContext): Promise<ProductDto> {
+  async findByIdOrSlug(
+    idOrSlug: string,
+    viewer: ViewerContext,
+    locale: AnswerLocale,
+  ): Promise<ProductDto> {
     const row = await this.prisma.product.findFirst({
       where: { OR: [{ id: idOrSlug }, { slug: idOrSlug }] },
       include: PRODUCT_INCLUDE,
     });
     if (!row) throw new NotFoundException('We could not find that product.');
-    return toProductDto(row, this.scoreOne(row, viewer));
+    return toProductDto(row, this.scoreOne(row, viewer), locale);
   }
 
   /** Used by comparison, alternatives and the AI retrieval layer. */

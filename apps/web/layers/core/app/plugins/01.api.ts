@@ -48,6 +48,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     credentials: 'include',
     retry: 0,
     onRequest: ({ options }) => {
+      options.headers.set('accept-language', String(nuxtApp.$i18n.locale.value));
       if (import.meta.server && serverCookie) {
         options.headers.set('cookie', serverCookie);
       }

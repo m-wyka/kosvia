@@ -4,7 +4,11 @@ import type { PaginatedResult, UnmatchedTokenDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
 import { normalizeToken } from './inci-parser';
-import { MATCH_CONFIDENCE, type IngredientSuggestion } from './inci-matcher.service';
+import {
+  InciMatcherService,
+  MATCH_CONFIDENCE,
+  type IngredientSuggestion,
+} from './inci-matcher.service';
 
 const MAX_RAW_SAMPLES = 5;
 const DEFAULT_PAGE_SIZE = 25;
@@ -17,6 +21,12 @@ export interface UnmatchedTokenQuery {
 
 export interface ResolutionSummary {
   token: UnmatchedTokenDto;
+  rematchedRows: number;
+  affectedProducts: number;
+}
+
+export interface RematchSummary {
+  resolvedTokens: number;
   rematchedRows: number;
   affectedProducts: number;
 }
@@ -41,6 +51,7 @@ export class UnmatchedTokenService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly traits: ProductTraitsService,
+    private readonly matcher: InciMatcherService,
   ) {}
 
   async record(
@@ -169,6 +180,60 @@ export class UnmatchedTokenService {
       select: TOKEN_SELECT,
     });
     return toDto(updated);
+  }
+
+  /**
+   * After the dictionary grows (a CosIng import, a batch of aliases) every
+   * pending token gets one more exact lookup; hits are resolved the same way
+   * an admin would resolve them by hand.
+   */
+  async rematchPending(): Promise<RematchSummary> {
+    const pending = await this.prisma.unmatchedToken.findMany({
+      where: { status: 'PENDING' },
+      select: { id: true, normalized: true },
+    });
+    const matches = await this.matcher.matchMany(pending.map((token) => token.normalized));
+    const candidates = await this.prisma.productIngredient.findMany({
+      where: { ingredientId: null },
+      select: { id: true, productId: true, rawText: true },
+    });
+    const rowsByNormalized = new Map<string, typeof candidates>();
+    for (const row of candidates) {
+      const normalized = normalizeToken(row.rawText);
+      rowsByNormalized.set(normalized, [...(rowsByNormalized.get(normalized) ?? []), row]);
+    }
+
+    const productIds = new Set<string>();
+    let rematchedRows = 0;
+    let resolvedTokens = 0;
+    for (const token of pending) {
+      const match = matches.get(token.normalized);
+      if (!match) {
+        continue;
+      }
+      const rows = rowsByNormalized.get(token.normalized) ?? [];
+      if (rows.length) {
+        await this.prisma.productIngredient.updateMany({
+          where: { id: { in: rows.map((row) => row.id) } },
+          data: { ingredientId: match.ingredientId, matchConfidence: match.confidence },
+        });
+        rows.forEach((row) => productIds.add(row.productId));
+        rematchedRows += rows.length;
+      }
+      await this.prisma.unmatchedToken.update({
+        where: { id: token.id },
+        data: {
+          status: 'MAPPED',
+          resolvedAt: new Date(),
+          suggestedIngredientId: match.ingredientId,
+        },
+      });
+      resolvedTokens += 1;
+    }
+    if (productIds.size) {
+      await this.traits.refresh([...productIds]);
+    }
+    return { resolvedTokens, rematchedRows, affectedProducts: productIds.size };
   }
 
   private async rematchRows(

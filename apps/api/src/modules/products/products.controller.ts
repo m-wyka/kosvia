@@ -7,6 +7,8 @@ import type {
   ProductSuggestionDto,
 } from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
+import { RequestLocale } from '../../common/decorators/request-locale.decorator';
+import type { AnswerLocale } from '../../common/i18n/phrases';
 import {
   CurrentUser,
   type AuthenticatedUser,
@@ -45,9 +47,10 @@ export class ProductsController {
   async detail(
     @Param('slug') slug: string,
     @CurrentUser() user: AuthenticatedUser | null,
+    @RequestLocale() locale: AnswerLocale,
   ): Promise<ProductDto> {
     const viewer = await this.viewers.load(user?.id);
-    return this.products.findBySlug(slug, viewer);
+    return this.products.findBySlug(slug, viewer, locale);
   }
 
   @Get(':slug/ingredient-score')

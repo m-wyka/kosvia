@@ -1,6 +1,8 @@
 import type {
   AdvisorContext,
   AIProvider,
+  IngredientDescription,
+  IngredientDescriptionContext,
   ProductAnalysisContext,
   RecommendationExplanationContext,
 } from './ai-provider.interface';
@@ -29,6 +31,13 @@ export abstract class SanitizedAIProvider implements AIProvider {
     return this.explain(sanitize(context));
   }
 
+  describeIngredient(context: IngredientDescriptionContext): Promise<IngredientDescription | null> {
+    return this.describe(sanitize(context));
+  }
+
+  protected abstract describe(
+    context: IngredientDescriptionContext,
+  ): Promise<IngredientDescription | null>;
   protected abstract generate(context: AdvisorContext): Promise<string>;
   protected abstract analyze(context: ProductAnalysisContext): Promise<string>;
   protected abstract explain(context: RecommendationExplanationContext): Promise<string>;

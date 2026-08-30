@@ -96,12 +96,26 @@ const fullList = computed(() =>
                   :key="tag"
                   :tag="tag"
                 />
+                <BaseBadge
+                  v-if="entry.ingredient.regulatory.isFragranceAllergen"
+                  tone="caution"
+                  size="xs"
+                >
+                  {{ $t('PRODUCT.LIST.FRAGRANCE_ALLERGEN') }}
+                </BaseBadge>
+                <BaseBadge
+                  v-else-if="entry.ingredient.regulatory.isRestricted"
+                  tone="neutral"
+                  size="xs"
+                >
+                  {{ $t('PRODUCT.LIST.RESTRICTED') }}
+                </BaseBadge>
               </span>
             </span>
             <BaseIcon
               name="chevron-down"
               :size="16"
-              class="mt-1 shrink-0 text-ink-faint transition-transform duration-[--duration-fast]"
+              class="mt-1 shrink-0 text-ink-faint transition-transform duration-fast"
               :class="expanded === entry.ingredient.id && 'rotate-180'"
             />
           </button>

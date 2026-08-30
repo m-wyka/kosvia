@@ -2,15 +2,50 @@ import { Injectable, Logger } from '@nestjs/common';
 import Anthropic from '@anthropic-ai/sdk';
 import type { LocalisedText } from '@kosvia/shared';
 import { formatPrice } from '@kosvia/shared';
+import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
 import {
   LOCALE_NAMES,
   SAFETY_RULES,
   type AdvisorContext,
+  type IngredientDescription,
+  type IngredientDescriptionContext,
+  type IngredientProse,
   type ProductAnalysisContext,
   type RecommendationExplanationContext,
 } from './ai-provider.interface';
 import { MockAIProvider } from './mock-ai.provider';
 import { SanitizedAIProvider } from './sanitized-ai.provider';
+
+const PROSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    description: { type: 'string' },
+    functions: { type: 'array', items: { type: 'string' } },
+    commonName: { type: ['string', 'null'] },
+    concerns: { type: ['string', 'null'] },
+  },
+  required: ['description', 'functions', 'commonName', 'concerns'],
+  additionalProperties: false,
+} as const;
+
+const INGREDIENT_DESCRIPTION_FORMAT = jsonSchemaOutputFormat({
+  type: 'object',
+  properties: { en: PROSE_SCHEMA, pl: PROSE_SCHEMA },
+  required: ['en', 'pl'],
+  additionalProperties: false,
+} as const);
+
+const MAX_FUNCTION_PHRASES = 3;
+
+const cleanProse = (prose: IngredientProse): IngredientProse => ({
+  description: prose.description.trim(),
+  functions: prose.functions
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .slice(0, MAX_FUNCTION_PHRASES),
+  commonName: prose.commonName?.trim() || null,
+  concerns: prose.concerns?.trim() || null,
+});
 
 /**
  * Generated sentences as prompt material. The model is told which language to
@@ -97,6 +132,59 @@ export class AnthropicAIProvider extends SanitizedAIProvider {
       () => this.fallback.generateResponse(context),
       context.history,
     );
+  }
+
+  protected async describe(
+    context: IngredientDescriptionContext,
+  ): Promise<IngredientDescription | null> {
+    const facts = [
+      `INCI NAME: ${context.inciName}`,
+      context.chemicalDescription ? `CHEMICAL DESCRIPTION: ${context.chemicalDescription}` : '',
+      context.cosIngFunctions.length
+        ? `FUNCTIONS (CosIng): ${context.cosIngFunctions.join(', ')}`
+        : 'FUNCTIONS (CosIng): none listed',
+      context.isFragranceAllergen
+        ? 'REGULATORY: listed as a fragrance allergen with a labelling obligation (Regulation (EU) 2023/1545).'
+        : '',
+      context.isRestricted ? 'REGULATORY: listed in Annex III (restricted use).' : '',
+      context.existing
+        ? `EXISTING ENGLISH ENTRY (keep its meaning; return it unchanged as "en" and translate it as "pl"): ${JSON.stringify(context.existing)}`
+        : '',
+    ].filter(Boolean);
+
+    const prompt = [
+      'Write the ingredient-library entry for this cosmetic ingredient in two languages: "en" (English) and "pl" (Polish). Both must say the same thing; the Polish is natural, not word-for-word.',
+      'Use only the facts below. If the facts are too thin to say what it does, keep the description to what the functions imply and say nothing more.',
+      'description: two or three plain sentences for a shopper — what it does in a formula and what kind of product it is typical for.',
+      'functions: up to three short phrases in plain language, e.g. "Binds water in the skin" / "Wiąże wodę w skórze".',
+      'commonName: an everyday name only if one is genuinely in common use (e.g. "Vitamin C" / "Witamina C" for Ascorbic Acid); otherwise null.',
+      'concerns: one neutral sentence worth knowing (e.g. a labelling obligation, a fragrance allergen) or null when there is nothing factual to say.',
+      'Never call an ingredient safe, unsafe, toxic, natural, clean or bad; never make a health claim.',
+      '',
+      ...facts,
+    ].join('\n');
+
+    try {
+      const response = await this.client.messages.parse({
+        model: this.model,
+        max_tokens: 1500,
+        output_config: { effort: 'low', format: INGREDIENT_DESCRIPTION_FORMAT },
+        system: SAFETY_RULES,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      if (response.stop_reason === 'refusal' || !response.parsed_output) {
+        return null;
+      }
+      return {
+        en: cleanProse(response.parsed_output.en),
+        pl: cleanProse(response.parsed_output.pl),
+      };
+    } catch (error) {
+      this.logger.error(
+        `Claude describe request failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return null;
+    }
   }
 
   protected async analyze(context: ProductAnalysisContext): Promise<string> {

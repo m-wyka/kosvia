@@ -27,6 +27,15 @@ const entry = (
       targetsConcerns: [],
       supportsGoals: [],
       isActiveIngredient: false,
+      casNumber: null,
+      cosIngFunctions: [],
+      regulatory: {
+        isFragranceAllergen: false,
+        isRestricted: false,
+        isProhibited: false,
+        annex: null,
+        note: null,
+      },
       ...overrides,
     } as IngredientDto,
   };
