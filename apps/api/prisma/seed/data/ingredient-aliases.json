@@ -1,0 +1,430 @@
+{
+  "Butyrospermum Parkii Butter": [
+    {
+      "alias": "Butyrospermum Parkii",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Shea Butter",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Beurre de karité",
+      "kind": "TRANSLATION"
+    },
+    {
+      "alias": "Burro di karité",
+      "kind": "TRANSLATION"
+    },
+    {
+      "alias": "Masło shea",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Mineral Oil": [
+    {
+      "alias": "Paraffinum Liquidum",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Huile minérale",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Panthenol": [
+    {
+      "alias": "D-Panthenol",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Alpha-Arbutin": [
+    {
+      "alias": "Alpha Arbutin",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Parfum": [
+    {
+      "alias": "Perfume",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Parfum Fragrance",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Flagrance",
+      "kind": "TYPO"
+    }
+  ],
+  "Prunus Amygdalus Dulcis Oil": [
+    {
+      "alias": "Prunus Dulcis Oil",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Sweet Almond Oil",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Huile d'amande douce",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Prunus Armeniaca Kernel Oil": [
+    {
+      "alias": "Apricot Kernel Oil",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Huile de noyau d'abricot",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Xanthan Gum": [
+    {
+      "alias": "Gomme xanthane",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Citric Acid": [
+    {
+      "alias": "Acide citrique",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Allantoin": [
+    {
+      "alias": "Allantoïne",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Cetearyl Alcohol": [
+    {
+      "alias": "Alcool cétéarylique",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Isopropyl Palmitate": [
+    {
+      "alias": "Palmitate d'isopropyle",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Cetyl Esters": [
+    {
+      "alias": "Esters de cétyle",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Ethylhexyl Salicylate": [
+    {
+      "alias": "Octisalate",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Octyl Salicylate",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Ethylhexyl Methoxycinnamate": [
+    {
+      "alias": "Octinoxate",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Octyl Methoxycinnamate",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Butyl Methoxydibenzoylmethane": [
+    {
+      "alias": "Avobenzone",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Tocopherol": [
+    {
+      "alias": "Tocopherols",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Glyceryl Stearate": [
+    {
+      "alias": "Glyceryl Mono Stearate",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Glyceryl Monostearate",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Glyceril Stearate",
+      "kind": "TYPO"
+    }
+  ],
+  "Persea Gratissima Oil": [
+    {
+      "alias": "Avocado Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Sclerocarya Birrea Seed Oil": [
+    {
+      "alias": "Olio di marula",
+      "kind": "TRANSLATION"
+    }
+  ],
+  "Gluconolactone": [
+    {
+      "alias": "D-Glucono-1,5-Lactone",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Disodium EDTA": [
+    {
+      "alias": "Disodium Ethylenediaminetetraacetate",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Ascorbic Acid": [
+    {
+      "alias": "Azcorbic Acid",
+      "kind": "TYPO"
+    }
+  ],
+  "Citronellol": [
+    {
+      "alias": "Citronelol",
+      "kind": "TYPO"
+    }
+  ],
+  "Geraniol": [
+    {
+      "alias": "Gernaniol",
+      "kind": "TYPO"
+    }
+  ],
+  "Stearyl Alcohol": [
+    {
+      "alias": "Steary Alcohol",
+      "kind": "TYPO"
+    }
+  ],
+  "Potassium Sorbate": [
+    {
+      "alias": "Potassiumsorbate",
+      "kind": "TYPO"
+    }
+  ],
+  "Potassium Cetyl Phosphate": [
+    {
+      "alias": "Potassium Cetyl Phospate",
+      "kind": "TYPO"
+    }
+  ],
+  "Polysorbate 20": [
+    {
+      "alias": "Polysobrate 20",
+      "kind": "TYPO"
+    }
+  ],
+  "Sorbitan Oleate": [
+    {
+      "alias": "Sorbltan Oleate",
+      "kind": "TYPO"
+    }
+  ],
+  "Sorbitan Isostearate": [
+    {
+      "alias": "Sorbitan Isoterate",
+      "kind": "TYPO"
+    }
+  ],
+  "Camellia Sinensis Leaf Extract": [
+    {
+      "alias": "Camellila Sinensis Leaf Extract",
+      "kind": "TYPO"
+    }
+  ],
+  "Ginkgo Biloba Leaf Extract": [
+    {
+      "alias": "Ginkgo Bilboa Leaf Extract",
+      "kind": "TYPO"
+    }
+  ],
+  "Algae Extract": [
+    {
+      "alias": "Algea Extract",
+      "kind": "TYPO"
+    }
+  ],
+  "Coco-Caprylate": [
+    {
+      "alias": "Coco-Caprflate",
+      "kind": "TYPO"
+    }
+  ],
+  "Cetearyl Isononanoate": [
+    {
+      "alias": "Cetearyl lsononanoate",
+      "kind": "TYPO"
+    }
+  ],
+  "Diethylamino Hydroxybenzoyl Hexyl Benzoate": [
+    {
+      "alias": "Uvinul A Plus",
+      "kind": "TRADE_NAME"
+    }
+  ],
+  "Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine": [
+    {
+      "alias": "Tinosorb S",
+      "kind": "TRADE_NAME"
+    },
+    {
+      "alias": "Bis-Ethylhexyloxypheno Methoxyphenyl Triazine",
+      "kind": "TYPO"
+    }
+  ],
+  "Methylene Bis-Benzotriazolyl Tetramethylbutylphenol": [
+    {
+      "alias": "Tinosorb M",
+      "kind": "TRADE_NAME"
+    }
+  ],
+  "Ceteareth-20": [
+    {
+      "alias": "Ceteareth - 20",
+      "kind": "TYPO"
+    }
+  ],
+  "Hydroxyacetophenone": [
+    {
+      "alias": "Hydroxyace - tophenone",
+      "kind": "TYPO"
+    }
+  ],
+  "Hydroxypropyltrimonium Hyaluronate": [
+    {
+      "alias": "Hydroxypropyltrimo - nium Hyaluronate",
+      "kind": "TYPO"
+    }
+  ],
+  "Linum Usitatissimum Seed Oil": [
+    {
+      "alias": "Usitatissimum Seed Oil",
+      "kind": "TYPO"
+    }
+  ],
+  "Rosmarinus Officinalis Leaf Extract": [
+    {
+      "alias": "Rosmarininus Officinalis Leaf Extract",
+      "kind": "TYPO"
+    }
+  ],
+  "Terminalia Ferdinandiana Fruit Extract": [
+    {
+      "alias": "Terminalia Ferdinandiana Fruitextract",
+      "kind": "TYPO"
+    }
+  ],
+  "Aloe Barbadensis Leaf Juice": [
+    {
+      "alias": "Barbadensis Leaf Juice Aloe",
+      "kind": "TYPO"
+    }
+  ],
+  "Sodium Hyaluronate": [
+    {
+      "alias": "Sodium Hyaluronat",
+      "kind": "TYPO"
+    }
+  ],
+  "Lavandula Angustifolia Oil": [
+    {
+      "alias": "Lavandula Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Matricaria Recutita Flower Oil": [
+    {
+      "alias": "Matricaria Recutita Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Santalum Album Oil": [
+    {
+      "alias": "Santalum Album Wood Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "CI 16035": [
+    {
+      "alias": "Cl 16035",
+      "kind": "TYPO"
+    }
+  ],
+  "CI 75120": [
+    {
+      "alias": "Cl 75120",
+      "kind": "TYPO"
+    }
+  ],
+  "CI 77891": [
+    {
+      "alias": "Cl 77891",
+      "kind": "TYPO"
+    }
+  ],
+  "CI 19140": [
+    {
+      "alias": "Acetate Yellow 5",
+      "kind": "SYNONYM"
+    }
+  ],
+  "CI 15985": [
+    {
+      "alias": "Yellow 6",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Tocopheryl Acetate": [
+    {
+      "alias": "Vitamin E Acetate",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Caprylic/Capric Triglyceride": [
+    {
+      "alias": "Caprylic Triglyceride",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Capric Triglyceride",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Aleurites Moluccanus Seed Oil": [
+    {
+      "alias": "Aleurites Moluccana Seed Oil",
+      "kind": "SYNONYM"
+    },
+    {
+      "alias": "Aleurites Moluccana Nut Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Palmitoyl Tripeptide-1": [
+    {
+      "alias": "Palmitoyl Oligopeptide",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Avena Strigosa Seed Extract": [
+    {
+      "alias": "Avenas Strigosa Seed Extract",
+      "kind": "TYPO"
+    }
+  ]
+}

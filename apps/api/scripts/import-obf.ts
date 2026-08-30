@@ -1,7 +1,7 @@
 /**
  * Batch import from Open Beauty Facts.
  *
- *   npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume]
+ *   npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--dry-run] [--resume] [--refresh]
  *
  * Boots the Nest application context without HTTP, so the run uses the same
  * INCI pipeline, queue and provenance rules as the admin UI.
@@ -26,6 +26,7 @@ const readArguments = () => {
     limit: Number(flags.get('limit') ?? DEFAULT_LIMIT),
     isDryRun: flags.get('dry-run') === 'true',
     resume: flags.get('resume') === 'true',
+    refresh: flags.get('refresh') === 'true',
   };
 };
 

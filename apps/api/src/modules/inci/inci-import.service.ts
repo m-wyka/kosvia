@@ -55,7 +55,7 @@ export class InciImportService {
     }
 
     const parsed = parseLabel(rawLabel);
-    const lookups = parsed.tokens.flatMap((token) => token.fragments);
+    const lookups = parsed.tokens.flatMap((token) => [token.normalized, ...token.fragments]);
     const matches = await this.matcher.matchMany(lookups);
     const resolved = parsed.tokens.map((token) => this.resolveToken(token, matches));
 
@@ -94,8 +94,27 @@ export class InciImportService {
     };
   }
 
+  /**
+   * The whole token wins over its slash-separated parts: "Caprylic/Capric
+   * Triglyceride" is one dictionary entry, "Water/Aqua/Eau" is three names for one.
+   */
   private resolveToken(token: ParsedToken, matches: Map<string, IngredientMatch>): ResolvedToken {
     const base = { rawText: token.rawText, isAfterMayContain: token.isAfterMayContain };
+    const wholeMatch = matches.get(token.normalized);
+    if (wholeMatch) {
+      return {
+        token,
+        rows: [
+          {
+            ...base,
+            ingredientId: wholeMatch.ingredientId,
+            matchConfidence: wholeMatch.confidence,
+            position: 0,
+          },
+        ],
+        unmatchedNormalized: [],
+      };
+    }
     const fragmentMatches = token.fragments.map((fragment) => matches.get(fragment) ?? null);
     const distinctIngredientIds = new Set(
       fragmentMatches.flatMap((match) => (match ? [match.ingredientId] : [])),

@@ -120,4 +120,40 @@ export const LABEL_FIXTURES: LabelFixture[] = [
     expectedRaw: ['Aqua', 'Glycerin', 'Niacinamide'],
     expectedNormalized: ['aqua', 'glycerin', 'niacinamide'],
   },
+  {
+    name: 'bullets, "(and)" blends, ampersands and full stops used as separators',
+    raw: '• Aqua • Glyceryl Stearate (and) PEG-100 Stearate • Palmitic Acid & Stearic Acid. Alcohol Denat. Phenoxyethanol',
+    expectedRaw: [
+      'Aqua',
+      'Glyceryl Stearate',
+      'PEG-100 Stearate',
+      'Palmitic Acid',
+      'Stearic Acid',
+      'Alcohol Denat',
+      'Phenoxyethanol',
+    ],
+    expectedNormalized: [
+      'aqua',
+      'glyceryl stearate',
+      'peg-100 stearate',
+      'palmitic acid',
+      'stearic acid',
+      'alcohol denat',
+      'phenoxyethanol',
+    ],
+  },
+  {
+    name: 'a slash name stays one token; "1,2-Hexanediol" keeps its comma',
+    raw: 'Caprylic/Capric Triglyceride, 1,2-Hexanediol, Acrylates/C10-30 Alkyl Acrylate Crosspolymer',
+    expectedRaw: [
+      'Caprylic/Capric Triglyceride',
+      '1,2-Hexanediol',
+      'Acrylates/C10-30 Alkyl Acrylate Crosspolymer',
+    ],
+    expectedNormalized: [
+      'caprylic capric triglyceride',
+      '1 2-hexanediol',
+      'acrylates c10-30 alkyl acrylate crosspolymer',
+    ],
+  },
 ];

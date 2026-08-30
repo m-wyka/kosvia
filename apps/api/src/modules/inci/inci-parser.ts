@@ -24,7 +24,8 @@ export interface ParsedLabel {
   hasMayContainSection: boolean;
 }
 
-const LABEL_PREFIX = /^\s*(ingredients|ingrédients|inhaltsstoffe|składniki|inci|skład)\s*[:.]?\s*/i;
+const LABEL_PREFIX =
+  /^[\s/•·]*(ingredients?|ingrédients|ingredientes|ingredienti|inhaltsstoffe|składniki|sastojci|bileşenler|inci|skład)\s*[:.]?\s*/i;
 const MAY_CONTAIN =
   /(\[?\s*(\+\/-|±)\s*)?(may\s+contain|peut\s+contenir|może\s+zawierać|kann\s+enthalten)\s*[:.]?/i;
 const TRAILING_FOOTNOTE = /\*+\s*[^,;]*$/;
@@ -32,13 +33,17 @@ const CI_NUMBER = /^ci\s*(\d{5})$/;
 const SLASH_SEPARATOR = /\s*[\\/]\s*/;
 const OPENING_BRACKETS = new Set(['(', '[']);
 const CLOSING_BRACKETS = new Set([')', ']']);
-const TOKEN_SEPARATORS = new Set([',', ';']);
+/** Bullets some brands print instead of commas. */
+const TOKEN_SEPARATORS = new Set([',', ';', '•', '⚫', '·', '▪', '●']);
+/** "(and)" and "&" join the parts of a trade blend; a full stop followed by a space is a comma on some labels. */
+const WRITTEN_SEPARATORS = /\s*\((?:and|e|et|und)\)\s*|\s+&\s+|(?<=[a-z0-9)])\.\s+(?=[A-Za-z])/gi;
 
 export const cleanLabel = (raw: string): string =>
   raw
     .replace(/ /g, ' ')
     .replace(/[\r\n]+/g, ' ')
     .replace(LABEL_PREFIX, '')
+    .replace(WRITTEN_SEPARATORS, ', ')
     .replace(TRAILING_FOOTNOTE, '')
     .replace(/\s{2,}/g, ' ')
     .trim()

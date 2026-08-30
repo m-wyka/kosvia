@@ -14,6 +14,8 @@ export interface ObfImportOptions {
   limit: number;
   isDryRun: boolean;
   resume: boolean;
+  /** Re-parse labels even when the source record has not changed — after a parser or dictionary update. */
+  refresh?: boolean;
   onProgress?: (progress: ObfImportProgress) => void;
 }
 
@@ -101,7 +103,12 @@ export class OpenBeautyFactsImportService {
             continue;
           }
           try {
-            const outcome = await this.upsertProduct(mapped.product, source.id, options.isDryRun);
+            const outcome = await this.upsertProduct(
+              mapped.product,
+              source.id,
+              options.isDryRun,
+              options.refresh ?? false,
+            );
             counters[outcome.change] += 1;
             if (outcome.queued) {
               counters.queued += 1;
@@ -209,6 +216,7 @@ export class OpenBeautyFactsImportService {
     product: NormalizedProduct,
     sourceId: string,
     isDryRun: boolean,
+    refresh: boolean,
   ): Promise<{ change: 'created' | 'updated' | 'skipped'; queued: boolean }> {
     const existing = await this.prisma.product.findFirst({
       where: {
@@ -224,6 +232,7 @@ export class OpenBeautyFactsImportService {
       return { change: 'skipped', queued: false };
     }
     const isUnchanged =
+      !refresh &&
       existing?.sourceUpdatedAt &&
       product.sourceUpdatedAt &&
       existing.sourceUpdatedAt.getTime() >= product.sourceUpdatedAt.getTime();
