@@ -57,17 +57,17 @@ watch(
 <template>
   <div class="min-h-dvh bg-canvas lg:grid lg:grid-cols-[15rem_1fr]">
     <aside
-      class="fixed inset-y-0 left-0 z-50 w-60 -translate-x-full border-r border-line bg-surface transition-transform duration-base ease-out-soft lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-50 flex w-60 -translate-x-full flex-col border-r border-line bg-surface transition-transform duration-base ease-out-soft lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
       :class="open && 'translate-x-0 shadow-lg'"
     >
-      <div class="flex h-14 items-center justify-between border-b border-line px-4">
+      <div class="flex h-14 shrink-0 items-center justify-between border-b border-line px-4">
         <NuxtLinkLocale to="/admin" class="flex items-center gap-2">
           <AppLogo :size="22" />
         </NuxtLinkLocale>
         <BaseBadge tone="neutral" size="xs">{{ $t('ADMIN.BADGE') }}</BaseBadge>
       </div>
 
-      <nav class="space-y-5 overflow-y-auto p-3" :aria-label="$t('ADMIN.NAV.ARIA')">
+      <nav class="min-h-0 flex-1 space-y-5 overflow-y-auto p-3" :aria-label="$t('ADMIN.NAV.ARIA')">
         <div v-for="section in sections" :key="section.title">
           <p class="px-2 pb-1.5 text-2xs font-semibold tracking-widest text-ink-faint uppercase">
             {{ $t(section.title) }}
@@ -91,7 +91,7 @@ watch(
         </div>
       </nav>
 
-      <div class="absolute inset-x-0 bottom-0 border-t border-line p-3">
+      <div class="shrink-0 border-t border-line p-3">
         <NuxtLinkLocale
           to="/"
           class="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink"

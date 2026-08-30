@@ -219,7 +219,7 @@ watch(
 
     <section v-if="facets?.brands.length">
       <h3 class="mb-2.5 text-sm font-semibold text-ink">{{ $t('SEARCH.FILTER.BRAND') }}</h3>
-      <ul class="hide-scrollbar max-h-64 space-y-1.5 overflow-y-auto pr-1">
+      <ul class="hide-scrollbar max-h-61 space-y-1.5 overflow-y-auto pr-1">
         <li v-for="brand in facets.brands" :key="brand.id">
           <BaseCheckbox
             :model-value="activeBrands.includes(brand.slug)"

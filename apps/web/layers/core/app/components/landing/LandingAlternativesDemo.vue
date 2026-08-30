@@ -32,8 +32,7 @@ const options = computed(() => [
     <div
       v-for="option in options"
       :key="option.name"
-      class="flex items-center gap-4 rounded-xl border bg-surface p-4 shadow-xs"
-      :class="option.tone === 'neutral' ? 'border-line' : 'border-line-strong'"
+      class="flex items-center gap-4 rounded-xl border bg-surface p-4 shadow-xs border-line"
     >
       <span
         class="flex size-11 shrink-0 items-center justify-center rounded-lg text-sm font-semibold tabular-nums"

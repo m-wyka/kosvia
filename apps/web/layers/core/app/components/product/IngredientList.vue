@@ -30,6 +30,11 @@ const GROUPS: IngredientGroup[] = [
 const expanded = ref<string | null>(null);
 const showFullList = ref(false);
 
+const hasBadges = (entry: ProductIngredientDto): boolean =>
+  entry.ingredient.tags.length > 0 ||
+  entry.ingredient.regulatory.isFragranceAllergen ||
+  entry.ingredient.regulatory.isRestricted;
+
 const belongsToGroup = (entry: ProductIngredientDto, group: IngredientGroup): boolean => {
   if (group.key === 'ACTIVES' && entry.ingredient.isActiveIngredient) {
     return true;
@@ -90,7 +95,7 @@ const fullList = computed(() =>
               <span v-if="entry.ingredient.commonName" class="block text-xs text-ink-muted">
                 {{ entry.ingredient.inciName }}
               </span>
-              <span class="mt-1.5 flex flex-wrap gap-1">
+              <span v-if="hasBadges(entry)" class="mt-1.5 flex flex-wrap gap-1">
                 <IngredientBadge
                   v-for="tag in entry.ingredient.tags.slice(0, 3)"
                   :key="tag"
@@ -136,7 +141,8 @@ const fullList = computed(() =>
             </p>
             <NuxtLinkLocale
               :to="`/ingredients/${entry.ingredient.slug}`"
-              class="mt-3 inline-flex items-center gap-1 text-xs font-medium text-ink-soft underline-offset-4 hover:underline"
+              class="inline-flex items-center gap-1 text-xs font-medium text-ink-soft underline-offset-4 hover:underline"
+              :class="{ 'mt-3': entry.ingredient.description || entry.ingredient.concerns }"
             >
               {{ $t('PRODUCT.LIST.MORE_ABOUT') }}
               <BaseIcon name="chevron-right" :size="12" />

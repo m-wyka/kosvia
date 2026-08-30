@@ -35,7 +35,7 @@ onUnmounted(() => lockPageScroll(false));
       >
         <div
           v-if="open"
-          class="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto p-0 sm:items-center sm:p-6"
+          class="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto p-0 sm:items-start sm:p-6"
           role="dialog"
           aria-modal="true"
           :aria-labelledby="title ? titleId : undefined"
@@ -43,7 +43,7 @@ onUnmounted(() => lockPageScroll(false));
           <div class="fixed inset-0 bg-overlay backdrop-blur-[2px]" @click="open = false" />
 
           <div
-            class="animate-fade-up relative w-full rounded-t-2xl border border-line bg-surface shadow-lg sm:rounded-2xl"
+            class="animate-fade-up relative mt-auto w-full rounded-t-2xl border border-line bg-surface shadow-lg sm:my-auto sm:rounded-2xl"
             :class="widths[size]"
           >
             <header

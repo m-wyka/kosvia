@@ -136,7 +136,7 @@ useSeo(() => ({
       </div>
     </header>
 
-    <p class="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
+    <p class="mt-6 text-base leading-relaxed text-ink-soft">
       {{ ingredient.description }}
     </p>
 
@@ -167,7 +167,7 @@ useSeo(() => ({
           </p>
           <div v-if="ingredient.goodForSkinTypes.length">
             <p class="text-sm text-ink-soft">{{ $t('INGREDIENTS.COMMONLY_SUITS') }}</p>
-            <div class="mt-1.5 flex flex-wrap gap-1.5">
+            <div v-if="ingredient.goodForSkinTypes.length" class="mt-1.5 flex flex-wrap gap-1.5">
               <BaseBadge
                 v-for="type in ingredient.goodForSkinTypes"
                 :key="type"

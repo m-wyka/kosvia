@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { isAuthenticated, isAdmin, user, displayName } = storeToRefs(useAuthStore());
+const { isAuthenticated, isAdmin } = storeToRefs(useAuthStore());
 const { logout } = useAuthStore();
 const { count: compareCount } = storeToRefs(useCompareStore());
 const route = useRoute();
@@ -100,27 +100,7 @@ watch(
           <span class="tabular-nums">{{ compareCount }}</span>
         </NuxtLinkLocale>
 
-        <template v-if="isAuthenticated">
-          <NuxtLinkLocale
-            to="/profile"
-            class="hidden items-center gap-2 rounded-pill py-1 pr-3 pl-1 transition-colors hover:bg-surface-muted sm:flex"
-          >
-            <BaseAvatar :name="user?.name ?? user?.email" :size="30" />
-            <span class="max-w-24 truncate text-sm font-medium text-ink">{{ displayName }}</span>
-          </NuxtLinkLocale>
-          <BaseButton
-            v-if="isAdmin"
-            to="/admin"
-            variant="ghost"
-            size="sm"
-            class="hidden lg:inline-flex"
-          >
-            {{ $t('NAV.ADMIN') }}
-          </BaseButton>
-          <BaseButton variant="ghost" size="sm" class="hidden lg:inline-flex" @click="signOut">
-            {{ $t('COMMON.SIGN_OUT') }}
-          </BaseButton>
-        </template>
+        <UserMenu v-if="isAuthenticated" class="hidden sm:block" />
         <template v-else>
           <BaseButton to="/login" variant="ghost" size="sm" class="hidden sm:inline-flex">
             {{ $t('COMMON.SIGN_IN') }}
@@ -132,7 +112,7 @@ watch(
 
         <button
           type="button"
-          class="rounded-md p-2 text-ink-soft transition-colors hover:bg-surface-muted lg:hidden"
+          class="rounded-md p-2 text-ink-soft cursor-pointer transition-colors hover:bg-surface-muted lg:hidden"
           :aria-expanded="menuOpen"
           aria-controls="mobile-menu"
           :aria-label="$t('NAV.MENU')"
