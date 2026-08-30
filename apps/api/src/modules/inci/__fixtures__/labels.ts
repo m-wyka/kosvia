@@ -156,4 +156,10 @@ export const LABEL_FIXTURES: LabelFixture[] = [
       'acrylates c10-30 alkyl acrylate crosspolymer',
     ],
   },
+  {
+    name: 'US OTC sunscreen sections and doses',
+    raw: 'Active ingredients: Homosalate 10% w/w, Octocrylene 80mg/g. Inactive ingredients: Aqua, Glycerin',
+    expectedRaw: ['Homosalate 10% w/w', 'Octocrylene 80mg/g', 'Aqua', 'Glycerin'],
+    expectedNormalized: ['homosalate', 'octocrylene', 'aqua', 'glycerin'],
+  },
 ];

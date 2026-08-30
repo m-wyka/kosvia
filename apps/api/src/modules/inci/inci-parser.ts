@@ -37,12 +37,18 @@ const CLOSING_BRACKETS = new Set([')', ']']);
 const TOKEN_SEPARATORS = new Set([',', ';', '•', '⚫', '·', '▪', '●']);
 /** "(and)" and "&" join the parts of a trade blend; a full stop followed by a space is a comma on some labels. */
 const WRITTEN_SEPARATORS = /\s*\((?:and|e|et|und)\)\s*|\s+&\s+|(?<=[a-z0-9)])\.\s+(?=[A-Za-z])/gi;
+/** US OTC sunscreen labels split the list into sections; the headers are separators, not names. */
+const SECTION_HEADERS =
+  /\b(?:active|inactive|other)\s+ingredients?\s*[:.]?|\b(?:contains|preservatives?)\s*[:.]/gi;
+/** "Homosalate 10% w/w", "Octocrylene 80mg/g" — the dose is label noise, not part of the name. */
+const DOSE = /\b\d+(?:[.,]\d+)?\s*(?:%|mg\/g|mg)(?:\s*w\/w)?|\b\d+(?:[.,]\d+)?\s*w\/w\b/gi;
 
 export const cleanLabel = (raw: string): string =>
   raw
     .replace(/ /g, ' ')
     .replace(/[\r\n]+/g, ' ')
     .replace(LABEL_PREFIX, '')
+    .replace(SECTION_HEADERS, ', ')
     .replace(WRITTEN_SEPARATORS, ', ')
     .replace(TRAILING_FOOTNOTE, '')
     .replace(/\s{2,}/g, ' ')
@@ -89,7 +95,7 @@ export const tokenize = (text: string): string[] => {
     }
   }
   tokens.push(buffer);
-  return tokens.map((token) => token.replace(/^[\s*]+|[\s*]+$/g, '')).filter(Boolean);
+  return tokens.map((token) => token.replace(/^[\s*]+|[\s*.]+$/g, '')).filter(Boolean);
 };
 
 export const foldToAscii = (value: string): string =>
@@ -97,6 +103,7 @@ export const foldToAscii = (value: string): string =>
 
 export const normalizeToken = (token: string): string => {
   const folded = foldToAscii(token)
+    .replace(DOSE, ' ')
     .replace(/\([^)]*\)/g, ' ')
     .replace(/\[[^\]]*\]/g, ' ')
     .replace(/[^a-z0-9\s-]/g, ' ')

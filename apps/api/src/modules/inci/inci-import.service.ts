@@ -6,10 +6,13 @@ import { positionWeight } from '../scoring/types';
 import { ProductTraitsService } from '../scoring/product-traits.service';
 import { InciMatcherService, type IngredientMatch } from './inci-matcher.service';
 import { parseLabel, type ParsedToken } from './inci-parser';
+import { MIN_WORDS_TO_SEGMENT, segmentByDictionary, segmentCandidates } from './inci-segmenter';
 import { UnmatchedTokenService } from './unmatched-token.service';
 
 const MAY_CONTAIN_WEIGHT = 0.1;
 const RECOGNIZED_THRESHOLD = 0.9;
+/** A name recovered from an unseparated run is a match, but not a certain one. */
+const SEGMENTED_CONFIDENCE = 0.9;
 
 type ProductIngredientRowInput = Omit<Prisma.ProductIngredientCreateManyInput, 'productId'>;
 
@@ -57,7 +60,8 @@ export class InciImportService {
     const parsed = parseLabel(rawLabel);
     const lookups = parsed.tokens.flatMap((token) => [token.normalized, ...token.fragments]);
     const matches = await this.matcher.matchMany(lookups);
-    const resolved = parsed.tokens.map((token) => this.resolveToken(token, matches));
+    let resolved = parsed.tokens.map((token) => this.resolveToken(token, matches));
+    resolved = await this.segmentUnresolvedRuns(resolved);
 
     const rows = this.renumber(resolved.flatMap((entry) => entry.rows));
     await this.prisma.$transaction([
@@ -161,6 +165,51 @@ export class InciImportService {
       rows,
       unmatchedNormalized: token.fragments.filter((_, index) => !fragmentMatches[index]),
     };
+  }
+
+  /**
+   * Second pass for tokens that matched nothing and span several words —
+   * usually a scanned label whose commas were lost. See inci-segmenter.
+   */
+  private async segmentUnresolvedRuns(resolved: ResolvedToken[]): Promise<ResolvedToken[]> {
+    const runs = resolved.filter(
+      (entry) =>
+        entry.unmatchedNormalized.length === 1 &&
+        entry.rows.length === 1 &&
+        entry.token.normalized.split(' ').length >= MIN_WORDS_TO_SEGMENT,
+    );
+    if (!runs.length) {
+      return resolved;
+    }
+    const candidates = runs.flatMap((entry) =>
+      segmentCandidates(entry.token.normalized.split(' ')),
+    );
+    const matches = await this.matcher.matchMany(candidates);
+
+    const segmented = new Map<ResolvedToken, ResolvedToken>();
+    for (const entry of runs) {
+      const segments = segmentByDictionary(entry.token.normalized.split(' '), (candidate) =>
+        matches.has(candidate),
+      );
+      if (!segments) {
+        continue;
+      }
+      segmented.set(entry, {
+        token: entry.token,
+        rows: segments.map((segment) => {
+          const match = matches.get(segment)!;
+          return {
+            rawText: segment,
+            isAfterMayContain: entry.token.isAfterMayContain,
+            ingredientId: match.ingredientId,
+            matchConfidence: Math.min(match.confidence, SEGMENTED_CONFIDENCE),
+            position: 0,
+          };
+        }),
+        unmatchedNormalized: [],
+      });
+    }
+    return resolved.map((entry) => segmented.get(entry) ?? entry);
   }
 
   private renumber(rows: ProductIngredientRowInput[]): ProductIngredientRowInput[] {
