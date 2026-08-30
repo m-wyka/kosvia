@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from '../../components/Table.vue';
+import type { TableColumn } from '@@/layers/admin/app/components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 

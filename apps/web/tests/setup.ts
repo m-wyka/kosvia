@@ -15,19 +15,19 @@ import {
   watch,
   watchEffect,
 } from 'vue';
-import en from '../i18n/locales/en.json';
-import pl from '../i18n/locales/pl.json';
-import { useVocabulary } from '../layers/core/app/composables/useVocabulary';
-import { useFormat } from '../layers/core/app/composables/useFormat';
-import { useMatchReason } from '../layers/core/app/composables/useMatchReason';
-import { useLocalisedText } from '../layers/core/app/composables/useLocalisedText';
-import BaseBadge from '../layers/core/app/components/base/BaseBadge.vue';
-import BaseIcon from '../layers/core/app/components/base/BaseIcon.vue';
-import BaseSkeleton from '../layers/core/app/components/base/BaseSkeleton.vue';
-import BaseSpinner from '../layers/core/app/components/base/BaseSpinner.vue';
-import IngredientBadge from '../layers/core/app/components/product/IngredientBadge.vue';
-import PriceDisplay from '../layers/core/app/components/product/PriceDisplay.vue';
-import ProductImage from '../layers/core/app/components/product/ProductImage.vue';
+import en from '@@/i18n/locales/en.json';
+import pl from '@@/i18n/locales/pl.json';
+import { useVocabulary } from '@@/layers/core/app/composables/useVocabulary';
+import { useFormat } from '@@/layers/core/app/composables/useFormat';
+import { useMatchReason } from '@@/layers/core/app/composables/useMatchReason';
+import { useLocalisedText } from '@@/layers/core/app/composables/useLocalisedText';
+import BaseBadge from '@@/layers/core/app/components/base/BaseBadge.vue';
+import BaseIcon from '@@/layers/core/app/components/base/BaseIcon.vue';
+import BaseSkeleton from '@@/layers/core/app/components/base/BaseSkeleton.vue';
+import BaseSpinner from '@@/layers/core/app/components/base/BaseSpinner.vue';
+import IngredientBadge from '@@/layers/core/app/components/product/IngredientBadge.vue';
+import PriceDisplay from '@@/layers/core/app/components/product/PriceDisplay.vue';
+import ProductImage from '@@/layers/core/app/components/product/ProductImage.vue';
 
 type TestLocale = 'en' | 'pl';
 

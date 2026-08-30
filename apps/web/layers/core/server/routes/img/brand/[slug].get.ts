@@ -1,4 +1,4 @@
-import { monogramSvg } from '../../../utils/placeholder';
+import { monogramSvg } from '@@/layers/core/server/utils/placeholder';
 
 // Nitro cannot bind a route param that is only part of a path segment (`[slug].svg.get.ts`),
 // so the extension is stripped from the parameter instead.

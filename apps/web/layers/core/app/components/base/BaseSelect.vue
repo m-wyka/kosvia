@@ -82,267 +82,148 @@ const id = useId();
 </template>
 
 <style>
-/* ---------------------------------------------------------------- structure --
-
-   vue-multiselect ships a stylesheet we deliberately do not import: it would
-   drag in its own colours, radii and green highlight. But that file is not only
-   a skin — it is also what makes the control *work*. Without it the dropdown is
-   a static block that pushes the page down, the option list is an inline-block
-   narrower than its panel, and each option is an inline <span> whose padding
-   does not affect line height, so the rows overlap each other.
-
-   So the structural half lives here. Change it only if the library's markup
-   changes; everything below the second divider is ours to restyle freely.      */
+@reference '@@/layers/core/app/assets/css/main.css';
 
 .kosvia-select .multiselect {
-  position: relative;
-  display: block;
-  width: 100%;
-  min-height: 2.75rem;
-  color: var(--color-ink);
-  font-size: 0.875rem;
+  @apply relative block min-h-11 w-full text-sm leading-normal text-ink;
 }
 .kosvia-select .multiselect * {
-  box-sizing: border-box;
+  @apply box-border;
 }
 
 .kosvia-select .multiselect__tags {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 2.75rem;
-  padding: 0.375rem 2.25rem 0.375rem 0.875rem;
-  cursor: pointer;
+  @apply flex min-h-11 cursor-pointer flex-wrap items-center gap-1.5 py-1.5 pr-9 pl-3.5;
 }
 
-/* The tags live in a wrapper span; `contents` lets them sit in the flex row. */
 .kosvia-select .multiselect__tags-wrap {
-  display: contents;
+  @apply contents;
 }
 
 .kosvia-select .multiselect__input,
 .kosvia-select .multiselect__single,
 .kosvia-select .multiselect__placeholder {
-  flex: 1 1 4rem;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  min-height: 1.5rem;
-  line-height: 1.5rem;
-  border: none;
-  background: transparent;
+  @apply m-0 min-h-6 min-w-0 flex-[1_1_4rem] border-none bg-transparent p-0 leading-6;
 }
 .kosvia-select .multiselect__placeholder {
-  flex-basis: auto;
+  @apply basis-auto;
 }
 .kosvia-select .multiselect--active .multiselect__placeholder {
-  display: none;
+  @apply hidden;
 }
 
-/* The focus ring belongs on the control, not on the bare input inside it —
-   otherwise the global :focus-visible outline draws a second box within the
-   first. */
 .kosvia-select .multiselect__input:focus,
 .kosvia-select .multiselect__input:focus-visible {
-  outline: none;
+  @apply outline-none;
 }
 
 .kosvia-select .multiselect__select {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.75rem;
-  padding: 0;
-  cursor: pointer;
-  transition: transform var(--duration-base) var(--ease-out-soft);
+  @apply absolute top-0 right-0 flex h-11 w-9 cursor-pointer items-center justify-center p-0;
+  @apply transition-transform duration-(--duration-base) ease-out-soft;
 }
 .kosvia-select .multiselect--active .multiselect__select {
-  transform: rotate(180deg);
+  @apply rotate-180;
 }
 
 .kosvia-select .multiselect__content-wrapper {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 40;
-  display: block;
-  width: 100%;
-  margin-top: 0.375rem;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-/* The library flips the panel above the field when there is no room below. */
-.kosvia-select .multiselect--above .multiselect__content-wrapper {
-  top: auto;
-  bottom: 100%;
-  margin-top: 0;
-  margin-bottom: 0.375rem;
+  @apply absolute top-full left-0 z-40 block w-full;
+  @apply mt-1.5 overflow-x-hidden overflow-y-auto overscroll-contain;
 }
 
-/* The library sets `display: inline-block` on this list inline, so it cannot be
-   overridden from here — `min-width` is what makes the rows fill the panel
-   instead of shrink-wrapping to the longest brand name. */
+.kosvia-select .multiselect--above .multiselect__content-wrapper {
+  @apply top-auto bottom-full mt-0 mb-1.5;
+}
+
 .kosvia-select .multiselect__content {
-  width: 100%;
-  min-width: 100%;
-  margin: 0;
-  padding: 0.25rem;
-  list-style: none;
+  @apply m-0 w-full min-w-full list-none p-1;
 }
 .kosvia-select .multiselect__element {
-  display: block;
+  @apply block;
 }
 .kosvia-select .multiselect__option {
-  display: block;
-  position: relative;
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @apply relative block cursor-pointer truncate;
 }
-/* `show-labels` is off, so this pseudo-element only ever renders empty space. */
+
 .kosvia-select .multiselect__option::after {
-  display: none;
+  @apply hidden;
 }
 
 .kosvia-select .multiselect__spinner {
-  position: absolute;
-  top: 1px;
-  right: 1px;
-  display: block;
+  @apply absolute top-px right-px block;
 }
 
 .kosvia-select .multiselect--disabled {
-  opacity: 0.55;
-  pointer-events: none;
+  @apply pointer-events-none opacity-55;
 }
-
-/* --------------------------------------------------------------------- skin --
-
-   From here down the control is ours: it should read as a sibling of
-   BaseInput, not as a third-party widget.                                     */
 
 .kosvia-select .multiselect__tags {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line-strong);
-  border-radius: var(--radius-lg);
-  transition:
-    border-color var(--duration-fast),
-    box-shadow var(--duration-fast);
+  @apply rounded-lg border border-line-strong bg-surface;
+  @apply transition-[border-color,box-shadow] duration-(--duration-fast);
 }
 .kosvia-select .multiselect__tags:hover {
-  border-color: var(--color-ink-faint);
+  @apply border-ink-faint;
 }
 .kosvia-select .multiselect--active .multiselect__tags {
-  border-color: var(--color-ink-faint);
-  box-shadow: var(--shadow-focus);
+  @apply border-ink-faint shadow-focus;
 }
 .kosvia-select--error .multiselect__tags {
-  border-color: var(--color-critical);
+  @apply border-critical;
 }
 
 .kosvia-select .multiselect__input,
 .kosvia-select .multiselect__single {
-  font-size: 0.875rem;
-  color: var(--color-ink);
+  @apply text-sm text-ink;
 }
 .kosvia-select .multiselect__placeholder,
 .kosvia-select .multiselect__input::placeholder {
-  font-size: 0.875rem;
-  color: var(--color-ink-faint);
+  @apply text-sm text-ink-faint;
 }
 
 .kosvia-select .multiselect__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0.125rem 0.5rem;
-  background: var(--color-blush-soft);
-  color: var(--color-blush-deep);
-  border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
+  @apply m-0 inline-flex items-center gap-1 rounded-pill px-2 py-0.5;
+  @apply bg-blush-soft text-xs leading-normal font-medium whitespace-nowrap text-blush-deep;
 }
 .kosvia-select .multiselect__tag-icon {
-  position: static;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.875rem;
-  height: 0.875rem;
-  border-radius: 999px;
-  font-style: normal;
-  cursor: pointer;
+  @apply static inline-flex size-3.5 cursor-pointer items-center justify-center;
+  @apply rounded-pill not-italic;
 }
-/* The glyph lives in the library's stylesheet, which we do not import — without
-   it the remove button is an invisible 14px hit area. */
+
 .kosvia-select .multiselect__tag-icon::after {
-  content: '×';
-  color: var(--color-blush-deep);
-  font-size: 0.9rem;
-  line-height: 1;
+  @apply content-['×'] text-[0.9rem] leading-none text-blush-deep;
 }
 .kosvia-select .multiselect__tag-icon:hover {
-  background: transparent;
+  @apply bg-transparent;
 }
 .kosvia-select .multiselect__tag-icon:hover::after {
-  color: var(--color-critical);
+  @apply text-critical;
 }
 
 .kosvia-select .multiselect__select::before {
-  content: '';
-  border-style: solid;
-  border-width: 5px 4px 0;
-  border-color: var(--color-ink-muted) transparent transparent;
+  @apply content-[''] border-x-4 border-t-5 border-x-transparent border-t-ink-muted;
 }
 
 .kosvia-select .multiselect__content-wrapper {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  @apply rounded-lg border border-line bg-surface shadow-lg;
 }
 
 .kosvia-select .multiselect__option {
-  padding: 0.625rem 0.75rem;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--color-ink-soft);
-  transition: background-color var(--duration-fast);
+  @apply rounded-md px-3 py-2.5 text-sm text-ink-soft;
+  @apply transition-colors duration-(--duration-fast);
 }
-/* Rows carry a filled background, so two adjacent selected ones merge into a
-   single blob without a gap between them. */
+
 .kosvia-select .multiselect__element + .multiselect__element {
-  margin-top: 0.25rem;
+  @apply mt-1;
 }
 .kosvia-select .multiselect__option--highlight {
-  background: var(--color-surface-muted);
-  color: var(--color-ink);
+  @apply bg-surface-muted text-ink;
 }
 .kosvia-select .multiselect__option--selected {
-  background: var(--color-blush-soft);
-  color: var(--color-blush-deep);
-  font-weight: 500;
+  @apply bg-blush-soft font-medium text-blush-deep;
 }
 .kosvia-select .multiselect__option--disabled {
-  color: var(--color-ink-faint);
-  cursor: not-allowed;
+  @apply cursor-not-allowed text-ink-faint;
 }
 
 .kosvia-select .multiselect__spinner {
-  width: 2.25rem;
-  height: 2.5rem;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  @apply h-10 w-9 rounded-lg bg-surface;
 }
 </style>

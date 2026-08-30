@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import type { IngredientDto, ProductIngredientDto } from '@kosvia/shared';
-import IngredientBadge from '../../layers/core/app/components/product/IngredientBadge.vue';
-import IngredientList from '../../layers/core/app/components/product/IngredientList.vue';
+import IngredientBadge from '@@/layers/core/app/components/product/IngredientBadge.vue';
+import IngredientList from '@@/layers/core/app/components/product/IngredientList.vue';
 
 const entry = (
   position: number,

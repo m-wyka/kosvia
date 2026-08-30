@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import type { PersonalMatchDto } from '@kosvia/shared';
-import MatchScore from '../../layers/core/app/components/product/MatchScore.vue';
+import MatchScore from '@@/layers/core/app/components/product/MatchScore.vue';
 
 const match = (overrides: Partial<PersonalMatchDto> = {}): PersonalMatchDto => ({
   score: 92,

@@ -6,10 +6,13 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '~': fileURLToPath(new URL('./layers/core/app', import.meta.url)),
       '@kosvia/shared': fileURLToPath(
         new URL('../../packages/shared/src/index.ts', import.meta.url),
       ),
+      '@@': fileURLToPath(new URL('.', import.meta.url)),
+      '~~': fileURLToPath(new URL('.', import.meta.url)),
+      '@': fileURLToPath(new URL('./app', import.meta.url)),
+      '~': fileURLToPath(new URL('./app', import.meta.url)),
     },
   },
   test: {

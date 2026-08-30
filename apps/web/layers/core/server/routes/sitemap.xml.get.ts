@@ -1,4 +1,4 @@
-import { escapeXml } from '../utils/placeholder';
+import { escapeXml } from '@@/layers/core/server/utils/placeholder';
 
 interface SitemapEntry {
   path: string;

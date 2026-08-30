@@ -40,44 +40,24 @@ const display = computed(() => (props.format ? props.format(model.value) : Strin
 </template>
 
 <style scoped>
+@reference '@@/layers/core/app/assets/css/main.css';
+
 .kosvia-range::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(
-    to right,
-    var(--color-ink) var(--fill),
-    var(--color-line-strong) var(--fill)
-  );
+  @apply h-1 rounded-pill;
+  @apply bg-linear-to-r from-ink from-(length:--fill) to-line-strong to-(length:--fill);
 }
 .kosvia-range::-moz-range-track {
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(
-    to right,
-    var(--color-ink) var(--fill),
-    var(--color-line-strong) var(--fill)
-  );
+  @apply h-1 rounded-pill;
+  @apply bg-linear-to-r from-ink from-(length:--fill) to-line-strong to-(length:--fill);
 }
 .kosvia-range::-webkit-slider-thumb {
-  appearance: none;
-  margin-top: -8px;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  border: 2px solid var(--color-ink);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--duration-fast) var(--ease-out-soft);
+  @apply -mt-2 size-5 appearance-none rounded-pill border-2 border-ink bg-surface shadow-sm;
+  @apply transition-transform duration-(--duration-fast) ease-out-soft;
 }
 .kosvia-range::-webkit-slider-thumb:active {
-  transform: scale(1.12);
+  @apply scale-112;
 }
 .kosvia-range::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  border: 2px solid var(--color-ink);
-  box-shadow: var(--shadow-sm);
+  @apply size-4.5 rounded-pill border-2 border-ink bg-surface shadow-sm;
 }
 </style>

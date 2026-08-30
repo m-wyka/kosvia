@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import en from '../../i18n/locales/en.json';
-import pl from '../../i18n/locales/pl.json';
-import { resetTestGlobals, setTestLocale } from '../setup';
+import en from '@@/i18n/locales/en.json';
+import pl from '@@/i18n/locales/pl.json';
+import { resetTestGlobals, setTestLocale } from '@@/tests/setup';
 
-declare const useVocabulary: typeof import('../../layers/core/app/composables/useVocabulary').useVocabulary;
-declare const useMatchReason: typeof import('../../layers/core/app/composables/useMatchReason').useMatchReason;
-declare const useFormat: typeof import('../../layers/core/app/composables/useFormat').useFormat;
-declare const useLocalisedText: typeof import('../../layers/core/app/composables/useLocalisedText').useLocalisedText;
+declare const useVocabulary: typeof import('@@/layers/core/app/composables/useVocabulary').useVocabulary;
+declare const useMatchReason: typeof import('@@/layers/core/app/composables/useMatchReason').useMatchReason;
+declare const useFormat: typeof import('@@/layers/core/app/composables/useFormat').useFormat;
+declare const useLocalisedText: typeof import('@@/layers/core/app/composables/useLocalisedText').useLocalisedText;
 
 const flatten = (node: Record<string, unknown>, prefix = ''): string[] =>
   Object.entries(node).flatMap(([key, value]) =>

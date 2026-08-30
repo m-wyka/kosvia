@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import type { ProductSummaryDto } from '@kosvia/shared';
-import { resetTestGlobals, setTestLocale } from '../setup';
-import ProductCard from '../../layers/core/app/components/product/ProductCard.vue';
+import { resetTestGlobals, setTestLocale } from '@@/tests/setup';
+import ProductCard from '@@/layers/core/app/components/product/ProductCard.vue';
 
 const product = (overrides: Partial<ProductSummaryDto> = {}): ProductSummaryDto => ({
   id: 'p1',

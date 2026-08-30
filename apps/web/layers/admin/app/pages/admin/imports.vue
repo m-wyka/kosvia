@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ImportRunDto } from '@kosvia/shared';
-import type { TableColumn } from '../../components/Table.vue';
+import type { TableColumn } from '@@/layers/admin/app/components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
