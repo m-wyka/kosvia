@@ -12,7 +12,7 @@ interface OfferRow {
   availability: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNKNOWN';
   lastCheckedAt: string;
   product: { id: string; name: string; slug: string; brand: { name: string } };
-  variant: { id: string; ean: string | null; volume: string | null; volumeUnit: VolumeUnit } | null;
+  variant: { id: string; ean: string | null; volume: number | null; volumeUnit: VolumeUnit } | null;
   store: { id: string; name: string };
 }
 
@@ -182,7 +182,7 @@ useSeo(() => ({
           <span class="block text-xs text-ink-muted">
             {{ row.product.brand.name }}
             <template v-if="row.variant?.volume">
-              · {{ formatVolume(Number(row.variant.volume), row.variant.volumeUnit) }}
+              · {{ formatVolume(row.variant.volume, row.variant.volumeUnit) }}
             </template>
           </span>
         </span>

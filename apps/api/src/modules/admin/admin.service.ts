@@ -5,7 +5,8 @@ import type { AdminStatsDto, AuditLogDto, PaginatedResult } from '@kosvia/shared
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
-import { toVolumeUnitEnum } from '../products/volume-unit';
+import { decimalToNumber, toProductDto } from '../products/product.mapper';
+import { toVolumeUnitEnum, toVolumeUnitDto } from '../products/volume-unit';
 import { normalizeToken } from '../inci/inci-parser';
 import { MANUAL_SOURCE_CODE } from '../import/data-sources';
 import type {
@@ -302,8 +303,17 @@ export class AdminService {
     );
   }
 
-  productDetail(id: string) {
-    return this.prisma.product.findUniqueOrThrow({ where: { id }, include: PRODUCT_INCLUDE });
+  /** The public DTO (default pack flattened, packs listed) plus the flags only admins edit. */
+  async productDetail(id: string) {
+    const row = await this.prisma.product.findUniqueOrThrow({
+      where: { id },
+      include: PRODUCT_INCLUDE,
+    });
+    return {
+      ...toProductDto(row, null, 'en'),
+      isActive: row.isActive,
+      targetSkinTypes: row.targetSkinTypes,
+    };
   }
 
   async createProduct(dto: UpsertProductDto) {
@@ -385,7 +395,7 @@ export class AdminService {
     const where: Prisma.ProductOfferWhereInput = query.q
       ? { product: { name: { contains: query.q, mode: 'insensitive' } } }
       : {};
-    return this.paginate(
+    const page = await this.paginate(
       query,
       () => this.prisma.productOffer.count({ where }),
       (skip, take) =>
@@ -403,6 +413,17 @@ export class AdminService {
           },
         }),
     );
+    return {
+      ...page,
+      items: page.items.map((offer) => ({
+        ...offer,
+        variant: offer.variant && {
+          ...offer.variant,
+          volume: decimalToNumber(offer.variant.volume),
+          volumeUnit: toVolumeUnitDto(offer.variant.volumeUnit),
+        },
+      })),
+    };
   }
 
   async upsertOffer(dto: UpsertOfferDto) {
