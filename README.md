@@ -471,6 +471,7 @@ npm run import:obf -w @kosvia/api -- --category=en:facial-creams --limit=200 [--
 npm run ingredients:describe -w @kosvia/api -- --all --limit=139   # first: translate the seed entries
 npm run ingredients:describe -w @kosvia/api                        # then: ingredients used on product labels, most common first
 npm run ingredients:describe -w @kosvia/api -- --limit=500 --dry-run   # see what would be selected
+npm run ingredients:describe -w @kosvia/api -- --from=prisma/seed/data/ingredients.pl.json   # load prose written outside the API (no key needed)
 
 # Maintenance
 npm run traits:recompute -w @kosvia/api -- [--stale]   # ingredientScore + product_traits

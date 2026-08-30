@@ -1,0 +1,1114 @@
+{
+  "Aqua": {
+    "pl": {
+      "commonName": "Woda",
+      "description": "Rozpuszczalnik, na którym opiera się niemal każdy kosmetyk na bazie wody. Niesie pozostałe składniki i sprawia, że konsystencja daje się rozprowadzić.",
+      "functions": ["Rozpuszcza składniki rozpuszczalne w wodzie"],
+      "concerns": null
+    }
+  },
+  "Glycerin": {
+    "pl": {
+      "commonName": "Gliceryna",
+      "description": "Jeden z najlepiej przebadanych humektantów w pielęgnacji. Ściąga wodę do górnych warstw skóry i pomaga innym składnikom zachować komfort.",
+      "functions": ["Wiąże wodę w skórze", "Poprawia konsystencję"],
+      "concerns": null
+    }
+  },
+  "Propanediol": {
+    "pl": {
+      "commonName": null,
+      "description": "Rozpuszczalnik i humektant pochodzenia roślinnego. Rozpuszcza substancje aktywne i nadaje formułom lekki, nieklejący poślizg.",
+      "functions": ["Rozpuszcza substancje aktywne", "Lekkie nawilżenie"],
+      "concerns": null
+    }
+  },
+  "Butylene Glycol": {
+    "pl": {
+      "commonName": null,
+      "description": "Mały humektant i rozpuszczalnik, który stabilizuje formułę i pomaga równomiernie rozprowadzić substancje aktywne.",
+      "functions": ["Rozpuszczalnik", "Lekkie nawilżenie"],
+      "concerns": null
+    }
+  },
+  "Pentylene Glycol": {
+    "pl": {
+      "commonName": null,
+      "description": "Wielozadaniowy rozpuszczalnik, który wspiera też konserwację — pozwala skrócić układ konserwantów.",
+      "functions": ["Rozpuszczalnik", "Wspiera konserwację"],
+      "concerns": null
+    }
+  },
+  "Dipropylene Glycol": {
+    "pl": {
+      "commonName": null,
+      "description": "Lekki rozpuszczalnik używany do rozrzedzania ciężkich formuł.",
+      "functions": ["Rozpuszczalnik"],
+      "concerns": null
+    }
+  },
+  "Alcohol Denat.": {
+    "pl": {
+      "commonName": "Alkohol skażony",
+      "description": "Nadaje szybko schnące, nieważkie tekstury i pomaga substancjom aktywnym wnikać w skórę. Szybko odparowuje.",
+      "functions": ["Szybko schnąca tekstura", "Rozpuszczalnik"],
+      "concerns": "Wysoko na liście składników może przesuszać skórę już suchą lub reaktywną."
+    }
+  },
+  "Sodium Hyaluronate": {
+    "pl": {
+      "commonName": "Kwas hialuronowy (forma soli)",
+      "description": "Polimer wiążący wodę, który zatrzymuje jej wielokrotność swojej masy — skóra od razu wydaje się pełniejsza.",
+      "functions": ["Wiąże wodę na powierzchni", "Efekt wypełnienia"],
+      "concerns": null
+    }
+  },
+  "Hyaluronic Acid": {
+    "pl": {
+      "commonName": "Kwas hialuronowy",
+      "description": "Wielkocząsteczkowa forma tego samego polimeru wiążącego wodę. Pozostaje na powierzchni i spowalnia utratę wody.",
+      "functions": ["Wiąże wodę na powierzchni"],
+      "concerns": null
+    }
+  },
+  "Sodium PCA": {
+    "pl": {
+      "commonName": null,
+      "description": "Składnik naturalnego czynnika nawilżającego skóry (NMF). Uzupełnia jej zdolność do zatrzymywania wody.",
+      "functions": ["Wiąże wodę w skórze"],
+      "concerns": null
+    }
+  },
+  "Betaine": {
+    "pl": {
+      "commonName": "Betaina",
+      "description": "Łagodny humektant z buraka cukrowego. Nawilża bez lepkiego wykończenia.",
+      "functions": ["Wiąże wodę", "Łagodzi działanie detergentów"],
+      "concerns": null
+    }
+  },
+  "Urea": {
+    "pl": {
+      "commonName": "Mocznik",
+      "description": "Nawilża, a w wyższych stężeniach delikatnie rozluźnia szorstkie łuski na powierzchni. Częsty w pielęgnacji ciała.",
+      "functions": ["Wiąże wodę", "Wygładza szorstką skórę"],
+      "concerns": "W wyższych stężeniach może szczypać na świeżo złuszczonej lub uszkodzonej skórze."
+    }
+  },
+  "Trehalose": {
+    "pl": {
+      "commonName": "Trehaloza",
+      "description": "Cukier, który pomaga komórkom skóry zatrzymać wodę. Często łączony z kwasem hialuronowym.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Panthenol": {
+    "pl": {
+      "commonName": "Prowitamina B5",
+      "description": "Nawilża i przywraca komfort skórze po oczyszczaniu lub złuszczaniu. Podstawa formuł łagodzących.",
+      "functions": ["Nawilża", "Koi podrażnioną skórę"],
+      "concerns": null
+    }
+  },
+  "Glycereth-26": {
+    "pl": {
+      "commonName": null,
+      "description": "Humektant, który poprawia poślizg i zmniejsza lepkość żelowych tekstur.",
+      "functions": ["Nawilża", "Poprawia konsystencję"],
+      "concerns": null
+    }
+  },
+  "Sorbitol": {
+    "pl": {
+      "commonName": null,
+      "description": "Alkohol cukrowy używany jako łagodny humektant i składnik tekstury.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Honey Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z miodu",
+      "description": "Tradycyjny humektant, który nadaje formułom miękkie, otulające wykończenie.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Ceramide NP": {
+    "pl": {
+      "commonName": null,
+      "description": "Jeden z lipidów budujących zewnętrzną barierę skóry. Pomaga osłabionej barierze odzyskać odporność.",
+      "functions": ["Odbudowuje lipidy bariery"],
+      "concerns": null
+    }
+  },
+  "Ceramide AP": {
+    "pl": {
+      "commonName": null,
+      "description": "Lipid barierowy, zwykle łączony w formule z ceramidem NP i cholesterolem.",
+      "functions": ["Odbudowuje lipidy bariery"],
+      "concerns": null
+    }
+  },
+  "Ceramide EOP": {
+    "pl": {
+      "commonName": null,
+      "description": "Długołańcuchowy lipid barierowy stosowany w kompleksach wieloceramidowych.",
+      "functions": ["Odbudowuje lipidy bariery"],
+      "concerns": null
+    }
+  },
+  "Cholesterol": {
+    "pl": {
+      "commonName": null,
+      "description": "Współdziała z ceramidami i kwasami tłuszczowymi w proporcji, w jakiej występują naturalnie w barierze skóry.",
+      "functions": ["Odbudowuje lipidy bariery"],
+      "concerns": null
+    }
+  },
+  "Phytosphingosine": {
+    "pl": {
+      "commonName": null,
+      "description": "Prekursor lipidów używany w niewielkich ilościach do wsparcia bariery i stabilności formuły.",
+      "functions": ["Wspiera lipidy bariery"],
+      "concerns": null
+    }
+  },
+  "Squalane": {
+    "pl": {
+      "commonName": "Skwalan",
+      "description": "Bardzo stabilny, lekki lipid, który naśladuje część naturalnego sebum. Zmiękcza bez tłustego wykończenia.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Caprylic/Capric Triglyceride": {
+    "pl": {
+      "commonName": null,
+      "description": "Lekki emolient z oleju kokosowego. Daje jedwabisty, szybko wchłaniający się poślizg.",
+      "functions": ["Zmiękcza", "Niesie składniki rozpuszczalne w oleju"],
+      "concerns": null
+    }
+  },
+  "Cetearyl Alcohol": {
+    "pl": {
+      "commonName": null,
+      "description": "Alkohol tłuszczowy — woskowy, nie wysuszający. Zagęszcza kremy i pomaga utrzymać emulsję.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Cetyl Alcohol": {
+    "pl": {
+      "commonName": null,
+      "description": "Alkohol tłuszczowy, który nadaje kremom gęstość i otulające wykończenie.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Stearyl Alcohol": {
+    "pl": {
+      "commonName": null,
+      "description": "Alkohol tłuszczowy, który dodaje bogactwa cięższym kremom i balsamom.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Isopropyl Myristate": {
+    "pl": {
+      "commonName": null,
+      "description": "Szybko rozprowadzający się emolient, który zmniejsza tłustość bogatych w oleje formuł.",
+      "functions": ["Zmiękcza", "Ułatwia rozprowadzanie"],
+      "concerns": "Wysoko oceniany w klasycznych skalach komedogenności — warto mieć na uwadze przy skórze skłonnej do zatykania porów."
+    }
+  },
+  "Dimethicone": {
+    "pl": {
+      "commonName": "Dimetikon",
+      "description": "Silikon tworzący gładki, oddychający film. Skóra od razu wydaje się miękka, a utrata wody maleje.",
+      "functions": ["Wygładza", "Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Cyclopentasiloxane": {
+    "pl": {
+      "commonName": null,
+      "description": "Lotny silikon dający nieważkie, pudrowe wykończenie. Odparowuje po aplikacji.",
+      "functions": ["Lekka tekstura"],
+      "concerns": null
+    }
+  },
+  "Shea Butter": {
+    "pl": {
+      "commonName": "Masło shea",
+      "description": "Bogate masło roślinne o wysokiej zawartości kwasów tłuszczowych. Przynosi ulgę suchej, ściągniętej skórze.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Jojoba Seed Oil": {
+    "pl": {
+      "commonName": "Olej jojoba",
+      "description": "Ciekły wosk o profilu zbliżonym do sebum, dlatego wchłania się bez uczucia ciężkości.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Sunflower Seed Oil": {
+    "pl": {
+      "commonName": "Olej słonecznikowy",
+      "description": "Olej bogaty w kwas linolowy, często wybierany do formuł wspierających barierę skóry.",
+      "functions": ["Zmiękcza", "Wspiera barierę"],
+      "concerns": null
+    }
+  },
+  "Rosehip Seed Oil": {
+    "pl": {
+      "commonName": "Olej z dzikiej róży",
+      "description": "Olej o wysokiej zawartości nienasyconych kwasów tłuszczowych, tradycyjnie stosowany na nierówną skórę ze śladami.",
+      "functions": ["Zmiękcza", "Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Argan Oil": {
+    "pl": {
+      "commonName": "Olej arganowy",
+      "description": "Olej bogaty w witaminę E, który zmiękcza, nie obciążając większości typów skóry.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Coconut Oil": {
+    "pl": {
+      "commonName": "Olej kokosowy",
+      "description": "Olej stały w temperaturze pokojowej, bardzo okluzyjny. Popularny w pielęgnacji ciała i włosów.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": "Często zgłaszany jako zatykający pory na skórze twarzy."
+    }
+  },
+  "Marula Oil": {
+    "pl": {
+      "commonName": "Olej marula",
+      "description": "Lekki olej bogaty w kwas oleinowy, o suchym w dotyku wykończeniu.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Evening Primrose Oil": {
+    "pl": {
+      "commonName": "Olej z wiesiołka",
+      "description": "Olej bogaty w kwas gamma-linolenowy, często stosowany w formułach nastawionych na komfort skóry.",
+      "functions": ["Zmiękcza", "Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Petrolatum": {
+    "pl": {
+      "commonName": "Wazelina",
+      "description": "Najskuteczniejszy powszechnie stosowany okluzyjnik. Tworzy film, który wyraźnie spowalnia utratę wody.",
+      "functions": ["Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Paraffinum Liquidum": {
+    "pl": {
+      "commonName": "Olej mineralny",
+      "description": "Obojętny, dobrze tolerowany okluzyjnik — używany tam, gdzie chodzi o ochronny film.",
+      "functions": ["Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Beeswax": {
+    "pl": {
+      "commonName": "Wosk pszczeli",
+      "description": "Wosk, który zagęszcza balsamy i tworzy miękką warstwę ochronną. Niewegański.",
+      "functions": ["Zagęszcza", "Chroni"],
+      "concerns": null
+    }
+  },
+  "Lanolin": {
+    "pl": {
+      "commonName": "Lanolina",
+      "description": "Wosk z wełny owczej, wyjątkowo skuteczny w zmiękczaniu bardzo suchych miejsc.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": "Znany alergen kontaktowy dla niewielkiej grupy osób."
+    }
+  },
+  "Niacinamide": {
+    "pl": {
+      "commonName": "Witamina B3",
+      "description": "Wszechstronna substancja aktywna badana pod kątem wyrównania kolorytu, regulacji sebum i wsparcia bariery. Zwykle dobrze tolerowana.",
+      "functions": ["Wyrównuje koloryt", "Wspiera barierę", "Reguluje sebum"],
+      "concerns": "Przy bardzo wysokich stężeniach niektóre osoby zauważają przejściowe zaczerwienienie."
+    }
+  },
+  "Ascorbic Acid": {
+    "pl": {
+      "commonName": "Witamina C",
+      "description": "Czysta forma witaminy C — antyoksydant stosowany dla rozświetlenia i wyrównania kolorytu. Wymaga niskiego pH i starannego opakowania.",
+      "functions": ["Antyoksydant", "Wyrównuje koloryt"],
+      "concerns": "W wysokich stężeniach może szczypać, szczególnie na skórze reaktywnej."
+    }
+  },
+  "Ascorbyl Glucoside": {
+    "pl": {
+      "commonName": null,
+      "description": "Stabilna pochodna witaminy C, która przekształca się na skórze. Łagodniejsza niż czysty kwas askorbinowy.",
+      "functions": ["Antyoksydant", "Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Tetrahexyldecyl Ascorbate": {
+    "pl": {
+      "commonName": null,
+      "description": "Rozpuszczalna w oleju pochodna witaminy C, stabilna w formułach bezwodnych.",
+      "functions": ["Antyoksydant", "Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Retinol": {
+    "pl": {
+      "commonName": "Witamina A",
+      "description": "Najbardziej znany retinoid, szeroko badany pod kątem tekstury skóry i zmarszczek mimicznych. Wprowadzaj stopniowo.",
+      "functions": ["Wygładza teksturę", "Wspiera odnowę"],
+      "concerns": "W pierwszych tygodniach często powoduje suchość lub łuszczenie. Stosuj razem z filtrem SPF."
+    }
+  },
+  "Retinal": {
+    "pl": {
+      "commonName": "Retinaldehyd",
+      "description": "Retinoid o krok bliżej formy aktywnej niż retinol, stosowany w niższych stężeniach.",
+      "functions": ["Wygładza teksturę", "Wspiera odnowę"],
+      "concerns": "W okresie adaptacji może powodować suchość. Stosuj razem z filtrem SPF."
+    }
+  },
+  "Hydroxypinacolone Retinoate": {
+    "pl": {
+      "commonName": "Retinoid Granactive",
+      "description": "Ester retinoidu nowej generacji, zwykle lepiej tolerowany niż retinol.",
+      "functions": ["Wygładza teksturę"],
+      "concerns": "To wciąż retinoid — łącz z codzienną ochroną przeciwsłoneczną."
+    }
+  },
+  "Bakuchiol": {
+    "pl": {
+      "commonName": "Bakuchiol",
+      "description": "Składnik pochodzenia roślinnego badany jako łagodniejsza alternatywa dla retinoidów w kwestii tekstury i jędrności.",
+      "functions": ["Wygładza teksturę"],
+      "concerns": null
+    }
+  },
+  "Salicylic Acid": {
+    "pl": {
+      "commonName": "Kwas salicylowy (BHA)",
+      "description": "Rozpuszczalny w oleju kwas, który działa wewnątrz pora — dlatego jest podstawą pielęgnacji skóry z zaskórnikami.",
+      "functions": ["Oczyszcza pory", "Złuszcza"],
+      "concerns": "Przy codziennym stosowaniu może przesuszać. Łącz z kremem nawilżającym i codziennym SPF."
+    }
+  },
+  "Glycolic Acid": {
+    "pl": {
+      "commonName": "Kwas glikolowy (AHA)",
+      "description": "Najmniejszy kwas alfa-hydroksylowy. Rozluźnia martwe komórki na powierzchni, co z czasem wygładza i rozjaśnia.",
+      "functions": ["Złuszcza powierzchnię", "Wyrównuje koloryt"],
+      "concerns": "Zwiększa wrażliwość na słońce — codzienny SPF ma znaczenie. Może szczypać na skórze reaktywnej."
+    }
+  },
+  "Lactic Acid": {
+    "pl": {
+      "commonName": "Kwas mlekowy",
+      "description": "Większy kwas AHA, który złuszcza łagodniej niż glikolowy i dodatkowo nawilża.",
+      "functions": ["Złuszcza powierzchnię", "Nawilża"],
+      "concerns": "Zwiększa wrażliwość na słońce — w dzień stosuj SPF."
+    }
+  },
+  "Mandelic Acid": {
+    "pl": {
+      "commonName": "Kwas migdałowy",
+      "description": "Wielkocząsteczkowy kwas AHA, który wnika powoli — dlatego często wybierany do skóry wrażliwej.",
+      "functions": ["Łagodnie złuszcza"],
+      "concerns": "Zwiększa wrażliwość na słońce — w dzień stosuj SPF."
+    }
+  },
+  "Azelaic Acid": {
+    "pl": {
+      "commonName": "Kwas azelainowy",
+      "description": "Kwas dikarboksylowy stosowany dla wyrównania kolorytu i przy skórze łatwo czerwieniejącej.",
+      "functions": ["Wyrównuje koloryt", "Łagodzi widoczne zaczerwienienie"],
+      "concerns": "U niektórych osób przez pierwsze minuty pojawia się krótkie szczypanie."
+    }
+  },
+  "Tranexamic Acid": {
+    "pl": {
+      "commonName": "Kwas traneksamowy",
+      "description": "Stosowany w formułach wyrównujących koloryt, często razem z niacynamidem.",
+      "functions": ["Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Alpha-Arbutin": {
+    "pl": {
+      "commonName": "Alfa-arbutyna",
+      "description": "Składnik wyrównujący koloryt, który działa stopniowo i jest zwykle dobrze tolerowany.",
+      "functions": ["Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Zinc PCA": {
+    "pl": {
+      "commonName": null,
+      "description": "Sól cynku stosowana w formułach nastawionych na regulację sebum i zaskórniki.",
+      "functions": ["Reguluje sebum"],
+      "concerns": null
+    }
+  },
+  "Adenosine": {
+    "pl": {
+      "commonName": "Adenozyna",
+      "description": "Mała cząsteczka szeroko stosowana w formułach ujędrniających.",
+      "functions": ["Wspiera gładkość"],
+      "concerns": null
+    }
+  },
+  "Acetyl Hexapeptide-8": {
+    "pl": {
+      "commonName": "Argirelina",
+      "description": "Peptyd sygnałowy stosowany w produktach na zmarszczki mimiczne.",
+      "functions": ["Wspiera gładkość"],
+      "concerns": null
+    }
+  },
+  "Palmitoyl Tripeptide-1": {
+    "pl": {
+      "commonName": null,
+      "description": "Peptyd stosowany w formułach ujędrniających i wygładzających, zwykle w połączeniu z innymi peptydami.",
+      "functions": ["Wspiera jędrność"],
+      "concerns": null
+    }
+  },
+  "Copper Tripeptide-1": {
+    "pl": {
+      "commonName": "Peptyd miedziowy",
+      "description": "Peptyd związany z miedzią, badany pod kątem odnowy i jędrności skóry.",
+      "functions": ["Wspiera odnowę"],
+      "concerns": null
+    }
+  },
+  "Ectoin": {
+    "pl": {
+      "commonName": "Ektoina",
+      "description": "Cząsteczka ochronna wytwarzana przez bakterie ekstremofilne, stosowana w formułach nawilżających i kojących.",
+      "functions": ["Chroni", "Nawilża"],
+      "concerns": null
+    }
+  },
+  "Centella Asiatica Extract": {
+    "pl": {
+      "commonName": "Wąkrota azjatycka (cica)",
+      "description": "Ekstrakt roślinny od dawna stosowany w pielęgnacji kojącej skórę, która wygląda na zestresowaną.",
+      "functions": ["Łagodzi widoczne zaczerwienienie"],
+      "concerns": null
+    }
+  },
+  "Madecassoside": {
+    "pl": {
+      "commonName": "Madekasozyd",
+      "description": "Jedna z wyizolowanych substancji aktywnych z wąkroty, stosowana w niskich stężeniach w formułach kojących.",
+      "functions": ["Łagodzi widoczne zaczerwienienie"],
+      "concerns": null
+    }
+  },
+  "Allantoin": {
+    "pl": {
+      "commonName": "Alantoina",
+      "description": "Klasyczny składnik kojący, po którym skóra jest gładka po oczyszczaniu lub złuszczaniu.",
+      "functions": ["Koi", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Bisabolol": {
+    "pl": {
+      "commonName": "Bisabolol",
+      "description": "Główny składnik kojący rumianku, stosowany w formułach o niskim potencjale drażniącym.",
+      "functions": ["Łagodzi widoczne zaczerwienienie"],
+      "concerns": null
+    }
+  },
+  "Aloe Barbadensis Leaf Juice": {
+    "pl": {
+      "commonName": "Aloes",
+      "description": "Wodnisty sok roślinny, który daje natychmiastowe uczucie chłodu i ukojenia.",
+      "functions": ["Chłodzi", "Nawilża"],
+      "concerns": null
+    }
+  },
+  "Oat Kernel Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z owsa",
+      "description": "Ekstrakt z owsa stosowany w formułach dla skóry łatwo ulegającej podrażnieniom.",
+      "functions": ["Koi"],
+      "concerns": null
+    }
+  },
+  "Green Tea Leaf Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z zielonej herbaty",
+      "description": "Ekstrakt bogaty w antyoksydanty, stosowany w formułach dla skóry tłustej i reaktywnej.",
+      "functions": ["Antyoksydant", "Koi"],
+      "concerns": null
+    }
+  },
+  "Licorice Root Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z lukrecji",
+      "description": "Ekstrakt roślinny stosowany zarówno dla ukojenia, jak i wyrównania kolorytu.",
+      "functions": ["Koi", "Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Chamomilla Recutita Flower Extract": {
+    "pl": {
+      "commonName": "Rumianek",
+      "description": "Tradycyjny roślinny składnik kojący.",
+      "functions": ["Koi"],
+      "concerns": "Sporadycznie zgłaszany jako alergen u osób uczulonych na rośliny z rodziny astrowatych."
+    }
+  },
+  "Calendula Officinalis Extract": {
+    "pl": {
+      "commonName": "Nagietek",
+      "description": "Ekstrakt z nagietka stosowany w formułach kojących dla suchej, ściągniętej skóry.",
+      "functions": ["Koi"],
+      "concerns": null
+    }
+  },
+  "Beta-Glucan": {
+    "pl": {
+      "commonName": "Beta-glukan",
+      "description": "Polisacharyd, który nawilża i tworzy na skórze kojący film.",
+      "functions": ["Nawilża", "Koi"],
+      "concerns": null
+    }
+  },
+  "Tocopherol": {
+    "pl": {
+      "commonName": "Witamina E",
+      "description": "Rozpuszczalny w tłuszczach antyoksydant, który chroni też oleje w formule przed jełczeniem.",
+      "functions": ["Antyoksydant", "Stabilizuje oleje"],
+      "concerns": null
+    }
+  },
+  "Ferulic Acid": {
+    "pl": {
+      "commonName": "Kwas ferulowy",
+      "description": "Roślinny antyoksydant stosowany do stabilizowania mieszanek witamin C i E.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Resveratrol": {
+    "pl": {
+      "commonName": "Resweratrol",
+      "description": "Polifenolowy antyoksydant stosowany w formułach na noc i ochronnych.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Coenzyme Q10": {
+    "pl": {
+      "commonName": "Koenzym Q10",
+      "description": "Antyoksydant naturalnie obecny w skórze, częsty w kremach ujędrniających.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Astaxanthin": {
+    "pl": {
+      "commonName": "Astaksantyna",
+      "description": "Intensywnie zabarwiony antyoksydant karotenoidowy z alg.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Zinc Oxide": {
+    "pl": {
+      "commonName": "Tlenek cynku",
+      "description": "Mineralny filtr UV, który pozostaje na powierzchni i pokrywa szeroki zakres promieniowania. Częsty wybór dla skóry reaktywnej.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Titanium Dioxide": {
+    "pl": {
+      "commonName": "Dwutlenek tytanu",
+      "description": "Mineralny filtr UV, często łączony z tlenkiem cynku. Może zostawiać lekki biały nalot.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Ethylhexyl Methoxycinnamate": {
+    "pl": {
+      "commonName": null,
+      "description": "Szeroko stosowany organiczny filtr UVB, który daje lekkie, niewidoczne wykończenie.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine": {
+    "pl": {
+      "commonName": "Tinosorb S",
+      "description": "Nowoczesny szerokopasmowy filtr organiczny, fotostabilny i przyjemny kosmetycznie.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Diethylamino Hydroxybenzoyl Hexyl Benzoate": {
+    "pl": {
+      "commonName": "Uvinul A Plus",
+      "description": "Fotostabilny filtr UVA stosowany w codziennych fluidach o wysokiej ochronie.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Octocrylene": {
+    "pl": {
+      "commonName": "Oktokrylen",
+      "description": "Organiczny filtr UVB, który dodatkowo stabilizuje inne filtry.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Coco-Glucoside": {
+    "pl": {
+      "commonName": null,
+      "description": "Bardzo łagodny środek myjący pochodzenia cukrowego, częsty w żelach do twarzy o niskim potencjale drażniącym.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Cocamidopropyl Betaine": {
+    "pl": {
+      "commonName": null,
+      "description": "Surfaktant pomocniczy, który łagodzi ostrzejsze środki myjące i buduje pianę.",
+      "functions": ["Oczyszcza", "Buduje pianę"],
+      "concerns": "Uznany alergen kontaktowy dla niewielkiej grupy osób."
+    }
+  },
+  "Sodium Cocoyl Isethionate": {
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny środek myjący o kremowej pianie, stosowany w formułach syndetowych.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Sodium Laureth Sulfate": {
+    "pl": {
+      "commonName": "SLES",
+      "description": "Skuteczny pieniący surfaktant stosowany głównie w kosmetykach do mycia ciała i włosów.",
+      "functions": ["Oczyszcza", "Buduje pianę"],
+      "concerns": "Przy codziennym stosowaniu może dawać uczucie ściągnięcia na suchej skórze twarzy."
+    }
+  },
+  "Decyl Glucoside": {
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny niejonowy środek myjący z kukurydzy i kokosa.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Lauryl Glucoside": {
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny surfaktant cukrowy stosowany w delikatnych żelach myjących.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Poloxamer 184": {
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny środek myjący stosowany w płynach micelarnych i formułach o niskiej pianie.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Polysorbate 20": {
+    "pl": {
+      "commonName": null,
+      "description": "Solubilizator, który utrzymuje niewielkie ilości oleju rozproszone w wodzie.",
+      "functions": ["Solubilizuje"],
+      "concerns": null
+    }
+  },
+  "Sorbitan Olivate": {
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator z oliwy stosowany w łagodnych kremach przyjaznych barierze skóry.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Cetearyl Glucoside": {
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator na bazie cukru stosowany w kremach dla skóry wrażliwej.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Glyceryl Stearate": {
+    "pl": {
+      "commonName": null,
+      "description": "Popularny emulgator, który dodatkowo zmiękcza i nadaje kremom charakterystyczną gęstość.",
+      "functions": ["Emulguje", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "PEG-100 Stearate": {
+    "pl": {
+      "commonName": null,
+      "description": "Zwykle łączony ze stearynianem glicerylu, żeby zbudować stabilną, elegancką bazę kremu.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Carbomer": {
+    "pl": {
+      "commonName": "Karbomer",
+      "description": "Polimer żelujący, który nadaje serum i żelom gęstość.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Xanthan Gum": {
+    "pl": {
+      "commonName": "Guma ksantanowa",
+      "description": "Naturalna guma używana do zagęszczania formuł na bazie wody.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Sclerotium Gum": {
+    "pl": {
+      "commonName": null,
+      "description": "Guma, która daje gładką, nielepką żelową teksturę.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Hydroxyethylcellulose": {
+    "pl": {
+      "commonName": null,
+      "description": "Zagęstnik celulozowy stosowany w przezroczystych żelach.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Ammonium Acryloyldimethyltaurate/VP Copolymer": {
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny polimer, który nadaje żelom lekkie, sprężyste wykończenie.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Silica": {
+    "pl": {
+      "commonName": "Krzemionka",
+      "description": "Mineralny puder, który pochłania sebum z powierzchni i daje miękko-matowe wykończenie.",
+      "functions": ["Matuje"],
+      "concerns": null
+    }
+  },
+  "Kaolin": {
+    "pl": {
+      "commonName": "Glinka biała",
+      "description": "Drobna glinka stosowana w maseczkach do pochłaniania sebum.",
+      "functions": ["Pochłania sebum"],
+      "concerns": null
+    }
+  },
+  "Bentonite": {
+    "pl": {
+      "commonName": "Bentonit",
+      "description": "Glinka o silnych właściwościach pochłaniających sebum, stosowana w maseczkach głęboko oczyszczających.",
+      "functions": ["Pochłania sebum"],
+      "concerns": "Może ściągać lub przesuszać, jeśli zostanie na skórze dłużej, niż zaleca producent."
+    }
+  },
+  "Charcoal Powder": {
+    "pl": {
+      "commonName": "Węgiel aktywny",
+      "description": "Porowaty puder stosowany w maseczkach i produktach myjących dla uczucia głębokiego oczyszczenia.",
+      "functions": ["Pochłania sebum"],
+      "concerns": null
+    }
+  },
+  "Sodium Hydroxide": {
+    "pl": {
+      "commonName": "Wodorotlenek sodu",
+      "description": "Stosowany w śladowych ilościach, żeby doprowadzić formułę do pH przyjaznego skórze.",
+      "functions": ["Reguluje pH"],
+      "concerns": null
+    }
+  },
+  "Citric Acid": {
+    "pl": {
+      "commonName": "Kwas cytrynowy",
+      "description": "Używany głównie do korekty pH, a nie do złuszczania.",
+      "functions": ["Reguluje pH"],
+      "concerns": null
+    }
+  },
+  "Triethanolamine": {
+    "pl": {
+      "commonName": null,
+      "description": "Regulator pH stosowany z żelami na bazie karbomeru.",
+      "functions": ["Reguluje pH"],
+      "concerns": null
+    }
+  },
+  "Disodium EDTA": {
+    "pl": {
+      "commonName": null,
+      "description": "Wiąże śladowe ilości metali, dzięki czemu konserwanty i substancje aktywne zachowują skuteczność.",
+      "functions": ["Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Tetrasodium Glutamate Diacetate": {
+    "pl": {
+      "commonName": null,
+      "description": "Łatwo biodegradowalna alternatywa dla EDTA.",
+      "functions": ["Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Phenoxyethanol": {
+    "pl": {
+      "commonName": "Fenoksyetanol",
+      "description": "Jeden z najczęstszych konserwantów — sprawia, że produkty na bazie wody pozostają bezpieczne w użyciu przez długi czas.",
+      "functions": ["Konserwuje"],
+      "concerns": null
+    }
+  },
+  "Ethylhexylglycerin": {
+    "pl": {
+      "commonName": null,
+      "description": "Wzmacnia działanie innych konserwantów i lekko pielęgnuje skórę.",
+      "functions": ["Wspiera konserwację"],
+      "concerns": null
+    }
+  },
+  "Benzyl Alcohol": {
+    "pl": {
+      "commonName": "Alkohol benzylowy",
+      "description": "Konserwant, który występuje też naturalnie w niektórych olejkach eterycznych.",
+      "functions": ["Konserwuje"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Sodium Benzoate": {
+    "pl": {
+      "commonName": "Benzoesan sodu",
+      "description": "Konserwant działający w lekko kwaśnych formułach.",
+      "functions": ["Konserwuje"],
+      "concerns": null
+    }
+  },
+  "Potassium Sorbate": {
+    "pl": {
+      "commonName": "Sorbinian potasu",
+      "description": "Zwykle łączony z benzoesanem sodu, żeby objąć ochroną pleśnie i drożdże.",
+      "functions": ["Konserwuje"],
+      "concerns": null
+    }
+  },
+  "Chlorphenesin": {
+    "pl": {
+      "commonName": null,
+      "description": "Konserwant stosowany w niektórych układach razem z fenoksyetanolem.",
+      "functions": ["Konserwuje"],
+      "concerns": null
+    }
+  },
+  "Caprylyl Glycol": {
+    "pl": {
+      "commonName": null,
+      "description": "Humektant, który wspiera też układ konserwujący.",
+      "functions": ["Nawilża", "Wspiera konserwację"],
+      "concerns": null
+    }
+  },
+  "Parfum": {
+    "pl": {
+      "commonName": "Kompozycja zapachowa",
+      "description": "Mieszanka cząsteczek zapachowych nadająca produktowi zapach. Działa wyłącznie na zmysły — dla skóry nie robi nic.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Najczęstsze źródło kosmetycznych reakcji kontaktowych. Warto unikać, jeśli skóra łatwo się czerwieni lub szczypie."
+    }
+  },
+  "Limonene": {
+    "pl": {
+      "commonName": "Limonen",
+      "description": "Składnik zapachowy o cytrusowym aromacie, naturalnie obecny w wielu olejkach eterycznych.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Linalool": {
+    "pl": {
+      "commonName": "Linalol",
+      "description": "Kwiatowy składnik zapachowy obecny w lawendzie i wielu roślinach.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Geraniol": {
+    "pl": {
+      "commonName": "Geraniol",
+      "description": "Składnik zapachowy o różanym aromacie.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Citronellol": {
+    "pl": {
+      "commonName": "Cytronelol",
+      "description": "Świeży, różany składnik zapachowy.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Lavandula Angustifolia Oil": {
+    "pl": {
+      "commonName": "Olejek lawendowy",
+      "description": "Olejek eteryczny stosowany dla zapachu i wrażenia spa.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Olejki eteryczne to częsty wyzwalacz reakcji u skóry reaktywnej."
+    }
+  },
+  "Citrus Aurantium Dulcis Peel Oil": {
+    "pl": {
+      "commonName": "Olejek ze skórki pomarańczy",
+      "description": "Cytrusowy olejek eteryczny stosowany dla zapachu.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Olejki cytrusowe mogą zwiększać wrażliwość na słońce w produktach pozostających na skórze."
+    }
+  },
+  "Rosa Damascena Flower Water": {
+    "pl": {
+      "commonName": "Woda różana",
+      "description": "Delikatnie pachnąca woda kwiatowa stosowana jako część fazy wodnej.",
+      "functions": ["Nadaje zapach", "Nawilża"],
+      "concerns": null
+    }
+  },
+  "Menthol": {
+    "pl": {
+      "commonName": "Mentol",
+      "description": "Daje natychmiastowe uczucie chłodu.",
+      "functions": ["Efekt chłodzenia"],
+      "concerns": "Uczucie chłodu wynika z pobudzenia nerwów i może podrażniać skórę reaktywną."
+    }
+  },
+  "Behentrimonium Chloride": {
+    "pl": {
+      "commonName": null,
+      "description": "Składnik kondycjonujący, który ułatwia rozczesywanie włosów.",
+      "functions": ["Kondycjonuje włosy"],
+      "concerns": null
+    }
+  },
+  "Cetrimonium Chloride": {
+    "pl": {
+      "commonName": null,
+      "description": "Składnik kondycjonujący, który zmniejsza elektryzowanie i plątanie włosów.",
+      "functions": ["Kondycjonuje włosy"],
+      "concerns": null
+    }
+  },
+  "Hydrolyzed Wheat Protein": {
+    "pl": {
+      "commonName": "Hydrolizowane proteiny pszenicy",
+      "description": "Drobne białko, które dodaje włosom objętości.",
+      "functions": ["Kondycjonuje włosy"],
+      "concerns": null
+    }
+  },
+  "Panthenyl Ethyl Ether": {
+    "pl": {
+      "commonName": null,
+      "description": "Pochodna prowitaminy B5 stosowana w pielęgnacji włosów dla połysku i łatwości układania.",
+      "functions": ["Kondycjonuje włosy"],
+      "concerns": null
+    }
+  },
+  "Piroctone Olamine": {
+    "pl": {
+      "commonName": null,
+      "description": "Składnik przeciwłupieżowy stosowany w szamponach do skóry głowy.",
+      "functions": ["Pielęgnuje skórę głowy"],
+      "concerns": null
+    }
+  },
+  "Niacinamide Powder Blend": {
+    "pl": {
+      "commonName": "Kompleks witaminy B3",
+      "description": "Gotowa baza niacynamidowa używana przez niektórych producentów dla powtarzalności.",
+      "functions": ["Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Saccharomyces Ferment Filtrate": {
+    "pl": {
+      "commonName": null,
+      "description": "Ferment drożdżowy stosowany w esencjach dla lekkiego, nawilżającego wykończenia.",
+      "functions": ["Nawilża"],
+      "concerns": null
+    }
+  },
+  "Lactobacillus Ferment": {
+    "pl": {
+      "commonName": null,
+      "description": "Ferment stosowany w formułach nastawionych na komfort skóry.",
+      "functions": ["Koi"],
+      "concerns": null
+    }
+  },
+  "Sodium Lactate": {
+    "pl": {
+      "commonName": "Mleczan sodu",
+      "description": "Sól kwasu mlekowego używana głównie jako humektant, a nie do złuszczania.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Arginine": {
+    "pl": {
+      "commonName": "Arginina",
+      "description": "Aminokwas stosowany do regulacji pH i wsparcia nawilżenia.",
+      "functions": ["Reguluje pH", "Nawilża"],
+      "concerns": null
+    }
+  },
+  "Mica": {
+    "pl": {
+      "commonName": "Mika",
+      "description": "Minerał, który daje miękkie, odbijające światło wykończenie.",
+      "functions": ["Dodaje blasku"],
+      "concerns": null
+    }
+  },
+  "Iron Oxides": {
+    "pl": {
+      "commonName": "Tlenki żelaza",
+      "description": "Mineralne pigmenty używane do nadania koloru i zmniejszenia białego nalotu filtrów mineralnych.",
+      "functions": ["Nadaje kolor"],
+      "concerns": null
+    }
+  }
+}

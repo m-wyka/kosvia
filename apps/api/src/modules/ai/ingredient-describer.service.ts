@@ -1,7 +1,13 @@
+import { readFile } from 'node:fs/promises';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { AI_PROVIDER, type AIProvider } from './providers/ai-provider.interface';
+import { normalizeToken } from '../inci/inci-parser';
+import {
+  AI_PROVIDER,
+  type AIProvider,
+  type IngredientProse,
+} from './providers/ai-provider.interface';
 
 export interface DescribeOptions {
   /** How many entries to write in this run. */
@@ -20,6 +26,17 @@ export interface DescribeProgress {
 }
 
 const CONCURRENCY = 3;
+
+/**
+ * Prose written outside the API — in a Claude Code session, by hand — keyed by
+ * INCI name. `en` is optional: entries that already have English keep it.
+ */
+export type IngredientProseFile = Record<string, { pl: IngredientProse; en?: IngredientProse }>;
+
+export interface ProseFileSummary {
+  applied: number;
+  unknown: string[];
+}
 
 const UNDESCRIBED_SELECT = {
   id: true,
@@ -85,6 +102,49 @@ export class IngredientDescriberService {
       options.onProgress?.(progress);
     }
     return progress;
+  }
+
+  async applyProseFile(path: string): Promise<ProseFileSummary> {
+    const entries = JSON.parse(await readFile(path, 'utf8')) as IngredientProseFile;
+    return this.applyProse(entries);
+  }
+
+  async applyProse(entries: IngredientProseFile): Promise<ProseFileSummary> {
+    const byNormalized = new Map(
+      Object.entries(entries).map(([inciName, prose]) => [normalizeToken(inciName), prose]),
+    );
+    const rows = await this.prisma.ingredient.findMany({
+      where: { normalizedName: { in: [...byNormalized.keys()] } },
+      select: { id: true, normalizedName: true, description: true },
+    });
+    for (const row of rows) {
+      const prose = byNormalized.get(row.normalizedName);
+      if (!prose) {
+        continue;
+      }
+      const shouldWriteEnglish = prose.en && row.description === null;
+      await this.prisma.ingredient.update({
+        where: { id: row.id },
+        data: {
+          ...(shouldWriteEnglish && prose.en
+            ? {
+                description: prose.en.description,
+                functions: prose.en.functions,
+                commonName: prose.en.commonName,
+                concerns: prose.en.concerns,
+                descriptionGeneratedAt: new Date(),
+              }
+            : {}),
+          descriptionPl: prose.pl.description,
+          functionsPl: prose.pl.functions,
+          commonNamePl: prose.pl.commonName,
+          concernsPl: prose.pl.concerns,
+        },
+      });
+    }
+    const found = new Set(rows.map((row) => row.normalizedName));
+    const unknown = Object.keys(entries).filter((name) => !found.has(normalizeToken(name)));
+    return { applied: rows.length, unknown };
   }
 
   private async describeOne(row: UndescribedRow): Promise<boolean> {

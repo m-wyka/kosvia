@@ -3,10 +3,14 @@
  * missing either language; hand-written English entries are kept and translated.
  *
  *   npm run ingredients:describe -w @kosvia/api -- [--limit=200] [--all] [--dry-run]
+ *   npm run ingredients:describe -w @kosvia/api -- --from=path/to/prose.json
  *
  * By default only ingredients that appear on a product label are described,
  * most-used first, so the model is paid for entries someone will read.
  * Requires AI_PROVIDER=anthropic; the offline provider declines every entry.
+ *
+ * `--from` applies prose written elsewhere (see IngredientProseFile) and needs
+ * no provider at all.
  */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
@@ -24,6 +28,7 @@ const readArguments = () => {
     limit: Number(flags.get('limit') ?? DEFAULT_LIMIT),
     onlyInProducts: flags.get('all') !== 'true',
     isDryRun: flags.get('dry-run') === 'true',
+    fromFile: flags.get('from') ?? null,
   };
 };
 
@@ -33,7 +38,16 @@ const main = async () => {
     logger: ['warn', 'error'],
   });
   try {
-    const summary = await context.get(IngredientDescriberService).describeMissing({
+    const describer = context.get(IngredientDescriberService);
+    if (options.fromFile) {
+      const summary = await describer.applyProseFile(options.fromFile);
+      console.log(`applied ${summary.applied} entries from ${options.fromFile}`);
+      if (summary.unknown.length) {
+        console.warn(`not in the dictionary: ${summary.unknown.join(', ')}`);
+      }
+      return;
+    }
+    const summary = await describer.describeMissing({
       ...options,
       onProgress: (progress) =>
         console.log(

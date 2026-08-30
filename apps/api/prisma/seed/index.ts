@@ -19,6 +19,7 @@ import { ProductTraitsService } from '../../src/modules/scoring/product-traits.s
 import type { PrismaService } from '../../src/common/prisma/prisma.service';
 import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
 import { INGREDIENTS, INGREDIENT_ALIASES } from './data/ingredients';
+import INGREDIENT_PROSE_PL from './data/ingredients.pl.json';
 import { FORMULAS } from './data/formulas';
 
 const prisma = new PrismaClient();
@@ -90,6 +91,27 @@ const FRAGRANCE_FREE_BRANDS = new Set([
   'cerulea',
   'hydrapure-lab',
 ]);
+
+type PolishProse = {
+  pl: {
+    description: string;
+    functions: string[];
+    commonName: string | null;
+    concerns: string | null;
+  };
+};
+const polishProse = (inci: string) => {
+  const entry = (INGREDIENT_PROSE_PL as Record<string, PolishProse>)[inci];
+  if (!entry) {
+    return {};
+  }
+  return {
+    descriptionPl: entry.pl.description,
+    functionsPl: entry.pl.functions,
+    commonNamePl: entry.pl.commonName,
+    concernsPl: entry.pl.concerns,
+  };
+};
 
 const NON_VEGAN_INGREDIENTS = new Set([
   'Beeswax',
@@ -221,6 +243,7 @@ async function main(): Promise<void> {
         sensitivityImpact: ingredient.sensitivityImpact ?? 0,
         goodForSkinTypes: (ingredient.goodFor ?? []) as SkinType[],
         isActiveIngredient: ingredient.active ?? false,
+        ...polishProse(ingredient.inci),
         targetsConcerns: {
           connect: (ingredient.targets ?? []).map((slugRef) => {
             const found = concernBySlug.get(slugRef);
