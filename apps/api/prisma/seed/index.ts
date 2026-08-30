@@ -13,6 +13,7 @@ import * as bcrypt from 'bcryptjs';
 import { computeIngredientScore } from '../../src/modules/scoring/ingredient-score';
 import type { ScorableProductIngredient } from '../../src/modules/scoring/types';
 import { normalizeToken } from '../../src/modules/inci/inci-parser';
+import { toVolumeUnitEnum } from '../../src/modules/products/volume-unit';
 import { DATA_SOURCES, MANUAL_SOURCE_CODE } from '../../src/modules/import/data-sources';
 import { CONSENT_VERSIONS, type ConsentType } from '@kosvia/shared';
 import { ProductTraitsService } from '../../src/modules/scoring/product-traits.service';
@@ -351,16 +352,21 @@ async function main(): Promise<void> {
 
       const product = await prisma.product.create({
         data: {
-          ean: makeEan(productIndex),
           name: formula.name,
           slug,
           brandId: brand.id,
           categoryId: category.id,
           description: `${formula.description}\n\n${brandSeed.name}'s take on a ${formula.shortPurpose}.`,
           usage: formula.usage,
-          imageUrl: `/img/product/${slug}.svg`,
-          volume,
-          volumeUnit: formula.volumeUnit,
+          variants: {
+            create: {
+              ean: makeEan(productIndex),
+              imageUrl: `/img/product/${slug}.svg`,
+              volume,
+              volumeUnit: toVolumeUnitEnum(formula.volumeUnit),
+              isDefault: true,
+            },
+          },
           highlights: formula.highlights,
           isFragranceFree: !scented,
           isVegan,
@@ -370,7 +376,9 @@ async function main(): Promise<void> {
           sourceId: manualSource.id,
           ingredients: { create: productIngredients },
         },
+        include: { variants: true },
       });
+      const defaultVariant = product.variants[0]!;
 
       /* ------------------------------------------------------- offers ---- */
 
@@ -389,6 +397,7 @@ async function main(): Promise<void> {
         await prisma.productOffer.create({
           data: {
             productId: product.id,
+            variantId: defaultVariant.id,
             storeId: store.id,
             price: new Prisma.Decimal(storePrice),
             url: `${store.websiteUrl}/p/${slug}`,
@@ -407,6 +416,7 @@ async function main(): Promise<void> {
         for (let month = 6; month >= 1; month -= 1) {
           history.push({
             productId: product.id,
+            variantId: defaultVariant.id,
             storeId: store.id,
             price: new Prisma.Decimal(shelfPrice(storePrice * (0.92 + random() * 0.2))),
             recordedAt: new Date(Date.now() - month * 30 * 24 * 3600 * 1000),

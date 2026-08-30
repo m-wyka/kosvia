@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { ImportRun } from '@prisma/client';
+import type { ImportRun, VolumeUnit } from '@prisma/client';
 import { slugify } from '@kosvia/shared';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { InciImportService } from '../../inci/inci-import.service';
@@ -40,7 +40,6 @@ interface ObfCursor {
 
 /** Below this position-weighted recognition share a product stays hidden until reviewed. */
 const MIN_RECOGNIZED_RATIO_FOR_PUBLISHING = 0.8;
-const DEFAULT_VOLUME_UNIT = 'ml';
 
 @Injectable()
 export class OpenBeautyFactsImportService {
@@ -212,7 +211,9 @@ export class OpenBeautyFactsImportService {
     isDryRun: boolean,
   ): Promise<{ change: 'created' | 'updated' | 'skipped'; queued: boolean }> {
     const existing = await this.prisma.product.findFirst({
-      where: { OR: [{ sourceId, sourceRef: product.ean }, { ean: product.ean }] },
+      where: {
+        OR: [{ sourceId, sourceRef: product.ean }, { variants: { some: { ean: product.ean } } }],
+      },
       select: { id: true, sourceId: true, sourceUpdatedAt: true, isManuallyEdited: true },
     });
 
@@ -242,18 +243,29 @@ export class OpenBeautyFactsImportService {
       name: product.name,
       brandId: brand.id,
       categoryId: category.id,
-      imageUrl: product.imageUrl,
-      volume: product.volume,
-      volumeUnit: product.volumeUnit ?? DEFAULT_VOLUME_UNIT,
       sourceId,
       sourceRef: product.ean,
       sourceUpdatedAt: product.sourceUpdatedAt,
     };
+    const variant = {
+      ean: product.ean,
+      imageUrl: product.imageUrl,
+      volume: product.volume,
+      volumeUnit: product.volumeUnit,
+      sourceRef: product.ean,
+    };
     const row = existing
       ? await this.prisma.product.update({ where: { id: existing.id }, data })
       : await this.prisma.product.create({
-          data: { ...data, ean: product.ean, slug: await this.uniqueSlug(product) },
+          data: {
+            ...data,
+            slug: await this.uniqueSlug(product),
+            variants: { create: { ...variant, isDefault: true } },
+          },
         });
+    if (existing) {
+      await this.upsertVariant(existing.id, variant);
+    }
 
     const label = await this.inciImport.applyLabel(row.id, product.rawLabel, { sourceId });
     const isPublishable = label.recognizedRatio >= MIN_RECOGNIZED_RATIO_FOR_PUBLISHING;
@@ -262,6 +274,33 @@ export class OpenBeautyFactsImportService {
       data: { isActive: isPublishable },
     });
     return { change: existing ? 'updated' : 'created', queued: !isPublishable };
+  }
+
+  /** The barcode identifies the pack: an existing pack is refreshed, a new size joins the product. */
+  private async upsertVariant(
+    productId: string,
+    variant: {
+      ean: string;
+      imageUrl: string | null;
+      volume: number | null;
+      volumeUnit: VolumeUnit;
+      sourceRef: string;
+    },
+  ): Promise<void> {
+    const existing = await this.prisma.productVariant.findUnique({
+      where: { ean: variant.ean },
+      select: { id: true },
+    });
+    if (existing) {
+      await this.prisma.productVariant.update({ where: { id: existing.id }, data: variant });
+      return;
+    }
+    const hasDefault = await this.prisma.productVariant.count({
+      where: { productId, isDefault: true },
+    });
+    await this.prisma.productVariant.create({
+      data: { ...variant, productId, isDefault: hasDefault === 0 },
+    });
   }
 
   private async ensureBrand(name: string) {

@@ -1,3 +1,5 @@
+import type { VolumeUnit } from '@prisma/client';
+import { normaliseQuantity } from '../../products/volume-unit';
 import { mapObfCategory } from './obf-category-map';
 import type { OpenBeautyFactsProduct } from './obf-types';
 
@@ -9,7 +11,7 @@ export interface NormalizedProduct {
   rawLabel: string;
   imageUrl: string | null;
   volume: number | null;
-  volumeUnit: string | null;
+  volumeUnit: VolumeUnit;
   sourceUpdatedAt: Date | null;
 }
 
@@ -21,12 +23,10 @@ export type MappedRecord =
   | { kind: 'skip'; reason: SkipReason; ean: string | null };
 
 const EAN_PATTERN = /^\d{8,14}$/;
-const QUANTITY_PATTERN = /(\d+(?:[.,]\d+)?)\s*(ml|g|l|kg|oz|fl\s*oz)\b/i;
+const QUANTITY_PATTERN = /(\d+(?:[.,]\d+)?)\s*(ml|g|l|kg|oz|fl\s*oz|pcs|pc|pieces|piece|szt)\b/i;
 const MIN_LABEL_LENGTH = 12;
 /** How much of the label's start we look for again to detect a doubled paste. */
 const REPEAT_PROBE_LENGTH = 24;
-const MILLILITRES_PER_LITRE = 1000;
-const GRAMS_PER_KILOGRAM = 1000;
 
 const firstNonEmpty = (...values: Array<string | undefined>): string | null => {
   for (const value of values) {
@@ -54,23 +54,12 @@ export const dedupeRepeatedLabel = (label: string): string => {
 
 export const parseQuantity = (
   quantity: string | undefined,
-): { volume: number | null; volumeUnit: string | null } => {
+): { volume: number | null; volumeUnit: VolumeUnit } => {
   const match = quantity ? QUANTITY_PATTERN.exec(quantity) : null;
   if (!match) {
-    return { volume: null, volumeUnit: null };
+    return { volume: null, volumeUnit: 'ML' };
   }
-  const amount = Number(match[1].replace(',', '.'));
-  const unit = match[2].toLowerCase().replace(/\s+/g, '');
-  if (unit === 'l') {
-    return { volume: amount * MILLILITRES_PER_LITRE, volumeUnit: 'ml' };
-  }
-  if (unit === 'kg') {
-    return { volume: amount * GRAMS_PER_KILOGRAM, volumeUnit: 'g' };
-  }
-  if (unit === 'floz') {
-    return { volume: amount, volumeUnit: 'fl oz' };
-  }
-  return { volume: amount, volumeUnit: unit };
+  return normaliseQuantity(Number(match[1].replace(',', '.')), match[2]);
 };
 
 export const primaryBrand = (brands: string | undefined): string | null =>

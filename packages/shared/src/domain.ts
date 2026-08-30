@@ -92,6 +92,10 @@ export const INGREDIENT_TAGS = [
 ] as const;
 export type IngredientTag = (typeof INGREDIENT_TAGS)[number];
 
+/** How a variant's size is expressed; mirrors the Prisma enum, lower-cased for the wire. */
+export const VOLUME_UNITS = ['ml', 'g', 'piece'] as const;
+export type VolumeUnit = (typeof VOLUME_UNITS)[number];
+
 /** Slugs of BeautyConcern rows created by the seed. */
 export const CONCERN_SLUGS = [
   'acne',

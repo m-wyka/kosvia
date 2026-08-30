@@ -213,6 +213,31 @@ useBreadcrumbJsonLd(
           <MatchScore :match="product.personalMatch" size="md" animate />
         </div>
 
+        <div v-if="product.variants.length > 1" class="mt-4">
+          <p class="text-xs font-medium tracking-wide text-ink-muted uppercase">
+            {{ $t('PRODUCT.SIZES') }}
+          </p>
+          <ul class="mt-2 flex flex-wrap gap-2">
+            <li
+              v-for="variant in product.variants"
+              :key="variant.id"
+              class="rounded-lg border px-3 py-1.5 text-sm"
+              :class="
+                variant.isDefault
+                  ? 'border-ink bg-surface text-ink'
+                  : 'border-line bg-surface-muted text-ink-soft'
+              "
+            >
+              <span class="font-medium">
+                {{ formatVolume(variant.volume, variant.volumeUnit) }}
+              </span>
+              <span v-if="variant.lowestPrice !== null" class="ml-2 text-ink-muted">
+                {{ format.price(variant.lowestPrice) }}
+              </span>
+            </li>
+          </ul>
+        </div>
+
         <div class="mt-6 flex flex-wrap gap-2.5">
           <BaseButton
             size="lg"

@@ -8,18 +8,26 @@ import type {
   ProductDto,
   ProductOfferDto,
   ProductSummaryDto,
+  ProductVariantDto,
   StoreDto,
+  VolumeUnit,
 } from '@kosvia/shared';
 import type { AnswerLocale } from '../../common/i18n/phrases';
 import type { ScorableProduct } from '../scoring/types';
-import { hasMatchedIngredient, type IngredientRow, type ProductRow } from './product.select';
+import {
+  hasMatchedIngredient,
+  type IngredientRow,
+  type ProductOfferRow,
+  type ProductRow,
+  type ProductVariantRow,
+} from './product.select';
 
 export function decimalToNumber(value: Prisma.Decimal | number | null | undefined): number | null {
   if (value === null || value === undefined) return null;
   return typeof value === 'number' ? value : Number(value.toString());
 }
 
-export function toStoreDto(store: ProductRow['offers'][number]['store']): StoreDto {
+export function toStoreDto(store: ProductOfferRow['store']): StoreDto {
   return {
     id: store.id,
     name: store.name,
@@ -80,9 +88,10 @@ export function toIngredientDto(ingredient: IngredientRow, locale: AnswerLocale)
   };
 }
 
-export function toOfferDto(offer: ProductRow['offers'][number]): ProductOfferDto {
+export function toOfferDto(offer: ProductOfferRow): ProductOfferDto {
   return {
     id: offer.id,
+    variantId: offer.variantId ?? offer.productId,
     price: decimalToNumber(offer.price)!,
     currency: offer.currency,
     url: offer.url,
@@ -93,23 +102,58 @@ export function toOfferDto(offer: ProductRow['offers'][number]): ProductOfferDto
 }
 
 /** Offers are ordered by price, so the first in-stock one is the best buy. */
-function bestOffer(row: ProductRow): ProductRow['offers'][number] | null {
-  return row.offers.find((offer) => offer.availability !== 'OUT_OF_STOCK') ?? row.offers[0] ?? null;
+function bestOffer(offers: ProductOfferRow[]): ProductOfferRow | null {
+  return offers.find((offer) => offer.availability !== 'OUT_OF_STOCK') ?? offers[0] ?? null;
+}
+
+/** Every offer of every pack, cheapest first — what the product page lists. */
+export function allOffers(row: ProductRow): ProductOfferRow[] {
+  return row.variants
+    .flatMap((variant) => variant.offers)
+    .sort((first, second) => first.price.comparedTo(second.price));
+}
+
+/** The pack lists and cards describe; falls back to the cheapest one when none is flagged. */
+export function defaultVariant(row: ProductRow): ProductVariantRow | null {
+  return row.variants.find((variant) => variant.isDefault) ?? row.variants[0] ?? null;
+}
+
+const toVolumeUnit = (unit: ProductVariantRow['volumeUnit']): VolumeUnit =>
+  unit.toLowerCase() as VolumeUnit;
+
+export function toVariantDto(variant: ProductVariantRow): ProductVariantDto {
+  const offer = bestOffer(variant.offers);
+  const lowestPrice = offer ? decimalToNumber(offer.price) : null;
+  const volume = decimalToNumber(variant.volume);
+  return {
+    id: variant.id,
+    ean: variant.ean,
+    volume,
+    volumeUnit: toVolumeUnit(variant.volumeUnit),
+    imageUrl: variant.imageUrl,
+    isDefault: variant.isDefault,
+    lowestPrice,
+    pricePerHundred: pricePerHundred(lowestPrice, volume, toVolumeUnit(variant.volumeUnit)),
+  };
 }
 
 export function toProductSummary(
   row: ProductRow,
   personalMatch?: PersonalMatchDto | null,
 ): ProductSummaryDto {
-  const offer = bestOffer(row);
+  const offers = allOffers(row);
+  const offer = bestOffer(offers);
+  const pack = defaultVariant(row);
+  const variants = row.variants.map(toVariantDto);
   return {
     id: row.id,
-    ean: row.ean,
     name: row.name,
     slug: row.slug,
-    imageUrl: row.imageUrl,
-    volume: row.volume,
-    volumeUnit: row.volumeUnit,
+    ean: pack?.ean ?? null,
+    imageUrl: pack?.imageUrl ?? null,
+    volume: decimalToNumber(pack?.volume),
+    volumeUnit: pack ? toVolumeUnit(pack.volumeUnit) : 'ml',
+    variants,
     isFragranceFree: row.isFragranceFree,
     isVegan: row.isVegan,
     isCrueltyFree: row.isCrueltyFree,
@@ -128,6 +172,7 @@ export function toProductDto(
   locale: AnswerLocale,
 ): ProductDto {
   const summary = toProductSummary(row, personalMatch);
+  const pack = summary.variants.find((variant) => variant.isDefault) ?? summary.variants[0];
   return {
     ...summary,
     description: row.description,
@@ -138,15 +183,15 @@ export function toProductDto(
       concentrationRange: entry.concentrationRange,
       ingredient: toIngredientDto(entry.ingredient, locale),
     })),
-    offers: row.offers.map(toOfferDto),
-    pricePerHundredMl: pricePerHundred(summary.lowestPrice, row.volume, row.volumeUnit),
+    offers: allOffers(row).map(toOfferDto),
+    pricePerHundredMl: pack?.pricePerHundred ?? null,
     source: row.source,
   };
 }
 
 /** Converts a database row into the plain shape the scoring engine consumes. */
 export function toScorable(row: ProductRow): ScorableProduct {
-  const offer = bestOffer(row);
+  const offer = bestOffer(allOffers(row));
   return {
     id: row.id,
     name: row.name,

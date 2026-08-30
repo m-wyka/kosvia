@@ -24,15 +24,22 @@ export const PRODUCT_INCLUDE = Prisma.validator<Prisma.ProductInclude>()({
     orderBy: { position: 'asc' },
     include: { ingredient: { include: INGREDIENT_INCLUDE } },
   },
-  offers: {
-    orderBy: { price: 'asc' },
-    include: { store: true },
+  variants: {
+    orderBy: [{ isDefault: 'desc' }, { volume: 'asc' }],
+    include: {
+      offers: {
+        orderBy: { price: 'asc' },
+        include: { store: true },
+      },
+    },
   },
 });
 
 export type ProductRow = Prisma.ProductGetPayload<{ include: typeof PRODUCT_INCLUDE }>;
 
 export type ProductIngredientRow = ProductRow['ingredients'][number];
+export type ProductVariantRow = ProductRow['variants'][number];
+export type ProductOfferRow = ProductVariantRow['offers'][number];
 
 /** A label entry that was matched to the ingredient dictionary. */
 export type MatchedProductIngredientRow = ProductIngredientRow & {

@@ -664,7 +664,8 @@
       "CREATE": "Create alert",
       "CREATED": "Price alert created",
       "VIEW_ALERTS": "View alerts"
-    }
+    },
+    "SIZES": "Available sizes"
   },
   "INGREDIENTS": {
     "TITLE": "Ingredient library",

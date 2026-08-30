@@ -21,6 +21,7 @@
     "import:obf": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/import-obf.ts",
     "import:cosing": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/import-cosing.ts",
     "ingredients:describe": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/describe-ingredients.ts",
+    "variants:backfill": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/backfill-variants.ts",
     "traits:recompute": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/recompute-traits.ts",
     "account:purge": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/purge-accounts.ts"
   },

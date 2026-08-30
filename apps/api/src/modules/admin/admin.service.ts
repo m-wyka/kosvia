@@ -5,6 +5,7 @@ import type { AdminStatsDto, AuditLogDto, PaginatedResult } from '@kosvia/shared
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
+import { toVolumeUnitEnum } from '../products/volume-unit';
 import { normalizeToken } from '../inci/inci-parser';
 import { MANUAL_SOURCE_CODE } from '../import/data-sources';
 import type {
@@ -278,7 +279,7 @@ export class AdminService {
           OR: [
             { name: { contains: query.q, mode: 'insensitive' } },
             { slug: { contains: query.q, mode: 'insensitive' } },
-            { ean: query.q },
+            { variants: { some: { ean: query.q } } },
             { brand: { name: { contains: query.q, mode: 'insensitive' } } },
           ],
         }
@@ -317,6 +318,7 @@ export class AdminService {
         slug: dto.slug ?? slugify(dto.name),
         isManuallyEdited: true,
         sourceId: manualSource?.id ?? null,
+        variants: { create: { ...this.variantScalars(dto), isDefault: true } },
         ...(ingredients && { ingredients: { create: ingredients } }),
       },
     });
@@ -334,6 +336,7 @@ export class AdminService {
         isManuallyEdited: true,
       },
     });
+    await this.upsertDefaultVariant(id, this.variantScalars(dto));
 
     if (dto.ingredients) {
       // Replacing the list wholesale keeps positions consistent — partial
@@ -395,6 +398,7 @@ export class AdminService {
             product: {
               select: { id: true, name: true, slug: true, brand: { select: { name: true } } },
             },
+            variant: { select: { id: true, ean: true, volume: true, volumeUnit: true } },
             store: { select: { id: true, name: true } },
           },
         }),
@@ -402,10 +406,12 @@ export class AdminService {
   }
 
   async upsertOffer(dto: UpsertOfferDto) {
+    const variant = await this.resolveOfferVariant(dto);
     const offer = await this.prisma.productOffer.upsert({
-      where: { productId_storeId: { productId: dto.productId, storeId: dto.storeId } },
+      where: { variantId_storeId: { variantId: variant.id, storeId: dto.storeId } },
       create: {
         productId: dto.productId,
+        variantId: variant.id,
         storeId: dto.storeId,
         price: new Prisma.Decimal(dto.price),
         currency: dto.currency ?? 'PLN',
@@ -424,6 +430,7 @@ export class AdminService {
     await this.prisma.priceHistory.create({
       data: {
         productId: dto.productId,
+        variantId: variant.id,
         storeId: dto.storeId,
         price: new Prisma.Decimal(dto.price),
         currency: dto.currency ?? 'PLN',
@@ -523,12 +530,8 @@ export class AdminService {
       name: dto.name,
       brandId: dto.brandId,
       categoryId: dto.categoryId,
-      ean: dto.ean || null,
       description: dto.description ?? null,
       usage: dto.usage ?? null,
-      imageUrl: dto.imageUrl ?? null,
-      volume: dto.volume ?? null,
-      volumeUnit: dto.volumeUnit ?? 'ml',
       ...(dto.highlights && { highlights: dto.highlights }),
       ...(dto.isFragranceFree !== undefined && { isFragranceFree: dto.isFragranceFree }),
       ...(dto.isVegan !== undefined && { isVegan: dto.isVegan }),
@@ -536,6 +539,49 @@ export class AdminService {
       ...(dto.isActive !== undefined && { isActive: dto.isActive }),
       ...(dto.targetSkinTypes && { targetSkinTypes: dto.targetSkinTypes }),
     };
+  }
+
+  /** The admin form edits the default pack; other packs come from imports and feeds. */
+  private variantScalars(dto: UpsertProductDto) {
+    return {
+      ean: dto.ean || null,
+      imageUrl: dto.imageUrl ?? null,
+      volume: dto.volume ?? null,
+      volumeUnit: toVolumeUnitEnum(dto.volumeUnit),
+    };
+  }
+
+  private async upsertDefaultVariant(
+    productId: string,
+    data: ReturnType<AdminService['variantScalars']>,
+  ): Promise<void> {
+    const existing = await this.prisma.productVariant.findFirst({
+      where: { productId, isDefault: true },
+      select: { id: true },
+    });
+    if (existing) {
+      await this.prisma.productVariant.update({ where: { id: existing.id }, data });
+      return;
+    }
+    await this.prisma.productVariant.create({ data: { ...data, productId, isDefault: true } });
+  }
+
+  private async resolveOfferVariant(
+    dto: UpsertOfferDto,
+  ): Promise<{ id: string; productId: string }> {
+    const variant = dto.variantId
+      ? await this.prisma.productVariant.findUnique({
+          where: { id: dto.variantId },
+          select: { id: true, productId: true },
+        })
+      : await this.prisma.productVariant.findFirst({
+          where: { productId: dto.productId, isDefault: true },
+          select: { id: true, productId: true },
+        });
+    if (!variant || variant.productId !== dto.productId) {
+      throw new BadRequestException('That pack does not belong to the product.');
+    }
+    return variant;
   }
 
   private async ingredientRelations(dto: UpsertIngredientDto, mode: 'set' | 'connect') {
@@ -574,7 +620,7 @@ export class AdminService {
 
   private async refreshLowestPrice(productId: string): Promise<void> {
     const cheapest = await this.prisma.productOffer.aggregate({
-      where: { productId, availability: { not: 'OUT_OF_STOCK' } },
+      where: { variant: { productId }, availability: { not: 'OUT_OF_STOCK' } },
       _min: { price: true },
     });
     await this.prisma.product.update({

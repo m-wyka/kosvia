@@ -31,7 +31,7 @@ export function pricePerHundred(
   volume: number | null,
   unit: string | null,
 ): number | null {
-  if (price === null || volume === null || !volume) return null;
+  if (price === null || volume === null || !volume || unit === 'piece') return null;
   const normalised = unit === 'l' ? volume * 1000 : unit === 'kg' ? volume * 1000 : volume;
   if (!normalised) return null;
   return Math.round((price / normalised) * 100 * 100) / 100;

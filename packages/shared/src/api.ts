@@ -12,6 +12,7 @@ import type {
   SubscriptionStatus,
   TokenStatus,
   UserRole,
+  VolumeUnit,
 } from './domain.js';
 
 /**
@@ -242,8 +243,22 @@ export interface StoreDto {
   websiteUrl: string | null;
 }
 
+/** One sellable pack of a product — 50 ml and 100 ml are two variants of one formula. */
+export interface ProductVariantDto {
+  id: string;
+  ean: string | null;
+  volume: number | null;
+  volumeUnit: VolumeUnit;
+  imageUrl: string | null;
+  isDefault: boolean;
+  /** Cheapest in-stock offer for this pack. */
+  lowestPrice: number | null;
+  pricePerHundred: number | null;
+}
+
 export interface ProductOfferDto {
   id: string;
+  variantId: string;
   price: number;
   currency: string;
   url: string | null;
@@ -254,12 +269,15 @@ export interface ProductOfferDto {
 
 export interface ProductSummaryDto {
   id: string;
-  ean: string | null;
   name: string;
   slug: string;
+  /** Barcode, size and photo of the default variant — the pack lists and cards show. */
+  ean: string | null;
   imageUrl: string | null;
   volume: number | null;
-  volumeUnit: string | null;
+  volumeUnit: VolumeUnit;
+  /** Every pack the product is sold in, default first. */
+  variants: ProductVariantDto[];
   isFragranceFree: boolean;
   isVegan: boolean;
   isCrueltyFree: boolean;

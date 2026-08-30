@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProductSummaryDto, StoreDto } from '@kosvia/shared';
+import type { ProductSummaryDto, StoreDto, VolumeUnit } from '@kosvia/shared';
 import type { TableColumn } from '../../components/Table.vue';
 
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -12,6 +12,7 @@ interface OfferRow {
   availability: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'UNKNOWN';
   lastCheckedAt: string;
   product: { id: string; name: string; slug: string; brand: { name: string } };
+  variant: { id: string; ean: string | null; volume: string | null; volumeUnit: VolumeUnit } | null;
   store: { id: string; name: string };
 }
 
@@ -178,7 +179,12 @@ useSeo(() => ({
           >
             {{ row.product.name }}
           </NuxtLinkLocale>
-          <span class="block text-xs text-ink-muted">{{ row.product.brand.name }}</span>
+          <span class="block text-xs text-ink-muted">
+            {{ row.product.brand.name }}
+            <template v-if="row.variant?.volume">
+              · {{ formatVolume(Number(row.variant.volume), row.variant.volumeUnit) }}
+            </template>
+          </span>
         </span>
       </template>
       <template #cell-store="{ row }">

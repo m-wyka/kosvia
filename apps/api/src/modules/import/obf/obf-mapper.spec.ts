@@ -28,7 +28,7 @@ describe('mapObfProduct', () => {
       rawLabel: 'Aqua, Glycerin, Niacinamide, Phenoxyethanol',
       imageUrl: complete.image_url,
       volume: 15,
-      volumeUnit: 'ml',
+      volumeUnit: 'ML',
       sourceUpdatedAt: new Date(1787116654 * 1000),
     });
   });
@@ -87,15 +87,16 @@ describe('dedupeRepeatedLabel', () => {
 
 describe('parseQuantity', () => {
   it.each([
-    ['15 ml', 15, 'ml'],
-    ['200ml', 200, 'ml'],
-    ['50 g', 50, 'g'],
-    ['1 l', 1000, 'ml'],
-    ['1,5 L', 1500, 'ml'],
-    ['2 x 100 ml', 2, null],
-    ['1.7 fl oz', 1.7, 'fl oz'],
-    [undefined, null, null],
-    ['big', null, null],
+    ['15 ml', 15, 'ML'],
+    ['200ml', 200, 'ML'],
+    ['50 g', 50, 'G'],
+    ['1 l', 1000, 'ML'],
+    ['1,5 L', 1500, 'ML'],
+    ['2 x 100 ml', 2, 'ML'],
+    ['1.7 fl oz', 50, 'ML'],
+    ['10 pcs', 10, 'PIECE'],
+    [undefined, null, 'ML'],
+    ['big', null, 'ML'],
   ])('parses %p', (input, volume, unit) => {
     const parsed = parseQuantity(input);
     if (input === '2 x 100 ml') {

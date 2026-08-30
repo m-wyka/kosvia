@@ -664,7 +664,8 @@
       "CREATE": "Utwórz alert",
       "CREATED": "Alert cenowy utworzony",
       "VIEW_ALERTS": "Zobacz alerty"
-    }
+    },
+    "SIZES": "Dostępne pojemności"
   },
   "INGREDIENTS": {
     "TITLE": "Baza składników",

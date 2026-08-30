@@ -53,7 +53,7 @@ export class ShelfService {
     if (!key) throw new NotFoundException('Tell us which product to add.');
 
     const product = await this.prisma.product.findFirst({
-      where: { OR: [{ id: key }, { slug: key }, { ean: key }] },
+      where: { OR: [{ id: key }, { slug: key }, { variants: { some: { ean: key } } }] },
       select: { id: true },
     });
     if (!product) throw new NotFoundException('We do not have that product in the catalogue yet.');

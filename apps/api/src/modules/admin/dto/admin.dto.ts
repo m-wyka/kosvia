@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsIn,
   IsInt,
   IsNumber,
   IsObject,
@@ -23,6 +24,7 @@ import {
   TokenStatus,
   UserRole,
 } from '@prisma/client';
+import { VOLUME_UNITS, type VolumeUnit } from '@kosvia/shared';
 
 export class AdminListQueryDto {
   @IsOptional() @IsString() @MaxLength(120) q?: string;
@@ -80,7 +82,7 @@ export class UpsertProductDto {
   @IsOptional() @IsString() usage?: string;
   @IsOptional() @IsString() @MaxLength(500) imageUrl?: string;
   @IsOptional() @Type(() => Number) @IsNumber() @Min(0) volume?: number;
-  @IsOptional() @IsString() @MaxLength(10) volumeUnit?: string;
+  @IsOptional() @IsIn(VOLUME_UNITS) volumeUnit?: VolumeUnit;
   @IsOptional() @IsArray() @IsString({ each: true }) @ArrayMaxSize(10) highlights?: string[];
   @IsOptional() @IsBoolean() isFragranceFree?: boolean;
   @IsOptional() @IsBoolean() isVegan?: boolean;
@@ -127,6 +129,8 @@ export class UpsertStoreDto {
 
 export class UpsertOfferDto {
   @IsString() productId!: string;
+  /** Which pack the price is for; the product's default pack when omitted. */
+  @IsOptional() @IsString() variantId?: string;
   @IsString() storeId!: string;
   @Type(() => Number) @IsNumber({ maxDecimalPlaces: 2 }) @Min(0) price!: number;
   @IsOptional() @IsString() @MaxLength(8) currency?: string;

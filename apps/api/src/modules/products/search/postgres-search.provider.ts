@@ -53,18 +53,20 @@ export class PostgresSearchProvider implements SearchProvider {
     }
     if (isEanQuery(term)) {
       return this.prisma.$queryRaw<ProductSuggestionDto[]>(Prisma.sql`
-        SELECT p."id", p."name", p."slug", b."name" AS "brandName", p."imageUrl"
+        SELECT p."id", p."name", p."slug", b."name" AS "brandName", v."imageUrl"
         FROM "products" p
         JOIN "brands" b ON b."id" = p."brandId"
-        WHERE p."isActive" AND p."ean" = ${term}
+        JOIN "product_variants" v ON v."productId" = p."id"
+        WHERE p."isActive" AND v."ean" = ${term}
         LIMIT ${limit}
       `);
     }
     return this.prisma.$queryRaw<ProductSuggestionDto[]>(Prisma.sql`
       WITH q AS (SELECT f_unaccent(${term}) AS term)
-      SELECT p."id", p."name", p."slug", b."name" AS "brandName", p."imageUrl"
+      SELECT p."id", p."name", p."slug", b."name" AS "brandName", v."imageUrl"
       FROM "products" p
-      JOIN "brands" b ON b."id" = p."brandId", q
+      JOIN "brands" b ON b."id" = p."brandId"
+      LEFT JOIN "product_variants" v ON v."productId" = p."id" AND v."isDefault", q
       WHERE p."isActive"
         AND (
           f_unaccent(p."name") ILIKE q.term || '%'
@@ -82,7 +84,7 @@ export class PostgresSearchProvider implements SearchProvider {
 
   private async byEan(ean: string): Promise<RankedCandidate[]> {
     const rows = await this.prisma.product.findMany({
-      where: { ean, isActive: true },
+      where: { isActive: true, variants: { some: { ean } } },
       select: { id: true },
     });
     return rows.map((row) => ({ id: row.id, rank: 1 }));

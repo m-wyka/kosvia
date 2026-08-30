@@ -73,6 +73,13 @@ enum MessageRole {
   ASSISTANT
 }
 
+/// How a variant's size is expressed. PIECE covers sheet masks, pads, sticks.
+enum VolumeUnit {
+  ML
+  G
+  PIECE
+}
+
 /// Where a category sits in a skincare routine. Powers routine gap analysis
 /// and the future smart-basket builder.
 enum RoutineStep {
@@ -355,6 +362,7 @@ model Product {
   category    Category            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   ingredients ProductIngredient[]
   traits      ProductTraits?
+  variants    ProductVariant[]
   offers      ProductOffer[]
   priceHistory PriceHistory[]
   submissions ProductSubmission[]
@@ -734,9 +742,36 @@ model Store {
   @@map("stores")
 }
 
+/// One sellable pack of a product: 50 ml and 100 ml are two variants of the
+/// same formula. The barcode, size, photo and offers belong here; the
+/// ingredient list and scores stay on the product.
+model ProductVariant {
+  id         String      @id @default(cuid())
+  productId  String
+  ean        String?     @unique
+  volume     Decimal?    @db.Decimal(10, 2)
+  volumeUnit VolumeUnit  @default(ML)
+  imageUrl   String?
+  /// Exactly one per product — enforced by a partial unique index in SQL.
+  isDefault  Boolean     @default(false)
+  isActive   Boolean     @default(true)
+  /// The variant's identifier inside its source (barcode for Open Beauty Facts).
+  sourceRef  String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  product      Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  offers       ProductOffer[]
+  priceHistory PriceHistory[]
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
 model ProductOffer {
   id            String       @id @default(cuid())
   productId     String
+  variantId     String?
   storeId       String
   price         Decimal      @db.Decimal(10, 2)
   currency      String       @default("PLN")
@@ -748,11 +783,14 @@ model ProductOffer {
 
   sourceId String?
   source   DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  store   Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@unique([productId, storeId])
+  @@unique([variantId, storeId])
   @@index([productId, price])
+  @@index([variantId, price])
   @@index([storeId])
   @@map("product_offers")
 }
@@ -761,15 +799,18 @@ model ProductOffer {
 model PriceHistory {
   id         String   @id @default(cuid())
   productId  String
+  variantId  String?
   storeId    String
   price      Decimal  @db.Decimal(10, 2)
   currency   String   @default("PLN")
   recordedAt DateTime @default(now())
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  store   Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([productId, recordedAt])
+  @@index([variantId, recordedAt])
   @@map("price_history")
 }
 

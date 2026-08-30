@@ -474,6 +474,7 @@ npm run ingredients:describe -w @kosvia/api -- --limit=500 --dry-run   # see wha
 npm run ingredients:describe -w @kosvia/api -- --from=prisma/seed/data/ingredients.pl.json   # load prose written outside the API (no key needed)
 
 # Maintenance
+npm run variants:backfill -w @kosvia/api               # one default ProductVariant per product (step 2 of the variant migration)
 npm run traits:recompute -w @kosvia/api -- [--stale]   # ingredientScore + product_traits
 npm run account:purge -w @kosvia/api                   # execute deletion requests past their grace period
 ```

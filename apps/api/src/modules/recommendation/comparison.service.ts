@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { pricePerHundred } from '@kosvia/shared';
 import type {
   ComparisonResultDto,
   ComparisonRowDto,
@@ -53,9 +52,7 @@ export class ComparisonService {
     const products = ordered.map((row) => toProductDto(row, scores.get(row.id) ?? null, locale));
 
     const prices = products.map((p) => p.lowestPrice);
-    const perHundred = ordered.map((row, index) =>
-      pricePerHundred(prices[index], row.volume, row.volumeUnit),
-    );
+    const perHundred = products.map((p) => p.pricePerHundredMl);
     const matches = ordered.map((row) => scores.get(row.id)?.score ?? 0);
 
     if (viewer.userId) {
@@ -75,7 +72,7 @@ export class ComparisonService {
       this.row(
         'volume',
         'Size',
-        ordered.map((row) => (row.volume ? `${row.volume} ${row.volumeUnit ?? 'ml'}` : null)),
+        products.map((p) => (p.volume ? `${p.volume} ${p.volumeUnit}` : null)),
         'none',
       ),
       this.row('price-per-100', 'Price per 100 ml', perHundred, 'lower'),
