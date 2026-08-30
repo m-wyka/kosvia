@@ -127,14 +127,6 @@
       "concerns": null
     }
   },
-  "Honey Extract": {
-    "pl": {
-      "commonName": "Ekstrakt z miodu",
-      "description": "Tradycyjny humektant, który nadaje formułom miękkie, otulające wykończenie.",
-      "functions": ["Wiąże wodę"],
-      "concerns": null
-    }
-  },
   "Ceramide NP": {
     "pl": {
       "commonName": null,
@@ -236,70 +228,6 @@
       "commonName": null,
       "description": "Lotny silikon dający nieważkie, pudrowe wykończenie. Odparowuje po aplikacji.",
       "functions": ["Lekka tekstura"],
-      "concerns": null
-    }
-  },
-  "Shea Butter": {
-    "pl": {
-      "commonName": "Masło shea",
-      "description": "Bogate masło roślinne o wysokiej zawartości kwasów tłuszczowych. Przynosi ulgę suchej, ściągniętej skórze.",
-      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
-      "concerns": null
-    }
-  },
-  "Jojoba Seed Oil": {
-    "pl": {
-      "commonName": "Olej jojoba",
-      "description": "Ciekły wosk o profilu zbliżonym do sebum, dlatego wchłania się bez uczucia ciężkości.",
-      "functions": ["Zmiękcza"],
-      "concerns": null
-    }
-  },
-  "Sunflower Seed Oil": {
-    "pl": {
-      "commonName": "Olej słonecznikowy",
-      "description": "Olej bogaty w kwas linolowy, często wybierany do formuł wspierających barierę skóry.",
-      "functions": ["Zmiękcza", "Wspiera barierę"],
-      "concerns": null
-    }
-  },
-  "Rosehip Seed Oil": {
-    "pl": {
-      "commonName": "Olej z dzikiej róży",
-      "description": "Olej o wysokiej zawartości nienasyconych kwasów tłuszczowych, tradycyjnie stosowany na nierówną skórę ze śladami.",
-      "functions": ["Zmiękcza", "Pielęgnuje"],
-      "concerns": null
-    }
-  },
-  "Argan Oil": {
-    "pl": {
-      "commonName": "Olej arganowy",
-      "description": "Olej bogaty w witaminę E, który zmiękcza, nie obciążając większości typów skóry.",
-      "functions": ["Zmiękcza"],
-      "concerns": null
-    }
-  },
-  "Coconut Oil": {
-    "pl": {
-      "commonName": "Olej kokosowy",
-      "description": "Olej stały w temperaturze pokojowej, bardzo okluzyjny. Popularny w pielęgnacji ciała i włosów.",
-      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
-      "concerns": "Często zgłaszany jako zatykający pory na skórze twarzy."
-    }
-  },
-  "Marula Oil": {
-    "pl": {
-      "commonName": "Olej marula",
-      "description": "Lekki olej bogaty w kwas oleinowy, o suchym w dotyku wykończeniu.",
-      "functions": ["Zmiękcza"],
-      "concerns": null
-    }
-  },
-  "Evening Primrose Oil": {
-    "pl": {
-      "commonName": "Olej z wiesiołka",
-      "description": "Olej bogaty w kwas gamma-linolenowy, często stosowany w formułach nastawionych na komfort skóry.",
-      "functions": ["Zmiękcza", "Pielęgnuje"],
       "concerns": null
     }
   },
@@ -543,30 +471,6 @@
       "concerns": null
     }
   },
-  "Oat Kernel Extract": {
-    "pl": {
-      "commonName": "Ekstrakt z owsa",
-      "description": "Ekstrakt z owsa stosowany w formułach dla skóry łatwo ulegającej podrażnieniom.",
-      "functions": ["Koi"],
-      "concerns": null
-    }
-  },
-  "Green Tea Leaf Extract": {
-    "pl": {
-      "commonName": "Ekstrakt z zielonej herbaty",
-      "description": "Ekstrakt bogaty w antyoksydanty, stosowany w formułach dla skóry tłustej i reaktywnej.",
-      "functions": ["Antyoksydant", "Koi"],
-      "concerns": null
-    }
-  },
-  "Licorice Root Extract": {
-    "pl": {
-      "commonName": "Ekstrakt z lukrecji",
-      "description": "Ekstrakt roślinny stosowany zarówno dla ukojenia, jak i wyrównania kolorytu.",
-      "functions": ["Koi", "Wyrównuje koloryt"],
-      "concerns": null
-    }
-  },
   "Chamomilla Recutita Flower Extract": {
     "pl": {
       "commonName": "Rumianek",
@@ -611,14 +515,6 @@
     "pl": {
       "commonName": "Resweratrol",
       "description": "Polifenolowy antyoksydant stosowany w formułach na noc i ochronnych.",
-      "functions": ["Antyoksydant"],
-      "concerns": null
-    }
-  },
-  "Coenzyme Q10": {
-    "pl": {
-      "commonName": "Koenzym Q10",
-      "description": "Antyoksydant naturalnie obecny w skórze, częsty w kremach ujędrniających.",
       "functions": ["Antyoksydant"],
       "concerns": null
     }
@@ -1108,6 +1004,110 @@
       "commonName": "Tlenki żelaza",
       "description": "Mineralne pigmenty używane do nadania koloru i zmniejszenia białego nalotu filtrów mineralnych.",
       "functions": ["Nadaje kolor"],
+      "concerns": null
+    }
+  },
+  "Butyrospermum Parkii Butter": {
+    "pl": {
+      "commonName": "Masło shea",
+      "description": "Bogate masło roślinne o wysokiej zawartości kwasów tłuszczowych. Przynosi ulgę suchej, ściągniętej skórze.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Simmondsia Chinensis Seed Oil": {
+    "pl": {
+      "commonName": "Olej jojoba",
+      "description": "Ciekły wosk o profilu zbliżonym do sebum, dlatego wchłania się bez uczucia ciężkości.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Helianthus Annuus Seed Oil": {
+    "pl": {
+      "commonName": "Olej słonecznikowy",
+      "description": "Olej bogaty w kwas linolowy, często wybierany do formuł wspierających barierę skóry.",
+      "functions": ["Zmiękcza", "Wspiera barierę"],
+      "concerns": null
+    }
+  },
+  "Rosa Canina Fruit Oil": {
+    "pl": {
+      "commonName": "Olej z dzikiej róży",
+      "description": "Olej o wysokiej zawartości nienasyconych kwasów tłuszczowych, tradycyjnie stosowany na nierówną skórę ze śladami.",
+      "functions": ["Zmiękcza", "Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Argania Spinosa Kernel Oil": {
+    "pl": {
+      "commonName": "Olej arganowy",
+      "description": "Olej bogaty w witaminę E, który zmiękcza, nie obciążając większości typów skóry.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Cocos Nucifera Oil": {
+    "pl": {
+      "commonName": "Olej kokosowy",
+      "description": "Olej stały w temperaturze pokojowej, bardzo okluzyjny. Popularny w pielęgnacji ciała i włosów.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": "Często zgłaszany jako zatykający pory na skórze twarzy."
+    }
+  },
+  "Sclerocarya Birrea Seed Oil": {
+    "pl": {
+      "commonName": "Olej marula",
+      "description": "Lekki olej bogaty w kwas oleinowy, o suchym w dotyku wykończeniu.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Oenothera Biennis Oil": {
+    "pl": {
+      "commonName": "Olej z wiesiołka",
+      "description": "Olej bogaty w kwas gamma-linolenowy, często stosowany w formułach nastawionych na komfort skóry.",
+      "functions": ["Zmiękcza", "Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Camellia Sinensis Leaf Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z zielonej herbaty",
+      "description": "Ekstrakt bogaty w antyoksydanty, stosowany w formułach dla skóry tłustej i reaktywnej.",
+      "functions": ["Antyoksydant", "Koi"],
+      "concerns": null
+    }
+  },
+  "Glycyrrhiza Glabra Root Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z lukrecji",
+      "description": "Ekstrakt roślinny stosowany zarówno dla ukojenia, jak i wyrównania kolorytu.",
+      "functions": ["Koi", "Wyrównuje koloryt"],
+      "concerns": null
+    }
+  },
+  "Avena Sativa Kernel Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z owsa",
+      "description": "Ekstrakt z owsa stosowany w formułach dla skóry łatwo ulegającej podrażnieniom.",
+      "functions": ["Koi"],
+      "concerns": null
+    }
+  },
+  "Ubiquinone": {
+    "pl": {
+      "commonName": "Koenzym Q10",
+      "description": "Antyoksydant naturalnie obecny w skórze, częsty w kremach ujędrniających.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Mel Extract": {
+    "pl": {
+      "commonName": "Ekstrakt z miodu",
+      "description": "Tradycyjny humektant, który nadaje formułom miękkie, otulające wykończenie.",
+      "functions": ["Wiąże wodę"],
       "concerns": null
     }
   }

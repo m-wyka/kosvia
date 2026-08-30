@@ -23,10 +23,6 @@
   ],
   "Mineral Oil": [
     {
-      "alias": "Paraffinum Liquidum",
-      "kind": "SYNONYM"
-    },
-    {
       "alias": "Huile minérale",
       "kind": "TRANSLATION"
     }
@@ -173,6 +169,10 @@
     {
       "alias": "Olio di marula",
       "kind": "TRANSLATION"
+    },
+    {
+      "alias": "Marula Oil",
+      "kind": "SYNONYM"
     }
   ],
   "Gluconolactone": [
@@ -245,6 +245,10 @@
     {
       "alias": "Camellila Sinensis Leaf Extract",
       "kind": "TYPO"
+    },
+    {
+      "alias": "Green Tea Leaf Extract",
+      "kind": "SYNONYM"
     }
   ],
   "Ginkgo Biloba Leaf Extract": [
@@ -425,6 +429,60 @@
     {
       "alias": "Avenas Strigosa Seed Extract",
       "kind": "TYPO"
+    }
+  ],
+  "Simmondsia Chinensis Seed Oil": [
+    {
+      "alias": "Jojoba Seed Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Helianthus Annuus Seed Oil": [
+    {
+      "alias": "Sunflower Seed Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Glycyrrhiza Glabra Root Extract": [
+    {
+      "alias": "Licorice Root Extract",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Cocos Nucifera Oil": [
+    {
+      "alias": "Coconut Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Argania Spinosa Kernel Oil": [
+    {
+      "alias": "Argan Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Ubiquinone": [
+    {
+      "alias": "Coenzyme Q10",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Rosa Canina Fruit Oil": [
+    {
+      "alias": "Rosehip Seed Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Oenothera Biennis Oil": [
+    {
+      "alias": "Evening Primrose Oil",
+      "kind": "SYNONYM"
+    }
+  ],
+  "Avena Sativa Kernel Extract": [
+    {
+      "alias": "Oat Kernel Extract",
+      "kind": "SYNONYM"
     }
   ]
 }

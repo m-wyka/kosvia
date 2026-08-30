@@ -190,8 +190,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     sensitivityImpact: 0,
   },
   {
-    inci: 'Honey Extract',
-    common: 'Mel',
+    inci: 'Mel Extract',
+    common: 'Honey extract',
     description: 'A traditional humectant that also gives formulas a soft, cushiony feel.',
     functions: ['Binds water'],
     tags: ['humectant'],
@@ -331,8 +331,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     sensitivityImpact: 0,
   },
   {
-    inci: 'Shea Butter',
-    common: 'Butyrospermum Parkii Butter',
+    inci: 'Butyrospermum Parkii Butter',
+    common: 'Shea butter',
     description: 'A rich plant butter high in fatty acids. Comforting on dry, tight skin.',
     functions: ['Softens', 'Reduces water loss'],
     tags: ['emollient', 'occlusive'],
@@ -343,8 +343,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     supports: ['barrier-support'],
   },
   {
-    inci: 'Jojoba Seed Oil',
-    common: 'Simmondsia Chinensis Seed Oil',
+    inci: 'Simmondsia Chinensis Seed Oil',
+    common: 'Jojoba oil',
     description:
       'A liquid wax whose profile is close to skin’s own sebum, so it absorbs without heaviness.',
     functions: ['Softens'],
@@ -354,8 +354,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     goodFor: ['DRY', 'NORMAL', 'COMBINATION'],
   },
   {
-    inci: 'Sunflower Seed Oil',
-    common: 'Helianthus Annuus Seed Oil',
+    inci: 'Helianthus Annuus Seed Oil',
+    common: 'Sunflower seed oil',
     description: 'A linoleic-acid-rich oil often chosen for barrier-supporting formulas.',
     functions: ['Softens', 'Supports barrier'],
     tags: ['emollient', 'barrier-support'],
@@ -365,8 +365,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     supports: ['barrier-support'],
   },
   {
-    inci: 'Rosehip Seed Oil',
-    common: 'Rosa Canina Fruit Oil',
+    inci: 'Rosa Canina Fruit Oil',
+    common: 'Rosehip seed oil',
     description:
       'An oil high in unsaturated fatty acids, traditionally used on uneven, marked skin.',
     functions: ['Softens', 'Conditions'],
@@ -377,8 +377,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     targets: ['pigmentation', 'uneven-tone'],
   },
   {
-    inci: 'Argan Oil',
-    common: 'Argania Spinosa Kernel Oil',
+    inci: 'Argania Spinosa Kernel Oil',
+    common: 'Argan oil',
     description: 'A vitamin-E-rich oil that softens without feeling heavy on most skin.',
     functions: ['Softens'],
     tags: ['emollient', 'antioxidant'],
@@ -387,8 +387,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     goodFor: ['DRY', 'NORMAL'],
   },
   {
-    inci: 'Coconut Oil',
-    common: 'Cocos Nucifera Oil',
+    inci: 'Cocos Nucifera Oil',
+    common: 'Coconut oil',
     description:
       'A solid-at-room-temperature oil that is very occlusive. Popular in body and hair care.',
     functions: ['Softens', 'Reduces water loss'],
@@ -399,8 +399,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     goodFor: ['DRY'],
   },
   {
-    inci: 'Marula Oil',
-    common: 'Sclerocarya Birrea Seed Oil',
+    inci: 'Sclerocarya Birrea Seed Oil',
+    common: 'Marula oil',
     description: 'A lightweight oil high in oleic acid with a dry-touch finish.',
     functions: ['Softens'],
     tags: ['emollient'],
@@ -409,8 +409,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     goodFor: ['DRY', 'NORMAL'],
   },
   {
-    inci: 'Evening Primrose Oil',
-    common: 'Oenothera Biennis Oil',
+    inci: 'Oenothera Biennis Oil',
+    common: 'Evening primrose oil',
     description: 'An oil rich in gamma-linolenic acid, often used in comfort-focused formulas.',
     functions: ['Softens', 'Conditions'],
     tags: ['emollient'],
@@ -778,8 +778,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     supports: ['soothing', 'hydration'],
   },
   {
-    inci: 'Oat Kernel Extract',
-    common: 'Avena Sativa',
+    inci: 'Avena Sativa Kernel Extract',
+    common: 'Oat extract',
     description: 'An oat-derived extract used in formulas for easily irritated skin.',
     functions: ['Comforts'],
     tags: ['soothing', 'barrier-support'],
@@ -789,8 +789,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     supports: ['soothing', 'barrier-support'],
   },
   {
-    inci: 'Green Tea Leaf Extract',
-    common: 'Camellia Sinensis',
+    inci: 'Camellia Sinensis Leaf Extract',
+    common: 'Green tea extract',
     description: 'An antioxidant-rich extract used in formulas for oily and reactive skin.',
     functions: ['Antioxidant', 'Comforts'],
     tags: ['antioxidant', 'soothing'],
@@ -800,8 +800,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     supports: ['soothing'],
   },
   {
-    inci: 'Licorice Root Extract',
-    common: 'Glycyrrhiza Glabra',
+    inci: 'Glycyrrhiza Glabra Root Extract',
+    common: 'Licorice root extract',
     description: 'A plant extract used both for comfort and for evenness of tone.',
     functions: ['Calms', 'Evens tone'],
     tags: ['soothing', 'brightening'],
@@ -870,8 +870,8 @@ export const INGREDIENTS: IngredientSeed[] = [
     supports: ['anti-aging'],
   },
   {
-    inci: 'Coenzyme Q10',
-    common: 'Ubiquinone',
+    inci: 'Ubiquinone',
+    common: 'Coenzyme Q10',
     description: 'An antioxidant naturally present in skin, common in firmness-focused creams.',
     functions: ['Antioxidant'],
     tags: ['antioxidant'],

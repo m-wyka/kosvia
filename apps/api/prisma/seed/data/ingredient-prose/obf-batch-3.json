@@ -1,0 +1,1682 @@
+{
+  "Acrylates/C10-30 Alkyl Acrylate Crosspolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A synthetic gelling polymer that thickens creams and gels and keeps emulsions stable.",
+      "functions": ["Thickens", "Stabilises emulsions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny polimer żelujący, który zagęszcza kremy i żele oraz stabilizuje emulsję.",
+      "functions": ["Zagęszcza", "Stabilizuje emulsję"],
+      "concerns": null
+    }
+  },
+  "Diethylhexyl Butamido Triazone": {
+    "en": {
+      "commonName": "Uvasorb HEB",
+      "description": "A photostable organic UVB filter used in high-SPF sunscreens. Listed in Annex VI.",
+      "functions": ["UV protection"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Uvasorb HEB",
+      "description": "Fotostabilny organiczny filtr UVB stosowany w kremach o wysokim SPF. Wymieniony w Aneksie VI.",
+      "functions": ["Ochrona przed UV"],
+      "concerns": null
+    }
+  },
+  "Vp/Hexadecene Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that improves water resistance and helps products stay put.",
+      "functions": ["Forms a film", "Water resistance"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który poprawia wodoodporność i trwałość produktu na skórze.",
+      "functions": ["Tworzy film", "Wodoodporność"],
+      "concerns": null
+    }
+  },
+  "Dicaprylyl Ether": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-derived emollient with a dry, silky finish, often used instead of silicones.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny emolient o suchym, jedwabistym wykończeniu, często stosowany zamiast silikonów.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Coco-Caprylate/Caprate": {
+    "en": {
+      "commonName": null,
+      "description": "A coconut-derived emollient with a light, dry-touch finish.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emolient z kokosa o lekkim, suchym wykończeniu.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Disodium Lauryl Sulfosuccinate": {
+    "en": {
+      "commonName": null,
+      "description": "A mild cleansing agent that builds foam gently. Common in soft washes and syndet bars.",
+      "functions": ["Cleanses", "Builds foam"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny środek myjący, który delikatnie buduje pianę. Częsty w miękkich żelach i kostkach syndetowych.",
+      "functions": ["Oczyszcza", "Buduje pianę"],
+      "concerns": null
+    }
+  },
+  "Sodium Acrylate/Sodium Acryloyldimethyl Taurate Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A synthetic polymer that thickens and stabilises creams with a light, bouncy feel.",
+      "functions": ["Thickens", "Stabilises emulsions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny polimer, który zagęszcza i stabilizuje kremy, dając lekkie, sprężyste wykończenie.",
+      "functions": ["Zagęszcza", "Stabilizuje emulsję"],
+      "concerns": null
+    }
+  },
+  "Copernicia Cerifera Cera": {
+    "en": {
+      "commonName": "Carnauba wax",
+      "description": "A hard plant wax from the carnauba palm. Thickens sticks and balms and adds gloss.",
+      "functions": ["Thickens", "Adds gloss"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Wosk carnauba",
+      "description": "Twardy wosk roślinny z palmy carnauba. Zagęszcza sztyfty i balsamy oraz dodaje połysku.",
+      "functions": ["Zagęszcza", "Dodaje połysku"],
+      "concerns": null
+    }
+  },
+  "Hydroxyethyl Acrylate/Sodium Acryloyldimethyl Taurate Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A synthetic polymer that thickens and stabilises light, fast-absorbing creams.",
+      "functions": ["Thickens", "Stabilises emulsions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny polimer, który zagęszcza i stabilizuje lekkie, szybko wchłaniające się kremy.",
+      "functions": ["Zagęszcza", "Stabilizuje emulsję"],
+      "concerns": null
+    }
+  },
+  "C12-22 Alkyl Acrylate/Hydroxyethylacrylate Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A synthetic polymer that thickens creams and keeps them stable.",
+      "functions": ["Thickens", "Stabilises emulsions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny polimer, który zagęszcza kremy i utrzymuje ich stabilność.",
+      "functions": ["Zagęszcza", "Stabilizuje emulsję"],
+      "concerns": null
+    }
+  },
+  "Euphorbia Cerifera Wax": {
+    "en": {
+      "commonName": "Candelilla wax",
+      "description": "A hard plant wax that thickens balms and sticks. A vegan alternative to beeswax.",
+      "functions": ["Thickens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Wosk candelilla",
+      "description": "Twardy wosk roślinny, który zagęszcza balsamy i sztyfty. Wegańska alternatywa dla wosku pszczelego.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Capryloyl Glycine": {
+    "en": {
+      "commonName": null,
+      "description": "An amino-acid derivative used in formulas for oily skin and scalp, with a mild cleansing action.",
+      "functions": ["Balances oil", "Cleanses"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Pochodna aminokwasu stosowana w formułach dla skóry tłustej i skóry głowy, o łagodnym działaniu myjącym.",
+      "functions": ["Reguluje sebum", "Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Hydrogenated Rapeseed Oil": {
+    "en": {
+      "commonName": null,
+      "description": "Rapeseed oil turned into a soft wax. Thickens creams and softens the skin.",
+      "functions": ["Softens", "Thickens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Olej rzepakowy przekształcony w miękki wosk. Zagęszcza kremy i zmiękcza skórę.",
+      "functions": ["Zmiękcza", "Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Butylene Glycol Dicaprylate/Dicaprate": {
+    "en": {
+      "commonName": null,
+      "description": "A light, stable emollient with a silky, non-greasy slip.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Lekki, stabilny emolient o jedwabistym, nietłustym poślizgu.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Oryza Sativa Starch": {
+    "en": {
+      "commonName": "Rice starch",
+      "description": "A plant starch that absorbs oil and gives a soft, matte, powdery finish.",
+      "functions": ["Absorbs oil", "Mattifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Skrobia ryżowa",
+      "description": "Skrobia roślinna, która pochłania sebum i daje miękkie, matowe, pudrowe wykończenie.",
+      "functions": ["Pochłania sebum", "Matuje"],
+      "concerns": null
+    }
+  },
+  "Theobroma Cacao Seed Butter": {
+    "en": {
+      "commonName": "Cocoa butter",
+      "description": "A rich plant butter that melts at skin temperature. Comforting on dry skin, common in body care.",
+      "functions": ["Softens", "Reduces water loss"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Masło kakaowe",
+      "description": "Bogate masło roślinne, które topi się w temperaturze skóry. Przynosi ulgę suchej skórze, częste w pielęgnacji ciała.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Polyhydroxystearic Acid": {
+    "en": {
+      "commonName": null,
+      "description": "A polymer emulsifier that keeps mineral UV filters and pigments evenly dispersed.",
+      "functions": ["Stabilises formula"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator polimerowy, który utrzymuje mineralne filtry UV i pigmenty w równomiernej zawiesinie.",
+      "functions": ["Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Triacontanyl Pvp": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that improves water resistance in sunscreens.",
+      "functions": ["Forms a film", "Water resistance"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który poprawia wodoodporność kremów z filtrem.",
+      "functions": ["Tworzy film", "Wodoodporność"],
+      "concerns": null
+    }
+  },
+  "Vp/Eicosene Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that improves water resistance and helps pigments adhere.",
+      "functions": ["Forms a film", "Water resistance"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który poprawia wodoodporność i przyczepność pigmentów.",
+      "functions": ["Tworzy film", "Wodoodporność"],
+      "concerns": null
+    }
+  },
+  "Caprylyl/Capryl Glucoside": {
+    "en": {
+      "commonName": null,
+      "description": "A very mild sugar-derived cleansing agent, common in micellar waters and gentle washes.",
+      "functions": ["Cleanses"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Bardzo łagodny środek myjący pochodzenia cukrowego, częsty w płynach micelarnych i delikatnych żelach.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Copernicia Cerifera Wax": {
+    "en": {
+      "commonName": "Carnauba wax",
+      "description": "A hard plant wax from the carnauba palm. Thickens sticks and balms and adds gloss.",
+      "functions": ["Thickens", "Adds gloss"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Wosk carnauba",
+      "description": "Twardy wosk roślinny z palmy carnauba. Zagęszcza sztyfty i balsamy oraz dodaje połysku.",
+      "functions": ["Zagęszcza", "Dodaje połysku"],
+      "concerns": null
+    }
+  },
+  "Hydrogenated Polyisobutene": {
+    "en": {
+      "commonName": null,
+      "description": "A synthetic, very stable emollient that adds gloss and a cushioned feel.",
+      "functions": ["Softens", "Adds gloss"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny, bardzo stabilny emolient, który dodaje połysku i otulającego wykończenia.",
+      "functions": ["Zmiękcza", "Dodaje połysku"],
+      "concerns": null
+    }
+  },
+  "Hydroxypropyl Methylcellulose": {
+    "en": {
+      "commonName": null,
+      "description": "A cellulose thickener that builds clear gels and stabilises foam.",
+      "functions": ["Thickens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Zagęstnik celulozowy, który buduje przezroczyste żele i stabilizuje pianę.",
+      "functions": ["Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Tribehenin": {
+    "en": {
+      "commonName": null,
+      "description": "A waxy emollient that thickens sticks and creams and leaves a protective film.",
+      "functions": ["Softens", "Thickens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Woskowy emolient, który zagęszcza sztyfty i kremy oraz zostawia film ochronny.",
+      "functions": ["Zmiękcza", "Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Undecylenoyl Glycine": {
+    "en": {
+      "commonName": null,
+      "description": "An amino-acid derivative used in formulas for oily skin and scalp.",
+      "functions": ["Balances oil"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Pochodna aminokwasu stosowana w formułach dla skóry tłustej i skóry głowy.",
+      "functions": ["Reguluje sebum"],
+      "concerns": null
+    }
+  },
+  "Trisodium Edta": {
+    "en": {
+      "commonName": null,
+      "description": "Binds trace metals so preservatives and actives stay effective.",
+      "functions": ["Stabilises formula"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Wiąże śladowe metale, dzięki czemu konserwanty i substancje aktywne zachowują skuteczność.",
+      "functions": ["Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Acrylates/Octylacrylamide Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that improves wear and water resistance.",
+      "functions": ["Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który poprawia trwałość i wodoodporność.",
+      "functions": ["Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Solanum Lycopersicum Seed Oil": {
+    "en": {
+      "commonName": "Tomato seed oil",
+      "description": "A linoleic-rich plant oil that softens and supports the barrier.",
+      "functions": ["Softens", "Supports barrier"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej z pestek pomidora",
+      "description": "Olej roślinny bogaty w kwas linolowy, który zmiękcza i wspiera barierę skóry.",
+      "functions": ["Zmiękcza", "Wspiera barierę"],
+      "concerns": null
+    }
+  },
+  "Acrylates Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that improves wear, fixes hair and keeps formulas stable.",
+      "functions": ["Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który poprawia trwałość, utrwala włosy i stabilizuje formułę.",
+      "functions": ["Tworzy film"],
+      "concerns": null
+    }
+  },
+  "C10-18 Triglycerides": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-derived emollient blend similar to skin lipids. Softens and adds body.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinna mieszanka emolientów zbliżona do lipidów skóry. Zmiękcza i nadaje konsystencję.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Cetyl Peg/Ppg-10/1 Dimethicone": {
+    "en": {
+      "commonName": null,
+      "description": "A silicone emulsifier used to build stable water-in-oil creams and sunscreens.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Silikonowy emulgator używany do budowy stabilnych kremów typu woda w oleju i kremów z filtrem.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Daucus Carota Sativa Seed Oil": {
+    "en": {
+      "commonName": "Carrot seed oil",
+      "description": "A carotenoid-rich plant oil used in nourishing and glow-focused formulas.",
+      "functions": ["Softens", "Antioxidant"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej z nasion marchwi",
+      "description": "Olej roślinny bogaty w karotenoidy, stosowany w formułach odżywczych i rozświetlających.",
+      "functions": ["Zmiękcza", "Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Polyacrylamide": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer, usually part of a thickener blend in creams and gels.",
+      "functions": ["Thickens", "Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, zwykle część mieszanki zagęszczającej w kremach i żelach.",
+      "functions": ["Zagęszcza", "Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Sucrose Cocoate": {
+    "en": {
+      "commonName": null,
+      "description": "A mild sugar-based cleansing agent and emollient used in gentle washes.",
+      "functions": ["Cleanses", "Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny cukrowy środek myjący i emolient stosowany w delikatnych produktach myjących.",
+      "functions": ["Oczyszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "T-Butyl Alcohol": {
+    "en": {
+      "commonName": null,
+      "description": "A solvent used in small amounts, mainly to denature alcohol.",
+      "functions": ["Solvent"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Rozpuszczalnik używany w małych ilościach, głównie do skażania alkoholu.",
+      "functions": ["Rozpuszczalnik"],
+      "concerns": null
+    }
+  },
+  "Tetramethyl Acetyloctahydronaphthalenes": {
+    "en": {
+      "commonName": "Iso E Super",
+      "description": "A woody synthetic fragrance component.",
+      "functions": ["Adds scent"],
+      "concerns": "Listed as a fragrance allergen in EU labelling."
+    },
+    "pl": {
+      "commonName": "Iso E Super",
+      "description": "Drzewny syntetyczny składnik zapachowy.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Trimethylsiloxysilicate": {
+    "en": {
+      "commonName": null,
+      "description": "A silicone resin that forms a long-wearing, water-resistant film.",
+      "functions": ["Forms a film", "Water resistance"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Żywica silikonowa tworząca trwały, wodoodporny film.",
+      "functions": ["Tworzy film", "Wodoodporność"],
+      "concerns": null
+    }
+  },
+  "Acacia Senegal Gum": {
+    "en": {
+      "commonName": "Gum arabic",
+      "description": "A plant gum that forms a tightening film and thickens formulas.",
+      "functions": ["Forms a film", "Thickens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Guma arabska",
+      "description": "Guma roślinna, która tworzy napinający film i zagęszcza formuły.",
+      "functions": ["Tworzy film", "Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Acrylates/C12-22 Alkyl Methacrylate Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that improves wear and water resistance.",
+      "functions": ["Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który poprawia trwałość i wodoodporność.",
+      "functions": ["Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Aspartic Acid": {
+    "en": {
+      "commonName": null,
+      "description": "An amino acid that is part of the skin's natural moisturising factor.",
+      "functions": ["Binds water"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Kwas asparaginowy",
+      "description": "Aminokwas będący częścią naturalnego czynnika nawilżającego skóry.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Hydrogenated Dimer Dilinoleyl/Dimethylcarbonate Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A polymer emollient that forms a soft, protective, water-resistant film.",
+      "functions": ["Softens", "Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emolient polimerowy, który tworzy miękki, ochronny, wodoodporny film.",
+      "functions": ["Zmiękcza", "Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Methyl Benzoate": {
+    "en": {
+      "commonName": null,
+      "description": "A preservative and fragrance component. Listed in Annex V.",
+      "functions": ["Preserves", "Adds scent"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Benzoesan metylu",
+      "description": "Konserwant i składnik zapachowy. Wymieniony w Aneksie V.",
+      "functions": ["Konserwuje", "Nadaje zapach"],
+      "concerns": null
+    }
+  },
+  "Propylheptyl Caprylate": {
+    "en": {
+      "commonName": null,
+      "description": "A light emollient with a dry, silky finish, often used as a silicone alternative.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Lekki emolient o suchym, jedwabistym wykończeniu, często stosowany jako alternatywa dla silikonów.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Sesamum Indicum Seed Oil": {
+    "en": {
+      "commonName": "Sesame seed oil",
+      "description": "A balanced plant oil that softens and supports the barrier. A classic in body care.",
+      "functions": ["Softens", "Supports barrier"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej sezamowy",
+      "description": "Zrównoważony olej roślinny, który zmiękcza i wspiera barierę skóry. Klasyk w pielęgnacji ciała.",
+      "functions": ["Zmiękcza", "Wspiera barierę"],
+      "concerns": null
+    }
+  },
+  "Sucrose Polystearate": {
+    "en": {
+      "commonName": null,
+      "description": "A sugar-based emulsifier with a soft, skin-friendly feel.",
+      "functions": ["Emulsifies", "Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator na bazie cukru o miękkim, przyjaznym skórze wykończeniu.",
+      "functions": ["Emulguje", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Triethoxycaprylylsilane": {
+    "en": {
+      "commonName": null,
+      "description": "A silane used to coat mineral pigments and UV filters so they disperse evenly and resist water.",
+      "functions": ["Coats pigments"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Silan używany do powlekania pigmentów mineralnych i filtrów UV, żeby rozpraszały się równomiernie i były wodoodporne.",
+      "functions": ["Powleka pigmenty"],
+      "concerns": null
+    }
+  },
+  "Aloe Barbadensis Leaf Juice Powder": {
+    "en": {
+      "commonName": "Aloe powder",
+      "description": "Concentrated aloe in powder form, used for a cooling, comforting feel and light hydration.",
+      "functions": ["Cools", "Hydrates"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Aloes w proszku",
+      "description": "Skoncentrowany aloes w proszku, stosowany dla uczucia chłodu, ukojenia i lekkiego nawilżenia.",
+      "functions": ["Chłodzi", "Nawilża"],
+      "concerns": null
+    }
+  },
+  "Carnitine": {
+    "en": {
+      "commonName": "L-carnitine",
+      "description": "An amino-acid derivative used in body formulas aimed at smoothing and oil balance.",
+      "functions": ["Conditions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "L-karnityna",
+      "description": "Pochodna aminokwasu stosowana w formułach do ciała nastawionych na wygładzenie i regulację sebum.",
+      "functions": ["Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Coco-Betaine": {
+    "en": {
+      "commonName": null,
+      "description": "A coconut-derived surfactant that softens harsher cleansers and builds foam.",
+      "functions": ["Cleanses", "Builds foam"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Surfaktant z kokosa, który łagodzi ostrzejsze środki myjące i buduje pianę.",
+      "functions": ["Oczyszcza", "Buduje pianę"],
+      "concerns": null
+    }
+  },
+  "Polyglyceryl-2 Dipolyhydroxystearate": {
+    "en": {
+      "commonName": null,
+      "description": "A mild plant-based emulsifier for water-in-oil creams and sunscreens.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny roślinny emulgator do kremów typu woda w oleju i kremów z filtrem.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Polyglyceryl-6 Behenate": {
+    "en": {
+      "commonName": null,
+      "description": "A mild plant-based emulsifier and stabiliser used in gentle creams.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny roślinny emulgator i stabilizator stosowany w delikatnych kremach.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Polyglyceryl-6 Stearate": {
+    "en": {
+      "commonName": null,
+      "description": "A mild plant-based emulsifier with a soft, natural-leaning profile.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Łagodny roślinny emulgator o miękkim, naturalnym profilu.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Bis-Diglyceryl Polyacyladipate-2": {
+    "en": {
+      "commonName": null,
+      "description": "A thick, cushiony emollient used as a lanolin alternative in balms and lip care.",
+      "functions": ["Softens", "Reduces water loss"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Gęsty, otulający emolient stosowany jako alternatywa lanoliny w balsamach i pielęgnacji ust.",
+      "functions": ["Zmiękcza", "Ogranicza utratę wody"],
+      "concerns": null
+    }
+  },
+  "Bis-Ethylhexyl Hydroxydimethoxy Benzylmalonate": {
+    "en": {
+      "commonName": "RonaCare AP",
+      "description": "A stable antioxidant used to protect skin lipids and the formula from oxidation.",
+      "functions": ["Antioxidant"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "RonaCare AP",
+      "description": "Stabilny antyoksydant chroniący lipidy skóry i formułę przed utlenianiem.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "C18-38 Alkyl Hydroxystearoyl Stearate": {
+    "en": {
+      "commonName": null,
+      "description": "A waxy emollient that thickens and gives balms a smooth, cushioned texture.",
+      "functions": ["Thickens", "Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Woskowy emolient, który zagęszcza i nadaje balsamom gładką, otulającą teksturę.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Ceteth-20": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier that holds oil and water together in creams and lotions.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator utrzymujący olej i wodę razem w kremach i balsamach.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Dimethicone/Vinyl Dimethicone Crosspolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A silicone gel that gives a velvety, blurring finish.",
+      "functions": ["Smooths"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Silikonowy żel, który daje aksamitne, optycznie wygładzające wykończenie.",
+      "functions": ["Wygładza"],
+      "concerns": null
+    }
+  },
+  "Disodium Cocoamphodiacetate": {
+    "en": {
+      "commonName": null,
+      "description": "A very mild coconut-derived cleansing agent, common in baby washes and sensitive-skin cleansers.",
+      "functions": ["Cleanses"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Bardzo łagodny środek myjący z kokosa, częsty w produktach dla dzieci i skóry wrażliwej.",
+      "functions": ["Oczyszcza"],
+      "concerns": null
+    }
+  },
+  "Glyceryl Oleate": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-derived emollient and emulsifier that helps refat the skin after cleansing.",
+      "functions": ["Softens", "Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny emolient i emulgator, który pomaga natłuścić skórę po myciu.",
+      "functions": ["Zmiękcza", "Emulguje"],
+      "concerns": null
+    }
+  },
+  "Hydrogenated Vegetable Oil": {
+    "en": {
+      "commonName": null,
+      "description": "A plant oil turned into a soft wax. Thickens creams and softens the skin.",
+      "functions": ["Softens", "Thickens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Olej roślinny przekształcony w miękki wosk. Zagęszcza kremy i zmiękcza skórę.",
+      "functions": ["Zmiękcza", "Zagęszcza"],
+      "concerns": null
+    }
+  },
+  "Hydrolyzed Glycosaminoglycans": {
+    "en": {
+      "commonName": null,
+      "description": "Skin-identical sugar molecules that bind water and give a smooth, plumped feel.",
+      "functions": ["Binds water"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Cząsteczki cukrowe identyczne ze skórnymi, które wiążą wodę i dają gładkie, wypełnione wrażenie.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Nigella Sativa Seed Oil": {
+    "en": {
+      "commonName": "Black seed oil",
+      "description": "A plant oil traditionally used in comfort-focused formulas.",
+      "functions": ["Softens", "Comforts"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej z czarnuszki",
+      "description": "Olej roślinny tradycyjnie stosowany w formułach kojących.",
+      "functions": ["Zmiękcza", "Koi"],
+      "concerns": null
+    }
+  },
+  "Passiflora Incarnata Fruit Extract": {
+    "en": {
+      "commonName": "Passionflower extract",
+      "description": "A plant extract used in protective, conditioning formulas.",
+      "functions": ["Conditions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z passiflory",
+      "description": "Ekstrakt roślinny stosowany w formułach ochronnych i pielęgnujących.",
+      "functions": ["Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Phenylpropanol": {
+    "en": {
+      "commonName": null,
+      "description": "A solvent and scent component that also supports preservation.",
+      "functions": ["Solvent", "Supports preservation"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Rozpuszczalnik i składnik zapachowy, który wspiera też konserwację.",
+      "functions": ["Rozpuszczalnik", "Wspiera konserwację"],
+      "concerns": null
+    }
+  },
+  "Poly C10-30 Alkyl Acrylate": {
+    "en": {
+      "commonName": null,
+      "description": "A synthetic polymer that thickens oils and stabilises emulsions.",
+      "functions": ["Thickens", "Stabilises emulsions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Syntetyczny polimer, który zagęszcza oleje i stabilizuje emulsję.",
+      "functions": ["Zagęszcza", "Stabilizuje emulsję"],
+      "concerns": null
+    }
+  },
+  "Polyglyceryl-3 Stearate/Sebacate Crosspolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-based polymer emulsifier that stabilises light, natural-leaning creams.",
+      "functions": ["Emulsifies", "Stabilises emulsions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny emulgator polimerowy, który stabilizuje lekkie kremy o naturalnym profilu.",
+      "functions": ["Emulguje", "Stabilizuje emulsję"],
+      "concerns": null
+    }
+  },
+  "Polymethylsilsesquioxane": {
+    "en": {
+      "commonName": null,
+      "description": "Silicone microspheres that give a soft-focus, velvety finish and improve slip.",
+      "functions": ["Smooths", "Mattifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Silikonowe mikrosfery, które dają aksamitne, optycznie wygładzające wykończenie i poprawiają poślizg.",
+      "functions": ["Wygładza", "Matuje"],
+      "concerns": null
+    }
+  },
+  "Ppg-5-Ceteth-20": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier and solubiliser used in toners and light lotions.",
+      "functions": ["Emulsifies", "Solubilises"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator i solubilizator stosowany w tonikach i lekkich emulsjach.",
+      "functions": ["Emulguje", "Solubilizuje"],
+      "concerns": null
+    }
+  },
+  "Propylene Carbonate": {
+    "en": {
+      "commonName": null,
+      "description": "A solvent used to thin clays and keep gels smooth.",
+      "functions": ["Solvent"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Rozpuszczalnik używany do rozrzedzania glinek i utrzymania gładkości żeli.",
+      "functions": ["Rozpuszczalnik"],
+      "concerns": null
+    }
+  },
+  "Psidium Guajava Fruit Extract": {
+    "en": {
+      "commonName": "Guava extract",
+      "description": "A vitamin-rich fruit extract used in conditioning formulas.",
+      "functions": ["Conditions"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z gujawy",
+      "description": "Bogaty w witaminy ekstrakt owocowy stosowany w formułach pielęgnujących.",
+      "functions": ["Pielęgnuje"],
+      "concerns": null
+    }
+  },
+  "Pullulan": {
+    "en": {
+      "commonName": null,
+      "description": "A fermentation-derived polysaccharide that forms an instantly tightening film.",
+      "functions": ["Forms a film", "Tightening feel"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Pullulan",
+      "description": "Polisacharyd z fermentacji, który tworzy natychmiast napinający film.",
+      "functions": ["Tworzy film", "Efekt napięcia"],
+      "concerns": null
+    }
+  },
+  "Rosmarinus Officinalis Leaf Extract": {
+    "en": {
+      "commonName": "Rosemary extract",
+      "description": "An antioxidant-rich extract that also protects the oils in a formula.",
+      "functions": ["Antioxidant"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z rozmarynu",
+      "description": "Ekstrakt bogaty w antyoksydanty, który chroni też oleje w formule.",
+      "functions": ["Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Rubus Idaeus Seed Oil": {
+    "en": {
+      "commonName": "Raspberry seed oil",
+      "description": "A linoleic-rich oil with natural antioxidants. Softens and supports the barrier.",
+      "functions": ["Softens", "Antioxidant"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej z pestek malin",
+      "description": "Olej bogaty w kwas linolowy i naturalne antyoksydanty. Zmiękcza i wspiera barierę.",
+      "functions": ["Zmiękcza", "Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Sorbitan Stearate": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier that helps build stable, classic cream bases.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator pomagający budować stabilne, klasyczne bazy kremowe.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Steareth-2": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier, usually paired with steareth-21, that holds creams together.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator, zwykle w parze ze steareth-21, który utrzymuje spójność kremów.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Steareth-21": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier, usually paired with steareth-2, that holds creams together.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator, zwykle w parze ze steareth-2, który utrzymuje spójność kremów.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Styrene/Acrylates Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A film-forming polymer that adds opacity and improves wear.",
+      "functions": ["Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer filmotwórczy, który dodaje krycia i poprawia trwałość.",
+      "functions": ["Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Tapioca Starch": {
+    "en": {
+      "commonName": null,
+      "description": "A plant starch that absorbs oil and gives a soft, powdery finish.",
+      "functions": ["Absorbs oil", "Mattifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Skrobia z tapioki",
+      "description": "Skrobia roślinna, która pochłania sebum i daje miękkie, pudrowe wykończenie.",
+      "functions": ["Pochłania sebum", "Matuje"],
+      "concerns": null
+    }
+  },
+  "Tetrasodium Iminodisuccinate": {
+    "en": {
+      "commonName": null,
+      "description": "A biodegradable chelator that binds trace metals so the formula stays effective.",
+      "functions": ["Stabilises formula"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Biodegradowalny chelator, który wiąże śladowe metale, dzięki czemu formuła zachowuje skuteczność.",
+      "functions": ["Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Trideceth-6": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier, usually part of a thickener blend in gels and creams.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator, zwykle część mieszanki zagęszczającej w żelach i kremach.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Vitis Vinifera Seed Oil": {
+    "en": {
+      "commonName": "Grape seed oil",
+      "description": "A light, linoleic-rich oil that softens without heaviness. Suits most skin types.",
+      "functions": ["Softens", "Supports barrier"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej z pestek winogron",
+      "description": "Lekki olej bogaty w kwas linolowy, który zmiękcza bez ciężkości. Pasuje większości typów skóry.",
+      "functions": ["Zmiękcza", "Wspiera barierę"],
+      "concerns": null
+    }
+  },
+  "Calcium Carbonate": {
+    "en": {
+      "commonName": "Chalk",
+      "description": "A mineral powder that absorbs oil and gently polishes. Common in toothpastes and masks.",
+      "functions": ["Absorbs oil"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Kreda",
+      "description": "Mineralny puder, który pochłania sebum i delikatnie poleruje. Częsty w pastach i maseczkach.",
+      "functions": ["Pochłania sebum"],
+      "concerns": null
+    }
+  },
+  "CI 77491": {
+    "en": {
+      "commonName": "Red iron oxide",
+      "description": "A red mineral pigment used for tint. Listed in Annex IV.",
+      "functions": ["Adds colour"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Czerwony tlenek żelaza",
+      "description": "Czerwony pigment mineralny używany do nadania koloru. Wymieniony w Aneksie IV.",
+      "functions": ["Nadaje kolor"],
+      "concerns": null
+    }
+  },
+  "Decylene Glycol": {
+    "en": {
+      "commonName": null,
+      "description": "A skin-conditioning glycol that also supports preservation.",
+      "functions": ["Supports preservation"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Glikol pielęgnujący skórę, który wspiera też konserwację.",
+      "functions": ["Wspiera konserwację"],
+      "concerns": null
+    }
+  },
+  "Hydroxypropylcellulose": {
+    "en": {
+      "commonName": null,
+      "description": "A cellulose thickener that builds clear gels and films.",
+      "functions": ["Thickens", "Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Zagęstnik celulozowy, który buduje przezroczyste żele i filmy.",
+      "functions": ["Zagęszcza", "Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Methyl Salicylate": {
+    "en": {
+      "commonName": "Wintergreen",
+      "description": "A minty-scented compound used for scent and a warming-cooling sensation.",
+      "functions": ["Adds scent"],
+      "concerns": "Listed as a fragrance allergen in EU labelling."
+    },
+    "pl": {
+      "commonName": "Salicylan metylu",
+      "description": "Związek o miętowym aromacie, stosowany dla zapachu i wrażenia chłodząco-rozgrzewającego.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Pentaerythrityl Tetra-Di-T-Butyl Hydroxyhydrocinnamate": {
+    "en": {
+      "commonName": null,
+      "description": "A stable antioxidant that protects the oils and colour of a formula.",
+      "functions": ["Stabilises oils"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Stabilny antyoksydant, który chroni oleje i kolor formuły.",
+      "functions": ["Stabilizuje oleje"],
+      "concerns": null
+    }
+  },
+  "Persea Gratissima Fruit Extract": {
+    "en": {
+      "commonName": "Avocado extract",
+      "description": "An avocado extract used to soften and comfort dry skin.",
+      "functions": ["Softens", "Comforts"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z awokado",
+      "description": "Ekstrakt z awokado stosowany, by zmiękczyć i ukoić suchą skórę.",
+      "functions": ["Zmiękcza", "Koi"],
+      "concerns": null
+    }
+  },
+  "Saccharide Isomerate": {
+    "en": {
+      "commonName": "Pentavitin",
+      "description": "A plant-sugar complex that binds to the skin and holds water for days, not hours.",
+      "functions": ["Binds water"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Pentavitin",
+      "description": "Kompleks cukrów roślinnych, który wiąże się ze skórą i zatrzymuje wodę na dni, nie godziny.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Sorbitan Oleate": {
+    "en": {
+      "commonName": null,
+      "description": "An emulsifier that helps oils disperse in water-in-oil creams.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emulgator pomagający rozproszyć oleje w kremach typu woda w oleju.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Tridecane": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-derived volatile emollient with a light, dry feel. A common silicone alternative.",
+      "functions": ["Light texture"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny lotny emolient o lekkim, suchym wykończeniu. Częsta alternatywa dla silikonów.",
+      "functions": ["Lekka tekstura"],
+      "concerns": null
+    }
+  },
+  "Vaccinium Macrocarpon Seed Oil": {
+    "en": {
+      "commonName": "Cranberry seed oil",
+      "description": "An omega-balanced oil with natural antioxidants. Softens and supports the barrier.",
+      "functions": ["Softens", "Antioxidant"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej z pestek żurawiny",
+      "description": "Olej o zrównoważonych kwasach omega i naturalnych antyoksydantach. Zmiękcza i wspiera barierę.",
+      "functions": ["Zmiękcza", "Antyoksydant"],
+      "concerns": null
+    }
+  },
+  "Vanillin": {
+    "en": {
+      "commonName": null,
+      "description": "A vanilla-scented fragrance component.",
+      "functions": ["Adds scent"],
+      "concerns": "Listed as a fragrance allergen in EU labelling."
+    },
+    "pl": {
+      "commonName": "Wanilina",
+      "description": "Składnik zapachowy o aromacie wanilii.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Acetyl Cedrene": {
+    "en": {
+      "commonName": null,
+      "description": "A woody, cedar-like fragrance component.",
+      "functions": ["Adds scent"],
+      "concerns": "Listed as a fragrance allergen in EU labelling."
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Drzewny, cedrowy składnik zapachowy.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Wymieniony jako alergen zapachowy w unijnych przepisach o znakowaniu."
+    }
+  },
+  "Acrylates/Dimethicone Copolymer": {
+    "en": {
+      "commonName": null,
+      "description": "A silicone-acrylate polymer that forms a flexible, long-wearing film.",
+      "functions": ["Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polimer silikonowo-akrylowy, który tworzy elastyczny, trwały film.",
+      "functions": ["Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Alanine": {
+    "en": {
+      "commonName": null,
+      "description": "An amino acid that is part of the skin's natural moisturising factor.",
+      "functions": ["Binds water"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Alanina",
+      "description": "Aminokwas będący częścią naturalnego czynnika nawilżającego skóry.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Aluminum Stearate": {
+    "en": {
+      "commonName": null,
+      "description": "An aluminium salt of stearic acid used to thicken oils and stabilise pigments.",
+      "functions": ["Thickens", "Stabilises formula"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Sól glinowa kwasu stearynowego używana do zagęszczania olejów i stabilizacji pigmentów.",
+      "functions": ["Zagęszcza", "Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Aminomethyl Propanol": {
+    "en": {
+      "commonName": null,
+      "description": "A pH adjuster used to neutralise gelling polymers.",
+      "functions": ["Adjusts pH"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Regulator pH używany do neutralizacji polimerów żelujących.",
+      "functions": ["Reguluje pH"],
+      "concerns": null
+    }
+  },
+  "Behenic Acid": {
+    "en": {
+      "commonName": null,
+      "description": "A long-chain fatty acid that thickens creams and helps them stay emulsified.",
+      "functions": ["Thickens", "Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Kwas behenowy",
+      "description": "Długołańcuchowy kwas tłuszczowy, który zagęszcza kremy i pomaga utrzymać emulsję.",
+      "functions": ["Zagęszcza", "Emulguje"],
+      "concerns": null
+    }
+  },
+  "Biosaccharide Gum-1": {
+    "en": {
+      "commonName": null,
+      "description": "A fermentation-derived sugar that forms a hydrating, soothing film on the skin.",
+      "functions": ["Binds water", "Comforts"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Cukier z fermentacji, który tworzy na skórze nawilżający, kojący film.",
+      "functions": ["Wiąże wodę", "Koi"],
+      "concerns": null
+    }
+  },
+  "C15-19 Alkane": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-derived volatile emollient with a light, dry feel. A common silicone alternative.",
+      "functions": ["Light texture"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny lotny emolient o lekkim, suchym wykończeniu. Częsta alternatywa dla silikonów.",
+      "functions": ["Lekka tekstura"],
+      "concerns": null
+    }
+  },
+  "C18-36 Acid Triglyceride": {
+    "en": {
+      "commonName": null,
+      "description": "A waxy emollient that thickens balms and gives a cushioned feel.",
+      "functions": ["Thickens", "Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Woskowy emolient, który zagęszcza balsamy i daje otulające wykończenie.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Calcium Gluconate": {
+    "en": {
+      "commonName": null,
+      "description": "A calcium salt used to condition the skin and stabilise formulas.",
+      "functions": ["Stabilises formula"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Glukonian wapnia",
+      "description": "Sól wapnia używana do pielęgnacji skóry i stabilizacji formuły.",
+      "functions": ["Stabilizuje formułę"],
+      "concerns": null
+    }
+  },
+  "Canola Oil": {
+    "en": {
+      "commonName": "Rapeseed oil",
+      "description": "A balanced plant oil that softens and supports the barrier.",
+      "functions": ["Softens", "Supports barrier"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Olej rzepakowy",
+      "description": "Zrównoważony olej roślinny, który zmiękcza i wspiera barierę skóry.",
+      "functions": ["Zmiękcza", "Wspiera barierę"],
+      "concerns": null
+    }
+  },
+  "Carica Papaya Fruit Extract": {
+    "en": {
+      "commonName": "Papaya extract",
+      "description": "A fruit extract containing the enzyme papain, used in gentle exfoliating formulas.",
+      "functions": ["Exfoliates gently"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z papai",
+      "description": "Ekstrakt owocowy z enzymem papainą, stosowany w łagodnych formułach złuszczających.",
+      "functions": ["Łagodnie złuszcza"],
+      "concerns": null
+    }
+  },
+  "Centella Asiatica Leaf Extract": {
+    "en": {
+      "commonName": "Cica leaf extract",
+      "description": "A centella extract long used in comfort-focused skincare for stressed skin.",
+      "functions": ["Calms visible redness"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z liści wąkroty",
+      "description": "Ekstrakt z wąkroty od dawna stosowany w pielęgnacji kojącej zestresowaną skórę.",
+      "functions": ["Łagodzi widoczne zaczerwienienie"],
+      "concerns": null
+    }
+  },
+  "Cetyl Esters": {
+    "en": {
+      "commonName": null,
+      "description": "A waxy emollient blend that thickens creams and leaves a soft film.",
+      "functions": ["Thickens", "Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Estry cetylowe",
+      "description": "Woskowa mieszanka emolientów, która zagęszcza kremy i zostawia miękki film.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Chlorella Vulgaris/Lupinus Albus Protein Ferment": {
+    "en": {
+      "commonName": null,
+      "description": "A ferment of algae and lupin proteins used in firmness-focused formulas.",
+      "functions": ["Supports firmness"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Ferment z alg i białek łubinu stosowany w formułach ujędrniających.",
+      "functions": ["Wspiera jędrność"],
+      "concerns": null
+    }
+  },
+  "CI 77492": {
+    "en": {
+      "commonName": "Yellow iron oxide",
+      "description": "A yellow mineral pigment used for tint. Listed in Annex IV.",
+      "functions": ["Adds colour"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Żółty tlenek żelaza",
+      "description": "Żółty pigment mineralny używany do nadania koloru. Wymieniony w Aneksie IV.",
+      "functions": ["Nadaje kolor"],
+      "concerns": null
+    }
+  },
+  "Diisostearoyl Polyglyceryl-3 Dimer Dilinoleate": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-based emulsifier for water-in-oil creams with a rich, cushioned feel.",
+      "functions": ["Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny emulgator do kremów typu woda w oleju o bogatym, otulającym wykończeniu.",
+      "functions": ["Emulguje"],
+      "concerns": null
+    }
+  },
+  "Ethyl Oleate": {
+    "en": {
+      "commonName": null,
+      "description": "A light, fast-spreading emollient.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Lekki, szybko rozprowadzający się emolient.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Eucalyptus Globulus Leaf Extract": {
+    "en": {
+      "commonName": "Eucalyptus extract",
+      "description": "A plant extract used for a fresh feel and scent.",
+      "functions": ["Adds scent", "Cools"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Ekstrakt z eukaliptusa",
+      "description": "Ekstrakt roślinny stosowany dla świeżego odczucia i zapachu.",
+      "functions": ["Nadaje zapach", "Chłodzi"],
+      "concerns": null
+    }
+  },
+  "Eugenia Caryophyllus Leaf Oil": {
+    "en": {
+      "commonName": "Clove leaf oil",
+      "description": "A clove essential oil used for scent.",
+      "functions": ["Adds scent"],
+      "concerns": "Essential oils are a frequent trigger for reactive skin."
+    },
+    "pl": {
+      "commonName": "Olejek goździkowy",
+      "description": "Olejek eteryczny z goździków stosowany dla zapachu.",
+      "functions": ["Nadaje zapach"],
+      "concerns": "Olejki eteryczne to częsty wyzwalacz reakcji u skóry reaktywnej."
+    }
+  },
+  "Galactoarabinan": {
+    "en": {
+      "commonName": null,
+      "description": "A larch-derived polysaccharide that forms a smoothing film and helps actives spread.",
+      "functions": ["Forms a film"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Polisacharyd z modrzewia, który tworzy wygładzający film i pomaga rozprowadzić substancje aktywne.",
+      "functions": ["Tworzy film"],
+      "concerns": null
+    }
+  },
+  "Gluconolactone": {
+    "en": {
+      "commonName": "PHA",
+      "description": "A polyhydroxy acid that exfoliates very gently and hydrates. The mildest of the exfoliating acids.",
+      "functions": ["Exfoliates gently", "Hydrates"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Glukonolakton (PHA)",
+      "description": "Kwas polihydroksylowy, który złuszcza bardzo łagodnie i nawilża. Najdelikatniejszy z kwasów złuszczających.",
+      "functions": ["Łagodnie złuszcza", "Nawilża"],
+      "concerns": null
+    }
+  },
+  "Glyceryl Olivate": {
+    "en": {
+      "commonName": null,
+      "description": "An olive-derived emollient and emulsifier that helps refat the skin.",
+      "functions": ["Softens", "Emulsifies"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Emolient i emulgator z oliwy, który pomaga natłuścić skórę.",
+      "functions": ["Zmiękcza", "Emulguje"],
+      "concerns": null
+    }
+  },
+  "Glycine": {
+    "en": {
+      "commonName": null,
+      "description": "An amino acid that is part of the skin's natural moisturising factor.",
+      "functions": ["Binds water"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Glicyna",
+      "description": "Aminokwas będący częścią naturalnego czynnika nawilżającego skóry.",
+      "functions": ["Wiąże wodę"],
+      "concerns": null
+    }
+  },
+  "Hexyl Laurate": {
+    "en": {
+      "commonName": null,
+      "description": "A light emollient that spreads easily, often in water-in-oil creams.",
+      "functions": ["Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Lekki emolient, który łatwo się rozprowadza, często w kremach typu woda w oleju.",
+      "functions": ["Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Hydrogenated Rapeseed Alcohol": {
+    "en": {
+      "commonName": null,
+      "description": "A plant-derived fatty alcohol — waxy, not drying — that thickens creams.",
+      "functions": ["Thickens", "Softens"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": null,
+      "description": "Roślinny alkohol tłuszczowy — woskowy, nie wysuszający — który zagęszcza kremy.",
+      "functions": ["Zagęszcza", "Zmiękcza"],
+      "concerns": null
+    }
+  },
+  "Hydroxyapatite": {
+    "en": {
+      "commonName": null,
+      "description": "The mineral tooth enamel is made of; used in toothpastes and remineralising formulas.",
+      "functions": ["Polishes"],
+      "concerns": null
+    },
+    "pl": {
+      "commonName": "Hydroksyapatyt",
+      "description": "Minerał, z którego zbudowane jest szkliwo zębów; stosowany w pastach i formułach remineralizujących.",
+      "functions": ["Poleruje"],
+      "concerns": null
+    }
+  }
+}
