@@ -19,7 +19,7 @@ watch(
   },
 );
 
-const ratios = { square: 'aspect-square', portrait: 'aspect-[4/5]', wide: 'aspect-[16/10]' };
+const ratios = { square: 'aspect-square', portrait: 'aspect-4/5', wide: 'aspect-16/10' };
 </script>
 
 <template>
@@ -34,7 +34,7 @@ const ratios = { square: 'aspect-square', portrait: 'aspect-[4/5]', wide: 'aspec
       :fetchpriority="eager ? 'high' : 'auto'"
       :sizes="sizes"
       decoding="async"
-      class="absolute inset-0 size-full transition-opacity duration-[--duration-slow]"
+      class="absolute inset-0 size-full transition-opacity duration-slow"
       :class="[
         fit === 'contain' ? 'object-contain' : 'object-cover',
         status === 'loaded' ? 'opacity-100' : 'opacity-0',

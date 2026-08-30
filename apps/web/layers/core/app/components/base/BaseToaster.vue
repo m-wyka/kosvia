@@ -12,13 +12,13 @@ const tones = {
   <ClientOnly>
     <Teleport to="body">
       <div
-        class="safe-bottom pointer-events-none fixed inset-x-0 bottom-20 z-[60] flex flex-col items-center gap-2 px-4 sm:bottom-6"
+        class="safe-bottom pointer-events-none fixed inset-x-0 bottom-20 z-60 flex flex-col items-center gap-2 px-4 sm:bottom-6"
         role="status"
         aria-live="polite"
       >
         <TransitionGroup
-          enter-active-class="transition-all duration-[--duration-base] ease-[--ease-out-soft]"
-          leave-active-class="transition-all duration-[--duration-fast]"
+          enter-active-class="transition-all duration-base ease-out-soft"
+          leave-active-class="transition-all duration-fast"
           enter-from-class="translate-y-2 opacity-0"
           leave-to-class="translate-y-1 opacity-0"
         >

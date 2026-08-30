@@ -92,7 +92,7 @@ const toggleExplanation = async () => {
       <BaseIcon
         name="chevron-down"
         :size="16"
-        class="text-ink-faint transition-transform duration-[--duration-fast]"
+        class="text-ink-faint transition-transform duration-fast"
         :class="open && 'rotate-180'"
       />
     </button>

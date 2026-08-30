@@ -116,7 +116,7 @@ watch(score, (nextScore) => {
           stroke-linecap="round"
           :stroke-dasharray="circumference"
           :stroke-dashoffset="circumference * (1 - displayed / 100)"
-          class="transition-[stroke-dashoffset] duration-[--duration-slow] ease-[--ease-out-soft]"
+          class="transition-[stroke-dashoffset] duration-slow ease-out-soft"
         />
       </svg>
       <span

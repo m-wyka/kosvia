@@ -28,8 +28,8 @@ onUnmounted(() => lockPageScroll(false));
   <ClientOnly>
     <Teleport to="body">
       <Transition
-        enter-active-class="transition-opacity duration-[--duration-base]"
-        leave-active-class="transition-opacity duration-[--duration-fast]"
+        enter-active-class="transition-opacity duration-base"
+        leave-active-class="transition-opacity duration-fast"
         enter-from-class="opacity-0"
         leave-to-class="opacity-0"
       >

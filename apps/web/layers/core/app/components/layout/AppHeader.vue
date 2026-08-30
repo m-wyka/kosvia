@@ -144,8 +144,8 @@ watch(
     </div>
 
     <Transition
-      enter-active-class="transition-all duration-[--duration-base] ease-[--ease-out-soft]"
-      leave-active-class="transition-all duration-[--duration-fast]"
+      enter-active-class="transition-all duration-base ease-out-soft"
+      leave-active-class="transition-all duration-fast"
       enter-from-class="-translate-y-2 opacity-0"
       leave-to-class="-translate-y-2 opacity-0"
     >

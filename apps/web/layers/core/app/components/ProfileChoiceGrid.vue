@@ -38,13 +38,13 @@ const toggle = (slug: string) => {
       v-for="item in entries"
       :key="item.slug"
       type="button"
-      class="flex items-start gap-3 rounded-lg border bg-surface p-3.5 text-left transition-all duration-[--duration-fast] hover:border-ink-faint"
+      class="flex items-start gap-3 rounded-lg border bg-surface p-3.5 text-left transition-all duration-fast hover:border-ink-faint"
       :class="model.includes(item.slug) ? 'border-ink bg-surface-muted shadow-xs' : 'border-line'"
       :aria-pressed="model.includes(item.slug)"
       @click="toggle(item.slug)"
     >
       <span
-        class="mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-xs border transition-colors"
+        class="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-xs border transition-colors"
         :class="model.includes(item.slug) ? 'border-ink bg-ink text-white' : 'border-line-strong'"
         aria-hidden="true"
       >

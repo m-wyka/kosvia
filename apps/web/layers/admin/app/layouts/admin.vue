@@ -57,7 +57,7 @@ watch(
 <template>
   <div class="min-h-dvh bg-canvas lg:grid lg:grid-cols-[15rem_1fr]">
     <aside
-      class="fixed inset-y-0 left-0 z-50 w-60 -translate-x-full border-r border-line bg-surface transition-transform duration-[--duration-base] ease-[--ease-out-soft] lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-50 w-60 -translate-x-full border-r border-line bg-surface transition-transform duration-base ease-out-soft lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0"
       :class="open && 'translate-x-0 shadow-lg'"
     >
       <div class="flex h-14 items-center justify-between border-b border-line px-4">

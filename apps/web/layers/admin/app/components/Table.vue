@@ -45,7 +45,7 @@ const cellValue = (row: T, key: string): unknown => {
     </BaseEmptyState>
 
     <div v-else class="hide-scrollbar overflow-x-auto">
-      <table class="w-full min-w-[40rem] text-sm">
+      <table class="w-full min-w-160 text-sm">
         <thead>
           <tr class="border-b border-line bg-surface-muted/60">
             <th

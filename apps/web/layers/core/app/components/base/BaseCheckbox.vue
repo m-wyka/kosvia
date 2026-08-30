@@ -10,13 +10,13 @@ const id = useId();
     class="flex cursor-pointer items-start gap-3 select-none"
     :class="disabled && 'cursor-not-allowed opacity-55'"
   >
-    <span class="relative mt-0.5 flex size-[18px] shrink-0 items-center justify-center">
+    <span class="relative mt-0.5 flex size-4.5 shrink-0 items-center justify-center">
       <input
         :id="id"
         v-model="model"
         type="checkbox"
         :disabled="disabled"
-        class="peer size-[18px] cursor-pointer appearance-none rounded-xs border border-line-strong bg-surface transition-all duration-[--duration-fast] checked:border-ink checked:bg-ink disabled:cursor-not-allowed"
+        class="peer size-4.5 cursor-pointer appearance-none rounded-xs border border-line-strong bg-surface transition-all duration-fast checked:border-ink checked:bg-ink disabled:cursor-not-allowed"
       />
       <BaseIcon
         name="check"

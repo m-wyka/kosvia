@@ -12,7 +12,7 @@ withDefaults(
 <template>
   <component
     :is="as"
-    class="rounded-xl border transition-all duration-[--duration-base] ease-[--ease-out-soft]"
+    class="rounded-xl border transition-all duration-base ease-out-soft"
     :class="[
       variant === 'muted' ? 'border-line bg-surface-muted' : 'border-line bg-surface',
       variant === 'raised' &&

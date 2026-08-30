@@ -22,7 +22,7 @@ const open = ref<number | null>(0);
     />
 
     <dl
-      class="mx-auto mt-10 max-w-2xl divide-y divide-line rounded-xl border border-line bg-surface"
+      class="mx-auto mt-10 max-w-2xl divide-y divide-line rounded-xl border border-line bg-surface overflow-hidden"
     >
       <div v-for="(faq, index) in faqs" :key="faq.q">
         <dt>
@@ -36,7 +36,7 @@ const open = ref<number | null>(0);
             <BaseIcon
               name="chevron-down"
               :size="17"
-              class="mt-0.5 shrink-0 text-ink-faint transition-transform duration-[--duration-fast]"
+              class="mt-0.5 shrink-0 text-ink-faint transition-transform duration-fast"
               :class="open === index && 'rotate-180'"
             />
           </button>

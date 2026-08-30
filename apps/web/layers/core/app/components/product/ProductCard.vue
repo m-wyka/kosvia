@@ -63,7 +63,7 @@ const handleFavoriteClick = () => {
 
 <template>
   <article
-    class="group relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-all duration-[--duration-base] ease-[--ease-out-soft] hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md focus-within:border-line-strong focus-within:shadow-md"
+    class="group relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-all duration-base ease-out-soft hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md focus-within:border-line-strong focus-within:shadow-md"
     :class="variant === 'rail' && 'shrink-0 sm:w-60 w-54'"
   >
     <div class="relative">

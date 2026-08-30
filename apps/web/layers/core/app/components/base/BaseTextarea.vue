@@ -37,7 +37,7 @@ const describedBy = computed(
       :disabled="disabled"
       :aria-invalid="error ? 'true' : undefined"
       :aria-describedby="describedBy"
-      class="w-full resize-y rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint transition-colors duration-[--duration-fast]"
+      class="w-full resize-y rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint transition-colors duration-fast"
       :class="error ? 'border-critical' : 'border-line-strong hover:border-ink-faint'"
     />
     <p v-if="error" :id="`${id}-error`" class="mt-1.5 text-xs text-critical">{{ error }}</p>

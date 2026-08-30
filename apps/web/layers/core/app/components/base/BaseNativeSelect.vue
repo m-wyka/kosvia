@@ -33,7 +33,7 @@ const describedBy = computed(
         :disabled="disabled"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
-        class="w-full appearance-none rounded-lg border bg-surface pr-9 pl-3.5 text-sm text-ink transition-colors duration-[--duration-fast] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint"
+        class="w-full appearance-none rounded-lg border bg-surface pr-9 pl-3.5 text-sm text-ink transition-colors duration-fast disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint"
         :class="[
           error ? 'border-critical' : 'border-line-strong hover:border-ink-faint',
           size === 'sm' ? 'h-9' : 'h-11',

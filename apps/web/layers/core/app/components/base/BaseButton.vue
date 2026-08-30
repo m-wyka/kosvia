@@ -49,7 +49,7 @@ const sizes: Record<Size, string> = {
     :aria-disabled="disabled || loading ? 'true' : undefined"
     :aria-busy="loading ? 'true' : undefined"
     :aria-label="label"
-    class="inline-flex items-center justify-center font-medium tracking-tight whitespace-nowrap transition-all duration-[--duration-fast] ease-[--ease-out-soft] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+    class="inline-flex items-center justify-center font-medium tracking-tight whitespace-nowrap transition-all duration-fast ease-out-soft active:scale-98 disabled:pointer-events-none disabled:opacity-60"
     :class="[variants[variant], sizes[size], block && 'w-full']"
   >
     <BaseSpinner v-if="loading" :size="size === 'lg' ? 18 : 15" />

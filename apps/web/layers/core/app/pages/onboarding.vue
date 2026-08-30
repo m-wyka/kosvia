@@ -139,7 +139,7 @@ useSeo(() => ({
         :aria-valuemax="steps.length"
       >
         <div
-          class="h-full rounded-pill bg-ink transition-[width] duration-[--duration-slow] ease-[--ease-out-soft]"
+          class="h-full rounded-pill bg-ink transition-[width] duration-slow ease-out-soft"
           :style="{ width: `${progress}%` }"
         />
       </div>
@@ -148,7 +148,7 @@ useSeo(() => ({
     <h1 class="font-display text-3xl text-ink">{{ $t(currentStep.title) }}</h1>
     <p class="mt-2 text-sm text-ink-muted">{{ $t(currentStep.subtitle) }}</p>
 
-    <div class="mt-8 min-h-[19rem]">
+    <div class="mt-8 min-h-76">
       <div v-if="currentStep.key === 'skin'" class="space-y-8">
         <BaseRadioGroup
           v-model="form.skinType"

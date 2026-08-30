@@ -99,7 +99,7 @@ useSeo(() => ({
       <div v-for="index in 3" :key="index">
         <BaseSkeleton width="14rem" height="1.75rem" class="mb-4" />
         <div class="flex gap-4 overflow-hidden">
-          <div v-for="card in 5" :key="card" class="w-[13.5rem] shrink-0 sm:w-60">
+          <div v-for="card in 5" :key="card" class="w-54 shrink-0 sm:w-60">
             <ProductCardSkeleton />
           </div>
         </div>

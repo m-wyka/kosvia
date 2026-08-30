@@ -141,7 +141,7 @@ useSeo(() => ({
       </BaseCard>
 
       <div class="hide-scrollbar -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
-        <table class="w-full min-w-[42rem] border-separate border-spacing-0">
+        <table class="w-full min-w-168 border-separate border-spacing-0">
           <caption class="sr-only">{{ $t('COMPARE.CAPTION') }}</caption>
           <thead>
             <tr>

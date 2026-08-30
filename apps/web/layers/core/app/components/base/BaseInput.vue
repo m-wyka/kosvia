@@ -51,7 +51,7 @@ const describedBy = computed(
         :inputmode="inputmode"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
-        class="h-11 w-full rounded-lg border bg-surface px-3.5 text-sm text-ink placeholder:text-ink-faint transition-colors duration-[--duration-fast] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint"
+        class="h-11 w-full rounded-lg border bg-surface px-3.5 text-sm text-ink placeholder:text-ink-faint transition-colors duration-fast disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint"
         :class="[
           error ? 'border-critical' : 'border-line-strong hover:border-ink-faint',
           $slots.prefix && 'pl-10',
