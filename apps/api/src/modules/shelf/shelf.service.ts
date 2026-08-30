@@ -7,6 +7,7 @@ import { PersonalMatchService } from '../scoring/personal-match.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { RoutineAnalysisService } from '../recommendation/routine-analysis.service';
 import type { AddShelfItemDto, UpdateShelfItemDto } from './dto/shelf.dto';
+import { publicProductWhere } from '../products/product-visibility';
 
 @Injectable()
 export class ShelfService {
@@ -53,7 +54,12 @@ export class ShelfService {
     if (!key) throw new NotFoundException('Tell us which product to add.');
 
     const product = await this.prisma.product.findFirst({
-      where: { OR: [{ id: key }, { slug: key }, { variants: { some: { ean: key } } }] },
+      where: {
+        AND: [
+          publicProductWhere(),
+          { OR: [{ id: key }, { slug: key }, { variants: { some: { ean: key } } }] },
+        ],
+      },
       select: { id: true },
     });
     if (!product) throw new NotFoundException('We do not have that product in the catalogue yet.');

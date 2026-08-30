@@ -19,6 +19,7 @@ import type { ViewerContext } from '../profile/viewer-context.service';
 import { PRODUCT_INCLUDE, type ProductRow } from './product.select';
 import { decimalToNumber, toProductDto, toProductSummary, toScorable } from './product.mapper';
 import type { ProductQueryDto } from './dto/product-query.dto';
+import { isProductVisible, publicProductWhere } from './product-visibility';
 import {
   SEARCH_PROVIDER,
   type RankedCandidate,
@@ -186,7 +187,9 @@ export class ProductsService {
 
   async findBySlug(slug: string, viewer: ViewerContext, locale: AnswerLocale): Promise<ProductDto> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
-    if (!row || !row.isActive) throw new NotFoundException('We could not find that product.');
+    if (!row || !isProductVisible(row)) {
+      throw new NotFoundException('We could not find that product.');
+    }
     return toProductDto(row, this.scoreOne(row, viewer), locale);
   }
 
@@ -247,7 +250,7 @@ export class ProductsService {
     candidates: RankedCandidate[] | null,
     viewer: ViewerContext,
   ): Promise<Prisma.ProductWhereInput> {
-    const and: Prisma.ProductWhereInput[] = [{ isActive: true }];
+    const and: Prisma.ProductWhereInput[] = [publicProductWhere()];
 
     // A declared allergy is a hard filter, not a ranking signal: such products
     // must not be listed at all, and the totals must not count them.

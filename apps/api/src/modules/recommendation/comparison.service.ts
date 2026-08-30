@@ -11,6 +11,7 @@ import { PersonalMatchService } from '../scoring/personal-match.service';
 import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../products/product.select';
 import { toProductDto, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
+import { publicProductWhere } from '../products/product-visibility';
 
 /**
  * Side-by-side comparison of 2-4 products, ending in an explicit recommendation.
@@ -36,7 +37,9 @@ export class ComparisonService {
     }
 
     const rows = await this.prisma.product.findMany({
-      where: { OR: [{ id: { in: unique } }, { slug: { in: unique } }] },
+      where: {
+        AND: [publicProductWhere(), { OR: [{ id: { in: unique } }, { slug: { in: unique } }] }],
+      },
       include: PRODUCT_INCLUDE,
     });
     if (rows.length < 2) {

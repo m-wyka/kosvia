@@ -13,6 +13,7 @@ import { CoarseMatchService } from '../scoring/coarse-match.service';
 import { PRODUCT_INCLUDE, type ProductRow } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
+import { publicProductWhere } from '../products/product-visibility';
 
 const COARSE_POOL_MIN = 80;
 const COARSE_POOL_FACTOR = 8;
@@ -67,7 +68,7 @@ export class RecommendationService {
     const { limit = 8, routineStep, maxPrice, excludeOwned = true } = options;
 
     const where: Prisma.ProductWhereInput = {
-      isActive: true,
+      ...publicProductWhere(),
       ...(routineStep && { category: { routineStep } }),
       ...(maxPrice !== undefined && { lowestPrice: { lte: new Prisma.Decimal(maxPrice) } }),
       ...(excludeOwned && viewer.shelf?.productIds.length
@@ -108,7 +109,7 @@ export class RecommendationService {
 
     const rows = await this.prisma.product.findMany({
       where: {
-        isActive: true,
+        ...publicProductWhere(),
         id: { not: subject.id },
         category: { routineStep: subject.category.routineStep },
       },
@@ -151,7 +152,7 @@ export class RecommendationService {
       const concernSlug = viewer.profile.concernSlugs[0];
       const rows = await this.prisma.product.findMany({
         where: {
-          isActive: true,
+          ...publicProductWhere(),
           ingredients: {
             some: { ingredient: { targetsConcerns: { some: { slug: concernSlug } } } },
           },
@@ -172,7 +173,10 @@ export class RecommendationService {
     const budgetCeiling = viewer.profile ? BUDGET_CEILING[viewer.profile.budget] : null;
     const affordableCeiling = budgetCeiling ?? 50;
     const affordable = await this.prisma.product.findMany({
-      where: { isActive: true, lowestPrice: { lte: new Prisma.Decimal(affordableCeiling) } },
+      where: {
+        ...publicProductWhere(),
+        lowestPrice: { lte: new Prisma.Decimal(affordableCeiling) },
+      },
       include: PRODUCT_INCLUDE,
       orderBy: [{ ingredientScore: 'desc' }],
       take: 40,
@@ -185,7 +189,7 @@ export class RecommendationService {
     });
 
     const fragranceFree = await this.prisma.product.findMany({
-      where: { isActive: true, isFragranceFree: true },
+      where: { ...publicProductWhere(), isFragranceFree: true },
       include: PRODUCT_INCLUDE,
       orderBy: { ingredientScore: 'desc' },
       take: 40,
@@ -198,7 +202,7 @@ export class RecommendationService {
     });
 
     const spf = await this.prisma.product.findMany({
-      where: { isActive: true, category: { routineStep: 'SPF' } },
+      where: { ...publicProductWhere(), category: { routineStep: 'SPF' } },
       include: PRODUCT_INCLUDE,
       take: 30,
     });
@@ -366,7 +370,7 @@ export class RecommendationService {
   private async cheapestPrice(step: RoutineStep, viewer: ViewerContext): Promise<number | null> {
     const result = await this.prisma.product.aggregate({
       where: {
-        isActive: true,
+        ...publicProductWhere(),
         category: { routineStep: step },
         lowestPrice: { not: null },
         ...(viewer.profile?.excludedBrandIds.length

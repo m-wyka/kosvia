@@ -256,7 +256,12 @@ useBreadcrumbJsonLd(
             {{ inComparison ? $t('PRODUCT.IN_COMPARISON') : $t('PRODUCT.COMPARE') }}
           </BaseButton>
 
-          <BaseButton size="lg" variant="ghost" @click="alertOpen = true">
+          <BaseButton
+            v-if="product.lowestPrice !== null"
+            size="lg"
+            variant="ghost"
+            @click="alertOpen = true"
+          >
             <template #icon><BaseIcon name="bell" :size="17" /></template>
             {{ $t('PRODUCT.PRICE_ALERT') }}
           </BaseButton>
@@ -333,7 +338,7 @@ useBreadcrumbJsonLd(
           :match="product.personalMatch"
           :slug="product.slug"
         />
-        <ProductOffers :product="product" />
+        <ProductOffers v-if="product.offers.length" :product="product" />
       </aside>
     </div>
 

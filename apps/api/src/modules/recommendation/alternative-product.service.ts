@@ -11,6 +11,7 @@ import { ProductTraitsService } from '../scoring/product-traits.service';
 import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../products/product.select';
 import { decimalToNumber, toProductSummary, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
+import { publicProductWhere } from '../products/product-visibility';
 
 type Scored = {
   row: ProductRow;
@@ -202,7 +203,7 @@ export class AlternativeProductService {
   private async candidatePool(subject: ProductRow): Promise<ProductRow[]> {
     return this.prisma.product.findMany({
       where: {
-        isActive: true,
+        ...publicProductWhere(),
         id: { not: subject.id },
         category: { routineStep: subject.category.routineStep },
       },

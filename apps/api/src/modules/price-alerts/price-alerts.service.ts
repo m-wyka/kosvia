@@ -7,6 +7,7 @@ import { decimalToNumber, toProductSummary, toScorable } from '../products/produ
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import type { CreatePriceAlertDto, UpdatePriceAlertDto } from './dto/price-alert.dto';
+import { publicProductWhere } from '../products/product-visibility';
 
 /**
  * Price alerts.
@@ -55,7 +56,9 @@ export class PriceAlertsService {
 
   async create(userId: string, dto: CreatePriceAlertDto): Promise<PriceAlertDto> {
     const product = await this.prisma.product.findFirst({
-      where: { OR: [{ id: dto.productId }, { slug: dto.productId }] },
+      where: {
+        AND: [publicProductWhere(), { OR: [{ id: dto.productId }, { slug: dto.productId }] }],
+      },
       select: { id: true },
     });
     if (!product) throw new NotFoundException('We could not find that product.');

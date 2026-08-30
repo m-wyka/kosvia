@@ -109,6 +109,7 @@ app receives only the URL variables, never database credentials or JWT secrets.
 | `API_PORT`, `API_URL`                       | Where the API listens; direct address for tooling and docs                        |
 | `API_INTERNAL_URL`                          | Where the Nuxt server reaches the API — SSR and the `/api` proxy the browser uses |
 | `FRONTEND_URL`                              | Drives CORS and canonical URLs                                                    |
+| `HIDE_DEMO_DATA`                            | `true` hides the seeded demo catalogue from public surfaces (imported data stays) |
 | `AI_PROVIDER`                               | `mock` (default, offline) or `anthropic`                                          |
 | `AI_API_KEY`, `AI_MODEL`                    | Only needed when `AI_PROVIDER=anthropic`                                          |
 | `SEED_USER_PASSWORD`, `SEED_ADMIN_PASSWORD` | Demo account passwords, seed only                                                 |

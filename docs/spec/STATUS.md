@@ -42,7 +42,8 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 3. Feedy afiliacyjne (`01` etap 4) — po publicznym uruchomieniu.
 4. Keyset (`05` §5), autocomplete w nagłówku (`05` §6) — gdy będzie nieskończony scroll.
 5. Retencja 24 mies. i maile (karencja usunięcia) — wymagają mailera; `User.lastActiveAt` już jest.
-6. Poza kodem: prawnik (`/privacy` to draft inżynierski, DPA z dostawcą LLM, DPIA); `User-Agent` klienta OBF ma placeholder `kontakt@kosvia.pl`.
+6. Przygotowanie pod publiczny start (2026-08-30): `HIDE_DEMO_DATA=true` chowa katalog demo (źródło `manual` lub brak źródła) na wszystkich publicznych ścieżkach (`publicProductWhere()` / `isProductVisible()` w `products/product-visibility.ts`; admin widzi wszystko); UI radzi sobie bez cen — karta ofert i przycisk alertu cenowego znikają, gdy produkt nie ma ofert. Smoke na dev: flaga on → 199 produktów (sam OBF), off → 331.
+7. Poza kodem: prawnik (`/privacy` to draft inżynierski, DPA z dostawcą LLM, DPIA); `User-Agent` klienta OBF ma placeholder `kontakt@kosvia.pl`.
 
 ## Środowisko
 

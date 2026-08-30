@@ -20,6 +20,7 @@ const MEDICAL_FALLBACK_EN =
 import { BeautyAdvisorService } from './beauty-advisor.service';
 import { findMedicalLanguage, REPHRASE_INSTRUCTION } from './medical-language';
 import { AI_PROVIDER, type AIProvider, type AnswerLocale } from './providers/ai-provider.interface';
+import { isProductVisible } from '../products/product-visibility';
 
 @Injectable()
 export class AIService {
@@ -131,7 +132,9 @@ export class AIService {
     locale: AnswerLocale = 'pl',
   ): Promise<{ explanation: string }> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
-    if (!row) throw new NotFoundException('We could not find that product.');
+    if (!row || !isProductVisible(row)) {
+      throw new NotFoundException('We could not find that product.');
+    }
 
     const scorable = toScorable(row);
     const breakdown = this.ingredientScore.compute(scorable.ingredients);
@@ -165,7 +168,9 @@ export class AIService {
   ): Promise<{ explanation: string }> {
     const viewer = await this.viewers.load(userId);
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
-    if (!row) throw new NotFoundException('We could not find that product.');
+    if (!row || !isProductVisible(row)) {
+      throw new NotFoundException('We could not find that product.');
+    }
 
     const score = this.match.score({
       product: toScorable(row),
