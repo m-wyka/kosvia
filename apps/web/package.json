@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "author": "Mateusz Wyka <m.wyka@o2.pl>",
   "description": "Kosvia web app (Nuxt 4, SSR, layered)",
   "scripts": {
     "dev": "nuxt dev",
