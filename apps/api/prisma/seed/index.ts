@@ -22,6 +22,7 @@ import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
 import { INGREDIENTS, INGREDIENT_ALIASES } from './data/ingredients';
 import INGREDIENT_PROSE_PL from './data/ingredients.pl.json';
 import { FORMULAS } from './data/formulas';
+import { seedAppReviews } from './reviews';
 
 const prisma = new PrismaClient();
 
@@ -561,6 +562,12 @@ async function main(): Promise<void> {
       },
     ],
   });
+
+  /* --------------------------------------------------------- app reviews -- */
+
+  console.log('› Portal reviews');
+  const reviewCount = await seedAppReviews(prisma);
+  console.log(`  created ${reviewCount} reviewers with reviews`);
 
   /* -------------------------------------------------------------- traits -- */
 

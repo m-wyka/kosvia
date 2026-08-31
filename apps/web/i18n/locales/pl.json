@@ -54,6 +54,7 @@
     "INGREDIENT_LIBRARY": "Baza składników",
     "ABOUT_DATA": "O danych",
     "PRIVACY": "Prywatność",
+    "REVIEWS": "Opinie",
     "RIGHTS": "© {year} Kosvia. Wersja demonstracyjna."
   },
   "VOCAB": {
@@ -419,7 +420,43 @@
       "BODY": "Dwie minuty pytań i każdy produkt w katalogu dostaje wynik, który coś dla Ciebie znaczy.",
       "PRIMARY": "Dobierz moje kosmetyki",
       "SECONDARY": "Przeglądaj katalog"
+    },
+    "REVIEWS": {
+      "EYEBROW": "Opinie",
+      "TITLE": "Co mówią użytkownicy Kosvii",
+      "DESCRIPTION": "Prawdziwe wrażenia osób, które wybierają kosmetyki z Kosvią.",
+      "AVERAGE_LABEL": "na podstawie {count} opinii | na podstawie {count} opinii",
+      "CTA": "Zobacz wszystkie opinie"
     }
+  },
+  "REVIEWS": {
+    "TITLE": "Opinie",
+    "SUBTITLE": "Co użytkownicy sądzą o Kosvii — i miejsce na Twoją własną opinię.",
+    "SUMMARY_COUNT": "{count} opinia | {count} opinie | {count} opinii",
+    "RATING_LABEL": "{rating} na 5 gwiazdek",
+    "ANONYMOUS_AUTHOR": "Użytkownik Kosvii",
+    "SORT_LABEL": "Sortuj",
+    "SORT_NEWEST": "Najnowsze",
+    "SORT_OLDEST": "Najstarsze",
+    "SORT_RATING_DESC": "Najwyższa ocena",
+    "SORT_RATING_ASC": "Najniższa ocena",
+    "FORM_TITLE": "Podziel się opinią",
+    "FORM_RATING_LABEL": "Twoja ocena",
+    "FORM_BODY_LABEL": "Twoja opinia",
+    "FORM_BODY_HINT": "Co najmniej {min} znaków. Opinii nie da się później edytować — można ją tylko usunąć i napisać nową.",
+    "FORM_SUBMIT": "Opublikuj opinię",
+    "FORM_SAVED": "Dziękujemy! Twoja opinia jest już widoczna.",
+    "RATING_REQUIRED": "Najpierw wybierz ocenę w gwiazdkach.",
+    "BODY_TOO_SHORT": "Napisz co najmniej {min} znaków.",
+    "YOUR_REVIEW": "Twoja opinia",
+    "DELETE": "Usuń swoją opinię",
+    "DELETED": "Twoja opinia została usunięta.",
+    "CONFIRM_DELETE": "Usunąć Twoją opinię? Tego nie da się cofnąć, ale możesz napisać nową.",
+    "LOGIN_TITLE": "Znasz już Kosvię?",
+    "LOGIN_BODY": "Zaloguj się, aby ocenić portal i podzielić się wrażeniami — jedna opinia na konto.",
+    "LOGIN_CTA": "Zaloguj się, aby ocenić",
+    "EMPTY_TITLE": "Nie ma jeszcze opinii",
+    "EMPTY_BODY": "Podziel się jako pierwsza osoba tym, co sądzisz o Kosvii."
   },
   "AUTH": {
     "LOGIN_TITLE": "Dobrze Cię widzieć",
@@ -901,6 +938,10 @@
       "TITLE": "Polityka prywatności",
       "DESCRIPTION": "Co Kosvia o Tobie przechowuje, po co i co możesz z tym zrobić."
     },
+    "REVIEWS": {
+      "TITLE": "Opinie — co użytkownicy mówią o Kosvii",
+      "DESCRIPTION": "Oceny i opinie o portalu Kosvia od jego użytkowników, z ogólną oceną w skali 5 gwiazdek."
+    },
     "DISCOVER": {
       "TITLE": "Odkrywaj kosmetyki dobrane dla Ciebie",
       "DESCRIPTION": "Przeglądaj kosmetyki według kategorii, problemu i budżetu. Każdy produkt oceniany pod Twoją skórę, cele i to, co już masz."
@@ -982,7 +1023,9 @@
       "OFFERS": "Oferty · Admin",
       "OFFERS_DESCRIPTION": "Zarządzaj ofertami sklepów.",
       "USERS": "Użytkownicy · Admin",
-      "USERS_DESCRIPTION": "Zarządzaj kontami użytkowników."
+      "USERS_DESCRIPTION": "Zarządzaj kontami użytkowników.",
+      "REVIEWS": "Opinie o portalu · Admin",
+      "REVIEWS_DESCRIPTION": "Moderuj opinie o portalu."
     }
   },
   "ADMIN": {
@@ -1004,6 +1047,7 @@
       "STORES": "Sklepy",
       "OFFERS": "Oferty",
       "USERS": "Użytkownicy",
+      "REVIEWS": "Opinie",
       "OPEN": "Otwórz menu administratora",
       "ARIA": "Administracja"
     },
@@ -1304,6 +1348,26 @@
         "PREMIUM": "Premium",
         "CANCELLED": "Anulowany"
       }
+    },
+    "REVIEWS": {
+      "TITLE": "Opinie o portalu",
+      "SUBTITLE": "Co użytkownicy mówią o Kosvii; ukryte opinie znikają z publicznej listy.",
+      "EMPTY": "Nie znaleziono opinii",
+      "SEARCH_PLACEHOLDER": "Szukaj po treści, e-mailu lub imieniu…",
+      "COL_AUTHOR": "Autor",
+      "COL_RATING": "Ocena",
+      "COL_BODY": "Opinia",
+      "COL_STATUS": "Status",
+      "COL_CREATED": "Dodano",
+      "STATUS_VISIBLE": "Widoczna",
+      "STATUS_HIDDEN": "Ukryta",
+      "HIDE": "Ukryj",
+      "UNHIDE": "Pokaż",
+      "HIDDEN_DONE": "Opinia ukryta",
+      "SHOWN_DONE": "Opinia znów widoczna",
+      "DELETED": "Opinia usunięta",
+      "CONFIRM_DELETE": "Usunąć opinię użytkownika {email}? Tego nie da się cofnąć.",
+      "DELETE_ARIA": "Usuń opinię użytkownika {email}"
     }
   },
   "GENERATED": {

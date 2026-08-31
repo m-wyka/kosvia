@@ -17,6 +17,7 @@ import {
 } from 'class-validator';
 import {
   AliasKind,
+  AppReviewStatus,
   Availability,
   RoutineStep,
   SkinType,
@@ -30,6 +31,14 @@ export class AdminListQueryDto {
   @IsOptional() @IsString() @MaxLength(120) q?: string;
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) page?: number;
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100) pageSize?: number;
+}
+
+export class AdminAppReviewQueryDto extends AdminListQueryDto {
+  @IsOptional() @IsEnum(AppReviewStatus) status?: AppReviewStatus;
+}
+
+export class UpdateAppReviewStatusDto {
+  @IsEnum(AppReviewStatus) status!: AppReviewStatus;
 }
 
 export class UpsertBrandDto {

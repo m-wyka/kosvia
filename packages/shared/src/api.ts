@@ -508,6 +508,39 @@ export interface PriceAlertDto {
 }
 
 /* -------------------------------------------------------------------------- */
+/* App reviews                                                                */
+/* -------------------------------------------------------------------------- */
+
+export const APP_REVIEW_SORTS = ['newest', 'oldest', 'rating-desc', 'rating-asc'] as const;
+export type AppReviewSort = (typeof APP_REVIEW_SORTS)[number];
+
+export interface AppReviewDto {
+  id: string;
+  rating: number;
+  body: string;
+  authorName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AppReviewSummary {
+  /** Rounded to one decimal; null when there are no visible reviews. */
+  average: number | null;
+  count: number;
+  /** Index 0 = 1 star … index 4 = 5 stars. */
+  distribution: [number, number, number, number, number];
+}
+
+export interface AppReviewListResult extends PaginatedResult<AppReviewDto> {
+  summary: AppReviewSummary;
+}
+
+export interface CreateAppReviewPayload {
+  rating: number;
+  body: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /* AI OUTPUT                                                                  */
 /* -------------------------------------------------------------------------- */
 

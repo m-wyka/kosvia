@@ -32,6 +32,7 @@ const sections = [
     title: 'ADMIN.NAV.PEOPLE',
     links: [
       { to: '/admin/users', label: 'ADMIN.NAV.USERS', icon: 'user' as const },
+      { to: '/admin/reviews', label: 'ADMIN.NAV.REVIEWS', icon: 'star' as const },
       { to: '/admin/audit', label: 'ADMIN.NAV.AUDIT', icon: 'shield' as const },
       { to: '/admin/match-weights', label: 'ADMIN.NAV.MATCH_WEIGHTS', icon: 'sparkles' as const },
     ],

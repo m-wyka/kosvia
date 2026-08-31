@@ -45,7 +45,7 @@ const DOSE = /\b\d+(?:[.,]\d+)?\s*(?:%|mg\/g|mg)(?:\s*w\/w)?|\b\d+(?:[.,]\d+)?\s
 
 export const cleanLabel = (raw: string): string =>
   raw
-    .replace(/ /g, ' ')
+    .replace(/\u00a0/g, ' ')
     .replace(/[\r\n]+/g, ' ')
     .replace(LABEL_PREFIX, '')
     .replace(SECTION_HEADERS, ', ')

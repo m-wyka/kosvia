@@ -67,6 +67,12 @@ export type ExclusionReason = (typeof EXCLUSION_REASONS)[number];
 export const TOKEN_STATUSES = ['PENDING', 'MAPPED', 'NEW_INGREDIENT', 'IGNORED'] as const;
 export type TokenStatus = (typeof TOKEN_STATUSES)[number];
 
+export const APP_REVIEW_STATUSES = ['VISIBLE', 'HIDDEN'] as const;
+export type AppReviewStatus = (typeof APP_REVIEW_STATUSES)[number];
+
+export const APP_REVIEW_BODY_MIN_LENGTH = 20;
+export const APP_REVIEW_BODY_MAX_LENGTH = 1000;
+
 /** Ingredient functional tags — drives the grouped ingredient UI. */
 export const INGREDIENT_TAGS = [
   'humectant',

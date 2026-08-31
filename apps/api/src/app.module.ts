@@ -15,6 +15,7 @@ import { ScoringModule } from './modules/scoring/scoring.module';
 import { RecommendationModule } from './modules/recommendation/recommendation.module';
 import { ShelfModule } from './modules/shelf/shelf.module';
 import { PriceAlertsModule } from './modules/price-alerts/price-alerts.module';
+import { AppReviewsModule } from './modules/app-reviews/app-reviews.module';
 import { AIModule } from './modules/ai/ai.module';
 import { DiscoveryModule } from './modules/discovery/discovery.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -40,6 +41,7 @@ import { HealthController } from './health.controller';
     RecommendationModule,
     ShelfModule,
     PriceAlertsModule,
+    AppReviewsModule,
     AIModule,
     DiscoveryModule,
     AdminModule,

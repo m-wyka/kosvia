@@ -35,11 +35,13 @@ import { UnmatchedTokenService } from '../inci/unmatched-token.service';
 import { ImportRunService } from '../import/import-run.service';
 import { MatchWeightService } from '../scoring/match-weight.service';
 import {
+  AdminAppReviewQueryDto,
   AdminListQueryDto,
   CreateMatchWeightSetDto,
   ImportLabelDto,
   MapTokenDto,
   UnmatchedTokenQueryDto,
+  UpdateAppReviewStatusDto,
   UpdateUserDto,
   UpsertBrandDto,
   UpsertCategoryDto,
@@ -238,6 +240,22 @@ export class AdminController {
   }
   @Delete('offers/:id') @HttpCode(HttpStatus.NO_CONTENT) deleteOffer(@Param('id') id: string) {
     return this.admin.deleteOffer(id);
+  }
+
+  /* ----------------------------------------------------------- app reviews -- */
+  @Get('app-reviews') listAppReviews(@Query() query: AdminAppReviewQueryDto) {
+    return this.admin.listAppReviews(query);
+  }
+
+  @Patch('app-reviews/:id')
+  updateAppReviewStatus(@Param('id') id: string, @Body() dto: UpdateAppReviewStatusDto) {
+    return this.admin.updateAppReviewStatus(id, dto.status);
+  }
+
+  @Delete('app-reviews/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteAppReview(@Param('id') id: string) {
+    return this.admin.deleteAppReview(id);
   }
 
   /* --------------------------------------------------------------- users -- */

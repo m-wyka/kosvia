@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, type AppReviewStatus } from '@prisma/client';
 import { slugify } from '@kosvia/shared';
 import type { AdminStatsDto, AuditLogDto, PaginatedResult } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -10,6 +10,7 @@ import { toVolumeUnitEnum, toVolumeUnitDto } from '../products/volume-unit';
 import { normalizeToken } from '../inci/inci-parser';
 import { MANUAL_SOURCE_CODE } from '../import/data-sources';
 import type {
+  AdminAppReviewQueryDto,
   AdminListQueryDto,
   ProductIngredientInputDto,
   UpdateUserDto,
@@ -491,6 +492,45 @@ export class AdminService {
 
   /* --------------------------------------------------------------- users -- */
 
+  async listAppReviews(query: AdminAppReviewQueryDto) {
+    const where: Prisma.AppReviewWhereInput = {
+      ...(query.status && { status: query.status }),
+      ...(query.q && {
+        OR: [
+          { body: { contains: query.q, mode: 'insensitive' } },
+          { user: { email: { contains: query.q, mode: 'insensitive' } } },
+          { user: { name: { contains: query.q, mode: 'insensitive' } } },
+        ],
+      }),
+    };
+    return this.paginate(
+      query,
+      () => this.prisma.appReview.count({ where }),
+      (skip, take) =>
+        this.prisma.appReview.findMany({
+          where,
+          skip,
+          take,
+          orderBy: { createdAt: 'desc' },
+          include: { user: { select: { email: true, name: true } } },
+        }),
+    );
+  }
+
+  async updateAppReviewStatus(id: string, status: AppReviewStatus) {
+    await this.assertExists('appReview', id);
+    return this.prisma.appReview.update({
+      where: { id },
+      data: { status },
+      include: { user: { select: { email: true, name: true } } },
+    });
+  }
+
+  async deleteAppReview(id: string) {
+    await this.assertExists('appReview', id);
+    await this.prisma.appReview.delete({ where: { id } });
+  }
+
   async listUsers(query: AdminListQueryDto) {
     const where: Prisma.UserWhereInput = query.q
       ? {
@@ -672,7 +712,7 @@ export class AdminService {
   }
 
   private async assertExists(
-    model: 'brand' | 'category' | 'ingredient' | 'product' | 'store' | 'user',
+    model: 'appReview' | 'brand' | 'category' | 'ingredient' | 'product' | 'store' | 'user',
     id: string,
   ): Promise<void> {
     const delegate = this.prisma[model] as unknown as {

@@ -125,6 +125,7 @@ model User {
   refreshTokens RefreshToken[]
   submissions   ProductSubmission[]
   consents      UserConsent[]
+  appReview     AppReview?
   deletionRequest AccountDeletionRequest?
 
   @@index([role])
@@ -838,6 +839,29 @@ model PriceAlert {
   @@unique([userId, productId])
   @@index([userId, active])
   @@map("price_alerts")
+}
+
+enum AppReviewStatus {
+  VISIBLE
+  HIDDEN
+}
+
+/// A user's one review of the portal itself (not of a product). Immutable for
+/// the author — they can only delete it and write a new one; admins can hide it.
+model AppReview {
+  id        String          @id @default(cuid())
+  userId    String          @unique
+  rating    Int
+  body      String
+  status    AppReviewStatus @default(VISIBLE)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([status, rating])
+  @@map("app_reviews")
 }
 
 /// Comparison history — lets us restore a comparison from a shared link and,

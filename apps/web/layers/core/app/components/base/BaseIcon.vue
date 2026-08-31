@@ -8,6 +8,8 @@ type IconName =
   | 'chevron-left'
   | 'heart'
   | 'heart-filled'
+  | 'star'
+  | 'star-filled'
   | 'sparkles'
   | 'scan'
   | 'shelf'
@@ -51,6 +53,9 @@ const paths: Record<IconName, string> = {
     'M12 20s-7.5-4.6-7.5-9.4A4.1 4.1 0 0 1 12 7.7a4.1 4.1 0 0 1 7.5 2.9C19.5 15.4 12 20 12 20Z',
   'heart-filled':
     'M12 20s-7.5-4.6-7.5-9.4A4.1 4.1 0 0 1 12 7.7a4.1 4.1 0 0 1 7.5 2.9C19.5 15.4 12 20 12 20Z',
+  star: 'm12 4.5 2.32 4.7 5.18.75-3.75 3.66.89 5.16L12 16.33l-4.64 2.44.89-5.16L4.5 9.95l5.18-.75L12 4.5Z',
+  'star-filled':
+    'm12 4.5 2.32 4.7 5.18.75-3.75 3.66.89 5.16L12 16.33l-4.64 2.44.89-5.16L4.5 9.95l5.18-.75L12 4.5Z',
   sparkles:
     'M12 3v5M12 16v5M4.5 12h5M14.5 12h5M6.6 6.6l3 3M14.4 14.4l3 3M17.4 6.6l-3 3M9.6 14.4l-3 3',
   scan: 'M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16',
@@ -89,7 +94,7 @@ const paths: Record<IconName, string> = {
     :width="size"
     :height="size"
     viewBox="0 0 24 24"
-    :fill="name === 'heart-filled' ? 'currentColor' : 'none'"
+    :fill="name === 'heart-filled' || name === 'star-filled' ? 'currentColor' : 'none'"
     stroke="currentColor"
     :stroke-width="strokeWidth"
     stroke-linecap="round"

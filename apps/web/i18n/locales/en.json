@@ -54,6 +54,7 @@
     "INGREDIENT_LIBRARY": "Ingredient library",
     "ABOUT_DATA": "About the data",
     "PRIVACY": "Privacy",
+    "REVIEWS": "Reviews",
     "RIGHTS": "© {year} Kosvia. Demo build."
   },
   "VOCAB": {
@@ -419,7 +420,43 @@
       "BODY": "Two minutes of questions, and every product in the catalogue gets a score that means something to you specifically.",
       "PRIMARY": "Find my cosmetics",
       "SECONDARY": "Browse the catalogue"
+    },
+    "REVIEWS": {
+      "EYEBROW": "Reviews",
+      "TITLE": "What Kosvia users say",
+      "DESCRIPTION": "Real impressions from people who choose their cosmetics with Kosvia.",
+      "AVERAGE_LABEL": "based on {count} review | based on {count} reviews",
+      "CTA": "See all reviews"
     }
+  },
+  "REVIEWS": {
+    "TITLE": "Reviews",
+    "SUBTITLE": "What users think of Kosvia — and a place to add your own review.",
+    "SUMMARY_COUNT": "{count} review | {count} reviews",
+    "RATING_LABEL": "{rating} out of 5 stars",
+    "ANONYMOUS_AUTHOR": "Kosvia user",
+    "SORT_LABEL": "Sort by",
+    "SORT_NEWEST": "Newest",
+    "SORT_OLDEST": "Oldest",
+    "SORT_RATING_DESC": "Highest rating",
+    "SORT_RATING_ASC": "Lowest rating",
+    "FORM_TITLE": "Share your review",
+    "FORM_RATING_LABEL": "Your rating",
+    "FORM_BODY_LABEL": "Your review",
+    "FORM_BODY_HINT": "At least {min} characters. A review cannot be edited later — only deleted and written again.",
+    "FORM_SUBMIT": "Publish review",
+    "FORM_SAVED": "Thank you! Your review is now live.",
+    "RATING_REQUIRED": "Pick a star rating first.",
+    "BODY_TOO_SHORT": "Write at least {min} characters.",
+    "YOUR_REVIEW": "Your review",
+    "DELETE": "Delete your review",
+    "DELETED": "Your review has been deleted.",
+    "CONFIRM_DELETE": "Delete your review? This cannot be undone, but you can write a new one.",
+    "LOGIN_TITLE": "Have you tried Kosvia?",
+    "LOGIN_BODY": "Sign in to rate the portal and share your experience — one review per account.",
+    "LOGIN_CTA": "Sign in to review",
+    "EMPTY_TITLE": "No reviews yet",
+    "EMPTY_BODY": "Be the first to share what you think of Kosvia."
   },
   "AUTH": {
     "LOGIN_TITLE": "Welcome back",
@@ -907,6 +944,7 @@
       "STORES": "Stores",
       "OFFERS": "Offers",
       "USERS": "Users",
+      "REVIEWS": "Reviews",
       "OPEN": "Open admin menu",
       "ARIA": "Admin"
     },
@@ -1207,6 +1245,26 @@
         "PREMIUM": "Premium",
         "CANCELLED": "Cancelled"
       }
+    },
+    "REVIEWS": {
+      "TITLE": "Portal reviews",
+      "SUBTITLE": "What users say about Kosvia; hidden reviews leave the public list.",
+      "EMPTY": "No reviews found",
+      "SEARCH_PLACEHOLDER": "Search by text, email or name…",
+      "COL_AUTHOR": "Author",
+      "COL_RATING": "Rating",
+      "COL_BODY": "Review",
+      "COL_STATUS": "Status",
+      "COL_CREATED": "Added",
+      "STATUS_VISIBLE": "Visible",
+      "STATUS_HIDDEN": "Hidden",
+      "HIDE": "Hide",
+      "UNHIDE": "Show",
+      "HIDDEN_DONE": "Review hidden",
+      "SHOWN_DONE": "Review visible again",
+      "DELETED": "Review deleted",
+      "CONFIRM_DELETE": "Delete the review by {email}? This cannot be undone.",
+      "DELETE_ARIA": "Delete the review by {email}"
     }
   },
   "SEO": {
@@ -1221,6 +1279,10 @@
     "PRIVACY": {
       "TITLE": "Privacy policy",
       "DESCRIPTION": "What Kosvia stores about you, why, and what you can do about it."
+    },
+    "REVIEWS": {
+      "TITLE": "Reviews — what users say about Kosvia",
+      "DESCRIPTION": "Ratings and reviews of the Kosvia portal from its users, with an overall score out of 5 stars."
     },
     "DISCOVER": {
       "TITLE": "Discover cosmetics chosen for you",
@@ -1303,7 +1365,9 @@
       "OFFERS": "Offers · Admin",
       "OFFERS_DESCRIPTION": "Manage store offers.",
       "USERS": "Users · Admin",
-      "USERS_DESCRIPTION": "Manage user accounts."
+      "USERS_DESCRIPTION": "Manage user accounts.",
+      "REVIEWS": "Portal reviews · Admin",
+      "REVIEWS_DESCRIPTION": "Moderate portal reviews."
     }
   },
   "GENERATED": {

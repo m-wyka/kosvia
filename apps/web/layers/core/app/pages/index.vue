@@ -202,5 +202,6 @@ useHead({
     <LandingPricing />
     <LandingFaq />
     <LandingCta />
+    <LandingReviews />
   </div>
 </template>
