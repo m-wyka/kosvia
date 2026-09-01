@@ -170,7 +170,7 @@ useSeo(() => ({
               </BaseButton>
               <button
                 type="button"
-                class="rounded-md p-2 text-ink-faint transition-colors hover:text-critical cursor-pointer"
+                class="rounded-md p-2 text-ink-faint transition-colors hover:text-critical"
                 :aria-label="$t('ALERTS.DELETE', { name: alert.product.name })"
                 @click="remove(alert)"
               >

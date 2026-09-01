@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ text: string }>();
+withDefaults(defineProps<{ text: string; align?: 'center' | 'end' }>(), { align: 'center' });
 const open = ref(false);
 </script>
 
@@ -21,7 +21,8 @@ const open = ref(false);
       <span
         v-if="open"
         role="tooltip"
-        class="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-max max-w-56 -translate-x-1/2 rounded-md bg-ink px-2.5 py-1.5 text-xs leading-snug text-ink-inverse shadow-md"
+        class="pointer-events-none absolute bottom-full z-30 mb-2 w-max max-w-56 rounded-md bg-ink px-2.5 py-1.5 text-xs leading-snug text-ink-inverse shadow-md"
+        :class="align === 'end' ? 'right-0' : 'left-1/2 -translate-x-1/2'"
       >
         {{ text }}
       </span>

@@ -17,7 +17,7 @@ const id = useId();
       :aria-checked="model ? 'true' : 'false'"
       :aria-label="label"
       :disabled="disabled"
-      class="flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-pill border px-0.5 transition-colors duration-base disabled:cursor-not-allowed disabled:opacity-55"
+      class="flex h-6 w-11 shrink-0 items-center rounded-pill border px-0.5 transition-colors duration-base disabled:cursor-not-allowed disabled:opacity-55"
       :class="model ? 'border-ink bg-ink' : 'border-line-strong bg-canvas-deep'"
       @click="model = !model"
     >

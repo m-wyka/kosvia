@@ -41,7 +41,7 @@ watch(
     <button
       ref="triggerButton"
       type="button"
-      class="flex cursor-pointer items-center rounded-full transition-colors hover:bg-surface-muted"
+      class="flex items-center rounded-full transition-colors hover:bg-surface-muted"
       :class="isOpen && 'bg-surface-muted'"
       :aria-expanded="isOpen"
       :aria-controls="menuId"
@@ -97,7 +97,7 @@ watch(
 
         <button
           type="button"
-          class="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
+          class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
           @click="signOut"
         >
           <BaseIcon name="logout" :size="16" />

@@ -167,7 +167,7 @@ useSeo(() => ({
               <h2 class="font-display text-xl text-ink">{{ $t('REVIEWS.YOUR_REVIEW') }}</h2>
               <button
                 type="button"
-                class="rounded-md p-2 text-ink-faint transition-colors hover:text-critical cursor-pointer"
+                class="rounded-md p-2 text-ink-faint transition-colors hover:text-critical"
                 :aria-label="$t('REVIEWS.DELETE')"
                 @click="removeMyReview"
               >

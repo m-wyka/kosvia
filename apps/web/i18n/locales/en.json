@@ -828,7 +828,11 @@
       "SHARED": "{count} shared ingredient | {count} shared ingredients",
       "ONLY_IN": "Only in {name}",
       "NONE_SHARED": "These formulas have no ingredients in common.",
-      "NONE_UNIQUE": "Nothing beyond the shared ingredients."
+      "NONE_UNIQUE": "Nothing beyond the shared ingredients.",
+      "LEGEND": {
+        "FLAGGED": "Listed in the EU regulatory annexes (restricted or prohibited use)",
+        "ACTIVE": "Active ingredient (retinoids, acids, vitamin C and the like)"
+      }
     },
     "NOTE": "Price per 100 ml is the fairest way to compare products of different sizes. Personal Match is computed from your profile, not from reviews.",
     "TRAY": {

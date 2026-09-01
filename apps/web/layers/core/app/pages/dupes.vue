@@ -89,7 +89,7 @@ useSeo(() => ({
 
       <ul
         v-if="results.length"
-        class="mt-2 divide-y divide-line rounded-xl border border-line bg-surface"
+        class="mt-2 divide-y divide-line rounded-xl border border-line bg-surface overflow-hidden"
       >
         <li v-for="product in results" :key="product.id">
           <button

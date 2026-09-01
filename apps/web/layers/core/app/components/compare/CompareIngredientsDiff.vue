@@ -137,5 +137,16 @@ const isFlagged = (ingredient: IngredientDto): boolean => {
         </ul>
       </div>
     </div>
+
+    <ul class="mt-4 flex flex-col gap-x-5 gap-y-2 text-xs text-ink-muted">
+      <li class="flex items-center gap-1.5">
+        <span class="inline-block size-4 rounded-pill border border-caution" aria-hidden="true" />
+        {{ $t('COMPARE.DIFF.LEGEND.FLAGGED') }}
+      </li>
+      <li class="flex items-center gap-1.5">
+        <BaseIcon name="sparkles" :size="16" aria-hidden="true" />
+        {{ $t('COMPARE.DIFF.LEGEND.ACTIVE') }}
+      </li>
+    </ul>
   </section>
 </template>

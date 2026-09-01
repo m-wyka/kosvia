@@ -112,7 +112,7 @@ watch(
 
         <button
           type="button"
-          class="rounded-md p-2 text-ink-soft cursor-pointer transition-colors hover:bg-surface-muted lg:hidden"
+          class="rounded-md p-2 text-ink-soft transition-colors hover:bg-surface-muted lg:hidden"
           :aria-expanded="menuOpen"
           aria-controls="mobile-menu"
           :aria-label="$t('NAV.MENU')"

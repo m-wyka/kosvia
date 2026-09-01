@@ -31,6 +31,10 @@ const popping = ref(false);
 
 const inComparison = computed(() => isInCompareTray(props.product.id));
 
+const compareTooltip = computed(() =>
+  inComparison.value ? t('PRODUCT.IN_COMPARISON') : t('PRODUCT.COMPARE'),
+);
+
 const defaultVariant = computed(() => props.product.variants[0] ?? null);
 
 const topReasonChip = computed(() =>
@@ -134,25 +138,26 @@ const handleFavoriteClick = () => {
           :unit="product.volumeUnit"
           size="sm"
         />
-        <button
-          v-if="showCompare"
-          type="button"
-          class="relative z-10 rounded-md p-1.5 transition-colors"
-          :class="
-            inComparison
-              ? 'bg-ink text-ink-inverse'
-              : 'text-ink-muted hover:bg-surface-muted hover:text-ink'
-          "
-          :aria-label="
-            inComparison
-              ? $t('PRODUCT.REMOVE_COMPARE', { name: product.name })
-              : $t('PRODUCT.ADD_COMPARE', { name: product.name })
-          "
-          :aria-pressed="inComparison"
-          @click.stop.prevent="toggleCompare(product)"
-        >
-          <BaseIcon name="compare" :size="16" />
-        </button>
+        <BaseTooltip v-if="showCompare" :text="compareTooltip" align="end" class="relative z-10">
+          <button
+            type="button"
+            class="rounded-md p-1.5 transition-colors"
+            :class="
+              inComparison
+                ? 'bg-ink text-ink-inverse'
+                : 'text-ink-muted hover:bg-surface-muted hover:text-ink'
+            "
+            :aria-label="
+              inComparison
+                ? $t('PRODUCT.REMOVE_COMPARE', { name: product.name })
+                : $t('PRODUCT.ADD_COMPARE', { name: product.name })
+            "
+            :aria-pressed="inComparison"
+            @click.stop.prevent="toggleCompare(product)"
+          >
+            <BaseIcon name="compare" :size="16" />
+          </button>
+        </BaseTooltip>
       </div>
     </div>
   </article>

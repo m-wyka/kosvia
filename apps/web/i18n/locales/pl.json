@@ -828,7 +828,11 @@
       "SHARED": "{count} wspólny składnik | {count} wspólne składniki | {count} wspólnych składników",
       "ONLY_IN": "Tylko w {name}",
       "NONE_SHARED": "Te formuły nie mają wspólnych składników.",
-      "NONE_UNIQUE": "Nic poza wspólnymi składnikami."
+      "NONE_UNIQUE": "Nic poza wspólnymi składnikami.",
+      "LEGEND": {
+        "FLAGGED": "Wpis w unijnych aneksach regulacyjnych (użycie ograniczone lub zakazane)",
+        "ACTIVE": "Składnik aktywny (retinoidy, kwasy, witamina C itp.)"
+      }
     },
     "NOTE": "Cena za 100 ml to najuczciwszy sposób porównania produktów o różnych pojemnościach. Dopasowanie liczone jest z Twojego profilu, nie z recenzji.",
     "TRAY": {
