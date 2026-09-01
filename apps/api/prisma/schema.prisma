@@ -114,6 +114,8 @@ model User {
   birthDate          DateTime?
   /// Last login or token refresh — drives the inactivity retention policy.
   lastActiveAt       DateTime?
+  /// Regulatory alerts older than this are considered dismissed by the user.
+  regulatoryAlertsSeenAt DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -233,6 +235,7 @@ model BeautyProfile {
   preferredBrands     Brand[]         @relation("ProfilePreferredBrands")
   excludedBrands      Brand[]         @relation("ProfileExcludedBrands")
   excludedIngredients ProfileExcludedIngredient[]
+  diaryEntries        SkinDiaryEntry[]
 
   @@map("beauty_profiles")
 }
@@ -312,6 +315,9 @@ model Category {
   routineStep RoutineStep @default(OTHER)
   /// Ordering hint for navigation menus.
   sortOrder   Int         @default(0)
+  /// Typical period-after-opening (months) for this kind of product; the
+  /// product-level override wins when the label says otherwise.
+  paoMonths   Int?
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryTree")
@@ -342,6 +348,11 @@ model Product {
   ingredientScore Int        @default(50)
   /// Denormalised cheapest active offer price, for sorting/filtering at scale.
   lowestPrice     Decimal?   @db.Decimal(10, 2)
+  /// Denormalised price per 100 ml/g of the default variant's cheapest offer;
+  /// NULL for piece-based or unpriced products. Kept in step with lowestPrice.
+  pricePerHundred Decimal?   @db.Decimal(10, 2)
+  /// Label override of the category's period-after-opening (months).
+  paoMonths       Int?
   isActive        Boolean    @default(true)
   /// Generated in SQL from name, highlights and description — see the
   /// add_search_extensions_and_indexes migration. Prisma never writes it.
@@ -364,10 +375,12 @@ model Product {
   source      DataSource?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   shelfItems  UserShelfItem[]
   priceAlerts PriceAlert[]
+  formulaRevisions ProductFormulaRevision[]
 
   @@index([brandId])
   @@index([categoryId])
   @@index([lowestPrice])
+  @@index([pricePerHundred])
   @@index([ingredientScore])
   @@index([isActive, categoryId])
   @@index([name])
@@ -431,6 +444,7 @@ model Ingredient {
   targetsConcerns BeautyConcern[]     @relation("IngredientTargetsConcerns")
   supportsGoals   BeautyGoal[]        @relation("IngredientSupportsGoals")
   excludedByProfiles ProfileExcludedIngredient[]
+  regulatoryChanges  RegulatoryChange[]
 
   @@index([inciName])
   @@index([normalizedName])
@@ -637,6 +651,7 @@ model DataSource {
   productIngredients ProductIngredient[]
   offers             ProductOffer[]
   importRuns         ImportRun[]
+  formulaRevisions   ProductFormulaRevision[]
 
   @@map("data_sources")
 }
@@ -661,6 +676,7 @@ model ImportRun {
   finishedAt DateTime?
 
   source DataSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  regulatoryChanges RegulatoryChange[]
 
   @@index([sourceId, startedAt])
   @@map("import_runs")
@@ -846,6 +862,54 @@ enum AppReviewStatus {
   HIDDEN
 }
 
+enum RegulatoryChangeKind {
+  BECAME_PROHIBITED
+  BECAME_RESTRICTED
+  PROHIBITION_LIFTED
+  RESTRICTION_LIFTED
+}
+
+/// One day of the user's own skin observations — their words, never a
+/// diagnosis. Hangs off BeautyProfile so withdrawing the health consent
+/// removes the diary together with the profile, with no extra deletion code.
+model SkinDiaryEntry {
+  id            String   @id @default(cuid())
+  profileId     String
+  date          DateTime @db.Date
+  overall       Int
+  hasBreakouts  Boolean  @default(false)
+  hasDryness    Boolean  @default(false)
+  hasIrritation Boolean  @default(false)
+  hasRedness    Boolean  @default(false)
+  note          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  profile BeautyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, date])
+  @@map("skin_diary_entries")
+}
+
+/// One observed flip of an ingredient's Annex II/III status between CosIng
+/// imports — the source of the in-app regulatory alerts.
+model RegulatoryChange {
+  id            String               @id @default(cuid())
+  ingredientId  String
+  kind          RegulatoryChangeKind
+  previousAnnex String?
+  newAnnex      String?
+  importRunId   String?
+  createdAt     DateTime             @default(now())
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  importRun  ImportRun? @relation(fields: [importRunId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([ingredientId])
+  @@map("regulatory_changes")
+}
+
 /// A user's one review of the portal itself (not of a product). Immutable for
 /// the author — they can only delete it and write a new one; admins can hide it.
 model AppReview {
@@ -862,6 +926,26 @@ model AppReview {
   @@index([status, createdAt])
   @@index([status, rating])
   @@map("app_reviews")
+}
+
+/// One snapshot of a product's composition per observed change — written only
+/// by source imports, so a diff between the two newest rows is an honest
+/// "the label changed upstream" signal, never an admin correction.
+model ProductFormulaRevision {
+  id              String   @id @default(cuid())
+  productId       String
+  compositionHash String
+  /// Ordered rows [{ key, rawText, isAfterMayContain }] as imported.
+  composition     Json
+  sourceId        String?
+  createdAt       DateTime @default(now())
+
+  product Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  source  DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([productId, createdAt])
+  @@index([createdAt])
+  @@map("product_formula_revisions")
 }
 
 /// Comparison history — lets us restore a comparison from a shared link and,

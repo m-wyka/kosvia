@@ -8,6 +8,7 @@ const SORT_VALUES: ProductSort[] = [
   'best-match',
   'price-asc',
   'price-desc',
+  'price-per-100',
   'ingredient-score',
   'newest',
 ];

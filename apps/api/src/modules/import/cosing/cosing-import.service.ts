@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { ImportRun, Prisma } from '@prisma/client';
+import type { ImportRun, Prisma, RegulatoryChangeKind } from '@prisma/client';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { normalizeToken } from '../../inci/inci-parser';
 import { COSING_SOURCE_CODE, DATA_SOURCES } from '../data-sources';
@@ -45,6 +45,7 @@ interface CosIngCursor {
 
 const FIRST_CURSOR: CosIngCursor = { phase: 'functions', range: 0, page: 1, processed: 0 };
 const MAX_RESTRICTION_NOTE_LENGTH = 600;
+const MAX_REGULATORY_FLIP_RATIO = 0.05;
 
 type ExistingIngredient = Prisma.IngredientGetPayload<{
   select: {
@@ -175,7 +176,7 @@ export class CosIngImportService {
           cursor.page = COSING_ANNEXES.indexOf(annex) + 1;
           entries.push(...parseAnnexCsv(await this.client.fetchAnnexCsv(annex), annex));
         }
-        const annexResult = await this.applyAnnexes(entries, options.isDryRun);
+        const annexResult = await this.applyAnnexes(entries, options.isDryRun, run.id);
         counters.updated += annexResult.flagged;
         skipReasons['annex-name-not-in-glossary'] = annexResult.unmatchedNames.length;
         this.logger.log(
@@ -382,6 +383,7 @@ export class CosIngImportService {
   private async applyAnnexes(
     entries: CosIngAnnexEntry[],
     isDryRun: boolean,
+    importRunId: string,
   ): Promise<{ flagged: number; unmatchedNames: string[] }> {
     const nameToEntries = new Map<string, CosIngAnnexEntry[]>();
     for (const entry of entries) {
@@ -395,12 +397,43 @@ export class CosIngImportService {
     }
     const rows = await this.prisma.ingredient.findMany({
       where: { normalizedName: { in: [...nameToEntries.keys()] } },
-      select: { id: true, normalizedName: true },
+      select: {
+        id: true,
+        normalizedName: true,
+        isProhibited: true,
+        isRestricted: true,
+        cosIngAnnex: true,
+      },
     });
     const matchedNames = new Set(rows.map((row) => row.normalizedName));
     const unmatchedNames = [...nameToEntries.keys()].filter((name) => !matchedNames.has(name));
     if (isDryRun) {
       return { flagged: rows.length, unmatchedNames };
+    }
+
+    const changes: Prisma.RegulatoryChangeCreateManyInput[] = [];
+    const record = (
+      ingredientId: string,
+      kind: RegulatoryChangeKind,
+      previousAnnex: string | null,
+      newAnnex: string | null,
+    ) => {
+      changes.push({ ingredientId, kind, previousAnnex, newAnnex, importRunId });
+    };
+
+    const flaggedOutsideAnnexes = await this.prisma.ingredient.findMany({
+      where: {
+        OR: [{ isProhibited: true }, { isRestricted: true }],
+        id: { notIn: rows.map((row) => row.id) },
+      },
+      select: { id: true, isProhibited: true, isRestricted: true, cosIngAnnex: true },
+    });
+    for (const row of flaggedOutsideAnnexes) {
+      if (row.isProhibited) {
+        record(row.id, 'PROHIBITION_LIFTED', row.cosIngAnnex, null);
+      } else {
+        record(row.id, 'RESTRICTION_LIFTED', row.cosIngAnnex, null);
+      }
     }
 
     await this.prisma.ingredient.updateMany({
@@ -414,15 +447,57 @@ export class CosIngImportService {
     });
     for (const row of rows) {
       const rowEntries = nameToEntries.get(row.normalizedName) ?? [];
+      const data = this.regulatoryData(rowEntries);
+      if (!row.isProhibited && data.isProhibited) {
+        record(row.id, 'BECAME_PROHIBITED', row.cosIngAnnex, 'II');
+      } else if (!row.isRestricted && data.isRestricted && !data.isProhibited) {
+        record(row.id, 'BECAME_RESTRICTED', row.cosIngAnnex, 'III');
+      }
+      if (row.isProhibited && !data.isProhibited) {
+        record(row.id, 'PROHIBITION_LIFTED', row.cosIngAnnex, data.cosIngAnnex);
+      }
+      if (row.isRestricted && !data.isRestricted) {
+        record(row.id, 'RESTRICTION_LIFTED', row.cosIngAnnex, data.cosIngAnnex);
+      }
       await this.prisma.ingredient.update({
         where: { id: row.id },
-        data: this.regulatoryData(rowEntries),
+        data,
       });
     }
+
+    await this.recordRegulatoryChanges(changes);
     return { flagged: rows.length, unmatchedNames };
   }
 
-  private regulatoryData(entries: CosIngAnnexEntry[]): Prisma.IngredientUpdateInput {
+  /**
+   * A change wave touching a large share of the dictionary is almost certainly
+   * a parser or normalisation regression, not a change in the law — better to
+   * miss one real wave than to spam every shelf with false alerts.
+   */
+  private async recordRegulatoryChanges(
+    changes: Prisma.RegulatoryChangeCreateManyInput[],
+  ): Promise<void> {
+    if (!changes.length) {
+      return;
+    }
+    const dictionarySize = await this.prisma.ingredient.count();
+    if (changes.length > dictionarySize * MAX_REGULATORY_FLIP_RATIO) {
+      this.logger.warn(
+        `Skipping ${changes.length} regulatory change events — more than ${MAX_REGULATORY_FLIP_RATIO * 100}% of the dictionary flipped in one run`,
+      );
+      return;
+    }
+    await this.prisma.regulatoryChange.createMany({ data: changes });
+    this.logger.log(`Recorded ${changes.length} regulatory changes`);
+  }
+
+  private regulatoryData(entries: CosIngAnnexEntry[]): {
+    isProhibited: boolean;
+    isRestricted: boolean;
+    isFragranceAllergen: boolean;
+    cosIngAnnex: CosIngAnnex | null;
+    restrictionNote: string | null;
+  } {
     const annexes = new Set<CosIngAnnex>(entries.map((entry) => entry.annex));
     const primaryAnnex = COSING_ANNEXES.find((annex) => annexes.has(annex)) ?? null;
     const note = entries

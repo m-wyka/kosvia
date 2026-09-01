@@ -32,6 +32,7 @@ const showFullList = ref(false);
 
 const hasBadges = (entry: ProductIngredientDto): boolean =>
   entry.ingredient.tags.length > 0 ||
+  entry.ingredient.regulatory.isProhibited ||
   entry.ingredient.regulatory.isFragranceAllergen ||
   entry.ingredient.regulatory.isRestricted;
 
@@ -102,7 +103,14 @@ const fullList = computed(() =>
                   :tag="tag"
                 />
                 <BaseBadge
-                  v-if="entry.ingredient.regulatory.isFragranceAllergen"
+                  v-if="entry.ingredient.regulatory.isProhibited"
+                  tone="critical"
+                  size="xs"
+                >
+                  {{ $t('PRODUCT.LIST.PROHIBITED') }}
+                </BaseBadge>
+                <BaseBadge
+                  v-else-if="entry.ingredient.regulatory.isFragranceAllergen"
                   tone="caution"
                   size="xs"
                 >

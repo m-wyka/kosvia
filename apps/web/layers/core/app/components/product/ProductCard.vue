@@ -31,6 +31,8 @@ const popping = ref(false);
 
 const inComparison = computed(() => isInCompareTray(props.product.id));
 
+const defaultVariant = computed(() => props.product.variants[0] ?? null);
+
 const topReasonChip = computed(() =>
   props.product.personalMatch?.reasons
     .filter((reason) => CHIP_REASON_CODES.includes(reason.code))
@@ -125,7 +127,13 @@ const handleFavoriteClick = () => {
       </div>
 
       <div class="mt-auto flex items-end justify-between gap-2 pt-1">
-        <PriceDisplay :price="product.lowestPrice" :store="product.lowestPriceStore" size="sm" />
+        <PriceDisplay
+          :price="product.lowestPrice"
+          :store="product.lowestPriceStore"
+          :per-hundred="defaultVariant?.pricePerHundred ?? null"
+          :unit="product.volumeUnit"
+          size="sm"
+        />
         <button
           v-if="showCompare"
           type="button"

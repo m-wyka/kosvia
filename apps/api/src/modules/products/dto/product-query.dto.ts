@@ -19,6 +19,7 @@ const PRODUCT_SORTS = [
   'recommended',
   'price-asc',
   'price-desc',
+  'price-per-100',
   'best-match',
   'ingredient-score',
   'newest',

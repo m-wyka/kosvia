@@ -52,6 +52,8 @@
     "ACCOUNT": "Twoje konto",
     "ALL_PRODUCTS": "Wszystkie produkty",
     "INGREDIENT_LIBRARY": "Baza składników",
+    "DUPES": "Znajdź zamiennik",
+    "DIARY": "Dziennik skóry",
     "ABOUT_DATA": "O danych",
     "PRIVACY": "Prywatność",
     "REVIEWS": "Opinie",
@@ -429,6 +431,53 @@
       "CTA": "Zobacz wszystkie opinie"
     }
   },
+  "DUPES": {
+    "TITLE": "Znajdź zamiennik",
+    "SUBTITLE": "Wybierz produkt, a pokażemy najbliższe mu formuły z naszego katalogu — razem z różnicą ceny, żeby było widać, kiedy tańszy robi to samo.",
+    "SEARCH_LABEL": "Który produkt chcesz zastąpić?",
+    "SEARCH_PLACEHOLDER": "Nazwa produktu lub marki…",
+    "PICK_TITLE": "Zacznij od produktu",
+    "PICK_BODY": "Wyszukaj powyżej i wskaż produkt, dla którego szukasz zamiennika.",
+    "SUBJECT_LABEL": "Porównujesz z",
+    "RESULTS_TITLE": "Formuły najbliższe {name}",
+    "SIMILARITY": "{percent}% zbieżności składu",
+    "SHARED_COUNT": "{count} wspólny kluczowy składnik | {count} wspólne kluczowe składniki | {count} wspólnych kluczowych składników",
+    "CHEAPER_BY": "taniej o {amount}",
+    "PRICIER_BY": "drożej o {amount}",
+    "EMPTY_TITLE": "Brak zbliżonych formuł",
+    "EMPTY_BODY": "Nic w katalogu nie jest na tyle podobne, by nazwać to zamiennikiem. Spróbuj z innym produktem."
+  },
+  "DIARY": {
+    "TITLE": "Dziennik skóry",
+    "SUBTITLE": "Krótka codzienna notatka o tym, jak czuje się Twoja skóra — Twoimi słowami. Z czasem widać, co się zmienia razem z tym, czego używasz.",
+    "OVERALL_LABEL": "Jak dziś Twoja skóra?",
+    "FLAG": {
+      "BREAKOUTS": "Wypryski",
+      "DRYNESS": "Suchość",
+      "IRRITATION": "Podrażnienie",
+      "REDNESS": "Zaczerwienienie"
+    },
+    "NOTE_LABEL": "Notatka",
+    "NOTE_PLACEHOLDER": "Cokolwiek wartego zapamiętania z dzisiaj…",
+    "SAVE": "Zapisz dzień",
+    "SAVED": "Zapisane w dzienniku.",
+    "DELETED": "Wpis usunięty.",
+    "DELETE_ENTRY": "Usuń ten dzień",
+    "PREVIOUS_MONTH": "Poprzedni miesiąc",
+    "NEXT_MONTH": "Następny miesiąc",
+    "DISCLAIMER": "Twoje własne obserwacje, przechowywane tylko dla Ciebie. Dziennik opisuje, nie diagnozuje — z tym, co Cię niepokoi, idź do dermatologa.",
+    "STATS": {
+      "TITLE": "Ten miesiąc",
+      "LOGGED_DAYS": "Zapisane dni",
+      "AVERAGE": "Średnie samopoczucie",
+      "VS_LAST_MONTH": "Dni z… (ten / poprzedni miesiąc)"
+    },
+    "CONSENT": {
+      "TITLE": "Zanim zaczniesz dziennik",
+      "BODY": "Wpisy w dzienniku opisują, jak Twoja skóra czuje się z dnia na dzień — w świetle prawa to dane o zdrowiu i są przechowywane w ramach tej samej zgody co profil urodowy. Wycofanie tej zgody usuwa profil razem z dziennikiem.",
+      "CONFIRM": "Otwórz dziennik"
+    }
+  },
   "REVIEWS": {
     "TITLE": "Opinie",
     "SUBTITLE": "Co użytkownicy sądzą o Kosvii — i miejsce na Twoją własną opinię.",
@@ -516,9 +565,17 @@
     "SUBTITLE_PERSONAL": "Wszystko poniżej jest oceniane pod Twój profil.",
     "SUBTITLE_GENERIC": "Uzupełnij profil, a te wyniki staną się osobiste.",
     "ASK_AI": "Zapytaj asystenta AI",
+    "OPEN_DIARY": "Dziennik skóry",
     "NO_PROFILE_TITLE": "Twój profil nie jest jeszcze uzupełniony",
     "NO_PROFILE_BODY": "Dwie minuty pytań zamienia każdy wynik na stronie w wynik osobisty.",
     "NO_PROFILE_CTA": "Uzupełnij profil",
+    "REGULATORY": {
+      "TITLE": "Zmiana regulacyjna na Twojej półce",
+      "BECAME_PROHIBITED": "trafił do Aneksu II rozporządzenia kosmetycznego UE (zakazany w kosmetykach).",
+      "BECAME_RESTRICTED": "trafił do Aneksu III rozporządzenia kosmetycznego UE (dopuszczony z warunkami).",
+      "AFFECTED_PRODUCTS": "Na Twojej półce:",
+      "DISMISS": "Odrzuć"
+    },
     "STAT_SHELF": "Na Twojej półce",
     "STAT_FAVORITES": "Ulubione",
     "STAT_ALERTS": "Alerty cenowe",
@@ -569,6 +626,7 @@
       "BEST_MATCH": "Najlepiej dopasowane",
       "PRICE_ASC": "Cena: od najniższej",
       "PRICE_DESC": "Cena: od najwyższej",
+      "PRICE_PER_100": "Cena za 100 ml/g",
       "INGREDIENT_SCORE": "Najlepszy skład",
       "NEWEST": "Najnowsze"
     },
@@ -598,6 +656,7 @@
     "PRICE_UNAVAILABLE": "Cena niedostępna",
     "AT": "w {store}",
     "PER_HUNDRED": "{price} / 100 {unit}",
+    "FIND_DUPES": "Znajdź tańszy zamiennik",
     "ADD_FAVORITE": "Dodaj {name} do ulubionych",
     "REMOVE_FAVORITE": "Usuń {name} z ulubionych",
     "ADD_COMPARE": "Dodaj {name} do porównania",
@@ -649,7 +708,16 @@
       "MORE_ABOUT": "Więcej o tym składniku",
       "FULL_LIST": "Pełny skład INCI, w kolejności z etykiety",
       "FRAGRANCE_ALLERGEN": "Alergen zapachowy",
-      "RESTRICTED": "Aneks III"
+      "RESTRICTED": "Aneks III",
+      "PROHIBITED": "Aneks II — zakazany"
+    },
+    "FORMULA_CHANGE": {
+      "BADGE": "Nowa formuła",
+      "TITLE": "Zaimportowana etykieta zmieniła się {date}",
+      "ADDED": "Dodane:",
+      "REMOVED": "Usunięte:",
+      "REORDERED": "Składniki są te same, ale zmieniła się ich kolejność na etykiecie.",
+      "DISCLAIMER": "Na podstawie odświeżonej etykiety źródłowej; Kosvia nie weryfikowała zmiany u producenta."
     },
     "MATCH_PANEL": {
       "PERSONAL_TITLE": "Twoje dopasowanie",
@@ -754,6 +822,14 @@
     "REMOVE": "Usuń {name}",
     "OUR_PICK": "Wybór Kosvii",
     "VIEW_PRODUCT": "Zobacz produkt",
+    "DIFF": {
+      "TITLE": "Skład pod lupą",
+      "OVERLAP": "Obie formuły mają {percent}% wspólnych składników.",
+      "SHARED": "{count} wspólny składnik | {count} wspólne składniki | {count} wspólnych składników",
+      "ONLY_IN": "Tylko w {name}",
+      "NONE_SHARED": "Te formuły nie mają wspólnych składników.",
+      "NONE_UNIQUE": "Nic poza wspólnymi składnikami."
+    },
     "NOTE": "Cena za 100 ml to najuczciwszy sposób porównania produktów o różnych pojemnościach. Dopasowanie liczone jest z Twojego profilu, nie z recenzji.",
     "TRAY": {
       "COUNT": "{current} z {max}",
@@ -790,6 +866,31 @@
     "ADD_FAVORITE": "Dodaj do ulubionych",
     "REMOVE_FAVORITE": "Usuń z ulubionych",
     "REMOVE_ITEM": "Usuń {name} z półki",
+    "REGULATORY_BADGE": "Zmiana regulacyjna",
+    "PLAN": {
+      "TITLE": "Twój tydzień rano i wieczorem",
+      "SUBTITLE": "Jak produkty z Twojej półki zwykle rozkładają się w tygodniu. Podpowiedź do dopasowania, nie recepta.",
+      "MORNING": "Rano",
+      "EVENING": "Wieczorem",
+      "UNSCHEDULED": "Wedle potrzeby:",
+      "DAY": {
+        "MONDAY": "Pon",
+        "TUESDAY": "Wt",
+        "WEDNESDAY": "Śr",
+        "THURSDAY": "Czw",
+        "FRIDAY": "Pt",
+        "SATURDAY": "Sob",
+        "SUNDAY": "Nd"
+      }
+    },
+    "PAO": {
+      "MARK_OPENED": "Oznacz jako otwarty",
+      "MARK_FINISHED": "Oznacz jako zużyty",
+      "OPENED_ON": "Otwarty {date}",
+      "FINISHED_ON": "Zużyty {date}",
+      "USE_WITHIN": "Został {count} miesiąc — zużyj do {date} | Zostały {count} miesiące — zużyj do {date} | Zostało {count} miesięcy — zużyj do {date}",
+      "EXPIRED": "Termin po otwarciu minął ({date})"
+    },
     "REMOVED": "{name} usunięty z Twojej półki",
     "ADDED": "{name} dodany na Twoją półkę",
     "SAVED": "{name} zapisany na Twojej półce",
@@ -883,7 +984,7 @@
       "TITLE": "Prywatność i Twoje dane",
       "SUBTITLE": "Udzielone zgody, kopia wszystkiego, co przechowujemy, i wyjście.",
       "CONSENT_SAVED": "Zgoda zaktualizowana",
-      "HEALTH_WITHDRAW_CONFIRM": "Wycofanie tej zgody usuwa Twój profil urodowy. Kontynuować?",
+      "HEALTH_WITHDRAW_CONFIRM": "Wycofanie tej zgody usuwa Twój profil urodowy i dziennik skóry. Kontynuować?",
       "EXPORT": "Pobierz moje dane (JSON)",
       "DELETE": "Usuń moje konto",
       "DELETE_TITLE": "Usuń konto",
@@ -941,6 +1042,14 @@
     "REVIEWS": {
       "TITLE": "Opinie — co użytkownicy mówią o Kosvii",
       "DESCRIPTION": "Oceny i opinie o portalu Kosvia od jego użytkowników, z ogólną oceną w skali 5 gwiazdek."
+    },
+    "DUPES": {
+      "TITLE": "Znajdź zamiennik — tańsze kosmetyki o tej samej formule",
+      "DESCRIPTION": "Wybierz dowolny kosmetyk, a Kosvia pokaże produkty najbliższe mu składem INCI, wraz z różnicą ceny — prawdziwe zamienniki znalezione po formule, nie po marketingu."
+    },
+    "DIARY": {
+      "TITLE": "Dziennik skóry — obserwuj, jak czuje się Twoja skóra",
+      "DESCRIPTION": "Prywatny, codzienny zapis samopoczucia Twojej skóry, prowadzony obok półki."
     },
     "DISCOVER": {
       "TITLE": "Odkrywaj kosmetyki dobrane dla Ciebie",
@@ -1016,6 +1125,8 @@
       "IMPORTS_DESCRIPTION": "Historia importów wsadowych.",
       "AUDIT": "Dziennik zmian · Admin",
       "AUDIT_DESCRIPTION": "Historia zmian w panelu.",
+      "FORMULA_CHANGES": "Zmiany formuł · Admin",
+      "FORMULA_CHANGES_DESCRIPTION": "Migawki składów z importów źródłowych.",
       "MATCH_WEIGHTS": "Wagi dopasowania · Admin",
       "MATCH_WEIGHTS_DESCRIPTION": "Stroj Personal Match bez wdrożenia.",
       "STORES": "Sklepy · Admin",
@@ -1042,6 +1153,7 @@
       "INGREDIENTS": "Składniki",
       "INCI_QUEUE": "Kolejka INCI",
       "IMPORTS": "Importy",
+      "FORMULA_CHANGES": "Zmiany formuł",
       "AUDIT": "Dziennik zmian",
       "MATCH_WEIGHTS": "Wagi dopasowania",
       "STORES": "Sklepy",
@@ -1204,6 +1316,16 @@
       "STATUS_INTERRUPTED": "Przerwany",
       "ERRORS": "{count} błędów — ostatni: {last}"
     },
+    "FORMULA_CHANGES": {
+      "TITLE": "Zmiany formuł",
+      "SUBTITLE": "Migawki składów zapisywane przez importy źródłowe — nowy wiersz oznacza zmianę etykiety u źródła.",
+      "EMPTY": "Brak zapisanych zmian formuł",
+      "SEARCH_PLACEHOLDER": "Szukaj po nazwie produktu…",
+      "COL_WHEN": "Kiedy",
+      "COL_PRODUCT": "Produkt",
+      "COL_SOURCE": "Źródło",
+      "COL_HASH": "Suma kontrolna"
+    },
     "AUDIT": {
       "TITLE": "Dziennik zmian",
       "SUBTITLE": "Każda zmiana z panelu administratora — kto, co, kiedy i jakie żądanie ją wykonało.",
@@ -1259,6 +1381,8 @@
       "FIELD_EAN": "EAN",
       "FIELD_VOLUME": "Pojemność",
       "FIELD_UNIT": "Jednostka",
+      "FIELD_PAO": "PAO (miesiące)",
+      "FIELD_PAO_HINT": "Nadpisuje domyślną wartość kategorii",
       "FIELD_DESCRIPTION": "Opis",
       "FIELD_USAGE": "Jak stosować",
       "FIELD_HIGHLIGHTS": "Wyróżniki",
@@ -1371,6 +1495,16 @@
     }
   },
   "GENERATED": {
+    "PLAN_DAILY_BOTH": "Codzienna baza, rano i wieczorem",
+    "PLAN_SPF_MORNING": "Ochrona przeciwsłoneczna należy do porannej rutyny",
+    "PLAN_RETINOID_EVENING": "Retinoidy zwykle stosuje się wieczorem, z dniami przerwy",
+    "PLAN_EXFOLIANT_SPACING": "Złuszczanie zwykle rozkłada się w czasie, z dala od wieczorów z retinoidem",
+    "PLAN_ACTIVE_SLOT": "Najlepiej sprawdza się rano, pod ekspozycję na słońce",
+    "PLAN_SUPPORTING_BOTH": "Pasuje zarówno do porannej, jak i wieczornej rutyny",
+    "PLAN_MASK_WEEKLY": "Cotygodniowy rytuał, w najspokojniejszy wieczór",
+    "PLAN_UNSCHEDULED": "Używane wedle potrzeby, bez stałego grafiku",
+    "PLAN_NOTE_SENSITIVITY": "Rozplanowane na maksymalnie {count} złuszczający wieczór w tygodniu przy Twojej wrażliwości skóry | Rozplanowane na maksymalnie {count} złuszczające wieczory w tygodniu przy Twojej wrażliwości skóry | Rozplanowane na maksymalnie {count} złuszczających wieczorów w tygodniu przy Twojej wrażliwości skóry",
+    "PLAN_NOTE_DISCLAIMER": "Opisowa podpowiedź oparta na typowym stosowaniu, nie zalecenie medyczne ani dermatologiczne.",
     "ALT_CHEAPER": "{percent}% taniej niż {product}",
     "ALT_BETTER_MATCH": "{score}% dopasowania — o {delta} pkt więcej niż ten produkt",
     "ALT_BETTER_VALUE": "{score}% dopasowania za {price}",
@@ -1432,7 +1566,7 @@
     "TERMS_LABEL": "Akceptuję regulamin",
     "PRIVACY_LABEL": "Zapoznałam/em się z polityką prywatności",
     "HEALTH_LABEL": "Wyrażam zgodę na przetwarzanie przez Kosvię informacji o mojej skórze",
-    "HEALTH_HINT": "Typ cery, problemy, wrażliwość i składniki, których unikasz, to dane o zdrowiu. Bez tej zgody nie ma profilu urodowego ani Personal Match — cała reszta działa.",
+    "HEALTH_HINT": "Typ cery, problemy, wrażliwość, składniki, których unikasz, i wpisy w dzienniku skóry to dane o zdrowiu. Bez tej zgody nie ma profilu urodowego, Personal Match ani dziennika — cała reszta działa.",
     "AI_LABEL": "Wyrażam zgodę na wysyłanie zanonimizowanej wersji mojego profilu do dostawcy modelu AI",
     "AI_HINT": "Tylko typ cery, problemy, cele i budżet — nigdy imię, e-mail ani identyfikator konta. Potrzebne do AI Shoppera i wyjaśnień AI.",
     "MARKETING_LABEL": "Chcę od czasu do czasu dostawać nowości produktowe e-mailem",

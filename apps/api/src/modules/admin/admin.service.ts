@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, type AppReviewStatus } from '@prisma/client';
-import { slugify } from '@kosvia/shared';
+import { pricePerHundred, slugify } from '@kosvia/shared';
 import type { AdminStatsDto, AuditLogDto, PaginatedResult } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
@@ -324,6 +324,7 @@ export class AdminService {
     return {
       ...toProductDto(row, null, 'en'),
       isActive: row.isActive,
+      paoMonths: row.paoMonths,
       targetSkinTypes: row.targetSkinTypes,
     };
   }
@@ -580,6 +581,35 @@ export class AdminService {
     await this.prisma.user.delete({ where: { id } });
   }
 
+  /* ----------------------------------------------------- formula changes -- */
+
+  listFormulaChanges(query: AdminListQueryDto) {
+    const where: Prisma.ProductFormulaRevisionWhereInput = query.q
+      ? { product: { name: { contains: query.q, mode: 'insensitive' } } }
+      : {};
+    return this.paginate(
+      query,
+      () => this.prisma.productFormulaRevision.count({ where }),
+      (skip, take) =>
+        this.prisma.productFormulaRevision.findMany({
+          where,
+          skip,
+          take,
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            productId: true,
+            compositionHash: true,
+            createdAt: true,
+            product: {
+              select: { name: true, slug: true, brand: { select: { name: true } } },
+            },
+            source: { select: { code: true } },
+          },
+        }),
+    );
+  }
+
   /* ------------------------------------------------------------ internals -- */
 
   /**
@@ -619,6 +649,7 @@ export class AdminService {
       ...(dto.isVegan !== undefined && { isVegan: dto.isVegan }),
       ...(dto.isCrueltyFree !== undefined && { isCrueltyFree: dto.isCrueltyFree }),
       ...(dto.isActive !== undefined && { isActive: dto.isActive }),
+      ...(dto.paoMonths !== undefined && { paoMonths: dto.paoMonths }),
       ...(dto.targetSkinTypes && { targetSkinTypes: dto.targetSkinTypes }),
     };
   }
@@ -701,13 +732,38 @@ export class AdminService {
   }
 
   private async refreshLowestPrice(productId: string): Promise<void> {
-    const cheapest = await this.prisma.productOffer.aggregate({
-      where: { variant: { productId }, availability: { not: 'OUT_OF_STOCK' } },
-      _min: { price: true },
-    });
+    const [cheapest, defaultVariant] = await Promise.all([
+      this.prisma.productOffer.aggregate({
+        where: { variant: { productId }, availability: { not: 'OUT_OF_STOCK' } },
+        _min: { price: true },
+      }),
+      this.prisma.productVariant.findFirst({
+        where: { productId, isDefault: true },
+        select: {
+          volume: true,
+          volumeUnit: true,
+          offers: {
+            where: { availability: { not: 'OUT_OF_STOCK' } },
+            orderBy: { price: 'asc' },
+            take: 1,
+            select: { price: true },
+          },
+        },
+      }),
+    ]);
+    const unitPrice = defaultVariant
+      ? pricePerHundred(
+          decimalToNumber(defaultVariant.offers[0]?.price ?? null),
+          decimalToNumber(defaultVariant.volume),
+          toVolumeUnitDto(defaultVariant.volumeUnit),
+        )
+      : null;
     await this.prisma.product.update({
       where: { id: productId },
-      data: { lowestPrice: cheapest._min.price ?? null },
+      data: {
+        lowestPrice: cheapest._min.price ?? null,
+        pricePerHundred: unitPrice === null ? null : new Prisma.Decimal(unitPrice),
+      },
     });
   }
 

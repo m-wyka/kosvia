@@ -6,6 +6,7 @@ import type {
   AlternativeGroupDto,
   ComparisonResultDto,
   DiscoveryFeedDto,
+  DupeResultDto,
   ProductSummaryDto,
 } from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
@@ -16,6 +17,7 @@ import {
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { CompareQueryDto } from '../products/dto/product-query.dto';
 import { AlternativeProductService } from './alternative-product.service';
+import { DupeFinderService } from './dupe-finder.service';
 import { RequestLocale } from '../../common/decorators/request-locale.decorator';
 import type { AnswerLocale } from '../../common/i18n/phrases';
 import { ComparisonService } from './comparison.service';
@@ -32,6 +34,7 @@ export class RecommendationController {
   constructor(
     private readonly viewers: ViewerContextService,
     private readonly alternatives: AlternativeProductService,
+    private readonly dupes: DupeFinderService,
     private readonly comparison: ComparisonService,
     private readonly recommendations: RecommendationService,
   ) {}
@@ -43,6 +46,15 @@ export class RecommendationController {
     @CurrentUser() user: AuthenticatedUser | null,
   ): Promise<AlternativeGroupDto[]> {
     return this.alternatives.forProduct(idOrSlug, await this.viewers.load(user?.id));
+  }
+
+  @Get('products/:idOrSlug/dupes')
+  @ApiOperation({ summary: 'Closest formulas to a product, with the price gap' })
+  async findDupes(
+    @Param('idOrSlug') idOrSlug: string,
+    @CurrentUser() user: AuthenticatedUser | null,
+  ): Promise<DupeResultDto> {
+    return this.dupes.findDupes(idOrSlug, await this.viewers.load(user?.id));
   }
 
   @Get('products/:idOrSlug/similar')

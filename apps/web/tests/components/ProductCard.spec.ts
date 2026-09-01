@@ -12,6 +12,18 @@ const product = (overrides: Partial<ProductSummaryDto> = {}): ProductSummaryDto 
   imageUrl: '/img/product/kalme-ceramide-barrier-cream.svg',
   volume: 50,
   volumeUnit: 'ml',
+  variants: [
+    {
+      id: 'v1',
+      ean: null,
+      volume: 50,
+      volumeUnit: 'ml',
+      imageUrl: null,
+      isDefault: true,
+      lowestPrice: 59.99,
+      pricePerHundred: 119.98,
+    },
+  ],
   isFragranceFree: true,
   isVegan: true,
   isCrueltyFree: true,

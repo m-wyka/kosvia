@@ -15,7 +15,7 @@ import type { ScorableProductIngredient } from '../../src/modules/scoring/types'
 import { normalizeToken } from '../../src/modules/inci/inci-parser';
 import { toVolumeUnitEnum } from '../../src/modules/products/volume-unit';
 import { DATA_SOURCES, MANUAL_SOURCE_CODE } from '../../src/modules/import/data-sources';
-import { CONSENT_VERSIONS, type ConsentType } from '@kosvia/shared';
+import { CONSENT_VERSIONS, pricePerHundred, type ConsentType } from '@kosvia/shared';
 import { ProductTraitsService } from '../../src/modules/scoring/product-traits.service';
 import type { PrismaService } from '../../src/common/prisma/prisma.service';
 import { BRANDS, CATEGORIES, CONCERNS, GOALS, STORES } from './data/taxonomy';
@@ -425,7 +425,16 @@ async function main(): Promise<void> {
       }
 
       const lowestPrice = Number.isFinite(lowest) ? new Prisma.Decimal(lowest) : null;
-      await prisma.product.update({ where: { id: product.id }, data: { lowestPrice } });
+      const unitPrice = Number.isFinite(lowest)
+        ? pricePerHundred(lowest, volume, formula.volumeUnit)
+        : null;
+      await prisma.product.update({
+        where: { id: product.id },
+        data: {
+          lowestPrice,
+          pricePerHundred: unitPrice === null ? null : new Prisma.Decimal(unitPrice),
+        },
+      });
 
       createdProducts.push({
         id: product.id,

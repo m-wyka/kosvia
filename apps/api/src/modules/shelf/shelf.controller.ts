@@ -11,18 +11,27 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { RoutineAnalysisDto, ShelfItemDto } from '@kosvia/shared';
+import type {
+  RegulatoryAlertDto,
+  RoutineAnalysisDto,
+  RoutinePlanDto,
+  ShelfItemDto,
+} from '@kosvia/shared';
 import {
   CurrentUser,
   type AuthenticatedUser,
 } from '../../common/decorators/current-user.decorator';
 import { ShelfService } from './shelf.service';
+import { RegulatoryAlertsService } from './regulatory-alerts.service';
 import { AddShelfItemDto, UpdateShelfItemDto } from './dto/shelf.dto';
 
 @ApiTags('shelf')
 @Controller('shelf')
 export class ShelfController {
-  constructor(private readonly shelf: ShelfService) {}
+  constructor(
+    private readonly shelf: ShelfService,
+    private readonly regulatoryAlerts: RegulatoryAlertsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Everything on the user’s shelf' })
@@ -37,6 +46,25 @@ export class ShelfController {
   @ApiOperation({ summary: 'Descriptive routine analysis of the shelf' })
   analysis(@CurrentUser() user: AuthenticatedUser): Promise<RoutineAnalysisDto> {
     return this.shelf.analyse(user.id);
+  }
+
+  @Get('routine-plan')
+  @ApiOperation({ summary: 'Descriptive weekly AM/PM plan for the shelf' })
+  plan(@CurrentUser() user: AuthenticatedUser): Promise<RoutinePlanDto> {
+    return this.shelf.plan(user.id);
+  }
+
+  @Get('regulatory-alerts')
+  @ApiOperation({ summary: 'Recent annex changes affecting products on the shelf' })
+  regulatory(@CurrentUser() user: AuthenticatedUser): Promise<RegulatoryAlertDto[]> {
+    return this.regulatoryAlerts.alertsFor(user.id);
+  }
+
+  @Post('regulatory-alerts/seen')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Dismiss the current regulatory alerts' })
+  dismissRegulatory(@CurrentUser() user: AuthenticatedUser): Promise<void> {
+    return this.regulatoryAlerts.markSeen(user.id);
   }
 
   @Post()

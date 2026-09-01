@@ -96,6 +96,30 @@ async function refreshLowestPrices(productIds: string[]): Promise<void> {
           FROM product_offers o
           JOIN product_variants v ON v.id = o."variantId"
           WHERE v."productId" = p.id AND o.availability <> 'OUT_OF_STOCK')`;
+    await prisma.$executeRaw`
+      UPDATE products AS p
+      SET "pricePerHundred" = sub.per_hundred
+      FROM (
+        SELECT v."productId" AS product_id,
+               CASE
+                 WHEN v."volume" IS NULL OR v."volume" <= 0 OR v."volumeUnit" = 'PIECE' THEN NULL
+                 ELSE ROUND(MIN(o."price") / v."volume" * 100, 2)
+               END AS per_hundred
+        FROM product_variants v
+        JOIN product_offers o ON o."variantId" = v.id AND o.availability <> 'OUT_OF_STOCK'
+        WHERE v."isDefault"
+        GROUP BY v."productId", v."volume", v."volumeUnit"
+      ) AS sub
+      WHERE p.id = sub.product_id AND p.id IN (${Prisma.join(ids)})`;
+    await prisma.$executeRaw`
+      UPDATE products AS p
+      SET "pricePerHundred" = NULL
+      WHERE p.id IN (${Prisma.join(ids)})
+        AND NOT EXISTS (
+          SELECT 1
+          FROM product_offers o
+          JOIN product_variants v ON v.id = o."variantId"
+          WHERE v."productId" = p.id AND v."isDefault" AND o.availability <> 'OUT_OF_STOCK')`;
   }
 }
 

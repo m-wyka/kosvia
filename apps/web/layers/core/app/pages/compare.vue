@@ -211,6 +211,8 @@ useSeo(() => ({
         </table>
       </div>
 
+      <CompareIngredientsDiff :products="data.products" />
+
       <p class="mt-6 text-xs text-ink-muted">
         {{ $t('COMPARE.NOTE') }}
       </p>

@@ -1,4 +1,4 @@
-# STATUS — co jest zrobione z AUDIT.md (stan na 2026-08-30)
+# STATUS — co jest zrobione z AUDIT.md (stan na 2026-09-01)
 
 Ten plik jest nowszy niż `AUDIT.md`. Sekcje 3 i 6 audytu są **wykonane w całości**;
 czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–07) nadal aktualna.
@@ -21,6 +21,21 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 | 03 §3 | `a16f31d`→`2fc5f11` | **`ProductVariant`** w 3 migracjach (dodaj → backfill → drop): EAN/pojemność/zdjęcie/oferty/historia cen na wariancie, `products` bez kolumn opakowania; DTO ma `variants[]` + pola wariantu domyślnego; przełącznik pojemności na karcie produktu; admin edytuje wariant domyślny, oferta wskazuje wariant |
 | 01 et. 2 | `e87b896`→`eaa1db0` | **Katalog OBF**: 18 tagów kategorii (twarz, SPF, oczy, maski, peelingi, demakijaż, dłonie, ciało, włosy) → **1263 produkty, 1076 widocznych (85%)**, 92% wierszy składu dopasowane. Parser: całość tokenu z ukośnikiem przed fragmentami, separatory •/(and)/&/kropka, prefiksy etykiet w 9 językach, sekcje OTC „Active/Inactive ingredients” z dawkami, segmentacja skanów o słownik (tylko pełne pokrycie słów); `ingredient-aliases.json` + `aliases:apply`; `import:obf --refresh`. Opisy EN+PL: seed (`ingredients.pl.json`) + partie `ingredient-prose/obf-batch-{1,2,3}.json` → **90% wierszy składu po polsku**, 419 produktów w całości. Duplikaty seed↔CosIng scalone aliasami (`4fced4a`); `HIDE_DEMO_DATA=true` chowa katalog demo, UI działa bez cen (`5709acf`) |
 | 01 et. 1 | `94d418c` | **CosIng**: `npm run import:cosing` (glosariusz 33 654 wpisów przez EU Search API + Aneksy II–VI z CSV; idempotentny, `--dry-run`, `--resume`, `--max-pages`); po pierwszym przebiegu słownik ma **32 860** składników (65 alergenów zapachowych, 281 z Aneksu III, 236 z Aneksu II, 83 funkcje CosIng); `Ingredient.{cosIngRef,casNumber,ecNumber,innName,chemicalDescription,isFragranceAllergen,isRestricted,isProhibited,cosIngAnnex,restrictionNote,isManuallyEdited}`; tabele `IngredientFunction` + `IngredientFunctionOnIngredient`; po imporcie automatyczny rematch kolejki (`UnmatchedTokenService.rematchPending`) i odkrycie ukrytych produktów (`republishHidden`); `npm run ingredients:describe` — opisy AI (`AIProvider.describeIngredient`, structured output) tylko dla składników występujących w produktach; status regulacyjny na stronie składnika i badge na liście produktu; atrybucja CC BY 4.0 na `/about-data` |
+
+## Sesja 2026-09-01 (niecommitowane — do commitu po akceptacji właściciela)
+
+- **Opinie o portalu** (`AppReview`, migracja `20260831100000`): `/reviews` z formularzem (1 opinia na konto, bez edycji, delete+nowa), lista z sortowaniem i sumarycznym rozkładem gwiazdek, marquee `LandingReviews` na dole strony głównej, link w stopce, moderacja w `/admin/reviews` (ukryj/pokaż/usuń), gwiazdki w `BaseIcon` + komponenty `Review*`.
+- **8 nowych funkcji** (fazy 1–8, wszystkie z bramkami i smoke testami):
+  1. Cena za 100 ml na kartach + sort `price-per-100` (denormalizacja `Product.pricePerHundred`, migracja `20260901100000`, utrzymywana w admin/seed/`prices:demo`).
+  2. PAO: `Category.paoMonths` (backfill wg kroku rutyny) + `Product.paoMonths` (override w adminie), półka pokazuje „otwarty/zużyj do/po terminie" + akcje otwarcia/zużycia (migracja `20260901110000`).
+  3. Dupe finder: `GET /products/:id/dupes` (fingerprint pgvector + overlap), publiczna strona `/dupes`, przycisk na stronie produktu, link w stopce.
+  4. Diff składów w porównywarce (`CompareIngredientsDiff` — wspólne/tylko-w + % zbieżności dla pary; czysty frontend).
+  5. Alerty regulacyjne: `RegulatoryChange` (migracja `20260901120000`), diff Aneksów II/III w `applyAnnexes` (bezpiecznik >5% słownika), `GET/POST /shelf/regulatory-alerts(/seen)`, baner na dashboardzie, badge na półce, badge „Aneks II" w składzie.
+  6. Zmiana formuły: `ProductFormulaRevision` (migracja `20260901130000`), hash składu przy `applyLabel` tylko z importów źródłowych, `ProductDto.recentFormulaChange` (<90 dni) + rozwijany diff na stronie produktu, lista w `/admin/formula-changes`.
+  7. Planer AM/PM: `GET /shelf/routine-plan` — czysty `buildWeekPlan` (SPF rano; retinoid wieczorami naprzemiennie; złuszczanie limitowane wrażliwością, nigdy z retinoidem; maska raz w tygodniu), siatka tygodnia w zakładce rutyny.
+  8. Dziennik skóry: `SkinDiaryEntry` na `BeautyProfile` (kasacja ze zgodą; migracja `20260901140000`), moduł `/diary` za `BEAUTY_PROFILE_HEALTH`, strona `/diary` (kalendarz+wpis+statystyki mies./mies.), w eksporcie RODO. **Wersja zgody podbita do `health-2026-09-01`** (hint wspomina dziennik) — istniejący użytkownicy (w tym demo) muszą ją ponowić w profilu/onboardingu.
+- Ceny demo: patrz sekcja Środowisko. Baza po restarcie Dockera działa; serwery dev uruchomione w tle.
+- Testy: API 216, web 40, i18n:check czysty, format czysty. Nowe klucze i18n z formami mnogimi (`|`).
 
 ## Decyzje podjęte po drodze (odstępstwa od 00–07)
 

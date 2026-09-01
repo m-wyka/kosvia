@@ -97,6 +97,7 @@ export class UpsertProductDto {
   @IsOptional() @IsBoolean() isVegan?: boolean;
   @IsOptional() @IsBoolean() isCrueltyFree?: boolean;
   @IsOptional() @IsBoolean() isActive?: boolean;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(60) paoMonths?: number | null;
   @IsOptional() @IsArray() @IsEnum(SkinType, { each: true }) targetSkinTypes?: SkinType[];
 
   @IsOptional()

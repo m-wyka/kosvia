@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DashboardDto } from '@kosvia/shared';
+import type { DashboardDto, RegulatoryChangeKind } from '@kosvia/shared';
 
 definePageMeta({ middleware: 'auth' });
 
@@ -8,10 +8,30 @@ const MAX_OBSERVATIONS = 3;
 const { displayName } = storeToRefs(useAuthStore());
 const { t } = useI18n();
 const localise = useLocalisedText();
+const api = useApi();
+const toast = useToast();
+const message = useApiMessage();
 
 const { data, pending, error, refresh } = await useApiFetch<DashboardDto>('/dashboard', {
   key: 'dashboard',
 });
+
+const regulatoryAlerts = computed(() => data.value?.regulatoryAlerts ?? []);
+
+const regulatoryKindLabel = (kind: RegulatoryChangeKind): string => {
+  return kind === 'became-prohibited'
+    ? t('DASHBOARD.REGULATORY.BECAME_PROHIBITED')
+    : t('DASHBOARD.REGULATORY.BECAME_RESTRICTED');
+};
+
+const dismissRegulatoryAlerts = async () => {
+  try {
+    await api('/shelf/regulatory-alerts/seen', { method: 'POST' });
+    await refresh();
+  } catch (caught) {
+    toast.error(message(caught));
+  }
+};
 
 const stats = computed(() => [
   {
@@ -56,10 +76,16 @@ useSeo(() => ({
           {{ data?.profile ? $t('DASHBOARD.SUBTITLE_PERSONAL') : $t('DASHBOARD.SUBTITLE_GENERIC') }}
         </p>
       </div>
-      <BaseButton to="/ai" variant="secondary">
-        <template #icon><BaseIcon name="sparkles" :size="16" /></template>
-        {{ $t('DASHBOARD.ASK_AI') }}
-      </BaseButton>
+      <span class="flex flex-wrap gap-2">
+        <BaseButton to="/diary" variant="secondary">
+          <template #icon><BaseIcon name="edit" :size="16" /></template>
+          {{ $t('DASHBOARD.OPEN_DIARY') }}
+        </BaseButton>
+        <BaseButton to="/ai" variant="secondary">
+          <template #icon><BaseIcon name="sparkles" :size="16" /></template>
+          {{ $t('DASHBOARD.ASK_AI') }}
+        </BaseButton>
+      </span>
     </header>
 
     <BaseErrorState v-if="error" class="mt-8" @retry="refresh()" />
@@ -74,6 +100,51 @@ useSeo(() => ({
             <p class="mt-1 text-sm text-ink-soft">{{ $t('DASHBOARD.NO_PROFILE_BODY') }}</p>
           </div>
           <BaseButton to="/onboarding">{{ $t('DASHBOARD.NO_PROFILE_CTA') }}</BaseButton>
+        </BaseCard>
+      </div>
+
+      <div v-if="regulatoryAlerts.length" class="mt-8">
+        <BaseCard class="border-caution/40 bg-caution-soft">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0">
+              <h2 class="flex items-center gap-2 font-display text-lg text-ink">
+                <BaseIcon name="alert" :size="18" class="text-caution" />
+                {{ $t('DASHBOARD.REGULATORY.TITLE') }}
+              </h2>
+              <ul class="mt-3 space-y-3">
+                <li
+                  v-for="alert in regulatoryAlerts"
+                  :key="alert.ingredientId"
+                  class="text-sm text-ink-soft"
+                >
+                  <p>
+                    <NuxtLinkLocale
+                      :to="`/ingredients/${alert.slug}`"
+                      class="font-medium text-ink underline-offset-4 hover:underline"
+                    >
+                      {{ alert.inciName }}
+                    </NuxtLinkLocale>
+                    {{ regulatoryKindLabel(alert.kind) }}
+                  </p>
+                  <p class="mt-1 text-xs text-ink-muted">
+                    {{ $t('DASHBOARD.REGULATORY.AFFECTED_PRODUCTS') }}
+                    <template v-for="(product, index) in alert.products" :key="product.id">
+                      <template v-if="index > 0">,</template>
+                      <NuxtLinkLocale
+                        :to="`/products/${product.slug}`"
+                        class="underline-offset-4 hover:underline"
+                      >
+                        {{ product.name }}
+                      </NuxtLinkLocale>
+                    </template>
+                  </p>
+                </li>
+              </ul>
+            </div>
+            <BaseButton variant="ghost" size="sm" @click="dismissRegulatoryAlerts">
+              {{ $t('DASHBOARD.REGULATORY.DISMISS') }}
+            </BaseButton>
+          </div>
         </BaseCard>
       </div>
 

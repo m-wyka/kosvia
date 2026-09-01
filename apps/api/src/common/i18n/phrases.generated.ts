@@ -36,6 +36,16 @@ export const PHRASES = {
       "GENERIC": "Based on formula quality alone — complete your profile for a personal score"
     },
     "GENERATED": {
+      "PLAN_DAILY_BOTH": "A daily staple, morning and evening",
+      "PLAN_SPF_MORNING": "Sun protection belongs to the morning routine",
+      "PLAN_RETINOID_EVENING": "Retinoids are usually used in the evening, with rest days in between",
+      "PLAN_EXFOLIANT_SPACING": "Exfoliating products are usually spaced out, away from retinoid evenings",
+      "PLAN_ACTIVE_SLOT": "Works best in the morning, under sun exposure",
+      "PLAN_SUPPORTING_BOTH": "Fits both the morning and the evening routine",
+      "PLAN_MASK_WEEKLY": "A weekly treat, on the calmest evening",
+      "PLAN_UNSCHEDULED": "Used as needed rather than on a fixed schedule",
+      "PLAN_NOTE_SENSITIVITY": "Spaced to at most {count} exfoliating evening a week for your skin sensitivity | Spaced to at most {count} exfoliating evenings a week for your skin sensitivity",
+      "PLAN_NOTE_DISCLAIMER": "A descriptive suggestion based on typical usage, not a medical or dermatological recommendation.",
       "ALT_CHEAPER": "{percent}% less than {product}",
       "ALT_BETTER_MATCH": "{score}% match — {delta} points above this product",
       "ALT_BETTER_VALUE": "{score}% match at {price}",
@@ -276,6 +286,16 @@ export const PHRASES = {
       "GENERIC": "Ocena wyłącznie na podstawie jakości składu — uzupełnij profil, aby zobaczyć wynik osobisty"
     },
     "GENERATED": {
+      "PLAN_DAILY_BOTH": "Codzienna baza, rano i wieczorem",
+      "PLAN_SPF_MORNING": "Ochrona przeciwsłoneczna należy do porannej rutyny",
+      "PLAN_RETINOID_EVENING": "Retinoidy zwykle stosuje się wieczorem, z dniami przerwy",
+      "PLAN_EXFOLIANT_SPACING": "Złuszczanie zwykle rozkłada się w czasie, z dala od wieczorów z retinoidem",
+      "PLAN_ACTIVE_SLOT": "Najlepiej sprawdza się rano, pod ekspozycję na słońce",
+      "PLAN_SUPPORTING_BOTH": "Pasuje zarówno do porannej, jak i wieczornej rutyny",
+      "PLAN_MASK_WEEKLY": "Cotygodniowy rytuał, w najspokojniejszy wieczór",
+      "PLAN_UNSCHEDULED": "Używane wedle potrzeby, bez stałego grafiku",
+      "PLAN_NOTE_SENSITIVITY": "Rozplanowane na maksymalnie {count} złuszczający wieczór w tygodniu przy Twojej wrażliwości skóry | Rozplanowane na maksymalnie {count} złuszczające wieczory w tygodniu przy Twojej wrażliwości skóry | Rozplanowane na maksymalnie {count} złuszczających wieczorów w tygodniu przy Twojej wrażliwości skóry",
+      "PLAN_NOTE_DISCLAIMER": "Opisowa podpowiedź oparta na typowym stosowaniu, nie zalecenie medyczne ani dermatologiczne.",
       "ALT_CHEAPER": "{percent}% taniej niż {product}",
       "ALT_BETTER_MATCH": "{score}% dopasowania — o {delta} pkt więcej niż ten produkt",
       "ALT_BETTER_VALUE": "{score}% dopasowania za {price}",

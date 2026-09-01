@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import type { RoutineAnalysisDto, ShelfItemDto } from '@kosvia/shared';
+import type { RoutineAnalysisDto, RoutinePlanDto, ShelfItemDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { RoutineAnalysisService } from '../recommendation/routine-analysis.service';
+import { RoutinePlanService } from '../recommendation/routine-plan.service';
 import type { AddShelfItemDto, UpdateShelfItemDto } from './dto/shelf.dto';
 import { publicProductWhere } from '../products/product-visibility';
 
@@ -16,6 +17,7 @@ export class ShelfService {
     private readonly viewers: ViewerContextService,
     private readonly match: PersonalMatchService,
     private readonly routine: RoutineAnalysisService,
+    private readonly routinePlan: RoutinePlanService,
   ) {}
 
   async list(userId: string, favoritesOnly = false): Promise<ShelfItemDto[]> {
@@ -41,6 +43,7 @@ export class ShelfService {
       finishedAt: item.finishedAt?.toISOString() ?? null,
       isFavorite: item.isFavorite,
       notes: item.notes,
+      paoMonths: item.product.paoMonths ?? item.product.category.paoMonths,
       product: toProductSummary(item.product, scores.get(item.productId) ?? null),
     }));
   }
@@ -109,6 +112,10 @@ export class ShelfService {
 
   analyse(userId: string): Promise<RoutineAnalysisDto> {
     return this.routine.analyse(userId);
+  }
+
+  plan(userId: string): Promise<RoutinePlanDto> {
+    return this.routinePlan.plan(userId);
   }
 
   private async assertOwned(userId: string, id: string): Promise<void> {

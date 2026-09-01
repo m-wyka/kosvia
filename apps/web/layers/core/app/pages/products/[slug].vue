@@ -326,10 +326,24 @@ useBreadcrumbJsonLd(
         <section>
           <h2 class="font-display text-2xl text-ink">{{ $t('PRODUCT.WHAT_IS_IN_IT') }}</h2>
           <p class="mt-1 mb-5 text-sm text-ink-muted">{{ $t('PRODUCT.WHAT_IS_IN_IT_SUBTITLE') }}</p>
+          <ProductFormulaChange
+            v-if="product.recentFormulaChange"
+            :change="product.recentFormulaChange"
+            class="mb-4"
+          />
           <IngredientList :ingredients="product.ingredients" />
         </section>
 
         <ProductAlternatives :slug="product.slug" :name="product.name" />
+
+        <div class="flex justify-start">
+          <BaseButton :to="`/dupes?product=${product.slug}`" variant="secondary" size="sm">
+            {{ $t('PRODUCT.FIND_DUPES') }}
+            <template #icon>
+              <BaseIcon name="sparkles" :size="16" />
+            </template>
+          </BaseButton>
+        </div>
       </div>
 
       <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">

@@ -20,6 +20,7 @@ import { PRODUCT_INCLUDE, type ProductRow } from './product.select';
 import { decimalToNumber, toProductDto, toProductSummary, toScorable } from './product.mapper';
 import type { ProductQueryDto } from './dto/product-query.dto';
 import { isProductVisible, publicProductWhere } from './product-visibility';
+import { FormulaRevisionService } from '../inci/formula-revision.service';
 import {
   SEARCH_PROVIDER,
   type RankedCandidate,
@@ -41,6 +42,7 @@ export class ProductsService {
     private readonly ingredientScore: IngredientScoreService,
     private readonly coarseMatch: CoarseMatchService,
     @Inject(SEARCH_PROVIDER) private readonly searchProvider: SearchProvider,
+    private readonly formulaRevisions: FormulaRevisionService,
   ) {}
 
   /* ------------------------------------------------------------- reading -- */
@@ -190,7 +192,8 @@ export class ProductsService {
     if (!row || !isProductVisible(row)) {
       throw new NotFoundException('We could not find that product.');
     }
-    return toProductDto(row, this.scoreOne(row, viewer), locale);
+    const recentFormulaChange = await this.formulaRevisions.recentChange(row.id);
+    return { ...toProductDto(row, this.scoreOne(row, viewer), locale), recentFormulaChange };
   }
 
   async findByIdOrSlug(
@@ -317,6 +320,8 @@ export class ProductsService {
         return [{ lowestPrice: 'asc' }, { name: 'asc' }];
       case 'price-desc':
         return [{ lowestPrice: 'desc' }, { name: 'asc' }];
+      case 'price-per-100':
+        return [{ pricePerHundred: { sort: 'asc', nulls: 'last' } }, { name: 'asc' }];
       case 'ingredient-score':
         return [{ ingredientScore: 'desc' }, { name: 'asc' }];
       case 'newest':

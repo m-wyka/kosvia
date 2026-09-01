@@ -53,7 +53,7 @@ export type ConsentType = (typeof CONSENT_TYPES)[number];
 export const CONSENT_VERSIONS: Record<ConsentType, string> = {
   TERMS: 'terms-2026-08-29',
   PRIVACY: 'privacy-2026-08-29',
-  BEAUTY_PROFILE_HEALTH: 'health-2026-08-29',
+  BEAUTY_PROFILE_HEALTH: 'health-2026-09-01',
   AI_PROCESSING: 'ai-2026-08-29',
   MARKETING_EMAIL: 'marketing-2026-08-29',
 };

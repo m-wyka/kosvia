@@ -19,6 +19,11 @@ const sections = [
       { to: '/admin/ingredients', label: 'ADMIN.NAV.INGREDIENTS', icon: 'leaf' as const },
       { to: '/admin/inci-queue', label: 'ADMIN.NAV.INCI_QUEUE', icon: 'filter' as const },
       { to: '/admin/imports', label: 'ADMIN.NAV.IMPORTS', icon: 'arrow-up-down' as const },
+      {
+        to: '/admin/formula-changes',
+        label: 'ADMIN.NAV.FORMULA_CHANGES',
+        icon: 'sparkles' as const,
+      },
     ],
   },
   {

@@ -53,5 +53,18 @@ export const useFormat = () => {
     }).format(toDate(value));
   };
 
-  return { price, pricePer100, date, dateShort, currencyUnit };
+  const monthsSince = (value: string | Date): number => {
+    const start = toDate(value);
+    const now = new Date();
+    const wholeMonths =
+      (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+    return now.getDate() >= start.getDate() ? wholeMonths : wholeMonths - 1;
+  };
+
+  const addMonths = (value: string | Date, months: number): Date => {
+    const result = toDate(value);
+    return new Date(result.getFullYear(), result.getMonth() + months, result.getDate());
+  };
+
+  return { price, pricePer100, date, dateShort, monthsSince, addMonths, currencyUnit };
 };

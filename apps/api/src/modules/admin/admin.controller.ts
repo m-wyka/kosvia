@@ -258,6 +258,11 @@ export class AdminController {
     return this.admin.deleteAppReview(id);
   }
 
+  /* ----------------------------------------------------- formula changes -- */
+  @Get('formula-changes') listFormulaChanges(@Query() query: AdminListQueryDto) {
+    return this.admin.listFormulaChanges(query);
+  }
+
   /* --------------------------------------------------------------- users -- */
   @Get('users') listUsers(@Query() query: AdminListQueryDto) {
     return this.admin.listUsers(query);

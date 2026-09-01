@@ -37,6 +37,7 @@ const EMPTY_FORM = {
   imageUrl: '',
   volume: '' as string | number,
   volumeUnit: 'ml',
+  paoMonths: '' as string | number,
   highlights: '',
   isFragranceFree: false,
   isVegan: false,
@@ -143,7 +144,9 @@ const openEdit = async (row: ProductRow) => {
   loadingDetail.value = true;
   labelResult.value = null;
   try {
-    const detail = await api<ProductDto & { isActive: boolean }>(`/admin/products/${row.id}`);
+    const detail = await api<ProductDto & { isActive: boolean; paoMonths: number | null }>(
+      `/admin/products/${row.id}`,
+    );
     labelText.value = detail.ingredients.map((entry) => entry.ingredient.inciName).join(', ');
     Object.assign(form, {
       name: detail.name,
@@ -156,6 +159,7 @@ const openEdit = async (row: ProductRow) => {
       imageUrl: detail.imageUrl ?? '',
       volume: detail.volume ?? '',
       volumeUnit: detail.volumeUnit ?? 'ml',
+      paoMonths: detail.paoMonths ?? '',
       highlights: detail.highlights.join('\n'),
       isFragranceFree: detail.isFragranceFree,
       isVegan: detail.isVegan,
@@ -180,6 +184,7 @@ const save = async () => {
     imageUrl: form.imageUrl || undefined,
     volume: form.volume === '' ? undefined : Number(form.volume),
     volumeUnit: form.volumeUnit,
+    paoMonths: form.paoMonths === '' ? null : Number(form.paoMonths),
     highlights: form.highlights
       .split('\n')
       .map((line) => line.trim())
@@ -359,7 +364,7 @@ useSeo(() => ({
           />
         </div>
 
-        <div class="grid gap-4 sm:grid-cols-3">
+        <div class="grid gap-4 sm:grid-cols-4">
           <BaseInput
             v-model="form.ean"
             :label="$t('ADMIN.PRODUCTS.FIELD_EAN')"
@@ -374,6 +379,12 @@ useSeo(() => ({
             v-model="form.volumeUnit"
             :label="$t('ADMIN.PRODUCTS.FIELD_UNIT')"
             placeholder="ml"
+          />
+          <BaseInput
+            v-model="form.paoMonths"
+            :label="$t('ADMIN.PRODUCTS.FIELD_PAO')"
+            :hint="$t('ADMIN.PRODUCTS.FIELD_PAO_HINT')"
+            type="number"
           />
         </div>
 

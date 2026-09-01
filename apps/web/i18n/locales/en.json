@@ -52,6 +52,8 @@
     "ACCOUNT": "Your account",
     "ALL_PRODUCTS": "All products",
     "INGREDIENT_LIBRARY": "Ingredient library",
+    "DUPES": "Find a dupe",
+    "DIARY": "Skin diary",
     "ABOUT_DATA": "About the data",
     "PRIVACY": "Privacy",
     "REVIEWS": "Reviews",
@@ -429,6 +431,53 @@
       "CTA": "See all reviews"
     }
   },
+  "DUPES": {
+    "TITLE": "Find a dupe",
+    "SUBTITLE": "Pick a product and we will show the formulas closest to it in our catalogue — with the price gap, so you can see when the cheaper one does the same job.",
+    "SEARCH_LABEL": "Which product do you want to replace?",
+    "SEARCH_PLACEHOLDER": "Product or brand name…",
+    "PICK_TITLE": "Start with a product",
+    "PICK_BODY": "Search above and pick the product you would like to find a substitute for.",
+    "SUBJECT_LABEL": "You are comparing against",
+    "RESULTS_TITLE": "Closest formulas to {name}",
+    "SIMILARITY": "{percent}% similar formula",
+    "SHARED_COUNT": "{count} shared key ingredient | {count} shared key ingredients",
+    "CHEAPER_BY": "{amount} cheaper",
+    "PRICIER_BY": "{amount} more",
+    "EMPTY_TITLE": "No close formulas found",
+    "EMPTY_BODY": "Nothing in the catalogue is similar enough to call a dupe. Try another product."
+  },
+  "DIARY": {
+    "TITLE": "Skin diary",
+    "SUBTITLE": "A short daily note on how your skin feels — in your own words. Over time it shows what changes with what you use.",
+    "OVERALL_LABEL": "How is your skin today?",
+    "FLAG": {
+      "BREAKOUTS": "Breakouts",
+      "DRYNESS": "Dryness",
+      "IRRITATION": "Irritation",
+      "REDNESS": "Redness"
+    },
+    "NOTE_LABEL": "Note",
+    "NOTE_PLACEHOLDER": "Anything worth remembering about today…",
+    "SAVE": "Save the day",
+    "SAVED": "Saved to your diary.",
+    "DELETED": "Entry removed.",
+    "DELETE_ENTRY": "Remove this day",
+    "PREVIOUS_MONTH": "Previous month",
+    "NEXT_MONTH": "Next month",
+    "DISCLAIMER": "Your own observations, stored for you only. The diary describes, it does not diagnose — see a dermatologist about anything that worries you.",
+    "STATS": {
+      "TITLE": "This month",
+      "LOGGED_DAYS": "Days logged",
+      "AVERAGE": "Average feel",
+      "VS_LAST_MONTH": "Days with… (this / last month)"
+    },
+    "CONSENT": {
+      "TITLE": "Before you start the diary",
+      "BODY": "Diary entries describe how your skin feels day to day — legally, that is health data, and it is stored under the same consent as your beauty profile. Withdrawing that consent deletes the profile and the diary together.",
+      "CONFIRM": "Open the diary"
+    }
+  },
   "REVIEWS": {
     "TITLE": "Reviews",
     "SUBTITLE": "What users think of Kosvia — and a place to add your own review.",
@@ -516,9 +565,17 @@
     "SUBTITLE_PERSONAL": "Everything below is ranked against your profile.",
     "SUBTITLE_GENERIC": "Complete your profile and these scores become personal.",
     "ASK_AI": "Ask the AI shopper",
+    "OPEN_DIARY": "Skin diary",
     "NO_PROFILE_TITLE": "Your profile is not set up yet",
     "NO_PROFILE_BODY": "Two minutes of questions turns every score on the site into a personal one.",
     "NO_PROFILE_CTA": "Set up my profile",
+    "REGULATORY": {
+      "TITLE": "Regulatory change on your shelf",
+      "BECAME_PROHIBITED": "was added to Annex II of the EU Cosmetics Regulation (prohibited in cosmetics).",
+      "BECAME_RESTRICTED": "was added to Annex III of the EU Cosmetics Regulation (permitted with conditions).",
+      "AFFECTED_PRODUCTS": "On your shelf:",
+      "DISMISS": "Dismiss"
+    },
     "STAT_SHELF": "On your shelf",
     "STAT_FAVORITES": "Favourites",
     "STAT_ALERTS": "Price alerts",
@@ -569,6 +626,7 @@
       "BEST_MATCH": "Best match for me",
       "PRICE_ASC": "Price: low to high",
       "PRICE_DESC": "Price: high to low",
+      "PRICE_PER_100": "Price per 100 ml/g",
       "INGREDIENT_SCORE": "Best ingredients",
       "NEWEST": "Newest"
     },
@@ -598,6 +656,7 @@
     "PRICE_UNAVAILABLE": "Price unavailable",
     "AT": "at {store}",
     "PER_HUNDRED": "{price} / 100 {unit}",
+    "FIND_DUPES": "Find a cheaper dupe",
     "ADD_FAVORITE": "Add {name} to favourites",
     "REMOVE_FAVORITE": "Remove {name} from favourites",
     "ADD_COMPARE": "Add {name} to comparison",
@@ -649,7 +708,16 @@
       "MORE_ABOUT": "More about this ingredient",
       "FULL_LIST": "Full INCI list, in label order",
       "FRAGRANCE_ALLERGEN": "Fragrance allergen",
-      "RESTRICTED": "Annex III"
+      "RESTRICTED": "Annex III",
+      "PROHIBITED": "Annex II — prohibited"
+    },
+    "FORMULA_CHANGE": {
+      "BADGE": "New formula",
+      "TITLE": "The imported label changed on {date}",
+      "ADDED": "Added:",
+      "REMOVED": "Removed:",
+      "REORDERED": "The ingredients are the same, but their order on the label changed.",
+      "DISCLAIMER": "Based on a refreshed source label; Kosvia has not verified the change with the manufacturer."
     },
     "MATCH_PANEL": {
       "PERSONAL_TITLE": "Your Personal Match",
@@ -754,6 +822,14 @@
     "REMOVE": "Remove {name}",
     "OUR_PICK": "Kosvia's pick",
     "VIEW_PRODUCT": "View product",
+    "DIFF": {
+      "TITLE": "Ingredient breakdown",
+      "OVERLAP": "The two formulas share {percent}% of their ingredients.",
+      "SHARED": "{count} shared ingredient | {count} shared ingredients",
+      "ONLY_IN": "Only in {name}",
+      "NONE_SHARED": "These formulas have no ingredients in common.",
+      "NONE_UNIQUE": "Nothing beyond the shared ingredients."
+    },
     "NOTE": "Price per 100 ml is the fairest way to compare products of different sizes. Personal Match is computed from your profile, not from reviews.",
     "TRAY": {
       "COUNT": "{current} of {max}",
@@ -790,6 +866,31 @@
     "ADD_FAVORITE": "Add to favourites",
     "REMOVE_FAVORITE": "Remove from favourites",
     "REMOVE_ITEM": "Remove {name} from shelf",
+    "REGULATORY_BADGE": "Regulatory change",
+    "PLAN": {
+      "TITLE": "Your week, morning and evening",
+      "SUBTITLE": "How the products on your shelf are usually spread over a week. A suggestion to adapt, not a prescription.",
+      "MORNING": "Morning",
+      "EVENING": "Evening",
+      "UNSCHEDULED": "Used as needed:",
+      "DAY": {
+        "MONDAY": "Mon",
+        "TUESDAY": "Tue",
+        "WEDNESDAY": "Wed",
+        "THURSDAY": "Thu",
+        "FRIDAY": "Fri",
+        "SATURDAY": "Sat",
+        "SUNDAY": "Sun"
+      }
+    },
+    "PAO": {
+      "MARK_OPENED": "Mark as opened",
+      "MARK_FINISHED": "Mark as finished",
+      "OPENED_ON": "Opened {date}",
+      "FINISHED_ON": "Finished {date}",
+      "USE_WITHIN": "{count} month left — use by {date} | {count} months left — use by {date}",
+      "EXPIRED": "Period after opening passed ({date})"
+    },
     "REMOVED": "{name} removed from your shelf",
     "ADDED": "{name} added to your shelf",
     "SAVED": "{name} saved to your shelf",
@@ -883,7 +984,7 @@
       "TITLE": "Privacy and your data",
       "SUBTITLE": "Consents you have given, a copy of everything we hold, and the way out.",
       "CONSENT_SAVED": "Consent updated",
-      "HEALTH_WITHDRAW_CONFIRM": "Withdrawing this consent deletes your beauty profile. Continue?",
+      "HEALTH_WITHDRAW_CONFIRM": "Withdrawing this consent deletes your beauty profile and your skin diary. Continue?",
       "EXPORT": "Download my data (JSON)",
       "DELETE": "Delete my account",
       "DELETE_TITLE": "Delete your account",
@@ -939,6 +1040,7 @@
       "INGREDIENTS": "Ingredients",
       "INCI_QUEUE": "INCI queue",
       "IMPORTS": "Imports",
+      "FORMULA_CHANGES": "Formula changes",
       "AUDIT": "Audit log",
       "MATCH_WEIGHTS": "Match weights",
       "STORES": "Stores",
@@ -1101,6 +1203,16 @@
       "STATUS_INTERRUPTED": "Interrupted",
       "ERRORS": "{count} errors — last: {last}"
     },
+    "FORMULA_CHANGES": {
+      "TITLE": "Formula changes",
+      "SUBTITLE": "Composition snapshots recorded by source imports — a new row means the upstream label changed.",
+      "EMPTY": "No formula changes recorded yet",
+      "SEARCH_PLACEHOLDER": "Search by product name…",
+      "COL_WHEN": "When",
+      "COL_PRODUCT": "Product",
+      "COL_SOURCE": "Source",
+      "COL_HASH": "Hash"
+    },
     "AUDIT": {
       "TITLE": "Audit log",
       "SUBTITLE": "Every change made through the admin panel — who, what, when, and the request that did it.",
@@ -1156,6 +1268,8 @@
       "FIELD_EAN": "EAN",
       "FIELD_VOLUME": "Volume",
       "FIELD_UNIT": "Unit",
+      "FIELD_PAO": "PAO (months)",
+      "FIELD_PAO_HINT": "Overrides the category default",
       "FIELD_DESCRIPTION": "Description",
       "FIELD_USAGE": "How to use it",
       "FIELD_HIGHLIGHTS": "Highlights",
@@ -1284,6 +1398,14 @@
       "TITLE": "Reviews — what users say about Kosvia",
       "DESCRIPTION": "Ratings and reviews of the Kosvia portal from its users, with an overall score out of 5 stars."
     },
+    "DUPES": {
+      "TITLE": "Find a dupe — cheaper cosmetics with the same formula",
+      "DESCRIPTION": "Pick any cosmetic and Kosvia will show the products closest to it by INCI ingredients, with the price difference — real dupes, found by formula, not by marketing."
+    },
+    "DIARY": {
+      "TITLE": "Skin diary — track how your skin feels",
+      "DESCRIPTION": "A private daily log of how your skin feels, kept alongside your shelf."
+    },
     "DISCOVER": {
       "TITLE": "Discover cosmetics chosen for you",
       "DESCRIPTION": "Browse cosmetics by category, concern and budget. Every product is scored against your skin, your goals and what you already own."
@@ -1358,6 +1480,8 @@
       "IMPORTS_DESCRIPTION": "Batch import history.",
       "AUDIT": "Audit log · Admin",
       "AUDIT_DESCRIPTION": "Admin change history.",
+      "FORMULA_CHANGES": "Formula changes · Admin",
+      "FORMULA_CHANGES_DESCRIPTION": "Composition snapshots from source imports.",
       "MATCH_WEIGHTS": "Match weights · Admin",
       "MATCH_WEIGHTS_DESCRIPTION": "Tune Personal Match without a deploy.",
       "STORES": "Stores · Admin",
@@ -1371,6 +1495,16 @@
     }
   },
   "GENERATED": {
+    "PLAN_DAILY_BOTH": "A daily staple, morning and evening",
+    "PLAN_SPF_MORNING": "Sun protection belongs to the morning routine",
+    "PLAN_RETINOID_EVENING": "Retinoids are usually used in the evening, with rest days in between",
+    "PLAN_EXFOLIANT_SPACING": "Exfoliating products are usually spaced out, away from retinoid evenings",
+    "PLAN_ACTIVE_SLOT": "Works best in the morning, under sun exposure",
+    "PLAN_SUPPORTING_BOTH": "Fits both the morning and the evening routine",
+    "PLAN_MASK_WEEKLY": "A weekly treat, on the calmest evening",
+    "PLAN_UNSCHEDULED": "Used as needed rather than on a fixed schedule",
+    "PLAN_NOTE_SENSITIVITY": "Spaced to at most {count} exfoliating evening a week for your skin sensitivity | Spaced to at most {count} exfoliating evenings a week for your skin sensitivity",
+    "PLAN_NOTE_DISCLAIMER": "A descriptive suggestion based on typical usage, not a medical or dermatological recommendation.",
     "ALT_CHEAPER": "{percent}% less than {product}",
     "ALT_BETTER_MATCH": "{score}% match — {delta} points above this product",
     "ALT_BETTER_VALUE": "{score}% match at {price}",
@@ -1432,7 +1566,7 @@
     "TERMS_LABEL": "I accept the terms of service",
     "PRIVACY_LABEL": "I have read the privacy policy",
     "HEALTH_LABEL": "I consent to Kosvia processing information about my skin",
-    "HEALTH_HINT": "Skin type, concerns, sensitivities and ingredients you avoid count as health data. Without this consent there is no beauty profile and no Personal Match — everything else works.",
+    "HEALTH_HINT": "Skin type, concerns, sensitivities, ingredients you avoid and skin diary entries count as health data. Without this consent there is no beauty profile, no Personal Match and no diary — everything else works.",
     "AI_LABEL": "I consent to an anonymised version of my profile being sent to the AI model provider",
     "AI_HINT": "Only skin type, concerns, goals and budget — never your name, e-mail or account id. Needed for the AI Shopper and AI explanations.",
     "MARKETING_LABEL": "Send me occasional product news by e-mail",

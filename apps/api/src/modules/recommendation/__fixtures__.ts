@@ -61,6 +61,8 @@ export function row(options: RowOptions): ProductRow {
     targetSkinTypes,
     ingredientScore,
     lowestPrice: new Prisma.Decimal(price),
+    pricePerHundred: new Prisma.Decimal(Math.round((price / volume) * 100 * 100) / 100),
+    paoMonths: null,
     isActive: true,
     sourceId: null,
     sourceRef: null,
@@ -85,6 +87,7 @@ export function row(options: RowOptions): ProductRow {
       parentId: null,
       routineStep,
       sortOrder: 0,
+      paoMonths: null,
     },
     source: null,
     ingredients: ingredientIds.map((ingredientId, index) => ({

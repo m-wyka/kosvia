@@ -7,6 +7,7 @@ import { ProfileService } from '../profile/profile.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { RecommendationService } from '../recommendation/recommendation.service';
 import { RoutineAnalysisService } from '../recommendation/routine-analysis.service';
+import { RegulatoryAlertsService } from '../shelf/regulatory-alerts.service';
 
 /** One call that fills the whole signed-in home screen. */
 @Injectable()
@@ -18,6 +19,7 @@ export class DashboardService {
     private readonly recommendations: RecommendationService,
     private readonly routine: RoutineAnalysisService,
     private readonly consents: ConsentService,
+    private readonly regulatoryAlerts: RegulatoryAlertsService,
   ) {}
 
   async load(userId: string): Promise<DashboardDto> {
@@ -37,9 +39,10 @@ export class DashboardService {
         select: { executeAt: true },
       }),
     ]);
-    const [recommended, routineAnalysis] = await Promise.all([
+    const [recommended, routineAnalysis, regulatoryAlerts] = await Promise.all([
       this.recommendations.getPersonalizedProducts(viewer, { limit: 6 }),
       shelfCount > 0 ? this.routine.analyse(userId) : Promise.resolve(null),
+      shelfCount > 0 ? this.regulatoryAlerts.alertsFor(userId) : Promise.resolve([]),
     ]);
 
     return {
@@ -50,6 +53,7 @@ export class DashboardService {
       activeAlerts,
       recommended,
       routine: routineAnalysis,
+      regulatoryAlerts,
     };
   }
 }

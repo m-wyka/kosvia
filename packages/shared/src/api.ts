@@ -100,6 +100,7 @@ export interface AccountExportDto {
   priceAlerts: unknown[];
   comparisons: unknown[];
   conversations: unknown[];
+  skinDiary: unknown[];
 }
 
 export interface AuthResponse {
@@ -292,6 +293,14 @@ export interface ProductSummaryDto {
   personalMatch?: PersonalMatchDto | null;
 }
 
+/** Diff between the two newest imported compositions of a product. */
+export interface FormulaChangeDto {
+  changedAt: string;
+  addedIngredients: string[];
+  removedIngredients: string[];
+  isReordered: boolean;
+}
+
 export interface ProductDto extends ProductSummaryDto {
   description: string | null;
   usage: string | null;
@@ -301,6 +310,8 @@ export interface ProductDto extends ProductSummaryDto {
   pricePerHundredMl: number | null;
   /** Where the record came from; drives the licence attribution on the page. */
   source: DataSourceDto | null;
+  /** Set only on the product-page read when the imported label changed recently. */
+  recentFormulaChange?: FormulaChangeDto | null;
 }
 
 export interface DataSourceDto {
@@ -316,7 +327,13 @@ export interface DataSourceDto {
 /* -------------------------------------------------------------------------- */
 
 export type ProductSort =
-  'recommended' | 'price-asc' | 'price-desc' | 'best-match' | 'ingredient-score' | 'newest';
+  | 'recommended'
+  | 'price-asc'
+  | 'price-desc'
+  | 'price-per-100'
+  | 'best-match'
+  | 'ingredient-score'
+  | 'newest';
 
 export interface ProductSearchQuery {
   q?: string;
@@ -475,6 +492,8 @@ export interface ShelfItemDto {
   finishedAt: string | null;
   isFavorite: boolean;
   notes: string | null;
+  /** Effective period-after-opening in months (product label override, else category default). */
+  paoMonths: number | null;
   product: ProductSummaryDto;
 }
 
@@ -484,6 +503,49 @@ export interface RoutineObservationDto {
   title: LocalisedText;
   detail: LocalisedText;
   productIds: string[];
+}
+
+export const REGULATORY_CHANGE_KINDS = [
+  'became-prohibited',
+  'became-restricted',
+  'prohibition-lifted',
+  'restriction-lifted',
+] as const;
+export type RegulatoryChangeKind = (typeof REGULATORY_CHANGE_KINDS)[number];
+
+/** A recent Annex II/III change affecting products on the user's shelf. */
+export interface RegulatoryAlertDto {
+  ingredientId: string;
+  inciName: string;
+  slug: string;
+  kind: RegulatoryChangeKind;
+  newAnnex: string | null;
+  changedAt: string;
+  products: ProductSummaryDto[];
+}
+
+export interface RoutinePlanAssignmentDto {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  /** RoutineStep enum value, translated on the client through the vocabulary. */
+  step: string;
+  reason: LocalisedText;
+}
+
+export interface RoutinePlanDayDto {
+  /** 0 = Monday … 6 = Sunday. */
+  day: number;
+  morning: RoutinePlanAssignmentDto[];
+  evening: RoutinePlanAssignmentDto[];
+}
+
+/** A descriptive weekly AM/PM suggestion built from the shelf — never a prescription. */
+export interface RoutinePlanDto {
+  itemCount: number;
+  days: RoutinePlanDayDto[];
+  unscheduled: RoutinePlanAssignmentDto[];
+  notes: LocalisedText[];
 }
 
 export interface RoutineAnalysisDto {
@@ -505,6 +567,65 @@ export interface PriceAlertDto {
   product: ProductSummaryDto;
   /** True when the current lowest offer already meets the target. */
   triggered: boolean;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Skin diary                                                                 */
+/* -------------------------------------------------------------------------- */
+
+export const SKIN_DIARY_FLAGS = ['breakouts', 'dryness', 'irritation', 'redness'] as const;
+export type SkinDiaryFlag = (typeof SKIN_DIARY_FLAGS)[number];
+
+export const SKIN_DIARY_OVERALL_MIN = 1;
+export const SKIN_DIARY_OVERALL_MAX = 5;
+export const SKIN_DIARY_NOTE_MAX_LENGTH = 500;
+
+/** One day of the user's own skin observations — their words, never a diagnosis. */
+export interface SkinDiaryEntryDto {
+  /** Opaque calendar date YYYY-MM-DD in the user's local time. */
+  date: string;
+  overall: number;
+  flags: SkinDiaryFlag[];
+  note: string | null;
+}
+
+export interface SkinDiaryStatsDto {
+  loggedDays: number;
+  averageOverall: number | null;
+  flagCounts: Record<SkinDiaryFlag, number>;
+  previousMonthFlagCounts: Record<SkinDiaryFlag, number>;
+}
+
+export interface SkinDiaryMonthDto {
+  /** YYYY-MM. */
+  month: string;
+  entries: SkinDiaryEntryDto[];
+  stats: SkinDiaryStatsDto;
+}
+
+export interface UpsertSkinDiaryEntryPayload {
+  overall: number;
+  flags: SkinDiaryFlag[];
+  note?: string | null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dupe finder                                                                */
+/* -------------------------------------------------------------------------- */
+
+export interface DupeMatchDto {
+  product: ProductSummaryDto;
+  /** Cosine similarity of the composition fingerprints, 0–100. */
+  similarityPercent: number;
+  /** Matched ingredients shared within the top of both INCI lists. */
+  sharedIngredientCount: number;
+  /** Candidate price minus subject price; negative means the dupe is cheaper. */
+  priceDifference: number | null;
+}
+
+export interface DupeResultDto {
+  subject: ProductSummaryDto;
+  dupes: DupeMatchDto[];
 }
 
 /* -------------------------------------------------------------------------- */
@@ -603,6 +724,7 @@ export interface DashboardDto {
   activeAlerts: number;
   recommended: ProductSummaryDto[];
   routine: RoutineAnalysisDto | null;
+  regulatoryAlerts: RegulatoryAlertDto[];
 }
 
 /* -------------------------------------------------------------------------- */

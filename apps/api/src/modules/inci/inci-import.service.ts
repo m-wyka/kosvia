@@ -8,6 +8,7 @@ import { InciMatcherService, type IngredientMatch } from './inci-matcher.service
 import { parseLabel, type ParsedToken } from './inci-parser';
 import { MIN_WORDS_TO_SEGMENT, segmentByDictionary, segmentCandidates } from './inci-segmenter';
 import { UnmatchedTokenService } from './unmatched-token.service';
+import { FormulaRevisionService } from './formula-revision.service';
 
 const MAY_CONTAIN_WEIGHT = 0.1;
 const RECOGNIZED_THRESHOLD = 0.9;
@@ -46,6 +47,7 @@ export class InciImportService {
     private readonly matcher: InciMatcherService,
     private readonly unmatchedTokens: UnmatchedTokenService,
     private readonly traits: ProductTraitsService,
+    private readonly formulaRevisions: FormulaRevisionService,
   ) {}
 
   async applyLabel(
@@ -85,6 +87,9 @@ export class InciImportService {
       ),
     );
     await this.traits.refresh([productId]);
+    if (provenance.sourceId && !provenance.isManuallyEdited) {
+      await this.formulaRevisions.recordIfChanged(productId, rows, provenance.sourceId);
+    }
 
     const unmatched = resolved
       .filter((entry) => entry.unmatchedNormalized.length)

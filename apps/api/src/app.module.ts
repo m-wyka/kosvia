@@ -20,6 +20,7 @@ import { AIModule } from './modules/ai/ai.module';
 import { DiscoveryModule } from './modules/discovery/discovery.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AccountModule } from './modules/account/account.module';
+import { DiaryModule } from './modules/diary/diary.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -46,6 +47,7 @@ import { HealthController } from './health.controller';
     DiscoveryModule,
     AdminModule,
     AccountModule,
+    DiaryModule,
   ],
   controllers: [HealthController],
   providers: [

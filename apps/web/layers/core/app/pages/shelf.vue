@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { ProductSummaryDto, RoutineAnalysisDto, ShelfItemDto } from '@kosvia/shared';
+import type {
+  ProductSummaryDto,
+  RegulatoryAlertDto,
+  RoutineAnalysisDto,
+  RoutinePlanDto,
+  ShelfItemDto,
+} from '@kosvia/shared';
 
 interface ShelfCategoryGroup {
   name: string;
@@ -13,6 +19,8 @@ const MIN_SEARCH_LENGTH = 2;
 const SEARCH_DEBOUNCE_MS = 280;
 const SEARCH_PAGE_SIZE = 8;
 
+const PAO_CAUTION_RATIO = 0.8;
+
 const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
@@ -20,6 +28,7 @@ const route = useRoute();
 const { t } = useI18n();
 const vocab = useVocabulary();
 const localise = useLocalisedText();
+const format = useFormat();
 
 const {
   data: items,
@@ -33,6 +42,23 @@ const {
 const { data: analysis, refresh: refreshAnalysis } = await useApiFetch<RoutineAnalysisDto>(
   '/shelf/analysis',
   { key: 'shelf-analysis', lazy: true },
+);
+const { data: regulatoryAlerts } = await useApiFetch<RegulatoryAlertDto[]>(
+  '/shelf/regulatory-alerts',
+  { key: 'shelf-regulatory-alerts', lazy: true, default: () => [] },
+);
+const { data: routinePlan } = await useApiFetch<RoutinePlanDto>('/shelf/routine-plan', {
+  key: 'shelf-routine-plan',
+  lazy: true,
+});
+
+const regulatoryProductIds = computed(
+  () =>
+    new Set(
+      (regulatoryAlerts.value ?? []).flatMap((alert) =>
+        alert.products.map((product) => product.id),
+      ),
+    ),
 );
 
 const tab = ref(String(route.query.tab ?? 'all'));
@@ -84,6 +110,41 @@ const toggleFavorite = async (item: ShelfItemDto) => {
   } catch (caught) {
     toast.error(message(caught));
   }
+};
+
+const patchItem = async (item: ShelfItemDto, body: Record<string, string>) => {
+  try {
+    await api(`/shelf/${item.id}`, { method: 'PATCH', body });
+    await reloadAll();
+  } catch (caught) {
+    toast.error(message(caught));
+  }
+};
+
+const markOpened = (item: ShelfItemDto) => patchItem(item, { openedAt: new Date().toISOString() });
+const markFinished = (item: ShelfItemDto) =>
+  patchItem(item, { finishedAt: new Date().toISOString() });
+
+interface PaoStatus {
+  tone: 'neutral' | 'caution' | 'critical';
+  label: string;
+}
+
+const paoStatusFor = (item: ShelfItemDto): PaoStatus | null => {
+  if (!item.openedAt || !item.paoMonths) {
+    return null;
+  }
+  const monthsUsed = format.monthsSince(item.openedAt);
+  const monthsLeft = item.paoMonths - monthsUsed;
+  const deadline = format.dateShort(format.addMonths(item.openedAt, item.paoMonths));
+  if (monthsLeft <= 0) {
+    return { tone: 'critical', label: t('SHELF.PAO.EXPIRED', { date: deadline }) };
+  }
+  const isNearDeadline = monthsUsed / item.paoMonths >= PAO_CAUTION_RATIO;
+  return {
+    tone: isNearDeadline ? 'caution' : 'neutral',
+    label: t('SHELF.PAO.USE_WITHIN', { count: monthsLeft, date: deadline }, monthsLeft),
+  };
 };
 
 const removeItem = async (item: ShelfItemDto) => {
@@ -230,6 +291,16 @@ useSeo(() => ({
           </p>
         </aside>
       </div>
+
+      <section v-if="routinePlan && routinePlan.itemCount > 0" class="mt-10">
+        <h2 class="font-display text-2xl text-ink">
+          {{ $t('SHELF.PLAN.TITLE') }}
+        </h2>
+        <p class="mt-1 text-sm text-ink-muted">
+          {{ $t('SHELF.PLAN.SUBTITLE') }}
+        </p>
+        <RoutinePlanGrid :plan="routinePlan" class="mt-5" />
+      </section>
     </div>
 
     <BaseEmptyState
@@ -276,6 +347,44 @@ useSeo(() => ({
               <p v-if="item.notes" class="mt-1 line-clamp-2 text-xs text-ink-muted">
                 {{ item.notes }}
               </p>
+
+              <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                <BaseBadge
+                  v-if="regulatoryProductIds.has(item.product.id)"
+                  tone="caution"
+                  size="xs"
+                >
+                  {{ $t('SHELF.REGULATORY_BADGE') }}
+                </BaseBadge>
+                <template v-if="item.finishedAt">
+                  <span class="text-xs text-ink-faint">
+                    {{ $t('SHELF.PAO.FINISHED_ON', { date: format.dateShort(item.finishedAt) }) }}
+                  </span>
+                </template>
+                <template v-else-if="item.openedAt">
+                  <BaseBadge v-if="paoStatusFor(item)" :tone="paoStatusFor(item)!.tone" size="xs">
+                    {{ paoStatusFor(item)!.label }}
+                  </BaseBadge>
+                  <span v-else class="text-xs text-ink-faint">
+                    {{ $t('SHELF.PAO.OPENED_ON', { date: format.dateShort(item.openedAt) }) }}
+                  </span>
+                  <button
+                    type="button"
+                    class="text-xs font-medium text-ink-soft underline-offset-4 hover:underline"
+                    @click="markFinished(item)"
+                  >
+                    {{ $t('SHELF.PAO.MARK_FINISHED') }}
+                  </button>
+                </template>
+                <button
+                  v-else
+                  type="button"
+                  class="text-xs font-medium text-ink-soft underline-offset-4 hover:underline"
+                  @click="markOpened(item)"
+                >
+                  {{ $t('SHELF.PAO.MARK_OPENED') }}
+                </button>
+              </div>
 
               <div class="mt-auto flex items-center justify-between gap-2 pt-2">
                 <span

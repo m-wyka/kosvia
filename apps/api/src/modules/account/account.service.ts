@@ -44,30 +44,42 @@ export class AccountService {
   /* -------------------------------------------------------------- export -- */
 
   async exportData(userId: string): Promise<AccountExportDto> {
-    const [user, beautyProfile, consents, shelf, priceAlerts, comparisons, conversations] =
-      await Promise.all([
-        this.prisma.user.findUniqueOrThrow({
-          where: { id: userId },
-          include: { beautyProfile: { select: { id: true } } },
-        }),
-        this.profile.get(userId),
-        this.consents.history(userId),
-        this.prisma.userShelfItem.findMany({
-          where: { userId },
-          include: {
-            product: { select: { name: true, slug: true, brand: { select: { name: true } } } },
-          },
-        }),
-        this.prisma.priceAlert.findMany({
-          where: { userId },
-          include: { product: { select: { name: true, slug: true } } },
-        }),
-        this.prisma.productComparison.findMany({ where: { userId } }),
-        this.prisma.aIConversation.findMany({
-          where: { userId },
-          include: { messages: { orderBy: { createdAt: 'asc' } } },
-        }),
-      ]);
+    const [
+      user,
+      beautyProfile,
+      consents,
+      shelf,
+      priceAlerts,
+      comparisons,
+      conversations,
+      skinDiary,
+    ] = await Promise.all([
+      this.prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        include: { beautyProfile: { select: { id: true } } },
+      }),
+      this.profile.get(userId),
+      this.consents.history(userId),
+      this.prisma.userShelfItem.findMany({
+        where: { userId },
+        include: {
+          product: { select: { name: true, slug: true, brand: { select: { name: true } } } },
+        },
+      }),
+      this.prisma.priceAlert.findMany({
+        where: { userId },
+        include: { product: { select: { name: true, slug: true } } },
+      }),
+      this.prisma.productComparison.findMany({ where: { userId } }),
+      this.prisma.aIConversation.findMany({
+        where: { userId },
+        include: { messages: { orderBy: { createdAt: 'asc' } } },
+      }),
+      this.prisma.skinDiaryEntry.findMany({
+        where: { profile: { userId } },
+        orderBy: { date: 'asc' },
+      }),
+    ]);
 
     return {
       exportedAt: new Date().toISOString(),
@@ -87,6 +99,7 @@ export class AccountService {
       priceAlerts,
       comparisons,
       conversations,
+      skinDiary,
     };
   }
 
