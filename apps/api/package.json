@@ -23,6 +23,7 @@
     "ingredients:describe": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/describe-ingredients.ts",
     "aliases:apply": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/apply-aliases.ts",
     "traits:recompute": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/recompute-traits.ts",
+    "prices:demo": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/demo-prices.ts",
     "account:purge": "ts-node -O '{\"module\":\"CommonJS\"}' scripts/purge-accounts.ts"
   },
   "prisma": {

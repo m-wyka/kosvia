@@ -4,6 +4,6 @@ withDefaults(defineProps<{ size?: number }>(), { size: 26 });
 
 <template>
   <div class="flex items-center">
-    <img class="w-28" src="/images/logo.png" alt="Kosvia" />
+    <img class="w-28" src="/images/logo-mini.png" alt="Kosvia" />
   </div>
 </template>

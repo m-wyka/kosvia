@@ -56,5 +56,6 @@ czytaj to zamiast nich. Reszta audytu (stan faktyczny, korekty do plików 00–0
 - 16 migracji; `prisma migrate diff` pokazuje fałszywy drift (GIN, kolumna generowana, `vector`) — źródłem prawdy jest `migrate status` + `migrate deploy`.
 - `@kosvia/shared` jest czytane przez API z `dist` — po zmianie wartości runtime: `npm run build -w @kosvia/shared`.
 - Prettier tylko z roota (`.prettierignore` obejmuje `phrases.generated.ts`, `docs/spec`, migracje); po edycji locale: `npm run sync:phrases -w @kosvia/api`.
-- Skrypty: `import:obf`, `import:cosing`, `ingredients:describe`, `aliases:apply`, `traits:recompute`, `account:purge` (`-w @kosvia/api`).
+- Skrypty: `import:obf`, `import:cosing`, `ingredients:describe`, `aliases:apply`, `traits:recompute`, `account:purge`, `prices:demo` (`-w @kosvia/api`).
+- **Ceny demo (2026-09-01)**: katalog OBF nie ma prawdziwych ofert, więc `prices:demo` generuje deterministyczne ceny (widełki per krok rutyny, 3 fejkowe drogerie `drogeria-demo-*`, `DataSource` `demo-prices`, 6 tyg. historii) i przelicza `lowestPrice`. `--dry-run` raportuje, `--remove` cofa wszystko do zera — **wykonać przed podpięciem feedów afiliacyjnych**. Po `db:reset` odpalić ponownie po `import:obf`.
 - Konta demo: `demo@kosvia.app / Password123!` (wszystkie zgody), `admin@kosvia.app / Admin123!`.
