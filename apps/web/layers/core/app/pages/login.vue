@@ -79,7 +79,7 @@ useSeo(() => ({
       </p>
 
       <BaseButton type="submit" block size="lg" :loading="pending">
-        {{ $t('AUTH.SIGN_IN') }}
+        {{ $t('COMMON.SIGN_IN') }}
       </BaseButton>
     </form>
 

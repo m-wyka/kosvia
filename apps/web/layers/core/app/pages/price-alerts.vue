@@ -59,7 +59,7 @@ const distanceToTarget = (alert: PriceAlertDto): string => {
 };
 
 useSeo(() => ({
-  title: t('SEO.ALERTS.TITLE'),
+  title: t('ALERTS.TITLE'),
   description: t('SEO.ALERTS.DESCRIPTION'),
   noindex: true,
 }));
@@ -84,7 +84,7 @@ useSeo(() => ({
       :title="$t('ALERTS.EMPTY_TITLE')"
       :description="$t('ALERTS.EMPTY_BODY')"
     >
-      <BaseButton to="/products">{{ $t('ALERTS.BROWSE') }}</BaseButton>
+      <BaseButton to="/products">{{ $t('COMMON.BROWSE_PRODUCTS') }}</BaseButton>
     </BaseEmptyState>
 
     <template v-else>

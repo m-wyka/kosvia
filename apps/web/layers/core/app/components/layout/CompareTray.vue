@@ -20,7 +20,7 @@ onMounted(hydrate);
         <div
           class="container-page flex items-center gap-3 rounded-xl border border-line bg-surface p-3 shadow-lg"
         >
-          <ul class="hide-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto">
+          <ul class="hide-scrollbar -m-2 flex min-w-0 flex-1 gap-2 overflow-x-auto p-2">
             <li v-for="item in items" :key="item.id" class="relative shrink-0">
               <ProductImage
                 :src="item.imageUrl"

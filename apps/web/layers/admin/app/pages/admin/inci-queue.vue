@@ -306,7 +306,7 @@ useSeo(() => ({
         <BaseButton variant="ghost" size="sm" :disabled="page <= 1" @click="page -= 1">
           <BaseIcon name="chevron-left" :size="14" />
         </BaseButton>
-        <span>{{ $t('ADMIN.PAGE_OF', { page, total: pageCount }) }}</span>
+        <span>{{ $t('COMMON.PAGE_OF', { page, total: pageCount }) }}</span>
         <BaseButton variant="ghost" size="sm" :disabled="page >= pageCount" @click="page += 1">
           <BaseIcon name="chevron-right" :size="14" />
         </BaseButton>

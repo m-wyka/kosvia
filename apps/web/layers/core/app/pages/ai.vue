@@ -126,7 +126,7 @@ onMounted(() => {
 });
 
 useSeo(() => ({
-  title: t('SEO.AI.TITLE'),
+  title: t('AI.TITLE'),
   description: t('SEO.AI.DESCRIPTION'),
   noindex: true,
 }));

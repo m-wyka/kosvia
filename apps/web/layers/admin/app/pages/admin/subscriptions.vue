@@ -112,7 +112,7 @@ useSeo(() => ({
               v-model="forms[period].price"
               type="number"
               inputmode="decimal"
-              :label="$t('ADMIN.SUBSCRIPTIONS.PRICE_LABEL')"
+              :label="$t('ADMIN.FIELD_PRICE')"
               :hint="$t('ADMIN.SUBSCRIPTIONS.PRICE_HINT')"
             />
             <BaseInput

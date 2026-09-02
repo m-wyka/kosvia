@@ -137,7 +137,7 @@ useSeo(() => ({
               {{ vocab.category(category.slug, category.name) }}
             </p>
             <p class="mt-1 text-xs text-ink-muted">
-              {{ $t('DISCOVER.PRODUCT_COUNT', category.productCount ?? 0) }}
+              {{ $t('COMMON.PRODUCT_COUNT', category.productCount ?? 0) }}
             </p>
             <BaseIcon
               name="arrow-right"

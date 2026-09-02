@@ -94,7 +94,7 @@ useSeo(() => ({
       :title="$t('COMPARE.EMPTY_TITLE')"
       :description="$t('COMPARE.EMPTY_BODY')"
     >
-      <BaseButton to="/products">{{ $t('COMPARE.BROWSE') }}</BaseButton>
+      <BaseButton to="/products">{{ $t('COMMON.BROWSE_PRODUCTS') }}</BaseButton>
       <BaseButton v-if="trayCount === 1" variant="secondary" to="/discover">
         {{ $t('COMPARE.FIND_ONE_MORE') }}
       </BaseButton>

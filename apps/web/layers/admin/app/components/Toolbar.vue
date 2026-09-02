@@ -23,7 +23,7 @@ defineEmits<{ 'update:page': [value: number] }>();
 
     <div v-if="pageCount > 1" class="flex items-center gap-2">
       <span class="text-xs tabular-nums text-ink-muted">
-        {{ $t('ADMIN.PAGE_OF', { page, total: pageCount }) }}
+        {{ $t('COMMON.PAGE_OF', { page, total: pageCount }) }}
         <template v-if="total">{{ $t('ADMIN.TOTAL_SUFFIX', { total }) }}</template>
       </span>
       <BaseButton

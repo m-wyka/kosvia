@@ -22,7 +22,7 @@ const columns = computed<TableColumn[]>(() => [
   { key: 'author', label: t('ADMIN.REVIEWS.COL_AUTHOR') },
   { key: 'rating', label: t('ADMIN.REVIEWS.COL_RATING'), width: 'w-28' },
   { key: 'body', label: t('ADMIN.REVIEWS.COL_BODY') },
-  { key: 'status', label: t('ADMIN.REVIEWS.COL_STATUS'), width: 'w-28' },
+  { key: 'status', label: t('ADMIN.FIELD_STATUS'), width: 'w-28' },
   { key: 'createdAt', label: t('ADMIN.REVIEWS.COL_CREATED'), secondary: true, align: 'right' },
   { key: 'actions', label: '', align: 'right', width: 'w-32' },
 ]);

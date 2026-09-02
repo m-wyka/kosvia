@@ -150,7 +150,7 @@ const handleFavoriteClick = async () => {
             "
             :aria-label="
               inComparison
-                ? $t('PRODUCT.REMOVE_COMPARE', { name: product.name })
+                ? $t('COMPARE.TRAY.REMOVE', { name: product.name })
                 : $t('PRODUCT.ADD_COMPARE', { name: product.name })
             "
             :aria-pressed="inComparison"

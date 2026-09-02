@@ -71,7 +71,7 @@ const submit = async () => {
 };
 
 useSeo(() => ({
-  title: t('SEO.REGISTER.TITLE'),
+  title: t('AUTH.REGISTER_TITLE'),
   description: t('SEO.REGISTER.DESCRIPTION'),
   noindex: true,
 }));

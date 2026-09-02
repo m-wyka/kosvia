@@ -12,7 +12,7 @@ const groups = [
       { to: '/dupes', label: 'FOOTER.DUPES' },
       { to: '/compare', label: 'NAV.COMPARE' },
       { to: '/reviews', label: 'FOOTER.REVIEWS' },
-      { to: '/pricing', label: 'FOOTER.PRICING' },
+      { to: '/pricing', label: 'NAV.PRICING' },
       { to: '/about-data', label: 'FOOTER.ABOUT_DATA' },
       { to: '/privacy', label: 'FOOTER.PRIVACY' },
     ],
@@ -22,7 +22,7 @@ const groups = [
     links: [
       { to: '/dashboard', label: 'NAV.DASHBOARD' },
       { to: '/shelf', label: 'NAV.SHELF' },
-      { to: '/ai', label: 'SEO.AI.TITLE' },
+      { to: '/ai', label: 'AI.TITLE' },
       { to: '/price-alerts', label: 'NAV.ALERTS' },
       { to: '/diary', label: 'FOOTER.DIARY' },
     ],

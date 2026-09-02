@@ -11,7 +11,7 @@ const isMissing = computed(() => props.error.statusCode === 404);
 const copy = computed(() =>
   isMissing.value
     ? { title: t('ERRORS.NOT_FOUND_TITLE'), body: t('ERRORS.NOT_FOUND_BODY') }
-    : { title: t('ERRORS.SERVER_TITLE'), body: t('ERRORS.SERVER_BODY') },
+    : { title: t('ERRORS.GENERIC_TITLE'), body: t('ERRORS.SERVER_BODY') },
 );
 
 useHead(() => ({ title: copy.value.title }));
@@ -37,7 +37,7 @@ useHead(() => ({ title: copy.value.title }));
 
         <div class="mt-8 flex flex-col justify-center gap-2.5 sm:flex-row">
           <BaseButton size="lg" @click="clearError({ redirect: localePath('/products') })">
-            {{ $t('ERRORS.BROWSE_PRODUCTS') }}
+            {{ $t('COMMON.BROWSE_PRODUCTS') }}
           </BaseButton>
           <BaseButton
             size="lg"

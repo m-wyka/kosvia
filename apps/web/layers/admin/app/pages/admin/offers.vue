@@ -45,12 +45,12 @@ const searching = ref(false);
 const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'product', label: t('ADMIN.OFFERS.COL_PRODUCT') },
-  { key: 'store', label: t('ADMIN.OFFERS.COL_STORE'), secondary: true },
-  { key: 'price', label: t('ADMIN.OFFERS.COL_PRICE'), align: 'right', width: 'w-32' },
+  { key: 'product', label: t('ADMIN.FIELD_PRODUCT') },
+  { key: 'store', label: t('ADMIN.FIELD_STORE'), secondary: true },
+  { key: 'price', label: t('ADMIN.FIELD_PRICE'), align: 'right', width: 'w-32' },
   {
     key: 'availability',
-    label: t('ADMIN.OFFERS.COL_AVAILABILITY'),
+    label: t('ADMIN.FIELD_AVAILABILITY'),
     align: 'center',
     secondary: true,
     width: 'w-32',
@@ -158,7 +158,7 @@ useSeo(() => ({
       :page="page"
       :page-count="pageCount"
       :total="total"
-      :placeholder="$t('ADMIN.OFFERS.SEARCH_PLACEHOLDER')"
+      :placeholder="$t('ADMIN.SEARCH_PRODUCT_PLACEHOLDER')"
       @update:page="page = $event"
     />
 
@@ -238,7 +238,7 @@ useSeo(() => ({
       <div class="space-y-4">
         <div>
           <p class="mb-1.5 text-sm font-medium text-ink-soft">
-            {{ $t('ADMIN.OFFERS.PRODUCT_LABEL') }}
+            {{ $t('ADMIN.FIELD_PRODUCT') }}
           </p>
           <div
             v-if="form.productId"
@@ -273,7 +273,7 @@ useSeo(() => ({
               </li>
             </ul>
             <p v-else-if="searching" class="mt-2 text-xs text-ink-muted">
-              {{ $t('ADMIN.OFFERS.SEARCHING') }}
+              {{ $t('COMMON.SEARCHING') }}
             </p>
           </template>
         </div>
@@ -281,7 +281,7 @@ useSeo(() => ({
         <BaseNativeSelect
           v-model="form.storeId"
           :options="storeOptions"
-          :label="$t('ADMIN.OFFERS.STORE_LABEL')"
+          :label="$t('ADMIN.FIELD_STORE')"
         />
 
         <BaseInput
@@ -299,7 +299,7 @@ useSeo(() => ({
         <BaseNativeSelect
           v-model="form.availability"
           :options="availabilityOptions"
-          :label="$t('ADMIN.OFFERS.AVAILABILITY_LABEL')"
+          :label="$t('ADMIN.FIELD_AVAILABILITY')"
         />
       </div>
 

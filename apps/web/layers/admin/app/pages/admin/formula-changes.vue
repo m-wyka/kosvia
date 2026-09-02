@@ -18,8 +18,8 @@ const { t } = useI18n();
 const format = useFormat();
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'createdAt', label: t('ADMIN.FORMULA_CHANGES.COL_WHEN'), width: 'w-44' },
-  { key: 'product', label: t('ADMIN.FORMULA_CHANGES.COL_PRODUCT') },
+  { key: 'createdAt', label: t('ADMIN.COL_WHEN'), width: 'w-44' },
+  { key: 'product', label: t('ADMIN.FIELD_PRODUCT') },
   { key: 'source', label: t('ADMIN.FORMULA_CHANGES.COL_SOURCE'), secondary: true, width: 'w-40' },
   {
     key: 'compositionHash',
@@ -51,7 +51,7 @@ useSeo(() => ({
       :page="page"
       :page-count="pageCount"
       :total="total"
-      :placeholder="$t('ADMIN.FORMULA_CHANGES.SEARCH_PLACEHOLDER')"
+      :placeholder="$t('ADMIN.SEARCH_PRODUCT_PLACEHOLDER')"
       @update:page="page = $event"
     />
 

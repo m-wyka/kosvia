@@ -119,12 +119,12 @@ const brandOptions = computed(() => [
 ]);
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'name', label: t('ADMIN.PRODUCTS.COL_PRODUCT') },
-  { key: 'brand', label: t('ADMIN.PRODUCTS.COL_BRAND'), secondary: true },
-  { key: 'category', label: t('ADMIN.PRODUCTS.COL_CATEGORY'), secondary: true },
+  { key: 'name', label: t('ADMIN.FIELD_PRODUCT') },
+  { key: 'brand', label: t('ADMIN.FIELD_BRAND'), secondary: true },
+  { key: 'category', label: t('ADMIN.FIELD_CATEGORY'), secondary: true },
   { key: 'ingredientScore', label: t('ADMIN.PRODUCTS.COL_SCORE'), align: 'center', width: 'w-20' },
   { key: 'lowestPrice', label: t('ADMIN.PRODUCTS.COL_FROM'), align: 'right', width: 'w-28' },
-  { key: 'status', label: t('ADMIN.PRODUCTS.COL_STATUS'), align: 'center', width: 'w-24' },
+  { key: 'status', label: t('ADMIN.FIELD_STATUS'), align: 'center', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
@@ -311,7 +311,7 @@ useSeo(() => ({
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="$t('ADMIN.PRODUCTS.EDIT', { name: row.name })"
+            :aria-label="$t('ADMIN.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -330,9 +330,7 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="
-        editing ? $t('ADMIN.PRODUCTS.EDIT', { name: editing.name }) : $t('ADMIN.PRODUCTS.NEW')
-      "
+      :title="editing ? $t('ADMIN.EDIT', { name: editing.name }) : $t('ADMIN.PRODUCTS.NEW')"
       size="lg"
     >
       <div v-if="loadingDetail" class="space-y-4">
@@ -343,10 +341,10 @@ useSeo(() => ({
 
       <div v-else class="space-y-5">
         <div class="grid gap-4 sm:grid-cols-2">
-          <BaseInput v-model="form.name" :label="$t('ADMIN.PRODUCTS.FIELD_NAME')" required />
+          <BaseInput v-model="form.name" :label="$t('ADMIN.FIELD_NAME')" required />
           <BaseInput
             v-model="form.slug"
-            :label="$t('ADMIN.PRODUCTS.FIELD_SLUG')"
+            :label="$t('ADMIN.FIELD_SLUG')"
             :hint="$t('ADMIN.PRODUCTS.SLUG_HINT')"
           />
         </div>
@@ -355,12 +353,12 @@ useSeo(() => ({
           <BaseNativeSelect
             v-model="form.brandId"
             :options="brandOptions"
-            :label="$t('ADMIN.PRODUCTS.BRAND_LABEL')"
+            :label="$t('ADMIN.FIELD_BRAND')"
           />
           <BaseNativeSelect
             v-model="form.categoryId"
             :options="categoryOptions"
-            :label="$t('ADMIN.PRODUCTS.CATEGORY_LABEL')"
+            :label="$t('ADMIN.FIELD_CATEGORY')"
           />
         </div>
 
@@ -388,11 +386,7 @@ useSeo(() => ({
           />
         </div>
 
-        <BaseTextarea
-          v-model="form.description"
-          :label="$t('ADMIN.PRODUCTS.FIELD_DESCRIPTION')"
-          :rows="4"
-        />
+        <BaseTextarea v-model="form.description" :label="$t('ADMIN.FIELD_DESCRIPTION')" :rows="4" />
         <BaseTextarea v-model="form.usage" :label="$t('ADMIN.PRODUCTS.FIELD_USAGE')" :rows="2" />
         <BaseTextarea
           v-model="form.highlights"

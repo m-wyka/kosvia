@@ -35,7 +35,7 @@ const format = useFormat();
 
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
           <BaseButton to="/onboarding" size="lg">
-            {{ $t('LANDING.CTA_PRIMARY') }}
+            {{ $t('LANDING.CTA.PRIMARY') }}
             <template #icon><BaseIcon name="arrow-right" :size="18" /></template>
           </BaseButton>
           <BaseButton to="/products" size="lg" variant="secondary">

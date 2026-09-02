@@ -49,10 +49,10 @@ const editing = ref<CategoryRow | null>(null);
 const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'name', label: t('ADMIN.CATEGORIES.COL_NAME') },
+  { key: 'name', label: t('ADMIN.FIELD_CATEGORY') },
   { key: 'parent', label: t('ADMIN.CATEGORIES.COL_PARENT'), secondary: true },
-  { key: 'routineStep', label: t('ADMIN.CATEGORIES.COL_STEP'), secondary: true },
-  { key: 'products', label: t('ADMIN.CATEGORIES.COL_PRODUCTS'), align: 'right', width: 'w-24' },
+  { key: 'routineStep', label: t('ADMIN.FIELD_STEP'), secondary: true },
+  { key: 'products', label: t('ADMIN.COL_PRODUCTS'), align: 'right', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
@@ -163,7 +163,7 @@ useSeo(() => ({
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="$t('ADMIN.CATEGORIES.EDIT', { name: row.name })"
+            :aria-label="$t('ADMIN.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -182,17 +182,15 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="
-        editing ? $t('ADMIN.CATEGORIES.EDIT', { name: editing.name }) : $t('ADMIN.CATEGORIES.NEW')
-      "
+      :title="editing ? $t('ADMIN.EDIT', { name: editing.name }) : $t('ADMIN.CATEGORIES.NEW')"
       size="sm"
     >
       <div class="space-y-4">
-        <BaseInput v-model="form.name" :label="$t('ADMIN.BRANDS.FIELD_NAME')" required />
+        <BaseInput v-model="form.name" :label="$t('ADMIN.FIELD_NAME')" required />
         <BaseInput
           v-model="form.slug"
-          :label="$t('ADMIN.BRANDS.FIELD_SLUG')"
-          :hint="$t('ADMIN.BRANDS.SLUG_HINT')"
+          :label="$t('ADMIN.FIELD_SLUG')"
+          :hint="$t('ADMIN.SLUG_HINT')"
         />
 
         <BaseNativeSelect
@@ -204,7 +202,7 @@ useSeo(() => ({
         <BaseNativeSelect
           v-model="form.routineStep"
           :options="routineStepOptions"
-          :label="$t('ADMIN.CATEGORIES.STEP_LABEL')"
+          :label="$t('ADMIN.FIELD_STEP')"
           :hint="$t('ADMIN.CATEGORIES.STEP_HINT')"
         />
 

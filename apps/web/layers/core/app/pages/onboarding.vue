@@ -34,9 +34,9 @@ const { t } = useI18n();
 const vocab = useVocabulary();
 
 const steps = [
-  { key: 'skin', title: 'ONBOARDING.SKIN_TITLE', subtitle: 'ONBOARDING.SKIN_SUBTITLE' },
-  { key: 'concerns', title: 'ONBOARDING.CONCERNS_TITLE', subtitle: 'ONBOARDING.CONCERNS_SUBTITLE' },
-  { key: 'goals', title: 'ONBOARDING.GOALS_TITLE', subtitle: 'ONBOARDING.GOALS_SUBTITLE' },
+  { key: 'skin', title: 'PROFILE.SKIN_TITLE', subtitle: 'ONBOARDING.SKIN_SUBTITLE' },
+  { key: 'concerns', title: 'PROFILE.CONCERNS_TITLE', subtitle: 'ONBOARDING.CONCERNS_SUBTITLE' },
+  { key: 'goals', title: 'PROFILE.GOALS_TITLE', subtitle: 'ONBOARDING.GOALS_SUBTITLE' },
   {
     key: 'preferences',
     title: 'ONBOARDING.PREFERENCES_TITLE',
@@ -205,7 +205,7 @@ useSeo(() => ({
           option-label="name"
           track-by="id"
           :label="$t('ONBOARDING.EXCLUDED_BRANDS')"
-          :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
+          :placeholder="$t('COMMON.SEARCH_BRANDS')"
           :hint="$t('ONBOARDING.EXCLUDED_BRANDS_HINT')"
           multiple
         />

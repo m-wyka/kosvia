@@ -69,7 +69,7 @@ const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
   { key: 'inciName', label: t('ADMIN.INGREDIENTS.COL_INCI') },
-  { key: 'tags', label: t('ADMIN.INGREDIENTS.COL_TAGS'), secondary: true },
+  { key: 'tags', label: t('ADMIN.FIELD_TAGS'), secondary: true },
   {
     key: 'sensitivityImpact',
     label: t('ADMIN.INGREDIENTS.COL_TOLERANCE'),
@@ -223,7 +223,7 @@ useSeo(() => ({
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="$t('ADMIN.INGREDIENTS.EDIT', { name: row.inciName })"
+            :aria-label="$t('ADMIN.EDIT', { name: row.inciName })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -242,11 +242,7 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="
-        editing
-          ? $t('ADMIN.INGREDIENTS.EDIT', { name: editing.inciName })
-          : $t('ADMIN.INGREDIENTS.NEW')
-      "
+      :title="editing ? $t('ADMIN.EDIT', { name: editing.inciName }) : $t('ADMIN.INGREDIENTS.NEW')"
       size="lg"
     >
       <div class="space-y-5">
@@ -261,7 +257,7 @@ useSeo(() => ({
 
         <BaseTextarea
           v-model="form.description"
-          :label="$t('ADMIN.INGREDIENTS.FIELD_DESCRIPTION')"
+          :label="$t('ADMIN.FIELD_DESCRIPTION')"
           :rows="3"
           :hint="$t('ADMIN.INGREDIENTS.DESCRIPTION_HINT')"
         />
@@ -279,7 +275,7 @@ useSeo(() => ({
 
         <div>
           <p class="mb-2 text-sm font-medium text-ink-soft">
-            {{ $t('ADMIN.INGREDIENTS.TAGS_LABEL') }}
+            {{ $t('ADMIN.FIELD_TAGS') }}
           </p>
           <div class="flex flex-wrap gap-1.5">
             <button

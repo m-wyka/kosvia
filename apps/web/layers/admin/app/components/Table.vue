@@ -38,7 +38,7 @@ const cellValue = (row: T, key: string): unknown => {
       v-else-if="!rows.length"
       compact
       class="rounded-none border-0 bg-transparent"
-      :title="emptyTitle ?? $t('ADMIN.EMPTY_TITLE')"
+      :title="emptyTitle ?? $t('ERRORS.EMPTY_TITLE')"
       :description="emptyDescription"
     >
       <slot name="empty-action" />

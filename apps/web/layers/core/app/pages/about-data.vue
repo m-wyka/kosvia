@@ -5,7 +5,7 @@ const COSING_URL = 'https://ec.europa.eu/growth/tools-databases/cosing/';
 const { t } = useI18n();
 
 useSeo(() => ({
-  title: t('SEO.ABOUT_DATA.TITLE'),
+  title: t('ABOUT_DATA.TITLE'),
   description: t('SEO.ABOUT_DATA.DESCRIPTION'),
 }));
 </script>

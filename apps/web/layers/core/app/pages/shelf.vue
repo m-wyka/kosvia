@@ -215,7 +215,7 @@ const addProduct = async (product: ProductSummaryDto) => {
 watchDebounced(search, searchProducts, { debounce: SEARCH_DEBOUNCE_MS });
 
 useSeo(() => ({
-  title: t('SEO.SHELF.TITLE'),
+  title: t('SHELF.TITLE'),
   description: t('SEO.SHELF.DESCRIPTION'),
   noindex: true,
 }));
@@ -465,7 +465,7 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="addOpen"
-      :title="$t('SHELF.ADD_MODAL.TITLE')"
+      :title="$t('SHELF.ADD_PRODUCT')"
       :description="$t('SHELF.ADD_MODAL.BODY')"
       size="md"
     >

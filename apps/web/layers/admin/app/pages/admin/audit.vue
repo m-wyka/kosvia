@@ -12,7 +12,7 @@ const { t } = useI18n();
 const format = useFormat();
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'createdAt', label: t('ADMIN.AUDIT.COL_WHEN'), width: 'w-44' },
+  { key: 'createdAt', label: t('ADMIN.COL_WHEN'), width: 'w-44' },
   { key: 'actorEmail', label: t('ADMIN.AUDIT.COL_WHO'), secondary: true },
   { key: 'action', label: t('ADMIN.AUDIT.COL_ACTION'), width: 'w-44' },
   { key: 'entityId', label: t('ADMIN.AUDIT.COL_TARGET'), secondary: true, width: 'w-56' },

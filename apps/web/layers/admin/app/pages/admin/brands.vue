@@ -29,10 +29,10 @@ const modalOpen = ref(false);
 const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'name', label: t('ADMIN.BRANDS.COL_NAME') },
-  { key: 'slug', label: t('ADMIN.BRANDS.COL_SLUG'), secondary: true },
+  { key: 'name', label: t('ADMIN.FIELD_BRAND') },
+  { key: 'slug', label: t('ADMIN.FIELD_SLUG'), secondary: true },
   { key: 'flags', label: t('ADMIN.BRANDS.COL_ETHICS'), secondary: true },
-  { key: 'products', label: t('ADMIN.BRANDS.COL_PRODUCTS'), align: 'right', width: 'w-24' },
+  { key: 'products', label: t('ADMIN.COL_PRODUCTS'), align: 'right', width: 'w-24' },
   { key: 'actions', label: '', align: 'right', width: 'w-24' },
 ]);
 
@@ -104,7 +104,7 @@ useSeo(() => ({
       :page="page"
       :page-count="pageCount"
       :total="total"
-      :placeholder="$t('ADMIN.BRANDS.SEARCH_PLACEHOLDER')"
+      :placeholder="$t('COMMON.SEARCH_BRANDS')"
       @update:page="page = $event"
     />
 
@@ -144,7 +144,7 @@ useSeo(() => ({
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint transition-colors hover:text-ink"
-            :aria-label="$t('ADMIN.BRANDS.EDIT', { name: row.name })"
+            :aria-label="$t('ADMIN.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -163,21 +163,17 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="editing ? $t('ADMIN.BRANDS.EDIT', { name: editing.name }) : $t('ADMIN.BRANDS.NEW')"
+      :title="editing ? $t('ADMIN.EDIT', { name: editing.name }) : $t('ADMIN.BRANDS.NEW')"
       size="sm"
     >
       <div class="space-y-4">
-        <BaseInput v-model="form.name" :label="$t('ADMIN.BRANDS.FIELD_NAME')" required />
+        <BaseInput v-model="form.name" :label="$t('ADMIN.FIELD_NAME')" required />
         <BaseInput
           v-model="form.slug"
-          :label="$t('ADMIN.BRANDS.FIELD_SLUG')"
-          :hint="$t('ADMIN.BRANDS.SLUG_HINT')"
+          :label="$t('ADMIN.FIELD_SLUG')"
+          :hint="$t('ADMIN.SLUG_HINT')"
         />
-        <BaseTextarea
-          v-model="form.description"
-          :label="$t('ADMIN.BRANDS.FIELD_DESCRIPTION')"
-          :rows="3"
-        />
+        <BaseTextarea v-model="form.description" :label="$t('ADMIN.FIELD_DESCRIPTION')" :rows="3" />
         <div class="space-y-3 rounded-lg border border-line bg-surface-muted p-4">
           <BaseSwitch v-model="form.isVegan" :label="$t('ADMIN.BRANDS.VEGAN')" />
           <BaseSwitch v-model="form.isCrueltyFree" :label="$t('ADMIN.BRANDS.CRUELTY_FREE')" />

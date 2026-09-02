@@ -14,7 +14,7 @@ const SECTIONS = [
 ] as const;
 
 useSeo(() => ({
-  title: t('SEO.PRIVACY.TITLE'),
+  title: t('PRIVACY.TITLE'),
   description: t('SEO.PRIVACY.DESCRIPTION'),
 }));
 </script>

@@ -12,6 +12,7 @@ const primaryLinks = [
   { to: '/discover', label: 'NAV.DISCOVER' },
   { to: '/products', label: 'NAV.PRODUCTS' },
   { to: '/compare', label: 'NAV.COMPARE' },
+  { to: '/pricing', label: 'NAV.PRICING' },
   { to: '/ai', label: 'NAV.AI', requiresAuth: true },
 ];
 

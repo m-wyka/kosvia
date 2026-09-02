@@ -133,7 +133,7 @@ useHead({
     </LandingFeature>
 
     <LandingFeature
-      :eyebrow="$t('LANDING.AI.EYEBROW')"
+      :eyebrow="$t('AI.TITLE')"
       :title="$t('LANDING.AI.TITLE')"
       :description="$t('LANDING.AI.BODY')"
       :points="[$t('LANDING.AI.POINT_1'), $t('LANDING.AI.POINT_2'), $t('LANDING.AI.POINT_3')]"

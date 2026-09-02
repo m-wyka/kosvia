@@ -57,7 +57,7 @@ const submit = async () => {
     />
     <BaseTextarea
       v-model="body"
-      :label="t('REVIEWS.FORM_BODY_LABEL')"
+      :label="t('REVIEWS.YOUR_REVIEW')"
       :hint="t('REVIEWS.FORM_BODY_HINT', { min: APP_REVIEW_BODY_MIN_LENGTH })"
       :error="bodyError"
       :rows="4"

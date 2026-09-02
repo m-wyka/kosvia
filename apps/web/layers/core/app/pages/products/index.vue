@@ -168,8 +168,8 @@ useBreadcrumbJsonLd(
       <div class="min-w-0">
         <div class="mb-5 flex items-center justify-between gap-3">
           <p class="shrink-0 text-sm whitespace-nowrap text-ink-muted">
-            <template v-if="pending">{{ $t('SEARCH.SEARCHING') }}</template>
-            <template v-else-if="data">{{ $t('SEARCH.COUNT', data.total) }}</template>
+            <template v-if="pending">{{ $t('COMMON.SEARCHING') }}</template>
+            <template v-else-if="data">{{ $t('COMMON.PRODUCT_COUNT', data.total) }}</template>
           </p>
 
           <div class="flex min-w-0 items-center gap-2">
@@ -205,7 +205,7 @@ useBreadcrumbJsonLd(
           <nav
             v-if="data && data.pageCount > 1"
             class="mt-10 flex items-center justify-center gap-2"
-            :aria-label="$t('SEARCH.PAGE', { page, total: data.pageCount })"
+            :aria-label="$t('COMMON.PAGE_OF', { page, total: data.pageCount })"
           >
             <BaseButton
               variant="secondary"
@@ -216,7 +216,7 @@ useBreadcrumbJsonLd(
               {{ $t('COMMON.PREVIOUS') }}
             </BaseButton>
             <span class="px-3 text-sm tabular-nums text-ink-muted">
-              {{ $t('SEARCH.PAGE', { page, total: data.pageCount }) }}
+              {{ $t('COMMON.PAGE_OF', { page, total: data.pageCount }) }}
             </span>
             <BaseButton
               variant="secondary"

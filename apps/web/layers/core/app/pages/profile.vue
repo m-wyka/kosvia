@@ -325,7 +325,7 @@ useSeo(() => ({
             option-label="name"
             track-by="id"
             :label="$t('PROFILE.PREFERRED_BRANDS')"
-            :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
+            :placeholder="$t('COMMON.SEARCH_BRANDS')"
             multiple
           />
           <BaseSelect
@@ -334,7 +334,7 @@ useSeo(() => ({
             option-label="name"
             track-by="id"
             :label="$t('ONBOARDING.EXCLUDED_BRANDS')"
-            :placeholder="$t('ONBOARDING.BRAND_PLACEHOLDER')"
+            :placeholder="$t('COMMON.SEARCH_BRANDS')"
             multiple
           />
           <BaseSelect

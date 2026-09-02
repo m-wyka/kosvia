@@ -17,7 +17,7 @@ const editing = ref<StoreRow | null>(null);
 const form = reactive({ ...EMPTY_FORM });
 
 const columns = computed<TableColumn[]>(() => [
-  { key: 'name', label: t('ADMIN.STORES.COL_STORE') },
+  { key: 'name', label: t('ADMIN.FIELD_STORE') },
   { key: 'websiteUrl', label: t('ADMIN.STORES.COL_WEBSITE'), secondary: true },
   { key: 'affiliate', label: t('ADMIN.STORES.COL_AFFILIATE'), secondary: true },
   { key: 'offers', label: t('ADMIN.STORES.COL_OFFERS'), align: 'right', width: 'w-24' },
@@ -107,7 +107,7 @@ useSeo(() => ({
           <button
             type="button"
             class="rounded-md p-1.5 text-ink-faint hover:text-ink"
-            :aria-label="$t('ADMIN.STORES.EDIT', { name: row.name })"
+            :aria-label="$t('ADMIN.EDIT', { name: row.name })"
             @click="openEdit(row)"
           >
             <BaseIcon name="edit" :size="15" />
@@ -126,15 +126,15 @@ useSeo(() => ({
 
     <BaseModal
       v-model:open="modalOpen"
-      :title="editing ? $t('ADMIN.STORES.EDIT', { name: editing.name }) : $t('ADMIN.STORES.NEW')"
+      :title="editing ? $t('ADMIN.EDIT', { name: editing.name }) : $t('ADMIN.STORES.NEW')"
       size="sm"
     >
       <div class="space-y-4">
-        <BaseInput v-model="form.name" :label="$t('ADMIN.STORES.FIELD_NAME')" required />
+        <BaseInput v-model="form.name" :label="$t('ADMIN.FIELD_NAME')" required />
         <BaseInput
           v-model="form.slug"
-          :label="$t('ADMIN.STORES.FIELD_SLUG')"
-          :hint="$t('ADMIN.STORES.SLUG_HINT')"
+          :label="$t('ADMIN.FIELD_SLUG')"
+          :hint="$t('ADMIN.SLUG_HINT')"
         />
         <BaseInput
           v-model="form.websiteUrl"

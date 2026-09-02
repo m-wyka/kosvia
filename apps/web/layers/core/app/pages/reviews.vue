@@ -215,7 +215,7 @@ useSeo(() => ({
           <nav
             v-if="data.pageCount > 1"
             class="mt-8 flex items-center justify-center gap-2"
-            :aria-label="$t('SEARCH.PAGE', { page, total: data.pageCount })"
+            :aria-label="$t('COMMON.PAGE_OF', { page, total: data.pageCount })"
           >
             <BaseButton
               variant="secondary"
@@ -226,7 +226,7 @@ useSeo(() => ({
               {{ $t('COMMON.PREVIOUS') }}
             </BaseButton>
             <span class="px-3 text-sm tabular-nums text-ink-muted">
-              {{ $t('SEARCH.PAGE', { page, total: data.pageCount }) }}
+              {{ $t('COMMON.PAGE_OF', { page, total: data.pageCount }) }}
             </span>
             <BaseButton
               variant="secondary"
