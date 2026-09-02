@@ -348,7 +348,7 @@ useBreadcrumbJsonLd(
           <BaseButton :to="`/dupes?product=${product.slug}`" variant="secondary" size="sm">
             {{ $t('PRODUCT.FIND_DUPES') }}
             <template #icon>
-              <BaseIcon name="sparkles" :size="16" />
+              <BaseIcon name="dupes" :size="16" />
             </template>
           </BaseButton>
         </div>

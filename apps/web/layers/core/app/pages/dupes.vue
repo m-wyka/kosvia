@@ -118,7 +118,7 @@ useSeo(() => ({
 
     <BaseEmptyState
       v-if="!subjectSlug"
-      icon="sparkles"
+      icon="dupes"
       :title="$t('DUPES.PICK_TITLE')"
       :description="$t('DUPES.PICK_BODY')"
       class="mt-10"
@@ -148,7 +148,7 @@ useSeo(() => ({
 
           <BaseEmptyState
             v-if="!data.dupes.length"
-            icon="sparkles"
+            icon="dupes"
             :title="$t('DUPES.EMPTY_TITLE')"
             :description="$t('DUPES.EMPTY_BODY')"
             class="mt-6"

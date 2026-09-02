@@ -100,7 +100,7 @@ const isFlagged = (ingredient: IngredientDto): boolean => {
                 : 'border-line text-ink-soft hover:border-line-strong'
             "
           >
-            <BaseIcon v-if="entry.ingredient.isActiveIngredient" name="sparkles" :size="12" />
+            <BaseIcon v-if="entry.ingredient.isActiveIngredient" name="molecule" :size="12" />
             {{ displayName(entry.ingredient) }}
           </NuxtLinkLocale>
         </li>
@@ -130,7 +130,7 @@ const isFlagged = (ingredient: IngredientDto): boolean => {
                   : 'border-line text-ink-soft hover:border-line-strong'
               "
             >
-              <BaseIcon v-if="ingredient.isActiveIngredient" name="sparkles" :size="12" />
+              <BaseIcon v-if="ingredient.isActiveIngredient" name="molecule" :size="12" />
               {{ displayName(ingredient) }}
             </NuxtLinkLocale>
           </li>
@@ -144,7 +144,7 @@ const isFlagged = (ingredient: IngredientDto): boolean => {
         {{ $t('COMPARE.DIFF.LEGEND.FLAGGED') }}
       </li>
       <li class="flex items-center gap-1.5">
-        <BaseIcon name="sparkles" :size="16" aria-hidden="true" />
+        <BaseIcon name="molecule" :size="16" aria-hidden="true" />
         {{ $t('COMPARE.DIFF.LEGEND.ACTIVE') }}
       </li>
     </ul>

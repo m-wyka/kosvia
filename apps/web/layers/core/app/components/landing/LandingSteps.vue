@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const steps = [
   { key: 'STEP_1', icon: 'user' as const },
-  { key: 'STEP_2', icon: 'droplet' as const },
-  { key: 'STEP_3', icon: 'sparkles' as const },
+  { key: 'STEP_2', icon: 'molecule' as const },
+  { key: 'STEP_3', icon: 'match' as const },
   { key: 'STEP_4', icon: 'tag' as const },
 ];
 </script>

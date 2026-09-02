@@ -16,13 +16,13 @@ const sections = [
       { to: '/admin/products', label: 'ADMIN.NAV.PRODUCTS', icon: 'droplet' as const },
       { to: '/admin/brands', label: 'ADMIN.NAV.BRANDS', icon: 'tag' as const },
       { to: '/admin/categories', label: 'ADMIN.NAV.CATEGORIES', icon: 'shelf' as const },
-      { to: '/admin/ingredients', label: 'ADMIN.NAV.INGREDIENTS', icon: 'leaf' as const },
+      { to: '/admin/ingredients', label: 'ADMIN.NAV.INGREDIENTS', icon: 'molecule' as const },
       { to: '/admin/inci-queue', label: 'ADMIN.NAV.INCI_QUEUE', icon: 'filter' as const },
       { to: '/admin/imports', label: 'ADMIN.NAV.IMPORTS', icon: 'arrow-up-down' as const },
       {
         to: '/admin/formula-changes',
         label: 'ADMIN.NAV.FORMULA_CHANGES',
-        icon: 'sparkles' as const,
+        icon: 'flask' as const,
       },
     ],
   },
@@ -31,7 +31,7 @@ const sections = [
     links: [
       { to: '/admin/stores', label: 'ADMIN.NAV.STORES', icon: 'store' as const },
       { to: '/admin/offers', label: 'ADMIN.NAV.OFFERS', icon: 'compare' as const },
-      { to: '/admin/subscriptions', label: 'ADMIN.NAV.SUBSCRIPTIONS', icon: 'tag' as const },
+      { to: '/admin/subscriptions', label: 'ADMIN.NAV.SUBSCRIPTIONS', icon: 'premium' as const },
     ],
   },
   {
@@ -40,7 +40,7 @@ const sections = [
       { to: '/admin/users', label: 'ADMIN.NAV.USERS', icon: 'user' as const },
       { to: '/admin/reviews', label: 'ADMIN.NAV.REVIEWS', icon: 'star' as const },
       { to: '/admin/audit', label: 'ADMIN.NAV.AUDIT', icon: 'shield' as const },
-      { to: '/admin/match-weights', label: 'ADMIN.NAV.MATCH_WEIGHTS', icon: 'sparkles' as const },
+      { to: '/admin/match-weights', label: 'ADMIN.NAV.MATCH_WEIGHTS', icon: 'match' as const },
     ],
   },
 ];

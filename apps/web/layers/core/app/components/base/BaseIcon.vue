@@ -11,6 +11,11 @@ type IconName =
   | 'star'
   | 'star-filled'
   | 'sparkles'
+  | 'match'
+  | 'premium'
+  | 'molecule'
+  | 'flask'
+  | 'dupes'
   | 'scan'
   | 'shelf'
   | 'user'
@@ -34,8 +39,7 @@ type IconName =
   | 'tag'
   | 'store'
   | 'droplet'
-  | 'shield'
-  | 'leaf';
+  | 'shield';
 
 withDefaults(defineProps<{ name: IconName; size?: number; strokeWidth?: number }>(), {
   size: 20,
@@ -58,6 +62,13 @@ const paths: Record<IconName, string> = {
     'm12 4.5 2.32 4.7 5.18.75-3.75 3.66.89 5.16L12 16.33l-4.64 2.44.89-5.16L4.5 9.95l5.18-.75L12 4.5Z',
   sparkles:
     'M12 3v5M12 16v5M4.5 12h5M14.5 12h5M6.6 6.6l3 3M14.4 14.4l3 3M17.4 6.6l-3 3M9.6 14.4l-3 3',
+  match: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+  premium: 'M8.5 5h7l3 4.5-6.5 10-6.5-10 3-4.5ZM5.5 9.5h13',
+  molecule:
+    'M12 3.8 19 7.9v8.2L12 20.2 5 16.1V7.9l7-4.1ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z',
+  flask:
+    'M9.5 3v6.5L5 18a1.5 1.5 0 0 0 1.4 2.2h11.2A1.5 1.5 0 0 0 19 18l-4.5-8.5V3M8 3h8M7.5 14.5h9',
+  dupes: 'M8.5 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM15.5 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z',
   scan: 'M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16',
   shelf: 'M4 7h16M4 12h16M4 17h16M8 7v5M14 12v5',
   user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0',
@@ -85,7 +96,6 @@ const paths: Record<IconName, string> = {
   store: 'M4 9h16M4 9 5.5 4.5h13L20 9M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 20v-5h4v5',
   droplet: 'M12 3.5s6 6.3 6 10.2A6 6 0 0 1 6 13.7C6 9.8 12 3.5 12 3.5Z',
   shield: 'M12 3.5 5 6v5.5c0 4.3 2.9 7.6 7 9 4.1-1.4 7-4.7 7-9V6l-7-2.5ZM9 12l2 2 4-4',
-  leaf: 'M5 19c0-8 5.5-12 15-12 0 9-4.5 13-11 13H5v-1ZM8 16c2-3.5 4.5-5.5 8-7',
 };
 </script>
 

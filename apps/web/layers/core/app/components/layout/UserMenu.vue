@@ -81,7 +81,7 @@ watch(
         <div class="my-1 border-t border-line" />
 
         <NuxtLinkLocale v-if="!isPremium" to="/pricing" :class="MENU_ITEM_CLASS" @click="closeMenu">
-          <BaseIcon name="sparkles" :size="16" />
+          <BaseIcon name="premium" :size="16" />
           {{ $t('PREMIUM.GO_PREMIUM') }}
         </NuxtLinkLocale>
 

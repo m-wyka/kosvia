@@ -159,7 +159,7 @@ const handlePremiumClick = () => {
             :key="feature"
             class="flex items-start gap-2.5 text-sm text-ink-soft"
           >
-            <BaseIcon name="sparkles" :size="15" class="mt-0.5 shrink-0 text-blush" />
+            <BaseIcon name="premium" :size="15" class="mt-0.5 shrink-0 text-blush" />
             {{ feature }}
           </li>
         </ul>

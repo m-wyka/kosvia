@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{ icon?: string; title: string; description?: string; compact?: boolean }>(),
-  { icon: 'sparkles' },
+  { icon: 'search' },
 );
 </script>
 

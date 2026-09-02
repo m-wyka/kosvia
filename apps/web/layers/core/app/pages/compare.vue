@@ -113,7 +113,7 @@ useSeo(() => ({
           <span
             class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-ink text-ink-inverse"
           >
-            <BaseIcon name="sparkles" :size="20" />
+            <BaseIcon name="match" :size="20" />
           </span>
           <div class="min-w-0 flex-1">
             <h2 class="font-display text-xl text-ink sm:text-2xl">

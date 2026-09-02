@@ -32,7 +32,7 @@ const cards = computed(() => [
     label: t('ADMIN.NAV.INGREDIENTS'),
     value: data.value?.ingredients,
     to: '/admin/ingredients',
-    icon: 'leaf' as const,
+    icon: 'molecule' as const,
   },
   {
     label: t('ADMIN.NAV.STORES'),
