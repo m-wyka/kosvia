@@ -28,23 +28,35 @@ onUnmounted(() => lockPageScroll(false));
   <ClientOnly>
     <Teleport to="body">
       <Transition
-        enter-active-class="transition-opacity duration-base"
-        leave-active-class="transition-opacity duration-fast"
-        enter-from-class="opacity-0"
-        leave-to-class="opacity-0"
+        enter-active-class="transition-all duration-slow ease-out-soft"
+        leave-active-class="transition-all duration-base ease-out-soft"
+        enter-from-class="opacity-0 backdrop-blur-[0px]"
+        leave-to-class="opacity-0 backdrop-blur-[0px]"
+      >
+        <div
+          v-if="open"
+          class="fixed inset-0 z-40 bg-overlay backdrop-blur-sm"
+          @click="open = false"
+        />
+      </Transition>
+
+      <Transition
+        enter-active-class="transition-all duration-base ease-out-soft"
+        leave-active-class="transition-all duration-fast ease-out-soft"
+        enter-from-class="translate-y-2 opacity-0"
+        leave-to-class="translate-y-2 opacity-0"
       >
         <div
           v-if="open"
           class="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto p-0 sm:items-start sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          :aria-labelledby="title ? titleId : undefined"
+          @click.self="open = false"
         >
-          <div class="fixed inset-0 bg-overlay backdrop-blur-[2px]" @click="open = false" />
-
           <div
-            class="animate-fade-up relative mt-auto w-full rounded-t-2xl border border-line bg-surface shadow-lg sm:my-auto sm:rounded-2xl"
+            class="relative mt-auto w-full rounded-t-2xl border border-line bg-surface shadow-lg sm:my-auto sm:rounded-2xl"
             :class="widths[size]"
+            role="dialog"
+            aria-modal="true"
+            :aria-labelledby="title ? titleId : undefined"
           >
             <header
               v-if="title"
