@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { PersonalMatchDto } from '@kosvia/shared';
 
-const props = defineProps<{ match: PersonalMatchDto; slug: string }>();
+const props = withDefaults(
+  defineProps<{ match: PersonalMatchDto; slug: string; limitReached?: boolean }>(),
+  { limitReached: false },
+);
 
-const { isAuthenticated } = storeToRefs(useAuthStore());
+const { isAuthenticated, isPremium } = storeToRefs(useAuthStore());
 const api = useApi();
 const reasonLabel = useMatchReason();
 const { locale } = useI18n();
@@ -16,6 +19,12 @@ const maxImpact = computed(() =>
   Math.max(
     1,
     ...[...props.match.reasons, ...props.match.warnings].map((entry) => Math.abs(entry.impact)),
+  ),
+);
+
+const sortedBreakdown = computed(() =>
+  [...(props.match.breakdown ?? [])].sort(
+    (first, second) => Math.abs(second.impact) - Math.abs(first.impact),
   ),
 );
 
@@ -35,7 +44,7 @@ const loadExplanation = async () => {
 
 const toggleExplanation = async () => {
   open.value = !open.value;
-  if (!open.value || explanation.value || explaining.value) {
+  if (!open.value || !isPremium.value || explanation.value || explaining.value) {
     return;
   }
   await loadExplanation();
@@ -58,6 +67,9 @@ const toggleExplanation = async () => {
           <template v-if="match.personalised">
             {{ $t('PRODUCT.MATCH_PANEL.PERSONAL_BODY') }}
           </template>
+          <template v-else-if="limitReached">
+            {{ $t('PRODUCT.MATCH_PANEL.LIMIT_BODY') }}
+          </template>
           <template v-else-if="isAuthenticated">
             {{ $t('PRODUCT.MATCH_PANEL.GENERIC_BODY_AUTHED') }}
           </template>
@@ -66,8 +78,15 @@ const toggleExplanation = async () => {
           </template>
         </p>
 
+        <PremiumPrompt
+          v-if="limitReached"
+          :message="$t('PRODUCT.MATCH_PANEL.LIMIT_PROMPT')"
+          :cta-label="$t('PREMIUM.UNLOCK')"
+          compact
+          class="mt-3"
+        />
         <BaseButton
-          v-if="!match.personalised"
+          v-else-if="!match.personalised"
           :to="isAuthenticated ? '/onboarding' : '/register'"
           size="sm"
           class="mt-3"
@@ -138,7 +157,28 @@ const toggleExplanation = async () => {
         </ul>
       </div>
 
-      <div class="rounded-lg bg-surface-muted p-4">
+      <div v-if="sortedBreakdown.length">
+        <p class="mb-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
+          {{ $t('PRODUCT.MATCH_PANEL.FULL_BREAKDOWN') }}
+        </p>
+        <ul class="space-y-1.5">
+          <li
+            v-for="entry in sortedBreakdown"
+            :key="entry.code"
+            class="flex items-center justify-between gap-3"
+          >
+            <span class="min-w-0 flex-1 text-sm text-ink-soft">{{ reasonLabel(entry) }}</span>
+            <span
+              class="shrink-0 text-xs font-medium tabular-nums"
+              :class="entry.impact >= 0 ? 'text-sage' : 'text-caution'"
+            >
+              {{ entry.impact >= 0 ? '+' : '' }}{{ entry.impact }}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div v-if="isPremium" class="rounded-lg bg-surface-muted p-4">
         <p
           class="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase"
         >
@@ -153,6 +193,11 @@ const toggleExplanation = async () => {
           {{ $t('PRODUCT.MATCH_PANEL.NO_EXPLANATION') }}
         </p>
       </div>
+      <PremiumPrompt
+        v-else-if="match.personalised"
+        :message="$t('PRODUCT.MATCH_PANEL.PREMIUM_WHY_TEASER')"
+        compact
+      />
     </div>
   </BaseCard>
 </template>

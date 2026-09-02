@@ -43,7 +43,6 @@ describe('locale files', () => {
       'LANDING.MATCH.DEMO_PRODUCT',
       'LANDING.PRICE.DEMO_TITLE',
       'LANDING.PRICING.EYEBROW',
-      'LANDING.PRICING.PREMIUM.NAME',
       'LANDING.FAQ.EYEBROW',
       'SEARCH.FILTER.CRUELTY_FREE',
       'PRODUCT.PER_HUNDRED',
@@ -73,6 +72,10 @@ describe('locale files', () => {
       'ADMIN.STORES.FIELD_SLUG',
       'ADMIN.USERS.COL_PLAN',
       'ADMIN.USERS.PLAN.PREMIUM',
+      'PRICING.PREMIUM.NAME',
+      'PRICING.COMPARE.ROW.AI',
+      'PREMIUM.BADGE',
+      'NAV.AI',
       'SEO.ADMIN.TITLE',
       'GENERATED.ROUTINE_STEP_NAME',
     ]);

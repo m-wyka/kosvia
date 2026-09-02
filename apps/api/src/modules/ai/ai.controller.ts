@@ -13,6 +13,8 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { RequiresConsent } from '../../common/decorators/requires-consent.decorator';
 import { ConsentGuard } from '../../common/guards/consent.guard';
+import { RequiresPremium } from '../../common/decorators/requires-premium.decorator';
+import { PremiumGuard } from '../../common/guards/premium.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AiChatResponse, AiConversationDto } from '@kosvia/shared';
 import {
@@ -35,7 +37,7 @@ export class AIController {
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Ask the AI Beauty Shopper a question' })
   chat(@CurrentUser() user: AuthenticatedUser, @Body() dto: ChatDto): Promise<AiChatResponse> {
-    return this.ai.chat(user.id, dto.message, dto.conversationId, dto.locale ?? 'pl');
+    return this.ai.chat(user, dto.message, dto.conversationId, dto.locale ?? 'pl');
   }
 
   @Get('conversations')
@@ -73,6 +75,8 @@ export class AIController {
 
   @OptionalAuth()
   @Get('products/:slug/why')
+  @UseGuards(PremiumGuard)
+  @RequiresPremium()
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Why this product got its Personal Match score' })
   explainMatch(

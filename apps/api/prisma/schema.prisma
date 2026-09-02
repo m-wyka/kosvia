@@ -31,6 +31,23 @@ enum SubscriptionStatus {
   CANCELLED
 }
 
+enum SubscriptionPeriod {
+  MONTHLY
+  YEARLY
+}
+
+/// CANCELED keeps Premium until expiresAt passes; EXPIRED is the terminal state.
+enum SubscriptionState {
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
+
+enum UsageMetric {
+  AI_MESSAGE
+  PERSONAL_MATCH
+}
+
 enum SkinType {
   DRY
   OILY
@@ -129,9 +146,82 @@ model User {
   consents      UserConsent[]
   appReview     AppReview?
   deletionRequest AccountDeletionRequest?
+  subscription  Subscription?
+  usageCounters UsageCounter[]
+  matchAnalyses PersonalMatchAnalysis[]
 
   @@index([role])
   @@map("users")
+}
+
+/// The lifecycle record behind User.subscriptionStatus. `provider` is MANUAL
+/// until a payment provider (App Store, Google Play, Stripe) is integrated —
+/// the entitlement layer only ever reads state and expiresAt, so a provider
+/// can be plugged in later without touching the permission system.
+model Subscription {
+  id                String             @id @default(cuid())
+  userId            String             @unique
+  period            SubscriptionPeriod
+  state             SubscriptionState  @default(ACTIVE)
+  provider          String             @default("MANUAL")
+  providerReference String?
+  startedAt         DateTime           @default(now())
+  /// Null means no scheduled end (a manual/dev grant).
+  expiresAt         DateTime?
+  canceledAt        DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([state, expiresAt])
+  @@map("subscriptions")
+}
+
+/// Admin-editable price of one Premium billing period. Display configuration
+/// only — once a payment provider exists, its catalogue must be updated too.
+model SubscriptionPlan {
+  id         String             @id @default(cuid())
+  period     SubscriptionPeriod @unique
+  priceMinor Int
+  currency   String             @default("PLN")
+  isActive   Boolean            @default(true)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@map("subscription_plans")
+}
+
+/// Monthly usage counter per user and metric. The limit check is a single
+/// conditional UPDATE (used < limit), so parallel requests cannot overshoot.
+model UsageCounter {
+  id          String      @id @default(cuid())
+  userId      String
+  metric      UsageMetric
+  periodStart DateTime    @db.Date
+  used        Int         @default(0)
+  updatedAt   DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, metric, periodStart])
+  @@map("usage_counters")
+}
+
+/// Which products a user already spent a full-analysis credit on this month —
+/// re-opening the same product page never burns a second credit.
+model PersonalMatchAnalysis {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String
+  periodStart DateTime @db.Date
+  createdAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId, periodStart])
+  @@map("personal_match_analyses")
 }
 
 enum ConsentType {
@@ -376,6 +466,7 @@ model Product {
   shelfItems  UserShelfItem[]
   priceAlerts PriceAlert[]
   formulaRevisions ProductFormulaRevision[]
+  matchAnalyses PersonalMatchAnalysis[]
 
   @@index([brandId])
   @@index([categoryId])

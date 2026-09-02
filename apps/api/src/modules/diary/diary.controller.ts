@@ -34,7 +34,7 @@ export class DiaryController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: DiaryMonthQueryDto,
   ): Promise<SkinDiaryMonthDto> {
-    return this.diary.month(user.id, query.month);
+    return this.diary.month(user, query.month);
   }
 
   @Put(':date')

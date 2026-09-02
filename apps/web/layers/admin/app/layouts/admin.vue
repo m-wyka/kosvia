@@ -31,6 +31,7 @@ const sections = [
     links: [
       { to: '/admin/stores', label: 'ADMIN.NAV.STORES', icon: 'store' as const },
       { to: '/admin/offers', label: 'ADMIN.NAV.OFFERS', icon: 'compare' as const },
+      { to: '/admin/subscriptions', label: 'ADMIN.NAV.SUBSCRIPTIONS', icon: 'tag' as const },
     ],
   },
   {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { isAdmin, user, displayName } = storeToRefs(useAuthStore());
+const { isAdmin, isPremium, user, displayName } = storeToRefs(useAuthStore());
 const { logout } = useAuthStore();
 const route = useRoute();
 const router = useRouter();
@@ -67,8 +67,11 @@ watch(
         class="absolute top-full right-0 z-50 mt-2 w-60 origin-top-right rounded-xl border border-line bg-surface p-1.5 shadow-lg"
       >
         <div class="px-2.5 py-2">
-          <p class="truncate text-sm font-medium text-ink">
+          <p class="flex items-center gap-1.5 truncate text-sm font-medium text-ink">
             {{ displayName }}
+            <BaseBadge v-if="isPremium" tone="blush" size="xs">
+              {{ $t('PREMIUM.BADGE') }}
+            </BaseBadge>
           </p>
           <p class="truncate text-xs text-ink-muted">
             {{ user?.email }}
@@ -76,6 +79,11 @@ watch(
         </div>
 
         <div class="my-1 border-t border-line" />
+
+        <NuxtLinkLocale v-if="!isPremium" to="/pricing" :class="MENU_ITEM_CLASS" @click="closeMenu">
+          <BaseIcon name="sparkles" :size="16" />
+          {{ $t('PREMIUM.GO_PREMIUM') }}
+        </NuxtLinkLocale>
 
         <NuxtLinkLocale to="/dashboard" :class="MENU_ITEM_CLASS" @click="closeMenu">
           <BaseIcon name="home" :size="16" />

@@ -29,11 +29,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: AccessTokenPayload): Promise<AuthenticatedUser> {
-    // Re-read the role from the database so a demotion takes effect immediately
-    // rather than at the end of the token's lifetime.
+    // Re-read the role and plan from the database so a demotion or downgrade
+    // takes effect immediately rather than at the end of the token's lifetime.
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, role: true },
+      select: { id: true, email: true, role: true, subscriptionStatus: true },
     });
     if (!user) throw new UnauthorizedException('Your session is no longer valid.');
     return user;

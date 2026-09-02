@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,12 +16,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { SubscriptionPeriod } from '@prisma/client';
+import { SUBSCRIPTION_PERIODS } from '@kosvia/shared';
 import type {
   AdminStatsDto,
   AuditLogDto,
   ImportRunDto,
   MatchWeights,
   PaginatedResult,
+  SubscriptionPlanDto,
 } from '@kosvia/shared';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -34,6 +38,7 @@ import { InciImportService } from '../inci/inci-import.service';
 import { UnmatchedTokenService } from '../inci/unmatched-token.service';
 import { ImportRunService } from '../import/import-run.service';
 import { MatchWeightService } from '../scoring/match-weight.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 import {
   AdminAppReviewQueryDto,
   AdminListQueryDto,
@@ -43,6 +48,7 @@ import {
   BulkTokenDto,
   UnmatchedTokenQueryDto,
   UpdateAppReviewStatusDto,
+  UpdateSubscriptionPlanDto,
   UpdateUserDto,
   UpsertBrandDto,
   UpsertCategoryDto,
@@ -65,7 +71,28 @@ export class AdminController {
     private readonly unmatchedTokens: UnmatchedTokenService,
     private readonly importRuns: ImportRunService,
     private readonly matchWeights: MatchWeightService,
+    private readonly subscriptionPlans: SubscriptionService,
   ) {}
+
+  /* --------------------------------------------------- subscription plans -- */
+  @Get('subscription-plans')
+  @ApiOperation({ summary: 'Premium pricing per billing period' })
+  listSubscriptionPlans(): Promise<SubscriptionPlanDto[]> {
+    return this.subscriptionPlans.plans();
+  }
+
+  @Patch('subscription-plans/:period')
+  @ApiOperation({ summary: 'Edit the price, currency or availability of a billing period' })
+  updateSubscriptionPlan(
+    @Param('period') period: string,
+    @Body() dto: UpdateSubscriptionPlanDto,
+  ): Promise<SubscriptionPlanDto> {
+    const normalized = period.toUpperCase() as SubscriptionPeriod;
+    if (!SUBSCRIPTION_PERIODS.includes(normalized)) {
+      throw new BadRequestException('Unknown billing period.');
+    }
+    return this.subscriptionPlans.updatePlan(normalized, dto);
+  }
 
   /* -------------------------------------------------------- match weights -- */
   @Get('match-weights')

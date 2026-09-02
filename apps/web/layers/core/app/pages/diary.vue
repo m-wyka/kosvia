@@ -87,7 +87,13 @@ useSeo(() => ({
     <template v-else>
       <BaseErrorState v-if="error" @retry="refresh()" />
 
-      <div v-else class="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <PremiumPrompt
+        v-if="!error && data?.historyLimited"
+        :message="$t('DIARY.HISTORY_LIMITED')"
+        class="mb-6"
+      />
+
+      <div v-if="!error" class="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section>
           <div class="mb-4 flex items-center justify-between gap-3">
             <h2 class="font-display text-xl text-ink capitalize">

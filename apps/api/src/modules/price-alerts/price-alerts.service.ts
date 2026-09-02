@@ -2,10 +2,12 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { Prisma } from '@prisma/client';
 import type { PriceAlertDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { decimalToNumber, toProductSummary, toScorable } from '../products/product.mapper';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
+import { EntitlementService } from '../subscription/entitlement.service';
 import type { CreatePriceAlertDto, UpdatePriceAlertDto } from './dto/price-alert.dto';
 import { publicProductWhere } from '../products/product-visibility';
 
@@ -22,6 +24,7 @@ export class PriceAlertsService {
     private readonly prisma: PrismaService,
     private readonly match: PersonalMatchService,
     private readonly viewers: ViewerContextService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   async list(userId: string): Promise<PriceAlertDto[]> {
@@ -54,7 +57,11 @@ export class PriceAlertsService {
     });
   }
 
-  async create(userId: string, dto: CreatePriceAlertDto): Promise<PriceAlertDto> {
+  async create(user: AuthenticatedUser, dto: CreatePriceAlertDto): Promise<PriceAlertDto> {
+    const userId = user.id;
+    const plan = await this.entitlements.currentPlan(user);
+    await this.entitlements.assertPriceAlertCapacity(userId, plan);
+
     const product = await this.prisma.product.findFirst({
       where: {
         AND: [publicProductWhere(), { OR: [{ id: dto.productId }, { slug: dto.productId }] }],
@@ -78,8 +85,23 @@ export class PriceAlertsService {
     return (await this.list(userId)).find((alert) => alert.id === created.id)!;
   }
 
-  async update(userId: string, id: string, dto: UpdatePriceAlertDto): Promise<PriceAlertDto> {
+  async update(
+    user: AuthenticatedUser,
+    id: string,
+    dto: UpdatePriceAlertDto,
+  ): Promise<PriceAlertDto> {
+    const userId = user.id;
     await this.assertOwned(userId, id);
+    if (dto.active === true) {
+      const current = await this.prisma.priceAlert.findUnique({
+        where: { id },
+        select: { active: true },
+      });
+      if (current && !current.active) {
+        const plan = await this.entitlements.currentPlan(user);
+        await this.entitlements.assertPriceAlertCapacity(userId, plan);
+      }
+    }
     await this.prisma.priceAlert.update({
       where: { id },
       data: {

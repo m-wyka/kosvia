@@ -35,7 +35,7 @@ export class PriceAlertsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreatePriceAlertDto,
   ): Promise<PriceAlertDto> {
-    return this.alerts.create(user.id, dto);
+    return this.alerts.create(user, dto);
   }
 
   @Patch(':id')
@@ -45,7 +45,7 @@ export class PriceAlertsController {
     @Param('id') id: string,
     @Body() dto: UpdatePriceAlertDto,
   ): Promise<PriceAlertDto> {
-    return this.alerts.update(user.id, id, dto);
+    return this.alerts.update(user, id, dto);
   }
 
   @Delete(':id')

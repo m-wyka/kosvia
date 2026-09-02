@@ -11,6 +11,7 @@ const groups = [
       { to: '/dupes', label: 'FOOTER.DUPES' },
       { to: '/compare', label: 'NAV.COMPARE' },
       { to: '/reviews', label: 'FOOTER.REVIEWS' },
+      { to: '/pricing', label: 'FOOTER.PRICING' },
       { to: '/about-data', label: 'FOOTER.ABOUT_DATA' },
       { to: '/privacy', label: 'FOOTER.PRIVACY' },
     ],

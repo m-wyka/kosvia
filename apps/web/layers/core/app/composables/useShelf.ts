@@ -47,7 +47,14 @@ export const useShelf = () => {
       await refresh(true);
       return true;
     } catch (error) {
-      toast.error(message(error));
+      if (apiErrorCode(error) === 'PLAN_LIMIT_REACHED') {
+        toast.notify(t('SHELF.LIMIT_REACHED', { limit: apiErrorLimit(error) ?? 10 }), {
+          label: t('PREMIUM.SEE_PREMIUM'),
+          to: '/pricing',
+        });
+      } else {
+        toast.error(message(error));
+      }
       return false;
     } finally {
       busy.value = false;

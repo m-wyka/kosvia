@@ -28,6 +28,81 @@ export type UserRole = (typeof USER_ROLES)[number];
 export const SUBSCRIPTION_STATUSES = ['FREE', 'PREMIUM', 'CANCELLED'] as const;
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
 
+/** Effective plan a user is on — CANCELLED collapses to FREE once the paid period ends. */
+export const PLAN_TIERS = ['FREE', 'PREMIUM'] as const;
+export type PlanTier = (typeof PLAN_TIERS)[number];
+
+export const SUBSCRIPTION_PERIODS = ['MONTHLY', 'YEARLY'] as const;
+export type SubscriptionPeriod = (typeof SUBSCRIPTION_PERIODS)[number];
+
+export const SUBSCRIPTION_STATES = ['ACTIVE', 'CANCELED', 'EXPIRED'] as const;
+export type SubscriptionState = (typeof SUBSCRIPTION_STATES)[number];
+
+/** Metrics tracked with a monthly usage counter. */
+export const USAGE_METRICS = ['AI_MESSAGE', 'PERSONAL_MATCH'] as const;
+export type UsageMetric = (typeof USAGE_METRICS)[number];
+
+/** Every feature a plan limit can apply to — used in machine-readable 403 bodies. */
+export const LIMIT_METRICS = [
+  'AI_MESSAGE',
+  'PERSONAL_MATCH',
+  'PRICE_ALERT',
+  'SHELF_ITEM',
+  'COMPARE_PRODUCTS',
+] as const;
+export type LimitMetric = (typeof LIMIT_METRICS)[number];
+
+/** Per-plan feature ceilings. `null` means unlimited. */
+export interface PlanLimits {
+  aiMessagesPerMonth: number;
+  personalMatchAnalysesPerMonth: number | null;
+  activePriceAlerts: number;
+  shelfItems: number | null;
+  compareProducts: number;
+  alternativesPerProduct: number | null;
+  dupesPerProduct: number | null;
+  diaryHistoryDays: number | null;
+}
+
+/**
+ * Single source of truth for Free vs Premium ceilings. The backend enforces
+ * them; the frontend only mirrors them in copy and in the comparison table.
+ */
+export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
+  FREE: {
+    aiMessagesPerMonth: 5,
+    personalMatchAnalysesPerMonth: 20,
+    activePriceAlerts: 1,
+    shelfItems: 10,
+    compareProducts: 2,
+    alternativesPerProduct: 3,
+    dupesPerProduct: 3,
+    diaryHistoryDays: 7,
+  },
+  PREMIUM: {
+    aiMessagesPerMonth: 100,
+    personalMatchAnalysesPerMonth: null,
+    activePriceAlerts: 20,
+    shelfItems: null,
+    compareProducts: 4,
+    alternativesPerProduct: null,
+    dupesPerProduct: null,
+    diaryHistoryDays: null,
+  },
+};
+
+/**
+ * Fallback pricing in minor units (grosze) used until an admin edits the plan.
+ * The live values come from the subscription_plans table via GET /subscription/plans.
+ */
+export const DEFAULT_PLAN_PRICING: Record<
+  SubscriptionPeriod,
+  { priceMinor: number; currency: string }
+> = {
+  MONTHLY: { priceMinor: 1999, currency: 'PLN' },
+  YEARLY: { priceMinor: 14999, currency: 'PLN' },
+};
+
 export const AVAILABILITY_STATES = ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'UNKNOWN'] as const;
 export type Availability = (typeof AVAILABILITY_STATES)[number];
 

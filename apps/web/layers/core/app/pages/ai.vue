@@ -11,6 +11,7 @@ const { hasConsent } = useAuthStore();
 const hasAiConsent = computed(() => hasConsent('AI_PROCESSING'));
 const message = useApiMessage();
 const { t, locale } = useI18n();
+const { overview, isPremium, fetchOverview } = useSubscription();
 
 const { data: conversations, refresh: refreshConversations } = await useApiFetch<
   AiConversationDto[]
@@ -21,7 +22,25 @@ const messages = ref<AiMessageDto[]>([]);
 const draft = ref('');
 const thinking = ref(false);
 const error = ref('');
+const limitReached = ref(false);
 const thread = ref<HTMLElement | null>(null);
+
+const aiUsage = computed(() => overview.value?.entitlements.aiMessages ?? null);
+const usageLabel = computed(() => {
+  const usage = aiUsage.value;
+  if (!usage || usage.limit === null) {
+    return null;
+  }
+  return t('AI.USAGE', { used: usage.used, limit: usage.limit });
+});
+const isOutOfMessages = computed(
+  () => limitReached.value || (aiUsage.value !== null && aiUsage.value.remaining === 0),
+);
+const limitPromptMessage = computed(() =>
+  isPremium.value
+    ? t('AI.LIMIT_REACHED_PREMIUM', { limit: aiUsage.value?.limit ?? 0 })
+    : t('AI.LIMIT_REACHED_FREE', { limit: aiUsage.value?.limit ?? 0 }),
+);
 
 const starters = computed(() =>
   Array.from({ length: STARTER_COUNT }, (_, index) => t(`AI.STARTER.ITEM_${index + 1}`)),
@@ -60,7 +79,7 @@ const appendLocalUserMessage = (content: string) => {
 
 const send = async (text?: string) => {
   const content = (text ?? draft.value).trim();
-  if (!content || thinking.value) {
+  if (!content || thinking.value || isOutOfMessages.value) {
     return;
   }
 
@@ -83,9 +102,14 @@ const send = async (text?: string) => {
     messages.value = [...messages.value, response.message];
     await refreshConversations();
   } catch (caught) {
-    error.value = message(caught);
+    if (apiErrorCode(caught) === 'PLAN_LIMIT_REACHED') {
+      limitReached.value = true;
+    } else {
+      error.value = message(caught);
+    }
   } finally {
     thinking.value = false;
+    void fetchOverview();
     await scrollToEnd();
   }
 };
@@ -96,6 +120,10 @@ const handleComposerKeydown = (event: KeyboardEvent) => {
     void send();
   }
 };
+
+onMounted(() => {
+  void fetchOverview();
+});
 
 useSeo(() => ({
   title: t('SEO.AI.TITLE'),
@@ -122,9 +150,14 @@ useSeo(() => ({
             <h1 class="font-display text-2xl text-ink sm:text-3xl">{{ $t('AI.TITLE') }}</h1>
             <p class="mt-1 text-sm text-ink-muted">{{ $t('AI.SUBTITLE') }}</p>
           </div>
-          <BaseButton v-if="messages.length" variant="ghost" size="sm" @click="startNew">
-            {{ $t('AI.NEW_CONVERSATION') }}
-          </BaseButton>
+          <div class="flex items-center gap-3">
+            <BaseBadge v-if="usageLabel" :tone="isOutOfMessages ? 'caution' : 'neutral'">
+              {{ usageLabel }}
+            </BaseBadge>
+            <BaseButton v-if="messages.length" variant="ghost" size="sm" @click="startNew">
+              {{ $t('AI.NEW_CONVERSATION') }}
+            </BaseButton>
+          </div>
         </header>
 
         <div v-if="!messages.length" class="flex flex-1 flex-col justify-center py-8">
@@ -167,7 +200,19 @@ useSeo(() => ({
           {{ error }}
         </p>
 
-        <form class="sticky bottom-20 lg:bottom-0" @submit.prevent="send()">
+        <PremiumPrompt
+          v-if="isOutOfMessages && !isPremium"
+          :message="limitPromptMessage"
+          :cta-label="$t('PREMIUM.GO_PREMIUM')"
+          class="sticky bottom-20 lg:bottom-0"
+        />
+        <p
+          v-else-if="isOutOfMessages"
+          class="sticky bottom-20 rounded-xl border border-line bg-surface-muted p-4 text-sm text-ink-soft lg:bottom-0"
+        >
+          {{ limitPromptMessage }}
+        </p>
+        <form v-else class="sticky bottom-20 lg:bottom-0" @submit.prevent="send()">
           <div class="flex items-end gap-2 rounded-2xl border border-line bg-surface p-2 shadow-sm">
             <label for="ai-input" class="sr-only">{{ $t('AI.INPUT_LABEL') }}</label>
             <textarea

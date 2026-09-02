@@ -108,7 +108,15 @@ const createAlert = async () => {
       to: '/price-alerts',
     });
   } catch (caught) {
-    toast.error(message(caught));
+    if (apiErrorCode(caught) === 'PLAN_LIMIT_REACHED') {
+      alertOpen.value = false;
+      toast.notify(t('ALERTS.LIMIT_REACHED', { limit: apiErrorLimit(caught) ?? 1 }), {
+        label: t('PREMIUM.SEE_PREMIUM'),
+        to: '/pricing',
+      });
+    } else {
+      toast.error(message(caught));
+    }
   } finally {
     alertSaving.value = false;
   }
@@ -351,6 +359,7 @@ useBreadcrumbJsonLd(
           v-if="product.personalMatch"
           :match="product.personalMatch"
           :slug="product.slug"
+          :limit-reached="product.matchLimitReached ?? false"
         />
         <ProductOffers v-if="product.offers.length" :product="product" />
       </aside>

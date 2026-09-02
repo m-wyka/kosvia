@@ -12,6 +12,7 @@ import { PRODUCT_INCLUDE, hasMatchedIngredient, type ProductRow } from '../produ
 import { toProductDto, toScorable } from '../products/product.mapper';
 import type { ViewerContext } from '../profile/viewer-context.service';
 import { publicProductWhere } from '../products/product-visibility';
+import { premiumRequiredException } from '../subscription/plan-errors';
 
 /**
  * Side-by-side comparison of 2-4 products, ending in an explicit recommendation.
@@ -30,10 +31,14 @@ export class ComparisonService {
     identifiers: string[],
     viewer: ViewerContext,
     locale: AnswerLocale,
+    maxProducts = 4,
   ): Promise<ComparisonResultDto> {
     const unique = [...new Set(identifiers.filter(Boolean))];
     if (unique.length < 2 || unique.length > 4) {
       throw new BadRequestException('Choose between two and four products to compare.');
+    }
+    if (unique.length > maxProducts) {
+      throw premiumRequiredException();
     }
 
     const rows = await this.prisma.product.findMany({

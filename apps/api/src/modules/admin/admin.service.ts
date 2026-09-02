@@ -4,6 +4,7 @@ import { pricePerHundred, slugify } from '@kosvia/shared';
 import type { AdminStatsDto, AuditLogDto, PaginatedResult } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { decimalToNumber, toProductDto } from '../products/product.mapper';
 import { toVolumeUnitEnum, toVolumeUnitDto } from '../products/volume-unit';
@@ -36,6 +37,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly traits: ProductTraitsService,
+    private readonly subscriptions: SubscriptionService,
   ) {}
 
   async stats(): Promise<AdminStatsDto> {
@@ -568,11 +570,17 @@ export class AdminService {
       throw new BadRequestException('You cannot remove your own admin access.');
     }
     await this.assertExists('user', id);
-    return this.prisma.user.update({
+    const { subscriptionStatus, subscriptionPeriod, ...profileFields } = dto;
+    const updated = await this.prisma.user.update({
       where: { id },
-      data: { ...dto },
+      data: { ...profileFields },
       select: { id: true, email: true, name: true, role: true, subscriptionStatus: true },
     });
+    if (subscriptionStatus && subscriptionStatus !== updated.subscriptionStatus) {
+      await this.subscriptions.applyAdminStatus(id, subscriptionStatus, subscriptionPeriod);
+      return { ...updated, subscriptionStatus };
+    }
+    return updated;
   }
 
   async deleteUser(id: string, actingUserId: string) {

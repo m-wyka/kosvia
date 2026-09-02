@@ -12,6 +12,8 @@ import type {
 } from '@kosvia/shared';
 import type { AnswerLocale } from '../../common/i18n/phrases';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import { EntitlementService } from '../subscription/entitlement.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
 import { IngredientScoreService } from '../scoring/ingredient-score.service';
 import { CoarseMatchService } from '../scoring/coarse-match.service';
@@ -51,6 +53,7 @@ export class ProductsService {
     private readonly coarseMatch: CoarseMatchService,
     @Inject(SEARCH_PROVIDER) private readonly searchProvider: SearchProvider,
     private readonly formulaRevisions: FormulaRevisionService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   /* ------------------------------------------------------------- reading -- */
@@ -240,13 +243,51 @@ export class ProductsService {
     };
   }
 
-  async findBySlug(slug: string, viewer: ViewerContext, locale: AnswerLocale): Promise<ProductDto> {
+  async findBySlug(
+    slug: string,
+    viewer: ViewerContext,
+    locale: AnswerLocale,
+    user: AuthenticatedUser | null = null,
+  ): Promise<ProductDto> {
     const row = await this.prisma.product.findUnique({ where: { slug }, include: PRODUCT_INCLUDE });
     if (!row || !isProductVisible(row)) {
       throw new NotFoundException('We could not find that product.');
     }
     const recentFormulaChange = await this.formulaRevisions.recentChange(row.id);
-    return { ...toProductDto(row, this.scoreOne(row, viewer), locale), recentFormulaChange };
+    const { match, matchLimitReached } = await this.detailMatch(row, viewer, user);
+    return {
+      ...toProductDto(row, match, locale),
+      recentFormulaChange,
+      ...(matchLimitReached ? { matchLimitReached } : {}),
+    };
+  }
+
+  /**
+   * The product page is the "full analysis" of the spec: a Free viewer with a
+   * profile spends one monthly credit per product (never twice for the same
+   * product in a month); over the quota the page still works, but with the
+   * generic score. Premium additionally gets the uncompressed breakdown.
+   */
+  private async detailMatch(
+    row: ProductRow,
+    viewer: ViewerContext,
+    user: AuthenticatedUser | null,
+  ): Promise<{ match: PersonalMatchDto; matchLimitReached: boolean }> {
+    if (!user || !viewer.profile) {
+      return { match: this.scoreOne(row, viewer), matchLimitReached: false };
+    }
+    const plan = await this.entitlements.currentPlan(user);
+    if (plan === 'PREMIUM') {
+      const match = this.scoreOne(row, viewer);
+      const breakdown = this.match.contributions(toScorable(row), viewer.profile, viewer.shelf);
+      return { match: { ...match, breakdown }, matchLimitReached: false };
+    }
+    const allowed = await this.entitlements.authoriseFullAnalysis(user.id, plan, row.id);
+    if (allowed) {
+      return { match: this.scoreOne(row, viewer), matchLimitReached: false };
+    }
+    const generic = this.match.score({ product: toScorable(row), profile: null });
+    return { match: generic, matchLimitReached: true };
   }
 
   async findByIdOrSlug(

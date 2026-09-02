@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const { items, count, compareLink, canCompare } = storeToRefs(useCompareStore());
-const { hydrate, remove, clear, MAX_ITEMS } = useCompareStore();
+const { items, count, compareLink, canCompare, maxItems } = storeToRefs(useCompareStore());
+const { hydrate, remove, clear } = useCompareStore();
 const route = useRoute();
 
 const visible = computed(() => count.value > 0 && !route.path.startsWith('/compare'));
@@ -41,7 +41,7 @@ onMounted(hydrate);
 
           <div class="flex shrink-0 items-center gap-2">
             <span class="hidden text-xs text-ink-muted sm:block">
-              {{ $t('COMPARE.TRAY.COUNT', { current: count, max: MAX_ITEMS }) }}
+              {{ $t('COMPARE.TRAY.COUNT', { current: count, max: maxItems }) }}
             </span>
             <BaseButton size="sm" variant="ghost" @click="clear()">
               {{ $t('COMMON.CLEAR') }}

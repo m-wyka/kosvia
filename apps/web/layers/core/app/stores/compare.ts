@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
-import type { ProductSummaryDto } from '@kosvia/shared';
+import { PLAN_LIMITS, type ProductSummaryDto } from '@kosvia/shared';
 
-const MAX_ITEMS = 4;
 const MIN_ITEMS_TO_COMPARE = 2;
 const STORAGE_KEY = 'kosvia:compare';
 
@@ -9,8 +8,13 @@ export const useCompareStore = defineStore('compare', () => {
   const items = ref<ProductSummaryDto[]>([]);
   const hydrated = ref(false);
 
+  const { isPremium } = storeToRefs(useAuthStore());
+
+  const maxItems = computed(
+    () => PLAN_LIMITS[isPremium.value ? 'PREMIUM' : 'FREE'].compareProducts,
+  );
   const count = computed(() => items.value.length);
-  const isFull = computed(() => items.value.length >= MAX_ITEMS);
+  const isFull = computed(() => items.value.length >= maxItems.value);
   const canCompare = computed(() => items.value.length >= MIN_ITEMS_TO_COMPARE);
   const compareLink = computed(
     () => `/compare?products=${items.value.map((item) => item.slug).join(',')}`,
@@ -81,6 +85,6 @@ export const useCompareStore = defineStore('compare', () => {
     remove,
     clear,
     hydrate,
-    MAX_ITEMS,
+    maxItems,
   };
 });

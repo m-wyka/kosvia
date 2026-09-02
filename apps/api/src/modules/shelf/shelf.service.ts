@@ -1,6 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { RoutineAnalysisDto, RoutinePlanDto, ShelfItemDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import { EntitlementService } from '../subscription/entitlement.service';
+import { restrictRoutineAnalysis } from '../subscription/plan-restrictions';
 import { PRODUCT_INCLUDE } from '../products/product.select';
 import { toProductSummary, toScorable } from '../products/product.mapper';
 import { PersonalMatchService } from '../scoring/personal-match.service';
@@ -18,16 +21,19 @@ export class ShelfService {
     private readonly match: PersonalMatchService,
     private readonly routine: RoutineAnalysisService,
     private readonly routinePlan: RoutinePlanService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
-  async list(userId: string, favoritesOnly = false): Promise<ShelfItemDto[]> {
-    const [items, viewer] = await Promise.all([
+  async list(user: AuthenticatedUser, favoritesOnly = false): Promise<ShelfItemDto[]> {
+    const userId = user.id;
+    const [items, viewer, plan] = await Promise.all([
       this.prisma.userShelfItem.findMany({
         where: { userId, ...(favoritesOnly && { isFavorite: true }) },
         include: { product: { include: PRODUCT_INCLUDE } },
         orderBy: { addedAt: 'desc' },
       }),
       this.viewers.load(userId),
+      this.entitlements.currentPlan(user),
     ]);
 
     const scores = this.match.scoreMany(
@@ -43,7 +49,8 @@ export class ShelfService {
       finishedAt: item.finishedAt?.toISOString() ?? null,
       isFavorite: item.isFavorite,
       notes: item.notes,
-      paoMonths: item.product.paoMonths ?? item.product.category.paoMonths,
+      paoMonths:
+        plan === 'PREMIUM' ? (item.product.paoMonths ?? item.product.category.paoMonths) : null,
       product: toProductSummary(item.product, scores.get(item.productId) ?? null),
     }));
   }
@@ -52,9 +59,13 @@ export class ShelfService {
    * Accepts a product id, slug or EAN. Accepting the EAN now means the future
    * barcode scanner is a UI change only — the API already speaks its language.
    */
-  async add(userId: string, dto: AddShelfItemDto): Promise<ShelfItemDto> {
+  async add(user: AuthenticatedUser, dto: AddShelfItemDto): Promise<ShelfItemDto> {
+    const userId = user.id;
     const key = dto.productId ?? dto.slug ?? dto.ean;
     if (!key) throw new NotFoundException('Tell us which product to add.');
+
+    const plan = await this.entitlements.currentPlan(user);
+    await this.entitlements.assertShelfCapacity(userId, plan);
 
     const product = await this.prisma.product.findFirst({
       where: {
@@ -82,11 +93,16 @@ export class ShelfService {
       },
     });
 
-    const items = await this.list(userId);
+    const items = await this.list(user);
     return items.find((item) => item.product.id === product.id)!;
   }
 
-  async update(userId: string, id: string, dto: UpdateShelfItemDto): Promise<ShelfItemDto> {
+  async update(
+    user: AuthenticatedUser,
+    id: string,
+    dto: UpdateShelfItemDto,
+  ): Promise<ShelfItemDto> {
+    const userId = user.id;
     await this.assertOwned(userId, id);
     await this.prisma.userShelfItem.update({
       where: { id },
@@ -101,7 +117,7 @@ export class ShelfService {
         }),
       },
     });
-    const items = await this.list(userId);
+    const items = await this.list(user);
     return items.find((item) => item.id === id)!;
   }
 
@@ -110,8 +126,12 @@ export class ShelfService {
     await this.prisma.userShelfItem.delete({ where: { id } });
   }
 
-  analyse(userId: string): Promise<RoutineAnalysisDto> {
-    return this.routine.analyse(userId);
+  async analyse(user: AuthenticatedUser): Promise<RoutineAnalysisDto> {
+    const [analysis, plan] = await Promise.all([
+      this.routine.analyse(user.id),
+      this.entitlements.currentPlan(user),
+    ]);
+    return restrictRoutineAnalysis(analysis, plan);
   }
 
   plan(userId: string): Promise<RoutinePlanDto> {

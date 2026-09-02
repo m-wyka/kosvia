@@ -41,6 +41,16 @@ const setRole = async (user: UserRow, role: UserRole) => {
   );
 };
 
+const setPlan = async (user: UserRow, plan: UserRow['subscriptionStatus']) => {
+  await patch(
+    user.id,
+    plan === 'PREMIUM'
+      ? { subscriptionStatus: plan, subscriptionPeriod: 'MONTHLY' }
+      : { subscriptionStatus: plan },
+    t('ADMIN.USERS.PLAN_CHANGED', { email: user.email, plan: t(`ADMIN.USERS.PLAN.${plan}`) }),
+  );
+};
+
 const confirmDelete = async (user: UserRow) => {
   if (!confirm(t('ADMIN.USERS.CONFIRM_DELETE', { email: user.email }))) {
     return;
@@ -107,9 +117,21 @@ useSeo(() => ({
       </template>
 
       <template #cell-subscriptionStatus="{ row }">
-        <BaseBadge :tone="row.subscriptionStatus === 'PREMIUM' ? 'blush' : 'neutral'" size="xs">
-          {{ $t(`ADMIN.USERS.PLAN.${row.subscriptionStatus}`) }}
-        </BaseBadge>
+        <select
+          :value="row.subscriptionStatus"
+          class="h-8 rounded-md border border-line bg-surface px-2 text-xs"
+          :aria-label="$t('ADMIN.USERS.PLAN_ARIA', { email: row.email })"
+          @change="
+            setPlan(
+              row,
+              ($event.target as HTMLSelectElement).value as UserRow['subscriptionStatus'],
+            )
+          "
+        >
+          <option value="FREE">{{ $t('ADMIN.USERS.PLAN.FREE') }}</option>
+          <option value="PREMIUM">{{ $t('ADMIN.USERS.PLAN.PREMIUM') }}</option>
+          <option value="CANCELLED">{{ $t('ADMIN.USERS.PLAN.CANCELLED') }}</option>
+        </select>
       </template>
 
       <template #cell-activity="{ row }">

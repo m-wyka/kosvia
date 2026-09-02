@@ -7,6 +7,8 @@ import type {
   AiProductSuggestion,
 } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import { EntitlementService } from '../subscription/entitlement.service';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { ProductsService } from '../products/products.service';
 import { PersonalMatchService } from '../scoring/personal-match.service';
@@ -32,9 +34,26 @@ export class AIService {
     private readonly products: ProductsService,
     private readonly match: PersonalMatchService,
     private readonly ingredientScore: IngredientScoreService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   async chat(
+    user: AuthenticatedUser,
+    message: string,
+    conversationId?: string,
+    locale: AnswerLocale = 'pl',
+  ): Promise<AiChatResponse> {
+    const plan = await this.entitlements.currentPlan(user);
+    await this.entitlements.consumeAiMessage(user.id, plan);
+    try {
+      return await this.answer(user.id, message, conversationId, locale);
+    } catch (error) {
+      await this.entitlements.refundAiMessage(user.id);
+      throw error;
+    }
+  }
+
+  private async answer(
     userId: string,
     message: string,
     conversationId?: string,

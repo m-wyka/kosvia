@@ -29,6 +29,8 @@ const { t } = useI18n();
 const vocab = useVocabulary();
 const localise = useLocalisedText();
 const format = useFormat();
+const { isPremium } = storeToRefs(useAuthStore());
+const { overview, fetchOverview } = useSubscription();
 
 const {
   data: items,
@@ -43,14 +45,31 @@ const { data: analysis, refresh: refreshAnalysis } = await useApiFetch<RoutineAn
   '/shelf/analysis',
   { key: 'shelf-analysis', lazy: true },
 );
-const { data: regulatoryAlerts } = await useApiFetch<RegulatoryAlertDto[]>(
-  '/shelf/regulatory-alerts',
-  { key: 'shelf-regulatory-alerts', lazy: true, default: () => [] },
-);
-const { data: routinePlan } = await useApiFetch<RoutinePlanDto>('/shelf/routine-plan', {
-  key: 'shelf-routine-plan',
-  lazy: true,
+const { data: regulatoryAlerts, execute: loadRegulatoryAlerts } = await useApiFetch<
+  RegulatoryAlertDto[]
+>('/shelf/regulatory-alerts', {
+  key: 'shelf-regulatory-alerts',
+  immediate: false,
+  default: () => [],
 });
+const { data: routinePlan, execute: loadRoutinePlan } = await useApiFetch<RoutinePlanDto>(
+  '/shelf/routine-plan',
+  { key: 'shelf-routine-plan', immediate: false },
+);
+
+onMounted(() => {
+  void fetchOverview();
+  if (isPremium.value) {
+    void loadRegulatoryAlerts();
+    void loadRoutinePlan();
+  }
+});
+
+const shelfLimit = computed(() => overview.value?.entitlements.shelfItems.limit ?? null);
+const isShelfFull = computed(
+  () =>
+    !isPremium.value && shelfLimit.value !== null && (items.value?.length ?? 0) >= shelfLimit.value,
+);
 
 const regulatoryProductIds = computed(
   () =>
@@ -181,7 +200,15 @@ const addProduct = async (product: ProductSummaryDto) => {
     search.value = '';
     toast.success(t('SHELF.ADDED', { name: product.name }));
   } catch (caught) {
-    toast.error(message(caught));
+    if (apiErrorCode(caught) === 'PLAN_LIMIT_REACHED') {
+      addOpen.value = false;
+      toast.notify(t('SHELF.LIMIT_REACHED', { limit: apiErrorLimit(caught) ?? 10 }), {
+        label: t('PREMIUM.UNLOCK'),
+        to: '/pricing',
+      });
+    } else {
+      toast.error(message(caught));
+    }
   }
 };
 
@@ -208,6 +235,13 @@ useSeo(() => ({
     </header>
 
     <BaseTabs v-model="tab" :tabs="tabs" class="mb-7 max-w-md" />
+
+    <PremiumPrompt
+      v-if="isShelfFull"
+      :message="$t('SHELF.LIMIT_BANNER', { limit: shelfLimit ?? 10 })"
+      :cta-label="$t('PREMIUM.UNLOCK')"
+      class="mb-6"
+    />
 
     <BaseErrorState v-if="error" @retry="reloadAll()" />
 
@@ -292,7 +326,7 @@ useSeo(() => ({
         </aside>
       </div>
 
-      <section v-if="routinePlan && routinePlan.itemCount > 0" class="mt-10">
+      <section v-if="isPremium && routinePlan && routinePlan.itemCount > 0" class="mt-10">
         <h2 class="font-display text-2xl text-ink">
           {{ $t('SHELF.PLAN.TITLE') }}
         </h2>
@@ -300,6 +334,13 @@ useSeo(() => ({
           {{ $t('SHELF.PLAN.SUBTITLE') }}
         </p>
         <RoutinePlanGrid :plan="routinePlan" class="mt-5" />
+      </section>
+
+      <section v-else-if="!isPremium && analysis && analysis.itemCount > 0" class="mt-10">
+        <h2 class="font-display text-2xl text-ink">
+          {{ $t('SHELF.PLAN.TITLE') }}
+        </h2>
+        <PremiumPrompt :message="$t('SHELF.PLAN.PREMIUM_TEASER')" class="mt-4" />
       </section>
     </div>
 

@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => user.value !== null);
   const isAdmin = computed(() => user.value?.role === 'ADMIN');
+  const isPremium = computed(() => user.value?.subscriptionStatus === 'PREMIUM');
   const needsOnboarding = computed(() => isAuthenticated.value && !user.value?.hasBeautyProfile);
   const displayName = computed(
     () => user.value?.name?.trim() || user.value?.email.split('@')[0] || FALLBACK_DISPLAY_NAME,
@@ -120,6 +121,7 @@ export const useAuthStore = defineStore('auth', () => {
     ready,
     isAuthenticated,
     isAdmin,
+    isPremium,
     needsOnboarding,
     displayName,
     init,

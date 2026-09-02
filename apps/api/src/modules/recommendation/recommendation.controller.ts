@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsInt, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -7,6 +7,7 @@ import type {
   ComparisonResultDto,
   DiscoveryFeedDto,
   DupeResultDto,
+  PlanTier,
   ProductSummaryDto,
 } from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
@@ -14,6 +15,8 @@ import {
   CurrentUser,
   type AuthenticatedUser,
 } from '../../common/decorators/current-user.decorator';
+import { RequiresPremium } from '../../common/decorators/requires-premium.decorator';
+import { PremiumGuard } from '../../common/guards/premium.guard';
 import { ViewerContextService } from '../profile/viewer-context.service';
 import { CompareQueryDto } from '../products/dto/product-query.dto';
 import { AlternativeProductService } from './alternative-product.service';
@@ -22,6 +25,8 @@ import { RequestLocale } from '../../common/decorators/request-locale.decorator'
 import type { AnswerLocale } from '../../common/i18n/phrases';
 import { ComparisonService } from './comparison.service';
 import { RecommendationService, type RoutinePlan } from './recommendation.service';
+import { EntitlementService } from '../subscription/entitlement.service';
+import { restrictAlternativeGroups, restrictDupes } from '../subscription/plan-restrictions';
 
 class BuildRoutineDto {
   @Type(() => Number) @IsInt() @Min(30) @Max(2000) budget!: number;
@@ -37,6 +42,7 @@ export class RecommendationController {
     private readonly dupes: DupeFinderService,
     private readonly comparison: ComparisonService,
     private readonly recommendations: RecommendationService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   @Get('products/:idOrSlug/alternatives')
@@ -45,7 +51,14 @@ export class RecommendationController {
     @Param('idOrSlug') idOrSlug: string,
     @CurrentUser() user: AuthenticatedUser | null,
   ): Promise<AlternativeGroupDto[]> {
-    return this.alternatives.forProduct(idOrSlug, await this.viewers.load(user?.id));
+    const [groups, plan] = await Promise.all([
+      this.viewers.load(user?.id).then((viewer) => this.alternatives.forProduct(idOrSlug, viewer)),
+      this.viewerPlan(user),
+    ]);
+    return restrictAlternativeGroups(
+      groups,
+      this.entitlements.limitsFor(plan).alternativesPerProduct,
+    );
   }
 
   @Get('products/:idOrSlug/dupes')
@@ -54,7 +67,11 @@ export class RecommendationController {
     @Param('idOrSlug') idOrSlug: string,
     @CurrentUser() user: AuthenticatedUser | null,
   ): Promise<DupeResultDto> {
-    return this.dupes.findDupes(idOrSlug, await this.viewers.load(user?.id));
+    const [result, plan] = await Promise.all([
+      this.viewers.load(user?.id).then((viewer) => this.dupes.findDupes(idOrSlug, viewer)),
+      this.viewerPlan(user),
+    ]);
+    return restrictDupes(result, this.entitlements.limitsFor(plan).dupesPerProduct);
   }
 
   @Get('products/:idOrSlug/similar')
@@ -74,7 +91,13 @@ export class RecommendationController {
     @CurrentUser() user: AuthenticatedUser | null,
     @RequestLocale() locale: AnswerLocale,
   ): Promise<ComparisonResultDto> {
-    return this.comparison.compare(query.products, await this.viewers.load(user?.id), locale);
+    const plan = await this.viewerPlan(user);
+    return this.comparison.compare(
+      query.products,
+      await this.viewers.load(user?.id),
+      locale,
+      this.entitlements.limitsFor(plan).compareProducts,
+    );
   }
 
   @Get('discover')
@@ -84,11 +107,17 @@ export class RecommendationController {
   }
 
   @Post('routine/build')
+  @UseGuards(PremiumGuard)
+  @RequiresPremium()
   @ApiOperation({ summary: 'Build a core routine within a budget (Smart Basket foundation)' })
   async buildRoutine(
     @Body() dto: BuildRoutineDto,
     @CurrentUser() user: AuthenticatedUser | null,
   ): Promise<RoutinePlan> {
     return this.recommendations.buildRoutine(dto.budget, await this.viewers.load(user?.id));
+  }
+
+  private viewerPlan(user: AuthenticatedUser | null): Promise<PlanTier> {
+    return user ? this.entitlements.currentPlan(user) : Promise.resolve('FREE');
   }
 }

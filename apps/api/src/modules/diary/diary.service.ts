@@ -7,6 +7,8 @@ import type {
   SkinDiaryStatsDto,
 } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import { EntitlementService } from '../subscription/entitlement.service';
 import type { UpsertSkinDiaryEntryDto } from './dto/diary.dto';
 
 const DATE_PATTERN = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
@@ -37,9 +39,13 @@ const toUtcDate = (date: string): Date => new Date(`${date}T00:00:00Z`);
 
 @Injectable()
 export class DiaryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly entitlements: EntitlementService,
+  ) {}
 
-  async month(userId: string, month: string): Promise<SkinDiaryMonthDto> {
+  async month(user: AuthenticatedUser, month: string): Promise<SkinDiaryMonthDto> {
+    const userId = user.id;
     const monthStart = toUtcDate(`${month}-01`);
     const nextMonthStart = new Date(
       Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 1),
@@ -48,20 +54,33 @@ export class DiaryService {
       Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() - 1, 1),
     );
 
+    const plan = await this.entitlements.currentPlan(user);
+    const historyDays = this.entitlements.limitsFor(plan).diaryHistoryDays;
+    const historyFloor = historyDays === null ? null : new Date(Date.now() - historyDays * DAY_MS);
+
     const [entries, previousEntries] = await Promise.all([
       this.prisma.skinDiaryEntry.findMany({
-        where: { profile: { userId }, date: { gte: monthStart, lt: nextMonthStart } },
+        where: {
+          profile: { userId },
+          date: {
+            gte: historyFloor && historyFloor > monthStart ? historyFloor : monthStart,
+            lt: nextMonthStart,
+          },
+        },
         orderBy: { date: 'asc' },
       }),
-      this.prisma.skinDiaryEntry.findMany({
-        where: { profile: { userId }, date: { gte: previousMonthStart, lt: monthStart } },
-      }),
+      historyFloor === null
+        ? this.prisma.skinDiaryEntry.findMany({
+            where: { profile: { userId }, date: { gte: previousMonthStart, lt: monthStart } },
+          })
+        : Promise.resolve([]),
     ]);
 
     return {
       month,
       entries: entries.map((entry) => this.toDto(entry)),
       stats: this.stats(entries, previousEntries),
+      historyLimited: historyFloor !== null,
     };
   }
 

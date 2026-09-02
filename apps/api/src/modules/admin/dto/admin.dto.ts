@@ -21,6 +21,7 @@ import {
   Availability,
   RoutineStep,
   SkinType,
+  SubscriptionPeriod,
   SubscriptionStatus,
   TokenStatus,
   UserRole,
@@ -159,4 +160,11 @@ export class UpdateUserDto {
   @IsOptional() @IsString() @MaxLength(80) @Transform(({ value }) => value?.trim()) name?: string;
   @IsOptional() @IsEnum(UserRole) role?: UserRole;
   @IsOptional() @IsEnum(SubscriptionStatus) subscriptionStatus?: SubscriptionStatus;
+  @IsOptional() @IsEnum(SubscriptionPeriod) subscriptionPeriod?: SubscriptionPeriod;
+}
+
+export class UpdateSubscriptionPlanDto {
+  @IsOptional() @Type(() => Number) @IsInt() @Min(0) @Max(10_000_000) priceMinor?: number;
+  @IsOptional() @IsString() @MaxLength(8) currency?: string;
+  @IsOptional() @IsBoolean() isActive?: boolean;
 }

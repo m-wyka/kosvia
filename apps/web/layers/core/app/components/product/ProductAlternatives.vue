@@ -9,6 +9,7 @@ const { data, pending, error, refresh } = await useApiFetch<AlternativeGroupDto[
 );
 
 const localise = useLocalisedText();
+const { isPremium } = storeToRefs(useAuthStore());
 const active = ref<string | null>(null);
 
 const groups = computed(() => data.value ?? []);
@@ -77,6 +78,13 @@ watchEffect(() => {
           show-compare
         />
       </div>
+
+      <PremiumPrompt
+        v-if="!isPremium"
+        :message="$t('PRODUCT.ALTERNATIVES.PREMIUM_TEASER')"
+        compact
+        class="mt-4"
+      />
     </template>
   </section>
 </template>

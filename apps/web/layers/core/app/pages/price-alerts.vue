@@ -27,7 +27,14 @@ const toggleActive = async (alert: PriceAlertDto) => {
     await api(`/price-alerts/${alert.id}`, { method: 'PATCH', body: { active: !alert.active } });
     await refresh();
   } catch (caught) {
-    toast.error(message(caught));
+    if (apiErrorCode(caught) === 'PLAN_LIMIT_REACHED') {
+      toast.notify(t('ALERTS.LIMIT_REACHED', { limit: apiErrorLimit(caught) ?? 1 }), {
+        label: t('PREMIUM.SEE_PREMIUM'),
+        to: '/pricing',
+      });
+    } else {
+      toast.error(message(caught));
+    }
   }
 };
 

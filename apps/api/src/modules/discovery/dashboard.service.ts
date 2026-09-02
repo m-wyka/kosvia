@@ -8,6 +8,8 @@ import { ViewerContextService } from '../profile/viewer-context.service';
 import { RecommendationService } from '../recommendation/recommendation.service';
 import { RoutineAnalysisService } from '../recommendation/routine-analysis.service';
 import { RegulatoryAlertsService } from '../shelf/regulatory-alerts.service';
+import { EntitlementService } from '../subscription/entitlement.service';
+import { restrictRoutineAnalysis } from '../subscription/plan-restrictions';
 
 /** One call that fills the whole signed-in home screen. */
 @Injectable()
@@ -20,6 +22,7 @@ export class DashboardService {
     private readonly routine: RoutineAnalysisService,
     private readonly consents: ConsentService,
     private readonly regulatoryAlerts: RegulatoryAlertsService,
+    private readonly entitlements: EntitlementService,
   ) {}
 
   async load(userId: string): Promise<DashboardDto> {
@@ -39,10 +42,12 @@ export class DashboardService {
         select: { executeAt: true },
       }),
     ]);
+    const plan = await this.entitlements.currentPlan(user);
+    const hasPremiumShelfInsights = plan === 'PREMIUM' && shelfCount > 0;
     const [recommended, routineAnalysis, regulatoryAlerts] = await Promise.all([
       this.recommendations.getPersonalizedProducts(viewer, { limit: 6 }),
       shelfCount > 0 ? this.routine.analyse(userId) : Promise.resolve(null),
-      shelfCount > 0 ? this.regulatoryAlerts.alertsFor(userId) : Promise.resolve([]),
+      hasPremiumShelfInsights ? this.regulatoryAlerts.alertsFor(userId) : Promise.resolve([]),
     ]);
 
     return {
@@ -52,7 +57,7 @@ export class DashboardService {
       favoriteCount,
       activeAlerts,
       recommended,
-      routine: routineAnalysis,
+      routine: routineAnalysis ? restrictRoutineAnalysis(routineAnalysis, plan) : null,
       regulatoryAlerts,
     };
   }

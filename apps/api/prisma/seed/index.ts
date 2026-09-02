@@ -449,6 +449,15 @@ async function main(): Promise<void> {
 
   /* --------------------------------------------------------- demo users -- */
 
+  console.log('› Subscription plans');
+  await prisma.subscriptionPlan.createMany({
+    data: [
+      { period: 'MONTHLY', priceMinor: 1999, currency: 'PLN' },
+      { period: 'YEARLY', priceMinor: 14999, currency: 'PLN' },
+    ],
+    skipDuplicates: true,
+  });
+
   console.log('› Demo accounts');
   const userPassword = process.env.SEED_USER_PASSWORD ?? 'Password123!';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!';
@@ -470,6 +479,7 @@ async function main(): Promise<void> {
       name: 'Demo User',
       role: 'USER',
       subscriptionStatus: 'PREMIUM',
+      subscription: { create: { period: 'MONTHLY' } },
       birthDate: new Date('1992-05-14'),
       passwordHash: await bcrypt.hash(userPassword, 12),
       consents: {

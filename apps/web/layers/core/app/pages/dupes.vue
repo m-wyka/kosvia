@@ -180,6 +180,14 @@ useSeo(() => ({
               </div>
             </li>
           </ul>
+
+          <PremiumPrompt
+            v-if="(data.lockedDupeCount ?? 0) > 0"
+            :message="
+              $t('DUPES.LOCKED_COUNT', { count: data.lockedDupeCount }, data.lockedDupeCount ?? 0)
+            "
+            class="mt-6"
+          />
         </section>
       </template>
     </template>

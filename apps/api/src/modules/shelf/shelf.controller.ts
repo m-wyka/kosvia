@@ -9,7 +9,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { RequiresPremium } from '../../common/decorators/requires-premium.decorator';
+import { PremiumGuard } from '../../common/guards/premium.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   RegulatoryAlertDto,
@@ -39,28 +42,34 @@ export class ShelfController {
     @CurrentUser() user: AuthenticatedUser,
     @Query('favorites') favorites?: string,
   ): Promise<ShelfItemDto[]> {
-    return this.shelf.list(user.id, favorites === 'true');
+    return this.shelf.list(user, favorites === 'true');
   }
 
   @Get('analysis')
   @ApiOperation({ summary: 'Descriptive routine analysis of the shelf' })
   analysis(@CurrentUser() user: AuthenticatedUser): Promise<RoutineAnalysisDto> {
-    return this.shelf.analyse(user.id);
+    return this.shelf.analyse(user);
   }
 
   @Get('routine-plan')
+  @UseGuards(PremiumGuard)
+  @RequiresPremium()
   @ApiOperation({ summary: 'Descriptive weekly AM/PM plan for the shelf' })
   plan(@CurrentUser() user: AuthenticatedUser): Promise<RoutinePlanDto> {
     return this.shelf.plan(user.id);
   }
 
   @Get('regulatory-alerts')
+  @UseGuards(PremiumGuard)
+  @RequiresPremium()
   @ApiOperation({ summary: 'Recent annex changes affecting products on the shelf' })
   regulatory(@CurrentUser() user: AuthenticatedUser): Promise<RegulatoryAlertDto[]> {
     return this.regulatoryAlerts.alertsFor(user.id);
   }
 
   @Post('regulatory-alerts/seen')
+  @UseGuards(PremiumGuard)
+  @RequiresPremium()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Dismiss the current regulatory alerts' })
   dismissRegulatory(@CurrentUser() user: AuthenticatedUser): Promise<void> {
@@ -70,7 +79,7 @@ export class ShelfController {
   @Post()
   @ApiOperation({ summary: 'Add a product by id, slug or EAN' })
   add(@CurrentUser() user: AuthenticatedUser, @Body() dto: AddShelfItemDto): Promise<ShelfItemDto> {
-    return this.shelf.add(user.id, dto);
+    return this.shelf.add(user, dto);
   }
 
   @Patch(':id')
@@ -80,7 +89,7 @@ export class ShelfController {
     @Param('id') id: string,
     @Body() dto: UpdateShelfItemDto,
   ): Promise<ShelfItemDto> {
-    return this.shelf.update(user.id, id, dto);
+    return this.shelf.update(user, id, dto);
   }
 
   @Delete(':id')

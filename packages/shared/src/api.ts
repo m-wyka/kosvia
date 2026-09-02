@@ -3,12 +3,17 @@ import type {
   BudgetTier,
   FragrancePreference,
   IngredientTag,
+  LimitMetric,
   MessageRole,
+  PlanLimits,
+  PlanTier,
   SensitivityLevel,
   SkinType,
   ConsentType,
   ExclusionReason,
   MatchWeights,
+  SubscriptionPeriod,
+  SubscriptionState,
   SubscriptionStatus,
   TokenStatus,
   UserRole,
@@ -40,6 +45,10 @@ export interface ApiErrorBody {
   code?: string;
   /** Which consent is missing when `code` is CONSENT_REQUIRED. */
   consent?: ConsentType;
+  /** Which feature ceiling was hit when `code` is PLAN_LIMIT_REACHED. */
+  metric?: LimitMetric;
+  /** The ceiling that was hit, for rendering the upsell copy. */
+  limit?: number;
   path?: string;
   timestamp?: string;
 }
@@ -90,6 +99,62 @@ export interface ConsentsDto {
 
 /** Error body code the API returns when an endpoint needs a consent the user has not given. */
 export const CONSENT_REQUIRED_CODE = 'CONSENT_REQUIRED';
+
+/** Error body code for endpoints reserved for the Premium plan. */
+export const PREMIUM_REQUIRED_CODE = 'PREMIUM_REQUIRED';
+
+/** Error body code for a monthly or absolute plan ceiling that has been hit. */
+export const PLAN_LIMIT_REACHED_CODE = 'PLAN_LIMIT_REACHED';
+
+/* -------------------------------------------------------------------------- */
+/* Subscription & entitlements                                                */
+/* -------------------------------------------------------------------------- */
+
+/** Admin-editable pricing of one billing period of Premium. */
+export interface SubscriptionPlanDto {
+  period: SubscriptionPeriod;
+  /** Minor units (grosze) — 1999 renders as 19,99 zł. */
+  priceMinor: number;
+  currency: string;
+  isActive: boolean;
+  updatedAt: string | null;
+}
+
+export interface SubscriptionDto {
+  period: SubscriptionPeriod;
+  state: SubscriptionState;
+  startedAt: string;
+  expiresAt: string | null;
+  canceledAt: string | null;
+}
+
+/** Usage of one limited feature within the current monthly window. */
+export interface EntitlementUsageDto {
+  /** null = unlimited on the current plan. */
+  limit: number | null;
+  used: number;
+  remaining: number | null;
+}
+
+export interface SubscriptionOverviewDto {
+  plan: PlanTier;
+  subscription: SubscriptionDto | null;
+  limits: PlanLimits;
+  entitlements: {
+    aiMessages: EntitlementUsageDto;
+    personalMatch: EntitlementUsageDto;
+    priceAlerts: EntitlementUsageDto;
+    shelfItems: EntitlementUsageDto;
+  };
+  /** ISO date of the first day of the next usage window. */
+  usageResetsAt: string;
+}
+
+export interface UpdateSubscriptionPlanPayload {
+  priceMinor?: number;
+  currency?: string;
+  isActive?: boolean;
+}
 
 export interface AccountExportDto {
   exportedAt: string;
@@ -312,6 +377,11 @@ export interface ProductDto extends ProductSummaryDto {
   source: DataSourceDto | null;
   /** Set only on the product-page read when the imported label changed recently. */
   recentFormulaChange?: FormulaChangeDto | null;
+  /**
+   * True when a Free viewer exhausted the monthly full-analysis quota — the
+   * personalMatch is then the generic score and the UI should offer Premium.
+   */
+  matchLimitReached?: boolean;
 }
 
 export interface DataSourceDto {
@@ -437,6 +507,11 @@ export interface PersonalMatchDto {
   warnings: MatchReason[];
   /** False when the user has no beauty profile — score is then generic. */
   personalised: boolean;
+  /**
+   * Every signed contribution behind the score, before compression — the full
+   * "Why?" breakdown. Present only for Premium viewers on the product page.
+   */
+  breakdown?: MatchReason[];
 }
 
 export interface IngredientScoreBreakdownDto {
@@ -601,6 +676,11 @@ export interface SkinDiaryMonthDto {
   month: string;
   entries: SkinDiaryEntryDto[];
   stats: SkinDiaryStatsDto;
+  /**
+   * True when the Free plan trimmed the response to the last few days —
+   * month-over-month stats are then zeroed as well.
+   */
+  historyLimited?: boolean;
 }
 
 export interface UpsertSkinDiaryEntryPayload {
@@ -626,6 +706,8 @@ export interface DupeMatchDto {
 export interface DupeResultDto {
   subject: ProductSummaryDto;
   dupes: DupeMatchDto[];
+  /** How many further matches exist beyond the Free ceiling; 0 for Premium. */
+  lockedDupeCount?: number;
 }
 
 /* -------------------------------------------------------------------------- */

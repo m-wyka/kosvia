@@ -67,7 +67,7 @@ export class ProductsController {
     @RequestLocale() locale: AnswerLocale,
   ): Promise<ProductDto> {
     const viewer = await this.viewers.load(user?.id);
-    return this.products.findBySlug(slug, viewer, locale);
+    return this.products.findBySlug(slug, viewer, locale, user);
   }
 
   @Get(':slug/ingredient-score')

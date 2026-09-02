@@ -32,7 +32,7 @@
     "COMPARE": "Porównaj",
     "SHELF": "Moja półka",
     "SHELF_SHORT": "Półka",
-    "AI": "Asystent AI",
+    "AI": "Kosvia AI",
     "ALERTS": "Alerty cenowe",
     "DIARY": "Dziennik skóry",
     "PROFILE": "Profil",
@@ -58,7 +58,8 @@
     "ABOUT_DATA": "O danych",
     "PRIVACY": "Prywatność",
     "REVIEWS": "Opinie",
-    "RIGHTS": "© {year} Kosvia. Wersja demonstracyjna."
+    "RIGHTS": "© {year} Kosvia. Wersja demonstracyjna.",
+    "PRICING": "Pakiety i Premium"
   },
   "VOCAB": {
     "SKIN_TYPE": {
@@ -378,29 +379,7 @@
       "EYEBROW": "Premium",
       "TITLE": "Wersja darmowa naprawdę wystarcza. Premium to skrót.",
       "BODY": "Analiza jest darmowa, bo taka powinna być. Premium płaci za te elementy, które działają, kiedy Ty nie patrzysz.",
-      "MOST_COMPLETE": "Najpełniejszy",
-      "PER_MONTH": "miesięcznie",
-      "FOREVER": "na zawsze",
-      "FREE": {
-        "NAME": "Darmowy",
-        "PRICE": "0 zł",
-        "DESCRIPTION": "Wszystko, czego potrzebujesz, żeby wybierać lepiej.",
-        "F_1": "Dopasowanie przy każdym produkcie",
-        "F_2": "Pełna analiza składu",
-        "F_3": "Moja półka i analiza rutyny",
-        "F_4": "Tańsze i lepsze zamienniki",
-        "CTA": "Załóż darmowe konto"
-      },
-      "PREMIUM": {
-        "NAME": "Premium",
-        "PRICE": "19 zł",
-        "DESCRIPTION": "Dla tych, którzy budują rutynę świadomie.",
-        "F_1": "Nielimitowany asystent AI",
-        "F_2": "Alerty cenowe we wszystkich sklepach",
-        "F_3": "Smart Basket — rutyna w ramach budżetu",
-        "F_4": "Wcześniejszy dostęp do nowych sklepów",
-        "CTA": "Wkrótce"
-      }
+      "SEE_FULL": "Porównaj plany i cennik"
     },
     "FAQ": {
       "EYEBROW": "FAQ",
@@ -446,7 +425,8 @@
     "CHEAPER_BY": "taniej o {amount}",
     "PRICIER_BY": "drożej o {amount}",
     "EMPTY_TITLE": "Brak zbliżonych formuł",
-    "EMPTY_BODY": "Nic w katalogu nie jest na tyle podobne, by nazwać to zamiennikiem. Spróbuj z innym produktem."
+    "EMPTY_BODY": "Nic w katalogu nie jest na tyle podobne, by nazwać to zamiennikiem. Spróbuj z innym produktem.",
+    "LOCKED_COUNT": "{count} dopasowanie więcej czeka w Premium | {count} dopasowania więcej czekają w Premium | {count} dopasowań więcej czeka w Premium"
   },
   "DIARY": {
     "TITLE": "Dziennik skóry",
@@ -477,7 +457,8 @@
       "TITLE": "Zanim zaczniesz dziennik",
       "BODY": "Wpisy w dzienniku opisują, jak Twoja skóra czuje się z dnia na dzień — w świetle prawa to dane o zdrowiu i są przechowywane w ramach tej samej zgody co profil urodowy. Wycofanie tej zgody usuwa profil razem z dziennikiem.",
       "CONFIRM": "Otwórz dziennik"
-    }
+    },
+    "HISTORY_LIMITED": "Darmowy plan pokazuje ostatnie 7 dni dziennika. Premium zachowuje pełną historię i trendy miesiąc do miesiąca."
   },
   "REVIEWS": {
     "TITLE": "Opinie",
@@ -746,7 +727,11 @@
       "IN_FAVOUR": "Działa na plus",
       "AGAINST": "Warto rozważyć",
       "PLAIN_LANGUAGE": "Zwykłym językiem",
-      "NO_EXPLANATION": "Powyższe rozbicie mówi w tym przypadku wszystko."
+      "NO_EXPLANATION": "Powyższe rozbicie mówi w tym przypadku wszystko.",
+      "LIMIT_BODY": "Wykorzystano limit 20 pełnych analiz w tym miesiącu, więc na razie pokazujemy ogólny wynik.",
+      "LIMIT_PROMPT": "Chcesz analizować produkty bez limitu?",
+      "FULL_BREAKDOWN": "Pełne rozbicie wyniku",
+      "PREMIUM_WHY_TEASER": "Premium dodaje pełne rozbicie wyniku, punkt po punkcie, oraz wyjaśnienie prostym językiem."
     },
     "OFFERS": {
       "TITLE": "Gdzie kupić",
@@ -774,7 +759,8 @@
         "BETTER_VALUE": "Najlepsze dopasowanie w przeliczeniu na złotówkę na tym etapie rutyny.",
         "SIMILAR_INGREDIENTS": "Formuły zbudowane w dużej mierze na tym samym składzie.",
         "SIMILAR_PURPOSE": "Inne produkty, które robią to, co {product}."
-      }
+      },
+      "PREMIUM_TEASER": "Darmowy plan pokazuje do 3 alternatyw. Premium odblokowuje wszystkie dopasowania, w tym najtańsze i najbardziej podobne formuły."
     },
     "ALERT_MODAL": {
       "TITLE": "Ustaw alert cenowy",
@@ -900,7 +886,8 @@
         "FRIDAY": "Pt",
         "SATURDAY": "Sob",
         "SUNDAY": "Nd"
-      }
+      },
+      "PREMIUM_TEASER": "Inteligentny planer tygodnia bezpiecznie rozkłada retinoidy, złuszczanie i maski z uwzględnieniem wrażliwości — to funkcja Premium."
     },
     "PAO": {
       "MARK_OPENED": "Oznacz jako otwarty",
@@ -929,7 +916,9 @@
       "BODY": "Przeszukaj katalog. Skanowanie kodów kreskowych pojawi się później.",
       "PLACEHOLDER": "Szukaj po produkcie, marce lub EAN",
       "NO_RESULTS": "Nic nie pasuje do „{query}”."
-    }
+    },
+    "LIMIT_REACHED": "Darmowa półka pozwala przechowywać do {limit} produktów.",
+    "LIMIT_BANNER": "Darmowa półka jest pełna ({limit} produktów). Premium znosi limit i odblokowuje pełną analizę półki."
   },
   "AI": {
     "TITLE": "Asystent zakupowy AI",
@@ -962,7 +951,10 @@
       "CHEAPER": "Tańsza opcja",
       "ALTERNATIVE": "Też warto zerknąć",
       "ALREADY_OWNED": "Już to masz"
-    }
+    },
+    "USAGE": "{used} / {limit} wiadomości",
+    "LIMIT_REACHED_FREE": "Wykorzystano {limit} darmowych wiadomości Kosvia AI w tym miesiącu. Premium daje 100 wiadomości miesięcznie.",
+    "LIMIT_REACHED_PREMIUM": "Wykorzystano {limit} wiadomości Kosvia AI w tym miesiącu. Limit odnowi się w następnym okresie rozliczeniowym."
   },
   "ALERTS": {
     "TITLE": "Alerty cenowe",
@@ -981,7 +973,8 @@
     "DELETE": "Usuń alert dla {name}",
     "REMOVED": "Alert usunięty",
     "VIEW": "Zobacz",
-    "NOTE": "Alerty są sprawdzane wobec ofert, które mamy w bazie w momencie otwarcia tej strony. Śledzenie cen w tle i powiadomienia push są w planach, ale nie zostały zbudowane."
+    "NOTE": "Alerty są sprawdzane wobec ofert, które mamy w bazie w momencie otwarcia tej strony. Śledzenie cen w tle i powiadomienia push są w planach, ale nie zostały zbudowane.",
+    "LIMIT_REACHED": "W darmowym planie możesz mieć {limit} aktywny alert cenowy. Premium zwiększa limit do 20."
   },
   "PROFILE": {
     "PREMIUM": "Premium",
@@ -1149,7 +1142,7 @@
       "FORMULA_CHANGES": "Zmiany formuł · Admin",
       "FORMULA_CHANGES_DESCRIPTION": "Migawki składów z importów źródłowych.",
       "MATCH_WEIGHTS": "Wagi dopasowania · Admin",
-      "MATCH_WEIGHTS_DESCRIPTION": "Stroj Personal Match bez wdrożenia.",
+      "MATCH_WEIGHTS_DESCRIPTION": "Stroj dopasowanie do profilu bez wdrożenia.",
       "STORES": "Sklepy · Admin",
       "STORES_DESCRIPTION": "Zarządzaj sklepami demonstracyjnymi.",
       "OFFERS": "Oferty · Admin",
@@ -1157,7 +1150,13 @@
       "USERS": "Użytkownicy · Admin",
       "USERS_DESCRIPTION": "Zarządzaj kontami użytkowników.",
       "REVIEWS": "Opinie o portalu · Admin",
-      "REVIEWS_DESCRIPTION": "Moderuj opinie o portalu."
+      "REVIEWS_DESCRIPTION": "Moderuj opinie o portalu.",
+      "SUBSCRIPTIONS": "Plany subskrypcji",
+      "SUBSCRIPTIONS_DESCRIPTION": "Edycja cen i dostępności Premium."
+    },
+    "PRICING": {
+      "TITLE": "Pakiety i cennik",
+      "DESCRIPTION": "Kosvia Free i Premium — co zawiera każdy plan i ile kosztuje."
     }
   },
   "ADMIN": {
@@ -1182,7 +1181,8 @@
       "USERS": "Użytkownicy",
       "REVIEWS": "Opinie",
       "OPEN": "Otwórz menu administratora",
-      "ARIA": "Administracja"
+      "ARIA": "Administracja",
+      "SUBSCRIPTIONS": "Subskrypcje"
     },
     "SEARCH_PLACEHOLDER": "Szukaj…",
     "PAGE_OF": "Strona {page} z {total}",
@@ -1367,7 +1367,7 @@
       "SYSTEM": "system"
     },
     "MATCH_WEIGHTS": {
-      "TITLE": "Wagi Personal Match",
+      "TITLE": "Wagi dopasowania",
       "SUBTITLE": "Ile punktów każda grupa sygnałów może dodać lub odjąć. Zapis nowej wersji niczego nie przelicza — wyniki liczone są przy odczycie, więc zmiana działa od razu.",
       "ACTIVE": "Aktywne",
       "VERSION": "v{version}",
@@ -1499,7 +1499,9 @@
         "FREE": "Darmowy",
         "PREMIUM": "Premium",
         "CANCELLED": "Anulowany"
-      }
+      },
+      "PLAN_CHANGED": "{email} ma teraz plan {plan}",
+      "PLAN_ARIA": "Zmień plan dla {email}"
     },
     "REVIEWS": {
       "TITLE": "Opinie o portalu",
@@ -1520,6 +1522,24 @@
       "DELETED": "Opinia usunięta",
       "CONFIRM_DELETE": "Usunąć opinię użytkownika {email}? Tego nie da się cofnąć.",
       "DELETE_ARIA": "Usuń opinię użytkownika {email}"
+    },
+    "SUBSCRIPTIONS": {
+      "TITLE": "Plany subskrypcji",
+      "SUBTITLE": "Cennik Premium wyświetlany w całej aplikacji. Nadanie użytkownikowi Premium tworzy ręczną subskrypcję miesięczną.",
+      "MONTHLY": "Premium miesięczne",
+      "YEARLY": "Premium roczne",
+      "PRICE_LABEL": "Cena",
+      "PRICE_HINT": "Kwota brutto, np. 19,99",
+      "CURRENCY_LABEL": "Waluta",
+      "ACTIVE_LABEL": "Plan dostępny",
+      "ACTIVE_HINT": "Nieaktywne plany znikają ze strony pakietów",
+      "SAVE": "Zapisz",
+      "SAVED": "Zapisano: {period}",
+      "INVALID_PRICE": "Podaj prawidłową cenę.",
+      "PREVIEW_TITLE": "Podgląd oszczędności rocznej",
+      "SAVINGS_PREVIEW": "Przy tych cenach plan roczny daje oszczędność {amount} ({percent}%).",
+      "NO_SAVINGS": "Przy tych cenach plan roczny nie daje oszczędności.",
+      "PROVIDER_NOTE": "Ta konfiguracja steruje tym, co wyświetla aplikacja. Po podłączeniu zewnętrznego operatora płatności (App Store, Google Play, Stripe) zmianę ceny trzeba będzie wykonać także w jego panelu."
     }
   },
   "GENERATED": {
@@ -1644,5 +1664,101 @@
     "ETHICS": "Wegańskie / cruelty-free",
     "BRAND_PREFERENCE": "Lubiane marki",
     "SHELF_CONTEXT": "Twoja półka"
+  },
+  "PRICING": {
+    "EYEBROW": "Pakiety",
+    "TITLE": "Proste pakiety, uczciwe limity",
+    "BODY": "Sprawdzanie kosmetyków, analiza INCI i dopasowanie do Twojego profilu pozostają darmowe. Premium jest do długoterminowego zarządzania rutyną, półką i zakupami.",
+    "PER_MONTH": "miesięcznie",
+    "PER_YEAR": "rocznie",
+    "FOREVER": "na zawsze",
+    "UNLIMITED": "Bez limitu",
+    "CURRENT_PLAN": "Twój obecny plan",
+    "BILLING": {
+      "MONTHLY": "Miesięcznie",
+      "YEARLY": "Rocznie",
+      "TOGGLE": "Przełącz między rozliczeniem miesięcznym a rocznym"
+    },
+    "FREE": {
+      "NAME": "Darmowy",
+      "DESCRIPTION": "Wszystko, czego potrzebujesz, żeby wybierać lepiej.",
+      "PRICE": "0 zł",
+      "F_1": "Dopasowanie przy każdym produkcie",
+      "F_2": "Pełna analiza składu",
+      "F_3": "Moja półka i podstawowa analiza rutyny",
+      "F_4": "Tańsze i lepsze zamienniki",
+      "CTA": "Załóż darmowe konto"
+    },
+    "PREMIUM": {
+      "NAME": "Premium",
+      "BADGE": "Najpopularniejszy",
+      "DESCRIPTION": "Dla tych, którzy budują rutynę świadomie.",
+      "F_1": "100 wiadomości Kosvia AI miesięcznie",
+      "F_2": "Inteligentny planer rutyny",
+      "F_3": "Pełna analiza Twojej półki",
+      "F_4": "Alerty cenowe i Smart Basket",
+      "F_5": "Zaawansowane porównania i zamienniki",
+      "CTA": "Przejdź na Premium",
+      "YEARLY_SAVINGS": "Oszczędzasz {amount} rocznie",
+      "MONTHLY_EQUIVALENT": "czyli {amount} miesięcznie"
+    },
+    "COMPARE": {
+      "OPEN": "Porównaj wszystkie funkcje",
+      "TITLE": "Darmowy vs Premium",
+      "FEATURE": "Funkcja",
+      "ROW": {
+        "PROFILE": "Profil urody",
+        "SEARCH": "Wyszukiwanie produktów",
+        "INCI": "Pełny skład INCI",
+        "PERSONAL_MATCH": "Dopasowanie do Twojego profilu",
+        "PERSONAL_MATCH_FREE": "20 analiz / miesiąc",
+        "PERSONAL_MATCH_PREMIUM": "Bez limitu",
+        "WHY": "Szczegółowe „Dlaczego?\"",
+        "WHY_FREE": "Podstawowe",
+        "WHY_PREMIUM": "Pełne rozbicie wyniku",
+        "COMPARE": "Porównanie produktów",
+        "COMPARE_FREE": "2 produkty",
+        "COMPARE_PREMIUM": "Do 4 produktów",
+        "ALTERNATIVES": "Alternatywy",
+        "ALTERNATIVES_FREE": "3 na produkt",
+        "ALTERNATIVES_PREMIUM": "Bez limitu",
+        "SHELF": "Moja półka",
+        "SHELF_FREE": "10 produktów",
+        "SHELF_PREMIUM": "Bez limitu",
+        "SHELF_ANALYSIS": "Analiza półki",
+        "SHELF_ANALYSIS_FREE": "Podstawowa",
+        "SHELF_ANALYSIS_PREMIUM": "Pełna: duplikaty, terminy po otwarciu, alerty",
+        "AI": "Kosvia AI",
+        "AI_FREE": "5 wiadomości / miesiąc",
+        "AI_PREMIUM": "100 wiadomości / miesiąc",
+        "PRICE_ALERTS": "Alerty cenowe",
+        "PRICE_ALERTS_FREE": "1 aktywny",
+        "PRICE_ALERTS_PREMIUM": "20 aktywnych",
+        "ROUTINE": "Planer rutyny",
+        "ROUTINE_FREE": "Podstawowy",
+        "ROUTINE_PREMIUM": "Inteligentny plan tygodnia",
+        "DIARY": "Dziennik skóry",
+        "DIARY_FREE": "7 dni historii",
+        "DIARY_PREMIUM": "Pełna historia"
+      }
+    },
+    "USAGE": {
+      "TITLE": "Twoje zużycie w tym miesiącu",
+      "AI": "Wiadomości Kosvia AI",
+      "PERSONAL_MATCH": "Pełne analizy dopasowania",
+      "PRICE_ALERTS": "Aktywne alerty cenowe",
+      "SHELF": "Produkty na półce"
+    },
+    "UPGRADE": {
+      "TITLE": "Przejdź na Premium",
+      "BODY": "Płatności online są na ostatniej prostej — Premium kupisz przez sklepy z aplikacjami i płatność w przeglądarce. Ceny, które tu widzisz, są aktualne i dokładnie tyle zapłacisz.",
+      "CREATE_ACCOUNT": "Załóż darmowe konto"
+    }
+  },
+  "PREMIUM": {
+    "SEE_PREMIUM": "Zobacz Premium",
+    "GO_PREMIUM": "Przejdź na Premium",
+    "UNLOCK": "Odblokuj Premium",
+    "BADGE": "Premium"
   }
 }

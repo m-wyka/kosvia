@@ -32,7 +32,7 @@
     "COMPARE": "Compare",
     "SHELF": "My Shelf",
     "SHELF_SHORT": "Shelf",
-    "AI": "AI Shopper",
+    "AI": "Kosvia AI",
     "ALERTS": "Price alerts",
     "DIARY": "Skin diary",
     "PROFILE": "Profile",
@@ -58,7 +58,8 @@
     "ABOUT_DATA": "About the data",
     "PRIVACY": "Privacy",
     "REVIEWS": "Reviews",
-    "RIGHTS": "© {year} Kosvia. Demo build."
+    "RIGHTS": "© {year} Kosvia. Demo build.",
+    "PRICING": "Plans and Premium"
   },
   "VOCAB": {
     "SKIN_TYPE": {
@@ -378,29 +379,7 @@
       "EYEBROW": "Premium",
       "TITLE": "Free is genuinely useful. Premium is for the shortcut.",
       "BODY": "The analysis is free because it should be. Premium pays for the parts that keep working while you are not looking.",
-      "MOST_COMPLETE": "Most complete",
-      "PER_MONTH": "per month",
-      "FOREVER": "forever",
-      "FREE": {
-        "NAME": "Free",
-        "PRICE": "0 PLN",
-        "DESCRIPTION": "Everything you need to choose better.",
-        "F_1": "Personal Match on every product",
-        "F_2": "Full ingredient analysis",
-        "F_3": "My Shelf and routine analysis",
-        "F_4": "Cheaper and better alternatives",
-        "CTA": "Create a free account"
-      },
-      "PREMIUM": {
-        "NAME": "Premium",
-        "PRICE": "19 PLN",
-        "DESCRIPTION": "For people building a routine deliberately.",
-        "F_1": "Unlimited AI Beauty Shopper",
-        "F_2": "Price alerts across every store",
-        "F_3": "Smart Basket routine budgeting",
-        "F_4": "Early access to new retailers",
-        "CTA": "Coming soon"
-      }
+      "SEE_FULL": "Compare plans and pricing"
     },
     "FAQ": {
       "EYEBROW": "FAQ",
@@ -446,7 +425,8 @@
     "CHEAPER_BY": "{amount} cheaper",
     "PRICIER_BY": "{amount} more",
     "EMPTY_TITLE": "No close formulas found",
-    "EMPTY_BODY": "Nothing in the catalogue is similar enough to call a dupe. Try another product."
+    "EMPTY_BODY": "Nothing in the catalogue is similar enough to call a dupe. Try another product.",
+    "LOCKED_COUNT": "{count} more match is waiting in Premium | {count} more matches are waiting in Premium"
   },
   "DIARY": {
     "TITLE": "Skin diary",
@@ -477,7 +457,8 @@
       "TITLE": "Before you start the diary",
       "BODY": "Diary entries describe how your skin feels day to day — legally, that is health data, and it is stored under the same consent as your beauty profile. Withdrawing that consent deletes the profile and the diary together.",
       "CONFIRM": "Open the diary"
-    }
+    },
+    "HISTORY_LIMITED": "The free plan shows the last 7 days of your diary. Premium keeps the full history and month-to-month trends."
   },
   "REVIEWS": {
     "TITLE": "Reviews",
@@ -746,7 +727,11 @@
       "IN_FAVOUR": "Working in its favour",
       "AGAINST": "Worth weighing up",
       "PLAIN_LANGUAGE": "In plain language",
-      "NO_EXPLANATION": "The breakdown above is the whole story for this one."
+      "NO_EXPLANATION": "The breakdown above is the whole story for this one.",
+      "LIMIT_BODY": "You have used this month's 20 full analyses, so this is the general score for now.",
+      "LIMIT_PROMPT": "Want to analyse products without limits?",
+      "FULL_BREAKDOWN": "Full score breakdown",
+      "PREMIUM_WHY_TEASER": "Premium adds the point-by-point score breakdown and a plain-language explanation."
     },
     "OFFERS": {
       "TITLE": "Where to buy",
@@ -774,7 +759,8 @@
         "BETTER_VALUE": "The strongest match per złoty in this routine step.",
         "SIMILAR_INGREDIENTS": "Formulas built from largely the same ingredient list.",
         "SIMILAR_PURPOSE": "Other products that do what {product} does."
-      }
+      },
+      "PREMIUM_TEASER": "Free shows up to 3 alternatives. Premium unlocks every match, including the cheapest and closest formulas."
     },
     "ALERT_MODAL": {
       "TITLE": "Set a price alert",
@@ -900,7 +886,8 @@
         "FRIDAY": "Fri",
         "SATURDAY": "Sat",
         "SUNDAY": "Sun"
-      }
+      },
+      "PREMIUM_TEASER": "The smart weekly planner arranges retinoids, exfoliants and masks safely around your sensitivity — a Premium feature."
     },
     "PAO": {
       "MARK_OPENED": "Mark as opened",
@@ -929,7 +916,9 @@
       "BODY": "Search the catalogue. Barcode scanning is coming later.",
       "PLACEHOLDER": "Search by product, brand or EAN",
       "NO_RESULTS": "Nothing matched “{query}”."
-    }
+    },
+    "LIMIT_REACHED": "The free shelf holds up to {limit} products.",
+    "LIMIT_BANNER": "Your free shelf is full ({limit} products). Premium removes the limit and unlocks the full shelf analysis."
   },
   "AI": {
     "TITLE": "AI Beauty Shopper",
@@ -962,7 +951,10 @@
       "CHEAPER": "Cheaper option",
       "ALTERNATIVE": "Also worth a look",
       "ALREADY_OWNED": "Already yours"
-    }
+    },
+    "USAGE": "{used} / {limit} messages",
+    "LIMIT_REACHED_FREE": "You have used your {limit} free Kosvia AI messages this month. Go Premium for 100 messages a month.",
+    "LIMIT_REACHED_PREMIUM": "You have used {limit} Kosvia AI messages this month. The limit renews with the next billing period."
   },
   "ALERTS": {
     "TITLE": "Price alerts",
@@ -981,7 +973,8 @@
     "DELETE": "Delete alert for {name}",
     "REMOVED": "Alert removed",
     "VIEW": "View",
-    "NOTE": "Alerts are evaluated against the store offers we hold when you open this page. Background price watching and push notifications are planned, not built."
+    "NOTE": "Alerts are evaluated against the store offers we hold when you open this page. Background price watching and push notifications are planned, not built.",
+    "LIMIT_REACHED": "The free plan includes {limit} active price alert. Premium raises it to 20."
   },
   "PROFILE": {
     "PREMIUM": "Premium",
@@ -1069,7 +1062,8 @@
       "USERS": "Users",
       "REVIEWS": "Reviews",
       "OPEN": "Open admin menu",
-      "ARIA": "Admin"
+      "ARIA": "Admin",
+      "SUBSCRIPTIONS": "Subscriptions"
     },
     "SEARCH_PLACEHOLDER": "Search…",
     "PAGE_OF": "Page {page} of {total}",
@@ -1386,7 +1380,9 @@
         "FREE": "Free",
         "PREMIUM": "Premium",
         "CANCELLED": "Cancelled"
-      }
+      },
+      "PLAN_CHANGED": "{email} is now on the {plan} plan",
+      "PLAN_ARIA": "Change plan for {email}"
     },
     "REVIEWS": {
       "TITLE": "Portal reviews",
@@ -1407,6 +1403,24 @@
       "DELETED": "Review deleted",
       "CONFIRM_DELETE": "Delete the review by {email}? This cannot be undone.",
       "DELETE_ARIA": "Delete the review by {email}"
+    },
+    "SUBSCRIPTIONS": {
+      "TITLE": "Subscription plans",
+      "SUBTITLE": "Premium pricing shown across the app. Granting Premium to a user creates a manual monthly subscription.",
+      "MONTHLY": "Premium Monthly",
+      "YEARLY": "Premium Yearly",
+      "PRICE_LABEL": "Price",
+      "PRICE_HINT": "Gross amount, e.g. 19.99",
+      "CURRENCY_LABEL": "Currency",
+      "ACTIVE_LABEL": "Plan available",
+      "ACTIVE_HINT": "Inactive plans disappear from the pricing page",
+      "SAVE": "Save",
+      "SAVED": "Saved {period}",
+      "INVALID_PRICE": "Enter a valid price.",
+      "PREVIEW_TITLE": "Yearly savings preview",
+      "SAVINGS_PREVIEW": "With these prices the yearly plan saves {amount} ({percent}%).",
+      "NO_SAVINGS": "With these prices the yearly plan saves nothing.",
+      "PROVIDER_NOTE": "This configuration drives what the app displays. Once an external payment provider (App Store, Google Play, Stripe) is connected, price changes must also be applied in the provider's console."
     }
   },
   "SEO": {
@@ -1519,7 +1533,13 @@
       "USERS": "Users · Admin",
       "USERS_DESCRIPTION": "Manage user accounts.",
       "REVIEWS": "Portal reviews · Admin",
-      "REVIEWS_DESCRIPTION": "Moderate portal reviews."
+      "REVIEWS_DESCRIPTION": "Moderate portal reviews.",
+      "SUBSCRIPTIONS": "Subscription plans",
+      "SUBSCRIPTIONS_DESCRIPTION": "Edit Premium pricing and availability."
+    },
+    "PRICING": {
+      "TITLE": "Plans and pricing",
+      "DESCRIPTION": "Kosvia Free and Premium — what each plan includes and how much it costs."
     }
   },
   "GENERATED": {
@@ -1644,5 +1664,101 @@
     "ETHICS": "Vegan / cruelty-free",
     "BRAND_PREFERENCE": "Preferred brands",
     "SHELF_CONTEXT": "Your shelf"
+  },
+  "PRICING": {
+    "EYEBROW": "Plans",
+    "TITLE": "Simple plans, honest limits",
+    "BODY": "Checking products, INCI analysis and your profile match stay free. Premium is for managing your routine, shelf and shopping long-term.",
+    "PER_MONTH": "per month",
+    "PER_YEAR": "per year",
+    "FOREVER": "forever",
+    "UNLIMITED": "Unlimited",
+    "CURRENT_PLAN": "Your current plan",
+    "BILLING": {
+      "MONTHLY": "Monthly",
+      "YEARLY": "Yearly",
+      "TOGGLE": "Switch between monthly and yearly billing"
+    },
+    "FREE": {
+      "NAME": "Free",
+      "DESCRIPTION": "Everything you need to choose better.",
+      "PRICE": "0 PLN",
+      "F_1": "Personal Match on every product",
+      "F_2": "Full ingredient analysis",
+      "F_3": "My Shelf with basic routine analysis",
+      "F_4": "Cheaper and better alternatives",
+      "CTA": "Create a free account"
+    },
+    "PREMIUM": {
+      "NAME": "Premium",
+      "BADGE": "Most popular",
+      "DESCRIPTION": "For people building a routine deliberately.",
+      "F_1": "100 Kosvia AI messages a month",
+      "F_2": "Smart weekly routine planner",
+      "F_3": "Full analysis of your shelf",
+      "F_4": "Price alerts and Smart Basket",
+      "F_5": "Advanced comparisons and dupes",
+      "CTA": "Go Premium",
+      "YEARLY_SAVINGS": "You save {amount} a year",
+      "MONTHLY_EQUIVALENT": "that is {amount} per month"
+    },
+    "COMPARE": {
+      "OPEN": "Compare all features",
+      "TITLE": "Free vs Premium",
+      "FEATURE": "Feature",
+      "ROW": {
+        "PROFILE": "Beauty profile",
+        "SEARCH": "Product search",
+        "INCI": "Full INCI list",
+        "PERSONAL_MATCH": "Match with your profile",
+        "PERSONAL_MATCH_FREE": "20 analyses / month",
+        "PERSONAL_MATCH_PREMIUM": "Unlimited",
+        "WHY": "Detailed \"Why?\"",
+        "WHY_FREE": "Basic",
+        "WHY_PREMIUM": "Full score breakdown",
+        "COMPARE": "Product comparison",
+        "COMPARE_FREE": "2 products",
+        "COMPARE_PREMIUM": "Up to 4 products",
+        "ALTERNATIVES": "Alternatives",
+        "ALTERNATIVES_FREE": "3 per product",
+        "ALTERNATIVES_PREMIUM": "Unlimited",
+        "SHELF": "My Shelf",
+        "SHELF_FREE": "10 products",
+        "SHELF_PREMIUM": "Unlimited",
+        "SHELF_ANALYSIS": "Shelf analysis",
+        "SHELF_ANALYSIS_FREE": "Basic",
+        "SHELF_ANALYSIS_PREMIUM": "Full: duplicates, use-by after opening, alerts",
+        "AI": "Kosvia AI",
+        "AI_FREE": "5 messages / month",
+        "AI_PREMIUM": "100 messages / month",
+        "PRICE_ALERTS": "Price alerts",
+        "PRICE_ALERTS_FREE": "1 active",
+        "PRICE_ALERTS_PREMIUM": "20 active",
+        "ROUTINE": "Routine planner",
+        "ROUTINE_FREE": "Basic",
+        "ROUTINE_PREMIUM": "Smart weekly plan",
+        "DIARY": "Skin diary",
+        "DIARY_FREE": "7 days of history",
+        "DIARY_PREMIUM": "Full history"
+      }
+    },
+    "USAGE": {
+      "TITLE": "Your usage this month",
+      "AI": "Kosvia AI messages",
+      "PERSONAL_MATCH": "Full match analyses",
+      "PRICE_ALERTS": "Active price alerts",
+      "SHELF": "Products on your shelf"
+    },
+    "UPGRADE": {
+      "TITLE": "Go Premium",
+      "BODY": "Online payments are being finalised — Premium will be purchasable through the app stores and a web checkout. The prices shown here are live and are exactly what you will pay.",
+      "CREATE_ACCOUNT": "Create a free account"
+    }
+  },
+  "PREMIUM": {
+    "SEE_PREMIUM": "See Premium",
+    "GO_PREMIUM": "Go Premium",
+    "UNLOCK": "Unlock Premium",
+    "BADGE": "Premium"
   }
 }

@@ -21,6 +21,7 @@ import { DiscoveryModule } from './modules/discovery/discovery.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AccountModule } from './modules/account/account.module';
 import { DiaryModule } from './modules/diary/diary.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -34,6 +35,7 @@ import { HealthController } from './health.controller';
     // A conservative global ceiling; sensitive routes tighten it with @Throttle.
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 300 }]),
     PrismaModule,
+    SubscriptionModule,
     ScoringModule,
     AuthModule,
     ProfileModule,

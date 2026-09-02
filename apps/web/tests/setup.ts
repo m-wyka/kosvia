@@ -136,7 +136,7 @@ const comparisonIds = ref<string[]>([]);
 const compareStoreStub = {
   items: comparisonIds,
   count: computed(() => comparisonIds.value.length),
-  MAX_ITEMS: 4,
+  maxItems: computed(() => 4),
   has: (id: string) => comparisonIds.value.includes(id),
   toggle: (product: { id: string }) => {
     comparisonIds.value = comparisonIds.value.includes(product.id)
@@ -153,11 +153,17 @@ const compareStoreStub = {
   hydrate: () => undefined,
 };
 const signedIn = ref(false);
+const premium = ref(false);
 const authStoreStub = {
   user: ref(null),
   isAuthenticated: computed(() => signedIn.value),
   isAdmin: computed(() => false),
+  isPremium: computed(() => premium.value),
   displayName: computed(() => 'there'),
+};
+
+export const setPremium = (value: boolean): void => {
+  premium.value = value;
 };
 
 export const setSignedIn = (value: boolean): void => {
