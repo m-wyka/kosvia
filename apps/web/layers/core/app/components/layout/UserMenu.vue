@@ -5,6 +5,9 @@ const route = useRoute();
 const router = useRouter();
 const localePath = useLocalePath();
 
+const MENU_ITEM_CLASS =
+  'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink';
+
 const menuRoot = ref<HTMLElement | null>(null);
 const triggerButton = ref<HTMLButtonElement | null>(null);
 const isOpen = ref(false);
@@ -74,32 +77,41 @@ watch(
 
         <div class="my-1 border-t border-line" />
 
-        <NuxtLinkLocale
-          to="/profile"
-          class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
-          @click="closeMenu"
-        >
+        <NuxtLinkLocale to="/dashboard" :class="MENU_ITEM_CLASS" @click="closeMenu">
+          <BaseIcon name="home" :size="16" />
+          {{ $t('NAV.DASHBOARD') }}
+        </NuxtLinkLocale>
+
+        <NuxtLinkLocale to="/shelf" :class="MENU_ITEM_CLASS" @click="closeMenu">
+          <BaseIcon name="shelf" :size="16" />
+          {{ $t('NAV.SHELF') }}
+        </NuxtLinkLocale>
+
+        <NuxtLinkLocale to="/diary" :class="MENU_ITEM_CLASS" @click="closeMenu">
+          <BaseIcon name="edit" :size="16" />
+          {{ $t('NAV.DIARY') }}
+        </NuxtLinkLocale>
+
+        <NuxtLinkLocale to="/price-alerts" :class="MENU_ITEM_CLASS" @click="closeMenu">
+          <BaseIcon name="bell" :size="16" />
+          {{ $t('NAV.ALERTS') }}
+        </NuxtLinkLocale>
+
+        <div class="my-1 border-t border-line" />
+
+        <NuxtLinkLocale to="/profile" :class="MENU_ITEM_CLASS" @click="closeMenu">
           <BaseIcon name="user" :size="16" />
           {{ $t('NAV.PROFILE') }}
         </NuxtLinkLocale>
 
-        <NuxtLinkLocale
-          v-if="isAdmin"
-          to="/admin"
-          class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
-          @click="closeMenu"
-        >
+        <NuxtLinkLocale v-if="isAdmin" to="/admin" :class="MENU_ITEM_CLASS" @click="closeMenu">
           <BaseIcon name="settings" :size="16" />
           {{ $t('NAV.ADMIN') }}
         </NuxtLinkLocale>
 
         <div class="my-1 border-t border-line" />
 
-        <button
-          type="button"
-          class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
-          @click="signOut"
-        >
+        <button type="button" :class="[MENU_ITEM_CLASS, 'w-full text-left']" @click="signOut">
           <BaseIcon name="logout" :size="16" />
           {{ $t('COMMON.SIGN_OUT') }}
         </button>

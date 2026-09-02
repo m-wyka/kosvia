@@ -14,22 +14,22 @@ const props = withDefaults(
     variant?: 'grid' | 'rail';
     eager?: boolean;
     showFavorite?: boolean;
-    isFavorite?: boolean;
     showCompare?: boolean;
     note?: string;
   }>(),
   { variant: 'grid', showFavorite: true },
 );
 
-const emit = defineEmits<{ favorite: [ProductSummaryDto] }>();
-
 const { has: isInCompareTray, toggle: toggleCompare } = useCompareStore();
+const { favoriteIds, toggleFavorite } = useShelf();
 const { t } = useI18n();
 const reasonLabel = useMatchReason();
 
 const popping = ref(false);
 
 const inComparison = computed(() => isInCompareTray(props.product.id));
+
+const isFavorite = computed(() => favoriteIds.value.includes(props.product.id));
 
 const compareTooltip = computed(() =>
   inComparison.value ? t('PRODUCT.IN_COMPARISON') : t('PRODUCT.COMPARE'),
@@ -58,12 +58,12 @@ const tags = computed(() => {
   return list.slice(0, MAX_TAGS);
 });
 
-const handleFavoriteClick = () => {
+const handleFavoriteClick = async () => {
   popping.value = true;
   setTimeout(() => {
     popping.value = false;
   }, POP_ANIMATION_MS);
-  emit('favorite', props.product);
+  await toggleFavorite(props.product);
 };
 </script>
 
@@ -97,7 +97,7 @@ const handleFavoriteClick = () => {
       <button
         v-if="showFavorite"
         type="button"
-        class="absolute top-2 right-2 flex size-9 items-center justify-center rounded-full bg-surface/92 text-ink-muted shadow-xs backdrop-blur-sm transition-colors hover:text-blush-deep"
+        class="absolute top-2 right-2 z-10 flex size-9 items-center justify-center rounded-full bg-surface/92 text-ink-muted shadow-xs backdrop-blur-sm transition-colors hover:text-blush-deep"
         :class="[isFavorite && 'text-blush-deep', popping && 'animate-pop']"
         :aria-label="
           isFavorite

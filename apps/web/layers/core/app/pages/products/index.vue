@@ -15,7 +15,7 @@ const SORT_VALUES: ProductSort[] = [
 
 const route = useRoute();
 const router = useRouter();
-const { refresh: refreshShelf, favoriteIds, toggleFavorite } = useShelf();
+const { refresh: refreshShelf } = useShelf();
 const { t } = useI18n();
 const vocab = useVocabulary();
 
@@ -200,14 +200,7 @@ useBreadcrumbJsonLd(
         </BaseEmptyState>
 
         <template v-else>
-          <ProductGrid
-            :products="data?.items"
-            :loading="pending"
-            :favorite-ids="favoriteIds"
-            :columns="3"
-            show-compare
-            @favorite="toggleFavorite"
-          />
+          <ProductGrid :products="data?.items" :loading="pending" :columns="3" show-compare />
 
           <nav
             v-if="data && data.pageCount > 1"

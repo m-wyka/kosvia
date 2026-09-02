@@ -129,6 +129,9 @@ Object.assign(globalThis, {
 
 Object.assign(globalThis, { useVocabulary, useFormat, useMatchReason, useLocalisedText });
 
+const { useToast } = await import('@@/layers/core/app/composables/useToast');
+Object.assign(globalThis, { useToast });
+
 const comparisonIds = ref<string[]>([]);
 const compareStoreStub = {
   items: comparisonIds,
@@ -149,15 +152,61 @@ const compareStoreStub = {
   },
   hydrate: () => undefined,
 };
+const signedIn = ref(false);
 const authStoreStub = {
   user: ref(null),
-  isAuthenticated: computed(() => false),
+  isAuthenticated: computed(() => signedIn.value),
   isAdmin: computed(() => false),
   displayName: computed(() => 'there'),
 };
+
+export const setSignedIn = (value: boolean): void => {
+  signedIn.value = value;
+};
+
+type ApiHandler = (url: string, options?: { method?: string; body?: unknown }) => Promise<unknown>;
+
+let apiHandler: ApiHandler = () => Promise.resolve(null);
+
+export const setApiHandler = (handler: ApiHandler): void => {
+  apiHandler = handler;
+};
+
+const stateByKey = new Map<string, ReturnType<typeof ref>>();
+
+Object.assign(globalThis, {
+  useState: <T>(key: string, init: () => T) => {
+    if (!stateByKey.has(key)) {
+      stateByKey.set(key, ref(init()));
+    }
+    return stateByKey.get(key);
+  },
+  useApi: () => (url: string, options?: { method?: string; body?: unknown }) =>
+    apiHandler(url, options),
+  useApiMessage: () => (error: unknown) => String(error),
+});
+const favoriteProductIds = ref<string[]>([]);
+const shelfStub = {
+  items: ref([]),
+  busy: ref(false),
+  productIds: computed(() => favoriteProductIds.value),
+  favoriteIds: favoriteProductIds,
+  refresh: () => Promise.resolve(),
+  has: (id: string) => favoriteProductIds.value.includes(id),
+  add: () => Promise.resolve(),
+  remove: () => Promise.resolve(),
+  toggleFavorite: (product: { id: string }) => {
+    favoriteProductIds.value = favoriteProductIds.value.includes(product.id)
+      ? favoriteProductIds.value.filter((entry) => entry !== product.id)
+      : [...favoriteProductIds.value, product.id];
+    return Promise.resolve();
+  },
+};
+
 Object.assign(globalThis, {
   useCompareStore: () => compareStoreStub,
   useAuthStore: () => authStoreStub,
+  useShelf: () => shelfStub,
 });
 
 const NuxtLinkStub = defineComponent({
@@ -188,5 +237,10 @@ config.global.stubs = {
 
 export const resetTestGlobals = (): void => {
   comparisonIds.value = [];
+  favoriteProductIds.value = [];
   activeLocale.value = 'en';
+  signedIn.value = false;
+  stateByKey.clear();
+  apiHandler = () => Promise.resolve(null);
+  useToast().clear();
 };

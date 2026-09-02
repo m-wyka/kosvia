@@ -34,6 +34,7 @@
     "SHELF_SHORT": "Półka",
     "AI": "Asystent AI",
     "ALERTS": "Alerty cenowe",
+    "DIARY": "Dziennik skóry",
     "PROFILE": "Profil",
     "ACCOUNT": "Konto",
     "DASHBOARD": "Panel",
@@ -613,6 +614,20 @@
     "ALL_PRODUCTS": "Wszystkie produkty",
     "RESULTS_FOR": "Wyniki dla „{query}”",
     "SEARCHING": "Szukam…",
+    "OVERLAY": {
+      "POPULAR": "Często wyszukiwane",
+      "FOR_YOU": "Dopasowane do Ciebie",
+      "RECOMMENDED": "Polecane",
+      "EMPTY": "Nic nie pasuje do „{query}”",
+      "SEE_ALL": "Zobacz wszystkie wyniki dla „{query}”",
+      "QUERY": {
+        "RETINOL": "Retinol",
+        "NIACINAMIDE": "Niacynamid",
+        "SPF": "SPF 50",
+        "CLEANSER": "Żel do mycia",
+        "VITAMIN_C": "Witamina C"
+      }
+    },
     "COUNT": "{count} produkt | {count} produkty | {count} produktów",
     "FILTERS": "Filtry",
     "SHOW_COUNT": "Pokaż {count} produktów",
@@ -898,13 +913,15 @@
     "REMOVED": "{name} usunięty z Twojej półki",
     "ADDED": "{name} dodany na Twoją półkę",
     "SAVED": "{name} zapisany na Twojej półce",
+    "FAVORITED": "Dodano {name} do ulubionych",
+    "UNFAVORITED": "Usunięto {name} z ulubionych",
     "VIEW_SHELF": "Zobacz półkę",
     "SIGN_IN_PROMPT": "Zaloguj się, żeby zbudować swoją półkę",
     "ROUTINE": {
       "EMPTY_TITLE": "Nie ma jeszcze czego analizować",
       "EMPTY_BODY": "Dodaj kilka produktów, a powiemy Ci, co Twoja rutyna pokrywa, a czego jej brakuje.",
       "COVERS": "Co pokrywa Twoja rutyna",
-      "GAPS": "Luki",
+      "GAPS": "Czego brakuje",
       "NOTE": "To obserwacje o tym, co robią Twoje produkty, a nie porady dotyczące Twojej skóry. Kosvia nie jest usługą medyczną."
     },
     "ADD_MODAL": {

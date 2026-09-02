@@ -6,14 +6,11 @@ withDefaults(
     products?: ProductSummaryDto[];
     loading?: boolean;
     skeletonCount?: number;
-    favoriteIds?: string[];
     showCompare?: boolean;
     columns?: 3 | 4;
   }>(),
   { skeletonCount: 8, columns: 4 },
 );
-
-defineEmits<{ favorite: [ProductSummaryDto] }>();
 </script>
 
 <template>
@@ -30,9 +27,7 @@ defineEmits<{ favorite: [ProductSummaryDto] }>();
         :key="product.id"
         :product="product"
         :eager="index < 4"
-        :is-favorite="favoriteIds?.includes(product.id)"
         :show-compare="showCompare"
-        @favorite="$emit('favorite', $event)"
       />
     </template>
   </div>

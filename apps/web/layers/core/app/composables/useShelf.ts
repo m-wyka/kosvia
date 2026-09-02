@@ -83,12 +83,21 @@ export const useShelf = () => {
     }
     const existing = items.value.find((item) => item.product.id === product.id);
     if (existing) {
-      await runMutation(() =>
+      const becomesFavorite = !existing.isFavorite;
+      const updated = await runMutation(() =>
         api(`/shelf/${existing.id}`, {
           method: 'PATCH',
-          body: { isFavorite: !existing.isFavorite },
+          body: { isFavorite: becomesFavorite },
         }),
       );
+      if (!updated) {
+        return;
+      }
+      if (becomesFavorite) {
+        announceSaved('SHELF.FAVORITED', product);
+        return;
+      }
+      toast.notify(t('SHELF.UNFAVORITED', { name: product.name }));
       return;
     }
     const saved = await runMutation(() =>

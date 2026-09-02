@@ -26,11 +26,19 @@ import {
   type RankedCandidate,
   type SearchProvider,
 } from './search/search-provider';
+import { toPopularQueries, type PopularQueryRow } from './search/popular-queries';
 
 const DEFAULT_PAGE_SIZE = 24;
 /** Upper bound on ranked hits a text query can page through. */
 const MAX_SEARCH_CANDIDATES = 500;
 const SUGGESTION_LIMIT = 8;
+/** Tiles the search panel shows while typing, and the ranked pool they come from. */
+const PREVIEW_LIMIT = 6;
+const PREVIEW_CANDIDATE_LIMIT = 60;
+const POPULAR_QUERY_LIMIT = 6;
+const POPULAR_QUERY_WINDOW_DAYS = 30;
+const POPULAR_QUERY_CANDIDATE_LIMIT = 40;
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class ProductsService {
@@ -69,6 +77,51 @@ export class ProductsService {
 
   suggest(query: string): Promise<ProductSuggestionDto[]> {
     return this.searchProvider.suggest(query, SUGGESTION_LIMIT);
+  }
+
+  /**
+   * The search panel's typing state: ranked hits carrying price and Personal
+   * Match, without the facets and paging a full search pays for. Keystrokes are
+   * deliberately not written to the search log — only a committed search is a
+   * signal worth counting in `popularQueries`.
+   */
+  async preview(query: string, viewer: ViewerContext): Promise<ProductSummaryDto[]> {
+    const candidates = await this.searchProvider.rankedCandidates(query, PREVIEW_CANDIDATE_LIMIT);
+    if (!candidates.length) {
+      return [];
+    }
+
+    const rows = await this.prisma.product.findMany({
+      where: {
+        AND: [
+          publicProductWhere(),
+          ...this.allergenExclusion(viewer),
+          { id: { in: candidates.map((candidate) => candidate.id) } },
+        ],
+      },
+      include: PRODUCT_INCLUDE,
+    });
+
+    const rowById = new Map(rows.map((row) => [row.id, row]));
+    const ranked = candidates
+      .flatMap((candidate) => rowById.get(candidate.id) ?? [])
+      .slice(0, PREVIEW_LIMIT);
+
+    return this.decorate(ranked, viewer);
+  }
+
+  /** What visitors actually searched for recently, for the panel's empty state. */
+  async popularQueries(): Promise<string[]> {
+    const since = new Date(Date.now() - POPULAR_QUERY_WINDOW_DAYS * DAY_IN_MS);
+    const rows = await this.prisma.$queryRaw<PopularQueryRow[]>`
+      SELECT lower(btrim(query)) AS query, count(*)::int AS uses
+      FROM search_logs
+      WHERE "createdAt" >= ${since} AND "resultCount" > 0
+      GROUP BY 1
+      ORDER BY uses DESC, query ASC
+      LIMIT ${POPULAR_QUERY_CANDIDATE_LIMIT}
+    `;
+    return toPopularQueries(rows, POPULAR_QUERY_LIMIT);
   }
 
   /** With a text query and no explicit sort, the engine's ranking wins. */
@@ -232,6 +285,18 @@ export class ProductsService {
     return rows.map((row) => toProductSummary(row, scores.get(row.id) ?? null));
   }
 
+  /**
+   * A declared allergy is a hard filter, not a ranking signal: such products
+   * must not be listed at all, and the totals must not count them.
+   */
+  private allergenExclusion(viewer: ViewerContext): Prisma.ProductWhereInput[] {
+    const allergens = viewer.profile?.allergenIngredientIds ?? [];
+    if (!allergens.length) {
+      return [];
+    }
+    return [{ ingredients: { none: { ingredientId: { in: allergens } } } }];
+  }
+
   scoreOne(row: ProductRow, viewer: ViewerContext): PersonalMatchDto {
     return this.match.score({
       product: toScorable(row),
@@ -253,14 +318,10 @@ export class ProductsService {
     candidates: RankedCandidate[] | null,
     viewer: ViewerContext,
   ): Promise<Prisma.ProductWhereInput> {
-    const and: Prisma.ProductWhereInput[] = [publicProductWhere()];
-
-    // A declared allergy is a hard filter, not a ranking signal: such products
-    // must not be listed at all, and the totals must not count them.
-    const allergens = viewer.profile?.allergenIngredientIds ?? [];
-    if (allergens.length) {
-      and.push({ ingredients: { none: { ingredientId: { in: allergens } } } });
-    }
+    const and: Prisma.ProductWhereInput[] = [
+      publicProductWhere(),
+      ...this.allergenExclusion(viewer),
+    ];
 
     if (candidates) {
       and.push({ id: { in: candidates.map((candidate) => candidate.id) } });

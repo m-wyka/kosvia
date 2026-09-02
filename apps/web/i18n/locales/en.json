@@ -34,6 +34,7 @@
     "SHELF_SHORT": "Shelf",
     "AI": "AI Shopper",
     "ALERTS": "Price alerts",
+    "DIARY": "Skin diary",
     "PROFILE": "Profile",
     "ACCOUNT": "Account",
     "DASHBOARD": "Dashboard",
@@ -613,6 +614,20 @@
     "ALL_PRODUCTS": "All products",
     "RESULTS_FOR": "Results for “{query}”",
     "SEARCHING": "Searching…",
+    "OVERLAY": {
+      "POPULAR": "Popular searches",
+      "FOR_YOU": "Matched to you",
+      "RECOMMENDED": "Recommended",
+      "EMPTY": "Nothing matches “{query}”",
+      "SEE_ALL": "See all results for “{query}”",
+      "QUERY": {
+        "RETINOL": "Retinol",
+        "NIACINAMIDE": "Niacinamide",
+        "SPF": "SPF 50",
+        "CLEANSER": "Cleanser",
+        "VITAMIN_C": "Vitamin C"
+      }
+    },
     "COUNT": "{count} product | {count} products",
     "FILTERS": "Filters",
     "SHOW_COUNT": "Show {count} products",
@@ -898,6 +913,8 @@
     "REMOVED": "{name} removed from your shelf",
     "ADDED": "{name} added to your shelf",
     "SAVED": "{name} saved to your shelf",
+    "FAVORITED": "{name} added to favourites",
+    "UNFAVORITED": "{name} removed from favourites",
     "VIEW_SHELF": "View shelf",
     "SIGN_IN_PROMPT": "Sign in to build your shelf",
     "ROUTINE": {

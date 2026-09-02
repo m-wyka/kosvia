@@ -13,6 +13,7 @@ interface PushOptions {
 
 const DEFAULT_DURATION_MS = 4200;
 const ERROR_DURATION_MS = 6000;
+const MAX_VISIBLE_TOASTS = 3;
 
 const toasts = ref<Toast[]>([]);
 let nextId = 0;
@@ -29,13 +30,18 @@ export const useToast = () => {
       tone: options.tone ?? 'neutral',
       action: options.action,
     };
-    toasts.value = [...toasts.value, toast];
+    toasts.value = [...toasts.value, toast].slice(-MAX_VISIBLE_TOASTS);
     setTimeout(() => dismiss(toast.id), options.duration ?? DEFAULT_DURATION_MS);
+  };
+
+  const clear = () => {
+    toasts.value = [];
   };
 
   return {
     toasts: readonly(toasts),
     dismiss,
+    clear,
     notify: (message: string, action?: Toast['action']) => push(message, { action }),
     success: (message: string, action?: Toast['action']) =>
       push(message, { tone: 'positive', action }),

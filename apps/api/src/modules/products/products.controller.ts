@@ -5,6 +5,7 @@ import type {
   ProductDto,
   ProductSearchResult,
   ProductSuggestionDto,
+  ProductSummaryDto,
 } from '@kosvia/shared';
 import { OptionalAuth } from '../../common/decorators/public.decorator';
 import { RequestLocale } from '../../common/decorators/request-locale.decorator';
@@ -40,6 +41,22 @@ export class ProductsController {
   @ApiOperation({ summary: 'Autocomplete hits for the search box' })
   suggest(@Query() query: SuggestQueryDto): Promise<ProductSuggestionDto[]> {
     return this.products.suggest(query.q);
+  }
+
+  @Get('preview')
+  @ApiOperation({ summary: 'Ranked hits with price and Personal Match for the search panel' })
+  async preview(
+    @Query() query: SuggestQueryDto,
+    @CurrentUser() user: AuthenticatedUser | null,
+  ): Promise<ProductSummaryDto[]> {
+    const viewer = await this.viewers.load(user?.id);
+    return this.products.preview(query.q, viewer);
+  }
+
+  @Get('popular-queries')
+  @ApiOperation({ summary: 'What visitors searched for most over the last month' })
+  popularQueries(): Promise<string[]> {
+    return this.products.popularQueries();
   }
 
   @Get(':slug')

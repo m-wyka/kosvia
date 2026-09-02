@@ -1,3 +1,12 @@
+<script setup lang="ts">
+const { isAuthenticated } = storeToRefs(useAuthStore());
+const { refresh: refreshShelf } = useShelf();
+
+onMounted(() => refreshShelf());
+
+watch(isAuthenticated, () => refreshShelf(true));
+</script>
+
 <template>
   <div class="flex min-h-dvh flex-col">
     <a

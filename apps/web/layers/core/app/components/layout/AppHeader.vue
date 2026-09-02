@@ -6,32 +6,31 @@ const route = useRoute();
 const router = useRouter();
 const localePath = useLocalePath();
 
-const search = ref('');
 const menuOpen = ref(false);
 
-const links = [
+const primaryLinks = [
   { to: '/discover', label: 'NAV.DISCOVER' },
   { to: '/products', label: 'NAV.PRODUCTS' },
   { to: '/compare', label: 'NAV.COMPARE' },
-  { to: '/shelf', label: 'NAV.SHELF', requiresAuth: true },
   { to: '/ai', label: 'NAV.AI', requiresAuth: true },
-  { to: '/price-alerts', label: 'NAV.ALERTS', requiresAuth: true },
 ];
 
-const visibleLinks = computed(() =>
-  links.filter((link) => !link.requiresAuth || isAuthenticated.value),
+const accountLinks = [
+  { to: '/dashboard', label: 'NAV.DASHBOARD' },
+  { to: '/shelf', label: 'NAV.SHELF' },
+  { to: '/diary', label: 'NAV.DIARY' },
+  { to: '/price-alerts', label: 'NAV.ALERTS' },
+];
+
+const desktopLinks = computed(() =>
+  primaryLinks.filter((link) => !link.requiresAuth || isAuthenticated.value),
+);
+
+const mobileLinks = computed(() =>
+  isAuthenticated.value ? [...desktopLinks.value, ...accountLinks] : desktopLinks.value,
 );
 
 const isActive = (to: string) => route.path === to || route.path.startsWith(`${to}/`);
-
-const submitSearch = () => {
-  const query = search.value.trim();
-  if (!query) {
-    return;
-  }
-  menuOpen.value = false;
-  router.push({ path: localePath('/products'), query: { q: query } });
-};
 
 const signOut = async () => {
   await logout();
@@ -56,7 +55,7 @@ watch(
 
       <nav class="hidden items-center gap-0.5 lg:flex" :aria-label="$t('NAV.MAIN')">
         <NuxtLinkLocale
-          v-for="link in visibleLinks"
+          v-for="link in desktopLinks"
           :key="link.to"
           :to="link.to"
           class="rounded-md px-3 py-2 text-sm font-medium transition-colors"
@@ -66,29 +65,9 @@ watch(
         </NuxtLinkLocale>
       </nav>
 
-      <form
-        class="ml-auto hidden min-w-0 flex-1 justify-end md:flex"
-        role="search"
-        @submit.prevent="submitSearch"
-      >
-        <label for="header-search" class="sr-only">{{ $t('NAV.SEARCH_LABEL') }}</label>
-        <div class="relative w-full max-w-xs">
-          <BaseIcon
-            name="search"
-            :size="16"
-            class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
-          />
-          <input
-            id="header-search"
-            v-model="search"
-            type="search"
-            :placeholder="$t('NAV.SEARCH_PLACEHOLDER')"
-            class="h-10 w-full rounded-pill border border-line bg-surface pr-3.5 pl-9 text-sm placeholder:text-ink-faint transition-colors hover:border-line-strong"
-          />
-        </div>
-      </form>
+      <div class="ml-auto flex shrink-0 items-center gap-1.5">
+        <AppSearch />
 
-      <div class="ml-auto flex shrink-0 items-center gap-1.5 md:ml-0">
         <LocaleSwitcher class="hidden sm:flex" />
 
         <NuxtLinkLocale
@@ -131,26 +110,8 @@ watch(
     >
       <div v-if="menuOpen" id="mobile-menu" class="border-t border-line bg-canvas lg:hidden">
         <div class="container-page space-y-1 py-4">
-          <form class="mb-3 md:hidden" role="search" @submit.prevent="submitSearch">
-            <label for="mobile-search" class="sr-only">{{ $t('NAV.SEARCH_LABEL') }}</label>
-            <div class="relative">
-              <BaseIcon
-                name="search"
-                :size="16"
-                class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
-              />
-              <input
-                id="mobile-search"
-                v-model="search"
-                type="search"
-                :placeholder="$t('NAV.SEARCH_PLACEHOLDER')"
-                class="h-11 w-full rounded-pill border border-line bg-surface pr-3.5 pl-9 text-sm"
-              />
-            </div>
-          </form>
-
           <NuxtLinkLocale
-            v-for="link in visibleLinks"
+            v-for="link in mobileLinks"
             :key="link.to"
             :to="link.to"
             class="block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"

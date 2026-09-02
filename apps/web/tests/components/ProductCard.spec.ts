@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import type { ProductSummaryDto } from '@kosvia/shared';
 import { resetTestGlobals, setTestLocale } from '@@/tests/setup';
@@ -98,10 +99,22 @@ describe('ProductCard', () => {
     expect(button.attributes('aria-pressed')).toBe('false');
   });
 
-  it('emits the product when the favourite control is used', async () => {
+  it('saves the product to the shelf itself, without a handler from the parent', async () => {
     const component = mount(ProductCard, { props: { product: product() } });
-    await component.get('[aria-pressed]').trigger('click');
-    expect(component.emitted('favorite')?.[0]?.[0]).toMatchObject({ id: 'p1' });
+    const button = component.get('[aria-pressed]');
+
+    await button.trigger('click');
+    await nextTick();
+    expect(button.attributes('aria-pressed')).toBe('true');
+
+    await button.trigger('click');
+    await nextTick();
+    expect(button.attributes('aria-pressed')).toBe('false');
+  });
+
+  it('keeps the favourite control above the link stretched across the card', () => {
+    const component = mount(ProductCard, { props: { product: product() } });
+    expect(component.get('[aria-pressed]').classes()).toContain('z-10');
   });
 
   it('shows the alternative reason instead of tags when one is given', async () => {
