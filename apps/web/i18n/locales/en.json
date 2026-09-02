@@ -59,7 +59,8 @@
     "PRIVACY": "Privacy",
     "REVIEWS": "Reviews",
     "RIGHTS": "© {year} Kosvia. Demo build.",
-    "PRICING": "Plans and Premium"
+    "PRICING": "Plans and Premium",
+    "SCAN": "Scan a barcode"
   },
   "VOCAB": {
     "SKIN_TYPE": {
@@ -839,7 +840,9 @@
     "TRAY": {
       "COUNT": "{current} of {max}",
       "COMPARE": "Compare",
-      "REMOVE": "Remove {name} from comparison"
+      "REMOVE": "Remove {name} from comparison",
+      "FULL_FREE": "The free plan compares {limit} product at a time. | The free plan compares {limit} products at a time.",
+      "FULL_PREMIUM": "You can compare {limit} product at a time. Remove one to add another. | You can compare {limit} products at a time. Remove one to add another."
     },
     "ROW": {
       "BRAND": "Brand",

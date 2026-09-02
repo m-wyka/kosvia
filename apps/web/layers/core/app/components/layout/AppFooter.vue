@@ -7,6 +7,7 @@ const groups = [
     links: [
       { to: '/discover', label: 'NAV.DISCOVER' },
       { to: '/products', label: 'FOOTER.ALL_PRODUCTS' },
+      { to: '/scan', label: 'FOOTER.SCAN' },
       { to: '/ingredients', label: 'FOOTER.INGREDIENT_LIBRARY' },
       { to: '/dupes', label: 'FOOTER.DUPES' },
       { to: '/compare', label: 'NAV.COMPARE' },

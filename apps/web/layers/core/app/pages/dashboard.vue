@@ -164,6 +164,8 @@ useSeo(() => ({
         </NuxtLinkLocale>
       </dl>
 
+      <PlanUsageCard class="mt-4" />
+
       <section class="mt-12">
         <div class="mb-4 flex items-end justify-between gap-4">
           <div>

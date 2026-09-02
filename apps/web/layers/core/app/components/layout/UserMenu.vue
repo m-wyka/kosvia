@@ -90,6 +90,11 @@ watch(
           {{ $t('NAV.DASHBOARD') }}
         </NuxtLinkLocale>
 
+        <NuxtLinkLocale to="/scan" :class="MENU_ITEM_CLASS" @click="closeMenu">
+          <BaseIcon name="scan" :size="16" />
+          {{ $t('NAV.SCAN') }}
+        </NuxtLinkLocale>
+
         <NuxtLinkLocale to="/shelf" :class="MENU_ITEM_CLASS" @click="closeMenu">
           <BaseIcon name="shelf" :size="16" />
           {{ $t('NAV.SHELF') }}

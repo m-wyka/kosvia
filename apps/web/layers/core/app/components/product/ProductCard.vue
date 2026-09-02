@@ -20,7 +20,8 @@ const props = withDefaults(
   { variant: 'grid', showFavorite: true },
 );
 
-const { has: isInCompareTray, toggle: toggleCompare } = useCompareStore();
+const { has: isInCompareTray } = useCompareStore();
+const { handleCompareClick } = useCompareAction();
 const { favoriteIds, toggleFavorite } = useShelf();
 const { t } = useI18n();
 const reasonLabel = useMatchReason();
@@ -153,7 +154,7 @@ const handleFavoriteClick = async () => {
                 : $t('PRODUCT.ADD_COMPARE', { name: product.name })
             "
             :aria-pressed="inComparison"
-            @click.stop.prevent="toggleCompare(product)"
+            @click.stop.prevent="handleCompareClick(product)"
           >
             <BaseIcon name="compare" :size="16" />
           </button>

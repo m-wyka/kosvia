@@ -59,7 +59,8 @@
     "PRIVACY": "Prywatność",
     "REVIEWS": "Opinie",
     "RIGHTS": "© {year} Kosvia. Wersja demonstracyjna.",
-    "PRICING": "Pakiety i Premium"
+    "PRICING": "Pakiety i Premium",
+    "SCAN": "Skanuj kod kreskowy"
   },
   "VOCAB": {
     "SKIN_TYPE": {
@@ -839,7 +840,9 @@
     "TRAY": {
       "COUNT": "{current} z {max}",
       "COMPARE": "Porównaj",
-      "REMOVE": "Usuń {name} z porównania"
+      "REMOVE": "Usuń {name} z porównania",
+      "FULL_FREE": "W darmowym planie porównasz {limit} produkt naraz. | W darmowym planie porównasz {limit} produkty naraz. | W darmowym planie porównasz {limit} produktów naraz.",
+      "FULL_PREMIUM": "Możesz porównać {limit} produkt naraz. Usuń jeden, żeby dodać kolejny. | Możesz porównać {limit} produkty naraz. Usuń jeden, żeby dodać kolejny. | Możesz porównać {limit} produktów naraz. Usuń jeden, żeby dodać kolejny."
     },
     "ROW": {
       "BRAND": "Marka",

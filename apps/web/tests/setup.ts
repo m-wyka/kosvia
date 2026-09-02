@@ -15,6 +15,7 @@ import {
   watch,
   watchEffect,
 } from 'vue';
+import { PLAN_LIMITS } from '@kosvia/shared';
 import en from '@@/i18n/locales/en.json';
 import pl from '@@/i18n/locales/pl.json';
 import { useVocabulary } from '@@/layers/core/app/composables/useVocabulary';
@@ -132,16 +133,28 @@ Object.assign(globalThis, { useVocabulary, useFormat, useMatchReason, useLocalis
 const { useToast } = await import('@@/layers/core/app/composables/useToast');
 Object.assign(globalThis, { useToast });
 
+const signedIn = ref(false);
+const premium = ref(false);
+
 const comparisonIds = ref<string[]>([]);
-const compareStoreStub = {
+const compareMaxItems = computed(
+  () => PLAN_LIMITS[premium.value ? 'PREMIUM' : 'FREE'].compareProducts,
+);
+// reactive() so storeToRefs unwraps these the way it does on a real Pinia store.
+const compareStoreStub = reactive({
   items: comparisonIds,
   count: computed(() => comparisonIds.value.length),
-  maxItems: computed(() => 4),
+  maxItems: compareMaxItems,
   has: (id: string) => comparisonIds.value.includes(id),
   toggle: (product: { id: string }) => {
-    comparisonIds.value = comparisonIds.value.includes(product.id)
-      ? comparisonIds.value.filter((entry) => entry !== product.id)
-      : [...comparisonIds.value, product.id];
+    if (comparisonIds.value.includes(product.id)) {
+      comparisonIds.value = comparisonIds.value.filter((entry) => entry !== product.id);
+      return 'removed' as const;
+    }
+    if (comparisonIds.value.length >= compareMaxItems.value) {
+      return 'full' as const;
+    }
+    comparisonIds.value = [...comparisonIds.value, product.id];
     return 'added' as const;
   },
   remove: (id: string) => {
@@ -151,16 +164,14 @@ const compareStoreStub = {
     comparisonIds.value = [];
   },
   hydrate: () => undefined,
-};
-const signedIn = ref(false);
-const premium = ref(false);
-const authStoreStub = {
+});
+const authStoreStub = reactive({
   user: ref(null),
   isAuthenticated: computed(() => signedIn.value),
   isAdmin: computed(() => false),
   isPremium: computed(() => premium.value),
   displayName: computed(() => 'there'),
-};
+});
 
 export const setPremium = (value: boolean): void => {
   premium.value = value;
@@ -215,6 +226,10 @@ Object.assign(globalThis, {
   useShelf: () => shelfStub,
 });
 
+// Imported after the store globals it reads, and kept real — it is under test.
+const { useCompareAction } = await import('@@/layers/core/app/composables/useCompareAction');
+Object.assign(globalThis, { useCompareAction });
+
 const NuxtLinkStub = defineComponent({
   name: 'NuxtLinkLocale',
   props: { to: { type: [String, Object], default: '' } },
@@ -246,6 +261,7 @@ export const resetTestGlobals = (): void => {
   favoriteProductIds.value = [];
   activeLocale.value = 'en';
   signedIn.value = false;
+  premium.value = false;
   stateByKey.clear();
   apiHandler = () => Promise.resolve(null);
   useToast().clear();

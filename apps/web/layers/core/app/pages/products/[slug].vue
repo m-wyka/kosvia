@@ -33,7 +33,8 @@ const { data: breakdown } = await useApiFetch<IngredientScoreBreakdownDto>(
 );
 
 const { refresh: refreshShelf, has: isOnShelfById, busy: shelfBusy, add: addToShelf } = useShelf();
-const { has: isInCompareTray, toggle: toggleCompare } = useCompareStore();
+const { has: isInCompareTray } = useCompareStore();
+const { handleCompareClick } = useCompareAction();
 const api = useApi();
 const toast = useToast();
 const message = useApiMessage();
@@ -259,7 +260,7 @@ useBreadcrumbJsonLd(
             {{ onShelf ? $t('PRODUCT.ON_SHELF') : $t('PRODUCT.ADD_TO_SHELF') }}
           </BaseButton>
 
-          <BaseButton size="lg" variant="secondary" @click="toggleCompare(product)">
+          <BaseButton size="lg" variant="secondary" @click="handleCompareClick(product)">
             <template #icon><BaseIcon name="compare" :size="17" /></template>
             {{ inComparison ? $t('PRODUCT.IN_COMPARISON') : $t('PRODUCT.COMPARE') }}
           </BaseButton>
