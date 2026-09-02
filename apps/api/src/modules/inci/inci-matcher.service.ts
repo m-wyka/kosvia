@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { isCiNumber } from './inci-parser';
+import { isCiNumber, joinHyphenatedToken, looseSeparatorKey } from './inci-parser';
 
-export type MatchLevel = 'INCI_NAME' | 'ALIAS' | 'CI_NUMBER';
+export type MatchLevel = 'INCI_NAME' | 'ALIAS' | 'CI_NUMBER' | 'HYPHEN_REPAIR' | 'SEPARATOR_SHAPE';
 
 export interface IngredientMatch {
   ingredientId: string;
@@ -20,6 +20,8 @@ export const MATCH_CONFIDENCE: Record<MatchLevel, number> = {
   INCI_NAME: 1,
   ALIAS: 0.95,
   CI_NUMBER: 0.95,
+  HYPHEN_REPAIR: 0.9,
+  SEPARATOR_SHAPE: 0.9,
 };
 
 /** Spec 07 §2: below this trigram score a token is simply unknown. */
@@ -70,7 +72,110 @@ export class InciMatcherService {
         level,
       });
     }
+
+    await this.matchHyphenatedRemainder(unique, matches);
+    await this.matchSeparatorShape(unique, matches);
     return matches;
+  }
+
+  /**
+   * Level 3b: a token still unknown after the exact lookups may be a name the
+   * scanner broke across a line. The joined form is accepted only when it is
+   * itself a dictionary name, so a real dash-separated list never collapses
+   * into one invented ingredient.
+   */
+  private async matchHyphenatedRemainder(
+    tokens: string[],
+    matches: Map<string, IngredientMatch>,
+  ): Promise<void> {
+    const joinedByToken = new Map<string, string>();
+    for (const token of tokens) {
+      if (matches.has(token)) {
+        continue;
+      }
+      const joined = joinHyphenatedToken(token);
+      if (joined) {
+        joinedByToken.set(token, joined);
+      }
+    }
+    if (!joinedByToken.size) {
+      return;
+    }
+
+    const repaired = await this.prisma.ingredient.findMany({
+      where: { normalizedName: { in: [...new Set(joinedByToken.values())] } },
+      select: { id: true, normalizedName: true },
+    });
+    const idByName = new Map(repaired.map((row) => [row.normalizedName, row.id]));
+
+    for (const [token, joined] of joinedByToken) {
+      const ingredientId = idByName.get(joined);
+      if (!ingredientId) {
+        continue;
+      }
+      matches.set(token, {
+        ingredientId,
+        confidence: MATCH_CONFIDENCE.HYPHEN_REPAIR,
+        level: 'HYPHEN_REPAIR',
+      });
+    }
+  }
+
+  /**
+   * Level 3c: labels and the dictionary disagree about hyphens, slashes and
+   * spaces — "coco glucoside" is "Coco-Glucoside", "coco caprylate caprate" is
+   * "Coco-Caprylate/Caprate". Both sides are compared with those characters
+   * removed. A key that more than one dictionary entry claims is left pending
+   * rather than guessed at.
+   */
+  private async matchSeparatorShape(
+    tokens: string[],
+    matches: Map<string, IngredientMatch>,
+  ): Promise<void> {
+    const keyByToken = new Map<string, string>();
+    for (const token of tokens) {
+      if (matches.has(token)) {
+        continue;
+      }
+      const key = looseSeparatorKey(token);
+      if (key) {
+        keyByToken.set(token, key);
+      }
+    }
+    if (!keyByToken.size) {
+      return;
+    }
+
+    const rows = await this.prisma.$queryRaw<Array<{ id: string; key: string }>>(Prisma.sql`
+      SELECT "id", regexp_replace("normalizedName", '[- /]', '', 'g') AS key
+      FROM "ingredients"
+      WHERE regexp_replace("normalizedName", '[- /]', '', 'g')
+            IN (${Prisma.join([...new Set(keyByToken.values())])})
+    `);
+
+    const idByKey = new Map<string, string | null>();
+    for (const row of rows) {
+      const seen = idByKey.get(row.key);
+      if (seen === undefined) {
+        idByKey.set(row.key, row.id);
+        continue;
+      }
+      if (seen !== row.id) {
+        idByKey.set(row.key, null);
+      }
+    }
+
+    for (const [token, key] of keyByToken) {
+      const ingredientId = idByKey.get(key);
+      if (!ingredientId) {
+        continue;
+      }
+      matches.set(token, {
+        ingredientId,
+        confidence: MATCH_CONFIDENCE.SEPARATOR_SHAPE,
+        level: 'SEPARATOR_SHAPE',
+      });
+    }
   }
 
   async matchOne(normalized: string): Promise<IngredientMatch | null> {

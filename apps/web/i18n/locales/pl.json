@@ -1314,7 +1314,14 @@
       "NEW_CONFIRM": "Utwórz i dopasuj ponownie",
       "RESOLVED": "Gotowe — {rows} pozycji dopasowanych ponownie w {products} produktach",
       "IGNORED": "Token zignorowany",
-      "REOPENED": "Token wrócił do kolejki"
+      "REOPENED": "Token wrócił do kolejki",
+      "SELECT_ALL": "Zaznacz wszystkie na stronie",
+      "SELECT_ROW": "Zaznacz token {token}",
+      "BULK_SELECTED": "Zaznaczono {count} token | Zaznaczono {count} tokeny | Zaznaczono {count} tokenów",
+      "BULK_ACCEPT": "Przyjmij sugestie ({count})",
+      "BULK_IGNORE": "Ignoruj zaznaczone",
+      "BULK_CLEAR": "Wyczyść zaznaczenie",
+      "BULK_DONE": "Rozwiązano {resolved}, pominięto {skipped}, poprawiono {rows} wierszy składu"
     },
     "IMPORTS": {
       "TITLE": "Importy",

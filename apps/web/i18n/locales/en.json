@@ -1201,7 +1201,14 @@
       "NEW_CONFIRM": "Create and re-match",
       "RESOLVED": "Done — {rows} label rows re-matched across {products} products",
       "IGNORED": "Token ignored",
-      "REOPENED": "Token back in the queue"
+      "REOPENED": "Token back in the queue",
+      "SELECT_ALL": "Select all on this page",
+      "SELECT_ROW": "Select token {token}",
+      "BULK_SELECTED": "{count} token selected | {count} tokens selected",
+      "BULK_ACCEPT": "Accept suggestions ({count})",
+      "BULK_IGNORE": "Ignore selected",
+      "BULK_CLEAR": "Clear selection",
+      "BULK_DONE": "{resolved} resolved, {skipped} skipped, {rows} label rows fixed"
     },
     "IMPORTS": {
       "TITLE": "Imports",

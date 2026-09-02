@@ -3,6 +3,7 @@ import {
   ALIAS_KINDS,
   TOKEN_STATUSES,
   type AliasKind,
+  type BulkResolutionDto,
   type PaginatedResult,
   type TokenResolutionDto,
   type TokenStatus,
@@ -31,6 +32,7 @@ const { t } = useI18n();
 const status = ref<TokenStatus>('PENDING');
 const page = ref(1);
 const saving = ref(false);
+const selectedIds = ref<string[]>([]);
 
 const queueUrl = computed(() => {
   const params = new URLSearchParams({
@@ -55,6 +57,7 @@ const statusTabs = computed(() =>
 );
 
 const columns = computed<TableColumn[]>(() => [
+  ...(isPending.value ? [{ key: 'select', label: '', width: 'w-10' }] : []),
   { key: 'normalized', label: t('ADMIN.INCI_QUEUE.COL_TOKEN') },
   { key: 'rawSamples', label: t('ADMIN.INCI_QUEUE.COL_SAMPLES'), secondary: true },
   {
@@ -191,6 +194,54 @@ const reopenToken = (token: UnmatchedTokenDto) =>
     () => t('ADMIN.INCI_QUEUE.REOPENED'),
   );
 
+const isSelected = (id: string): boolean => selectedIds.value.includes(id);
+
+const selectableIds = computed(() => rows.value.map((row) => row.id));
+
+const areAllOnPageSelected = computed(
+  () => selectableIds.value.length > 0 && selectableIds.value.every(isSelected),
+);
+
+const selectedWithSuggestion = computed(
+  () => rows.value.filter((row) => isSelected(row.id) && row.suggestedIngredient).length,
+);
+
+const toggleSelection = (id: string) => {
+  selectedIds.value = isSelected(id)
+    ? selectedIds.value.filter((entry) => entry !== id)
+    : [...selectedIds.value, id];
+};
+
+const toggleAllOnPage = () => {
+  selectedIds.value = areAllOnPageSelected.value ? [] : [...selectableIds.value];
+};
+
+const clearSelection = () => {
+  selectedIds.value = [];
+};
+
+const runBulk = async (path: string) => {
+  const ids = [...selectedIds.value];
+  const result = await runMutation(
+    () =>
+      api<BulkResolutionDto>(`/admin/inci/queue/bulk/${path}`, { method: 'POST', body: { ids } }),
+    (summary) =>
+      t('ADMIN.INCI_QUEUE.BULK_DONE', {
+        resolved: summary.resolvedTokens,
+        skipped: summary.skippedTokens,
+        rows: summary.rematchedRows,
+      }),
+  );
+  if (result) {
+    clearSelection();
+  }
+};
+
+const acceptSelectedSuggestions = () => runBulk('accept-suggestion');
+const ignoreSelected = () => runBulk('ignore');
+
+watch([page, status], clearSelection);
+
 const searchIngredients = async (query: string) => {
   if (!query.trim()) {
     ingredientResults.value = [];
@@ -264,6 +315,38 @@ useSeo(() => ({
 
     <BaseErrorState v-if="error" @retry="refresh()" />
 
+    <div
+      v-if="isPending && rows.length"
+      class="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2"
+    >
+      <BaseCheckbox
+        :model-value="areAllOnPageSelected"
+        :label="$t('ADMIN.INCI_QUEUE.SELECT_ALL')"
+        @update:model-value="toggleAllOnPage"
+      />
+      <template v-if="selectedIds.length">
+        <span class="text-sm text-ink-muted">
+          {{ $t('ADMIN.INCI_QUEUE.BULK_SELECTED', { count: selectedIds.length }) }}
+        </span>
+        <span class="ml-auto flex flex-wrap gap-1.5">
+          <BaseButton
+            variant="secondary"
+            size="sm"
+            :disabled="saving || selectedWithSuggestion === 0"
+            @click="acceptSelectedSuggestions"
+          >
+            {{ $t('ADMIN.INCI_QUEUE.BULK_ACCEPT', { count: selectedWithSuggestion }) }}
+          </BaseButton>
+          <BaseButton variant="ghost" size="sm" :disabled="saving" @click="ignoreSelected">
+            {{ $t('ADMIN.INCI_QUEUE.BULK_IGNORE') }}
+          </BaseButton>
+          <BaseButton variant="ghost" size="sm" :disabled="saving" @click="clearSelection">
+            {{ $t('ADMIN.INCI_QUEUE.BULK_CLEAR') }}
+          </BaseButton>
+        </span>
+      </template>
+    </div>
+
     <AdminTable
       v-else
       :columns="columns"
@@ -271,6 +354,13 @@ useSeo(() => ({
       :loading="pending"
       :empty-title="$t('ADMIN.INCI_QUEUE.EMPTY')"
     >
+      <template #cell-select="{ row }">
+        <BaseCheckbox
+          :model-value="isSelected(row.id)"
+          :aria-label="$t('ADMIN.INCI_QUEUE.SELECT_ROW', { token: row.normalized })"
+          @update:model-value="toggleSelection(row.id)"
+        />
+      </template>
       <template #cell-normalized="{ row }">
         <span class="font-mono text-sm text-ink">{{ row.normalized }}</span>
       </template>

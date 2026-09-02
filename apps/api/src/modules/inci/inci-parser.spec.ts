@@ -1,6 +1,8 @@
 import { LABEL_FIXTURES } from './__fixtures__/labels';
 import {
   extractParentheticals,
+  joinHyphenatedToken,
+  looseSeparatorKey,
   normalizeToken,
   parseLabel,
   splitFragments,
@@ -74,5 +76,74 @@ describe('extractParentheticals', () => {
   it('collects alias candidates', () => {
     expect(extractParentheticals('Tocopheryl Acetate (Vitamin E)')).toEqual(['Vitamin E']);
     expect(extractParentheticals('Aqua')).toEqual([]);
+  });
+});
+
+describe('joinHyphenatedToken', () => {
+  it.each([
+    ['linalo - ol', 'linalool'],
+    ['to - copherol', 'tocopherol'],
+    ['citro - nellol', 'citronellol'],
+    ['zinc sul - fate', 'zinc sulfate'],
+    ['cel - lulose gum', 'cellulose gum'],
+    ['poly - ester-8', 'polyester-8'],
+    ['phenoxy- ethanol', 'phenoxyethanol'],
+    ['phenoxy -ethanol', 'phenoxyethanol'],
+  ])('rejoins a name the scanner broke across a line: %s', (token, expected) => {
+    expect(joinHyphenatedToken(token)).toBe(expected);
+  });
+
+  it.each([
+    'peg-100 stearate',
+    'c12-15 alkyl benzoate',
+    'alpha-isomethyl ionone',
+    '1,2-hexanediol',
+  ])('leaves a hyphen that belongs to the name alone: %s', (token) => {
+    expect(joinHyphenatedToken(token)).toBeNull();
+  });
+
+  it('offers no candidate for a token without a spaced hyphen', () => {
+    expect(joinHyphenatedToken('aqua')).toBeNull();
+  });
+
+  it('still only proposes for a genuine dash-separated list, which the caller rejects', () => {
+    expect(joinHyphenatedToken('aqua - glycerin')).toBe('aquaglycerin');
+  });
+});
+
+describe('looseSeparatorKey', () => {
+  it.each([
+    ['coco glucoside', 'coco-glucoside'],
+    ['coco caprylate caprate', 'coco-caprylate/caprate'],
+    ['beta carotene', 'beta-carotene'],
+    ['polyglyceryl-3-polyricinoleate', 'polyglyceryl-3 polyricinoleate'],
+    ['cocoglucoside', 'coco-glucoside'],
+  ])('gives %s and its dictionary spelling the same key', (token, dictionaryName) => {
+    expect(looseSeparatorKey(token)).toBe(looseSeparatorKey(dictionaryName));
+  });
+
+  it.each([
+    ['sodium chloride', 'sodium citrate'],
+    ['peg-100 stearate', 'peg-40 stearate'],
+  ])('keeps genuinely different names apart: %s vs %s', (first, second) => {
+    expect(looseSeparatorKey(first)).not.toBe(looseSeparatorKey(second));
+  });
+
+  it('leaves a name without separators untouched', () => {
+    expect(looseSeparatorKey('niacinamide')).toBe('niacinamide');
+  });
+});
+
+describe('foldToAscii homoglyphs', () => {
+  it('recovers a Latin word that a scanner spelled with a Cyrillic lookalike', () => {
+    expect(normalizeToken('\u0410qua')).toBe('aqua');
+  });
+
+  it('leaves an ordinary Latin token untouched', () => {
+    expect(normalizeToken('Aqua')).toBe('aqua');
+  });
+
+  it('does not invent letters for genuinely foreign prose', () => {
+    expect(normalizeToken('\uc0ac\uc6a9\uc744')).toBe('');
   });
 });

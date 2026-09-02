@@ -98,8 +98,48 @@ export const tokenize = (text: string): string[] => {
   return tokens.map((token) => token.replace(/^[\s*]+|[\s*.]+$/g, '')).filter(Boolean);
 };
 
+/**
+ * Scanned labels mix in Cyrillic and Greek lookalikes — "Аqua" starts with
+ * U+0410, not "A". Without this the letter is stripped as non-Latin and the
+ * word survives as "qua", which matches nothing.
+ */
+const HOMOGLYPHS: Record<string, string> = {
+  а: 'a',
+  в: 'b',
+  е: 'e',
+  к: 'k',
+  м: 'm',
+  н: 'h',
+  о: 'o',
+  р: 'p',
+  с: 'c',
+  т: 't',
+  у: 'y',
+  х: 'x',
+  і: 'i',
+  ѕ: 's',
+  ј: 'j',
+  α: 'a',
+  β: 'b',
+  ε: 'e',
+  η: 'n',
+  ι: 'i',
+  κ: 'k',
+  μ: 'm',
+  ν: 'v',
+  ο: 'o',
+  ρ: 'p',
+  τ: 't',
+  χ: 'x',
+};
+
 export const foldToAscii = (value: string): string =>
-  value.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
+  value
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/[\u0080-\uFFFF]/g, (character) => HOMOGLYPHS[character] ?? character);
 
 export const normalizeToken = (token: string): string => {
   const folded = foldToAscii(token)
@@ -112,6 +152,34 @@ export const normalizeToken = (token: string): string => {
   const ciNumber = CI_NUMBER.exec(folded);
   return ciNumber ? `ci ${ciNumber[1]}` : folded;
 };
+
+/** A hyphen with whitespace on either side; "peg-100" and "c12-15" are left alone. */
+const SPACED_HYPHEN = /\s*-\s+|\s+-\s*/g;
+
+/**
+ * Scanned labels break long names across lines, leaving "sodium hyature - nate"
+ * or "citro - nellol" in a single token. Joining is only ever a *candidate*:
+ * the caller must confirm the result against the dictionary, because the same
+ * shape also appears in genuine dash-separated lists ("aqua - glycerin").
+ */
+export const joinHyphenatedToken = (normalized: string): string | null => {
+  const joined = normalized.replace(SPACED_HYPHEN, '');
+  if (!joined || joined === normalized) {
+    return null;
+  }
+  return joined;
+};
+
+/** Hyphen, slash and space are interchangeable on labels: "Coco-Glucoside" vs "coco glucoside". */
+const LOOSE_SEPARATORS = /[- /]/g;
+
+/**
+ * Reduces a name to the letters and digits that carry its identity, so a label
+ * can be compared to the dictionary regardless of how either side punctuates
+ * the joins. Only ever a lookup key — never stored, never shown.
+ */
+export const looseSeparatorKey = (normalized: string): string =>
+  normalized.replace(LOOSE_SEPARATORS, '');
 
 export const extractParentheticals = (token: string): string[] =>
   Array.from(token.matchAll(/\(([^)]*)\)/g), (match) => match[1].trim()).filter(Boolean);

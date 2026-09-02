@@ -40,6 +40,7 @@ import {
   CreateMatchWeightSetDto,
   ImportLabelDto,
   MapTokenDto,
+  BulkTokenDto,
   UnmatchedTokenQueryDto,
   UpdateAppReviewStatusDto,
   UpdateUserDto,
@@ -176,6 +177,16 @@ export class AdminController {
   @ApiOperation({ summary: 'Label tokens that did not match the dictionary, most frequent first' })
   listUnmatchedTokens(@Query() query: UnmatchedTokenQueryDto) {
     return this.unmatchedTokens.list(query);
+  }
+  @Post('inci/queue/bulk/accept-suggestion')
+  @ApiOperation({ summary: 'Accept the shown suggestion for many tokens at once' })
+  acceptTokenSuggestions(@Body() dto: BulkTokenDto) {
+    return this.unmatchedTokens.acceptSuggestions(dto.ids);
+  }
+  @Post('inci/queue/bulk/ignore')
+  @ApiOperation({ summary: 'Ignore many tokens at once' })
+  ignoreTokens(@Body() dto: BulkTokenDto) {
+    return this.unmatchedTokens.ignoreMany(dto.ids);
   }
   @Post('inci/queue/:id/map')
   @ApiOperation({ summary: 'Record the token as an alias and re-match every product using it' })

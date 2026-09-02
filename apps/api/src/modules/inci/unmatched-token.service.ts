@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { AliasKind, TokenStatus, type Prisma } from '@prisma/client';
-import type { PaginatedResult, UnmatchedTokenDto } from '@kosvia/shared';
+import type { BulkResolutionDto, PaginatedResult, UnmatchedTokenDto } from '@kosvia/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ProductTraitsService } from '../scoring/product-traits.service';
 import { normalizeToken } from './inci-parser';
@@ -170,6 +170,48 @@ export class UnmatchedTokenService {
       select: TOKEN_SELECT,
     });
     return toDto(updated);
+  }
+
+  async ignoreMany(tokenIds: string[]): Promise<BulkResolutionDto> {
+    const { count } = await this.prisma.unmatchedToken.updateMany({
+      where: { id: { in: tokenIds }, status: 'PENDING' },
+      data: { status: 'IGNORED', resolvedAt: new Date() },
+    });
+    return { resolvedTokens: count, skippedTokens: tokenIds.length - count, rematchedRows: 0 };
+  }
+
+  /**
+   * Accepts the trigram suggestion the queue already shows for each token.
+   * A token without a suggestion is skipped rather than guessed at, and one
+   * whose text is already an alias of a different ingredient is left for a
+   * human — the same rule `mapToIngredient` enforces one at a time.
+   */
+  async acceptSuggestions(tokenIds: string[]): Promise<BulkResolutionDto> {
+    const tokens = await this.prisma.unmatchedToken.findMany({
+      where: { id: { in: tokenIds }, status: 'PENDING', suggestedIngredientId: { not: null } },
+      select: { id: true, suggestedIngredientId: true },
+    });
+
+    let resolvedTokens = 0;
+    let rematchedRows = 0;
+    for (const token of tokens) {
+      try {
+        const summary = await this.mapToIngredient(
+          token.id,
+          token.suggestedIngredientId as string,
+          'SYNONYM',
+        );
+        resolvedTokens += 1;
+        rematchedRows += summary.rematchedRows;
+      } catch {
+        continue;
+      }
+    }
+    return {
+      resolvedTokens,
+      skippedTokens: tokenIds.length - resolvedTokens,
+      rematchedRows,
+    };
   }
 
   async reopen(tokenId: string): Promise<UnmatchedTokenDto> {

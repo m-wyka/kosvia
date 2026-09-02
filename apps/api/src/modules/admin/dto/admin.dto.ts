@@ -129,6 +129,13 @@ export class MapTokenDto {
   @IsOptional() @IsEnum(AliasKind) kind?: AliasKind;
 }
 
+export class BulkTokenDto {
+  @IsArray()
+  @ArrayMaxSize(200)
+  @IsString({ each: true })
+  ids!: string[];
+}
+
 export class UpsertStoreDto {
   @IsString() @MaxLength(120) name!: string;
   @IsOptional() @IsString() @MaxLength(140) slug?: string;

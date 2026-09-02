@@ -810,3 +810,14 @@ export interface TokenResolutionDto {
   rematchedRows: number;
   affectedProducts: number;
 }
+
+/**
+ * Outcome of a bulk queue action. There is deliberately no product count: the
+ * same product can be reached through several tokens, so a total would
+ * double-count. Token and row counts are exact.
+ */
+export interface BulkResolutionDto {
+  resolvedTokens: number;
+  skippedTokens: number;
+  rematchedRows: number;
+}
