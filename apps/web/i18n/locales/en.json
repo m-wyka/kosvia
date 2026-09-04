@@ -268,8 +268,8 @@
     "HERO_BODY": "Kosvia analyses products, ingredients, prices and your personal preferences to help you choose better.",
     "CTA_SECONDARY": "Explore products",
     "STAT_PRODUCTS": "Products analysed",
-    "STAT_INGREDIENTS": "Ingredients decoded",
-    "STAT_STORES": "Stores compared",
+    "STAT_INGREDIENTS": "Ingredients in the database",
+    "STAT_ALLERGENS": "Fragrance allergens flagged",
     "HERO_CARD_REASON_1": "Matches your combination skin",
     "HERO_CARD_REASON_2": "Ceramides and panthenol for your barrier goal",
     "HERO_CARD_REASON_3": "Fragrance-free, within your budget",
@@ -313,7 +313,7 @@
       "EYEBROW": "Ingredient analysis",
       "TITLE": "The label, translated",
       "BODY": "INCI lists are ordered by how much of each ingredient is in the bottle. We read them that way — grouped by what each ingredient is actually doing, with position taken seriously.",
-      "POINT_1": "139 ingredients with plain-language descriptions",
+      "POINT_1": "32,000+ ingredients from the official EU glossary, the common ones described in plain language",
       "POINT_2": "Grouped into actives, hydration, soothing, base",
       "POINT_3": "Nothing is labelled “toxic” — we describe, you decide",
       "CTA": "Browse the ingredient library",
@@ -365,7 +365,7 @@
     },
     "RAIL": {
       "TITLE": "Strong formulas under 50 PLN",
-      "SUBTITLE": "Live from the catalogue — every card scored the same way yours will be."
+      "SUBTITLE": "Live from the catalogue — every product scored by the same method that will score yours."
     },
     "PRICE": {
       "EYEBROW": "Price comparison",
@@ -399,7 +399,7 @@
       "Q_5": "Is this medical advice?",
       "A_5": "No. Kosvia is a shopping assistant. It does not diagnose skin conditions and does not claim any product will treat one. For a persistent skin concern, see a dermatologist.",
       "Q_6": "Are the products and prices real?",
-      "A_6": "Not in this build. The catalogue is demo data — invented brands, generated prices and illustrated packaging — so the product can be evaluated before any retailer integration exists."
+      "A_6": "The products are: the catalogue comes from the open Open Beauty Facts database, and the ingredient knowledge from the EU CosIng glossary. Prices and stores are not, yet — until real retailers are connected, offers are generated so you can see how price comparison and alerts will work."
     },
     "CTA": {
       "TITLE": "You do not need to understand cosmetics. Kosvia will help you choose.",
@@ -765,7 +765,24 @@
       "CREATED": "Price alert created",
       "VIEW_ALERTS": "View alerts"
     },
-    "SIZES": "Available sizes"
+    "SIZES": "Available sizes",
+    "GALLERY": {
+      "ARIA": "Product gallery",
+      "PHOTO": "Photo",
+      "LABEL": "Label",
+      "TEXTURE": "Texture",
+      "INCI": "INCI list",
+      "MORE_INCI": " …and {count} more",
+      "ACTIVES_COUNT": "{count} active | {count} actives",
+      "NO_ACTIVES": "This formula has no highlighted actives.",
+      "TEXTURE_NOTE": "A shade generated from the product profile — a slot for the texture shot.",
+      "PLACEHOLDER": "Rendered from data",
+      "OPEN": "Enlarge: {name}",
+      "PREVIOUS": "Previous view",
+      "NEXT": "Next view",
+      "SHOW": "Show: {name}",
+      "COUNTER": "{current}/{total}"
+    }
   },
   "INGREDIENTS": {
     "TITLE": "Ingredient library",

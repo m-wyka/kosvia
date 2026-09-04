@@ -1,6 +1,12 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { BrandDto, CategoryDto, IngredientDto, StoreDto } from '@kosvia/shared';
+import type {
+  BrandDto,
+  CatalogStatsDto,
+  CategoryDto,
+  IngredientDto,
+  StoreDto,
+} from '@kosvia/shared';
 import { Public } from '../../common/decorators/public.decorator';
 import { RequestLocale } from '../../common/decorators/request-locale.decorator';
 import type { AnswerLocale } from '../../common/i18n/phrases';
@@ -53,5 +59,11 @@ export class CatalogController {
   @ApiOperation({ summary: 'Demo stores carrying offers' })
   stores(): Promise<StoreDto[]> {
     return this.catalog.stores();
+  }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Public catalogue counts for the landing page' })
+  stats(): Promise<CatalogStatsDto> {
+    return this.catalog.stats();
   }
 }

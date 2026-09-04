@@ -1,12 +1,13 @@
 <script setup lang="ts">
 const open = defineModel<boolean>('open', { required: true });
 
-withDefaults(defineProps<{ title?: string; description?: string; size?: 'sm' | 'md' | 'lg' }>(), {
-  size: 'md',
-});
+withDefaults(
+  defineProps<{ title?: string; description?: string; size?: 'sm' | 'md' | 'lg' | 'full' }>(),
+  { size: 'md' },
+);
 
 const titleId = useId();
-const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl' };
+const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl', full: 'max-w-5xl' };
 
 const lockPageScroll = (locked: boolean) => {
   if (import.meta.client) {

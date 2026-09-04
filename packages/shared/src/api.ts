@@ -798,6 +798,17 @@ export interface DiscoveryFeedDto {
   sections: DiscoverySectionDto[];
 }
 
+/**
+ * Public catalogue counts shown on the landing page. Counts are rounded down
+ * to stable marketing steps on the API side so they do not jump with every
+ * import run; render them with a trailing "+" where the rounding applies.
+ */
+export interface CatalogStatsDto {
+  analysedProducts: number;
+  knownIngredients: number;
+  fragranceAllergens: number;
+}
+
 export interface DashboardDto {
   user: UserDto;
   profile: BeautyProfileDto | null;

@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import type { DiscoveryFeedDto, ProductSummaryDto } from '@kosvia/shared';
+import type { CatalogStatsDto, DiscoveryFeedDto, ProductSummaryDto } from '@kosvia/shared';
 
-const { data: feed } = await useApiFetch<DiscoveryFeedDto>('/discover', {
-  key: 'landing-feed',
-  default: () => ({ sections: [] }) as DiscoveryFeedDto,
-});
+const [{ data: feed }, { data: catalogStats }] = await Promise.all([
+  useApiFetch<DiscoveryFeedDto>('/discover', {
+    key: 'landing-feed',
+    default: () => ({ sections: [] }) as DiscoveryFeedDto,
+  }),
+  useApiFetch<CatalogStatsDto>('/stats', { key: 'landing-stats' }),
+]);
 
 const highlights = computed<ProductSummaryDto[]>(
   () => feed.value?.sections.find((section) => section.key === 'recommended')?.products ?? [],
@@ -47,7 +50,7 @@ useHead({
 
 <template>
   <div>
-    <LandingHero :featured="featured" />
+    <LandingHero :featured="featured" :stats="catalogStats" />
 
     <LandingSteps />
 

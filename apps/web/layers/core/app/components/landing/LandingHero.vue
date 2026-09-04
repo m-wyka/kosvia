@@ -1,9 +1,24 @@
 <script setup lang="ts">
-import type { ProductSummaryDto } from '@kosvia/shared';
+import type { CatalogStatsDto, ProductSummaryDto } from '@kosvia/shared';
 
-defineProps<{ featured?: ProductSummaryDto | null }>();
+const FALLBACK_CATALOG_STATS: CatalogStatsDto = {
+  analysedProducts: 1200,
+  knownIngredients: 32000,
+  fragranceAllergens: 65,
+};
+
+const props = defineProps<{
+  featured?: ProductSummaryDto | null;
+  stats?: CatalogStatsDto | null;
+}>();
 
 const format = useFormat();
+const { n } = useI18n();
+
+const catalogStats = computed(() => props.stats ?? FALLBACK_CATALOG_STATS);
+const analysedProductsLabel = computed(() => `${n(catalogStats.value.analysedProducts)}+`);
+const knownIngredientsLabel = computed(() => `${n(catalogStats.value.knownIngredients)}+`);
+const fragranceAllergensLabel = computed(() => n(catalogStats.value.fragranceAllergens));
 </script>
 
 <template>
@@ -46,15 +61,15 @@ const format = useFormat();
         <dl class="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-7">
           <div>
             <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_PRODUCTS') }}</dt>
-            <dd class="font-display text-2xl text-ink">130+</dd>
+            <dd class="font-display text-2xl text-ink">{{ analysedProductsLabel }}</dd>
           </div>
           <div>
             <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_INGREDIENTS') }}</dt>
-            <dd class="font-display text-2xl text-ink">139</dd>
+            <dd class="font-display text-2xl text-ink">{{ knownIngredientsLabel }}</dd>
           </div>
           <div>
-            <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_STORES') }}</dt>
-            <dd class="font-display text-2xl text-ink">5</dd>
+            <dt class="text-xs text-ink-muted">{{ $t('LANDING.STAT_ALLERGENS') }}</dt>
+            <dd class="font-display text-2xl text-ink">{{ fragranceAllergensLabel }}</dd>
           </div>
         </dl>
       </div>

@@ -182,16 +182,7 @@ useBreadcrumbJsonLd(
     </nav>
 
     <div class="grid gap-8 lg:grid-cols-[minmax(0,26rem)_1fr] lg:gap-12">
-      <div>
-        <ProductImage
-          :src="product.imageUrl"
-          :alt="`${product.brand.name} ${product.name}`"
-          ratio="square"
-          eager
-          sizes="(max-width: 1024px) 100vw, 26rem"
-          class="rounded-xl border border-line"
-        />
-      </div>
+      <ProductGallery :product="product" />
 
       <div class="min-w-0">
         <NuxtLinkLocale

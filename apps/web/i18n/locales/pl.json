@@ -268,8 +268,8 @@
     "HERO_BODY": "Kosvia analizuje produkty, składy, ceny i Twoje preferencje, żeby pomóc Ci wybrać lepiej.",
     "CTA_SECONDARY": "Przeglądaj produkty",
     "STAT_PRODUCTS": "Przeanalizowanych produktów",
-    "STAT_INGREDIENTS": "Rozszyfrowanych składników",
-    "STAT_STORES": "Porównywanych sklepów",
+    "STAT_INGREDIENTS": "Składników w bazie",
+    "STAT_ALLERGENS": "Wykrywanych alergenów zapachowych",
     "HERO_CARD_REASON_1": "Pasuje do Twojej skóry mieszanej",
     "HERO_CARD_REASON_2": "Ceramidy i pantenol pod Twój cel: barierę",
     "HERO_CARD_REASON_3": "Bezzapachowy, w Twoim budżecie",
@@ -287,7 +287,7 @@
       },
       "STEP_2": {
         "TITLE": "Czytamy składy INCI",
-        "BODY": "Każdy produkt rozkładamy na czynniki w oparciu o własną bazę składników — pozycja po pozycji, bez zgadywania."
+        "BODY": "Każdy produkt rozkładamy na czynniki pierwsze w oparciu o własną bazę składników — pozycja po pozycji, bez zgadywania."
       },
       "STEP_3": {
         "TITLE": "Dostajesz dopasowanie",
@@ -313,7 +313,7 @@
       "EYEBROW": "Analiza składu",
       "TITLE": "Skład, przetłumaczony",
       "BODY": "Listy INCI są uporządkowane według zawartości. Tak je czytamy — grupując po tym, co dany składnik faktycznie robi, i traktując pozycję poważnie.",
-      "POINT_1": "139 składników opisanych zwykłym językiem",
+      "POINT_1": "Ponad 32 000 składników z unijnego słownika, najczęstsze opisane zwykłym językiem",
       "POINT_2": "Pogrupowane na aktywne, nawilżające, łagodzące, bazowe",
       "POINT_3": "Nic nie jest „toksyczne” — my opisujemy, Ty decydujesz",
       "CTA": "Przeglądaj bazę składników",
@@ -352,7 +352,7 @@
       "DEMO_GAP_BODY": "Krok o najbardziej oczywistym długofalowym wpływie na skórę."
     },
     "AI": {
-      "TITLE": "Zapytaj tak, jak zapytałabyś koleżanki",
+      "TITLE": "Zapytaj tak, jak pyta się koleżankę",
       "BODY": "„Potrzebuję kremu do 70 zł do cery mieszanej i wrażliwej”. Kosvia najpierw przeszukuje własny katalog, a dopiero potem pisze odpowiedź wokół prawdziwych produktów.",
       "POINT_1": "Oparte na Twoim profilu i Twojej półce",
       "POINT_2": "Prawdziwe produkty i prawdziwe ceny, za każdym razem",
@@ -365,7 +365,7 @@
     },
     "RAIL": {
       "TITLE": "Mocne formuły do 50 zł",
-      "SUBTITLE": "Prosto z katalogu — każda karta oceniona tak samo, jak będą oceniane Twoje."
+      "SUBTITLE": "Prosto z katalogu — każdy produkt oceniony tą samą metodą, która policzy Twoje dopasowanie."
     },
     "PRICE": {
       "EYEBROW": "Porównanie cen",
@@ -399,7 +399,7 @@
       "Q_5": "Czy to porada medyczna?",
       "A_5": "Nie. Kosvia to asystent zakupowy. Nie diagnozuje problemów skórnych i nie twierdzi, że jakikolwiek produkt je wyleczy. Przy utrzymującym się problemie skonsultuj się z dermatologiem.",
       "Q_6": "Czy produkty i ceny są prawdziwe?",
-      "A_6": "W tej wersji nie. Katalog to dane demonstracyjne — wymyślone marki, wygenerowane ceny i ilustrowane opakowania — żeby dało się ocenić produkt, zanim powstanie integracja z jakimkolwiek sklepem."
+      "A_6": "Produkty tak: katalog pochodzi z otwartej bazy Open Beauty Facts, a wiedza o składnikach z unijnego słownika CosIng. Ceny i sklepy jeszcze nie — zanim podłączymy prawdziwe drogerie, oferty generujemy sami, żeby dało się zobaczyć, jak działa porównywarka i alerty cenowe."
     },
     "CTA": {
       "TITLE": "Nie musisz znać się na kosmetykach. Kosvia pomoże Ci wybrać.",
@@ -765,7 +765,24 @@
       "CREATED": "Alert cenowy utworzony",
       "VIEW_ALERTS": "Zobacz alerty"
     },
-    "SIZES": "Dostępne pojemności"
+    "SIZES": "Dostępne pojemności",
+    "GALLERY": {
+      "ARIA": "Galeria produktu",
+      "PHOTO": "Zdjęcie",
+      "LABEL": "Etykieta",
+      "TEXTURE": "Tekstura",
+      "INCI": "Skład INCI",
+      "MORE_INCI": " …i jeszcze {count}",
+      "ACTIVES_COUNT": "{count} aktyw | {count} aktywy | {count} aktywów",
+      "NO_ACTIVES": "Ta formuła nie ma wyróżnionych aktywów.",
+      "TEXTURE_NOTE": "Odcień wygenerowany z profilu produktu — miejsce na zdjęcie tekstury.",
+      "PLACEHOLDER": "Wizualizacja z danych",
+      "OPEN": "Powiększ: {name}",
+      "PREVIOUS": "Poprzedni kadr",
+      "NEXT": "Następny kadr",
+      "SHOW": "Pokaż: {name}",
+      "COUNTER": "{current}/{total}"
+    }
   },
   "INGREDIENTS": {
     "TITLE": "Baza składników",

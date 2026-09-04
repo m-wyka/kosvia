@@ -1,18 +1,54 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import type { BrandDto, CategoryDto, IngredientDto, StoreDto } from '@kosvia/shared';
+import type {
+  BrandDto,
+  CatalogStatsDto,
+  CategoryDto,
+  IngredientDto,
+  StoreDto,
+} from '@kosvia/shared';
 import type { AnswerLocale } from '../../common/i18n/phrases';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { normalizeToken } from '../inci/inci-parser';
 import { toIngredientDto } from '../products/product.mapper';
 import { INGREDIENT_INCLUDE } from '../products/product.select';
+import { publicProductWhere } from '../products/product-visibility';
 
 const MAX_INGREDIENT_RESULTS = 200;
+const STATS_CACHE_TTL_MS = 60 * 60 * 1000;
+const PRODUCT_STAT_STEP = 100;
+const INGREDIENT_STAT_STEP = 1000;
+
+const roundDownToStep = (value: number, step: number): number => Math.floor(value / step) * step;
 
 /** Read-only reference data: brands, the category tree, ingredients and stores. */
 @Injectable()
 export class CatalogService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private statsCache: { value: CatalogStatsDto; expiresAt: number } | null = null;
+
+  /**
+   * Landing-page counts, cached for an hour and rounded down to stable steps
+   * so the numbers do not jump with every import run.
+   */
+  async stats(): Promise<CatalogStatsDto> {
+    if (this.statsCache && this.statsCache.expiresAt > Date.now()) {
+      return this.statsCache.value;
+    }
+    const [products, ingredients, fragranceAllergens] = await this.prisma.$transaction([
+      this.prisma.product.count({ where: publicProductWhere() }),
+      this.prisma.ingredient.count(),
+      this.prisma.ingredient.count({ where: { isFragranceAllergen: true } }),
+    ]);
+    const value: CatalogStatsDto = {
+      analysedProducts: roundDownToStep(products, PRODUCT_STAT_STEP),
+      knownIngredients: roundDownToStep(ingredients, INGREDIENT_STAT_STEP),
+      fragranceAllergens,
+    };
+    this.statsCache = { value, expiresAt: Date.now() + STATS_CACHE_TTL_MS };
+    return value;
+  }
 
   async brands(): Promise<BrandDto[]> {
     const brands = await this.prisma.brand.findMany({
